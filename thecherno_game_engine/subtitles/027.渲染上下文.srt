@@ -1,0 +1,1210 @@
+﻿1
+00:00:00,133 --> 00:00:05,366
+嘿，你们好，我是TheCherno，欢迎回到我的游戏引擎系列，说这话的感觉真好
+hey, every guys, my name is TheCherno, welcome back to my game engine series, feels so good to say that
+
+2
+00:00:05,366 --> 00:00:13,075
+离上一期已经很久了，我现在结婚了，所以我们终于可以回到这个游戏引擎了，是吗
+it's been so long since the last episode, I am now married, so finally we can get back to this game engine, am I, right
+
+3
+00:00:14,366 --> 00:00:17,225
+那可能是你们所有人都在想的，我的意思是我对婚礼很满意
+that's probably what all of you have been thinking, I mean I'm very happy with the wedding
+
+4
+00:00:17,225 --> 00:00:22,925
+一切都进行得非常非常好，所有这些都不能说，游戏引擎在我的脑海中，但现在
+everything went really really well, and all of that can't say, that the game engine was on my mind, but it is now
+
+5
+00:00:23,100 --> 00:00:28,025
+所以我们要重新开始，我们最终要开始渲染，因为我想渲染
+so we're gonna get right back into it, and we're finally gonna start on rendering, because I feel like rendering
+
+6
+00:00:28,425 --> 00:00:33,025
+嗯，我一直在等着做一件大事，但我没有时间，但现在我有了更多的时间
+well, there's a huge kind of thing that I was waiting to do, and didn't have time, but now I've got a lot more time
+
+7
+00:00:33,133 --> 00:00:39,050
+所以我们要直接跳到这一步，开始我们的旅程，为Hazel创建一个渲染器
+so we're going to just jump right on into this, and begin our journey into creating a renderer up for Hazel
+
+8
+00:00:39,400 --> 00:00:44,125
+首先，我只想向所有patreon的支持者表示衷心的感谢，他们让这个系列成为可能
+first of all, I just want to give a huge thank you to all the patreon supporters that actually made this series possible
+
+9
+00:00:44,125 --> 00:00:48,141
+你们可以访问patreon.com/thecherno，并在那里帮助支持该系列
+you can head on over to patreon.com/thecherno, and help support the series there
+
+10
+00:00:48,366 --> 00:00:51,450
+它可以访问我为Hazel编写的代码
+it'll get stuff like access to the code that I've already written for Hazel
+
+11
+00:00:51,450 --> 00:00:56,425
+这是我自己的私人开发分支版本的Hazel，它比你们在这里看到的要先进得多
+which is kind of my own private development branch version of Hazel, it's a lot more advanced than what you see here
+
+12
+00:00:56,975 --> 00:01:00,073
+就像前面很多视频一样
+and like very very many videos essentially ahead
+
+13
+00:01:00,600 --> 00:01:04,950
+你们还可以通过私人频道与我交流，做其他事情
+and you'll also get access like private channels where you can talk to me in do a whole bunch of other stuff
+
+14
+00:01:04,950 --> 00:01:10,450
+非常感谢你们一如既往的慷慨支持这一系列节目的人们，好了
+so huge thank you as always for those people, who are generous enough to support this series, okay
+
+15
+00:01:10,575 --> 00:01:17,533
+所以关于渲染器，我们渲染器需要做的第一件事，就是回顾一下Hazel的渲染架构
+so renderer, the first thing that we need for our renderer, and we kind of went over the rendering architecture of Hazel
+
+16
+00:01:17,533 --> 00:01:20,225
+如果你们还没看过那期视频的话，一定要看看
+if you guys haven't seen that video, definitely check that out
+
+17
+00:01:20,500 --> 00:01:25,375
+最后一期也是把Hazel做成一个静态库，把所有的东西都清理干净
+last episode as well was the whole kind of making Hazel into a static library and cleaning everything up
+
+18
+00:01:25,625 --> 00:01:32,966
+我真的很高兴我们做到了这一切，因为现在我的意思是编译时没有警告，一切都准备好了
+I'm really really happy that we did all that, because now I mean this compiles with 0 warnings, everything is just ready to go
+
+19
+00:01:32,966 --> 00:01:40,275
+这是一个静态库，我们可以继续开发，那是一个非常好的状态
+it's a static library, it's all kind of just ready for us to continue development, and that's a really good state to kind of be
+
+20
+00:01:40,275 --> 00:01:45,950
+对于像渲染器这样大的东西，我的意思是我很想从开始到结束
+and for something as big as the renderer, and I mean as much as I'd like to just ride around or from start to finish
+
+21
+00:01:45,950 --> 00:01:49,533
+很明显，我们会做一些令人兴奋的事情，就像我在某个时候可能会做的那样
+there's obviously going to be exhilary stuff that we kind of do, like I will probably at some point
+
+22
+00:01:49,533 --> 00:01:55,900
+我想写一些ImGui类的小部件，所以我甚至想使用我们在ImGui中拥有的这种dock
+I'd want to write some ImGui kind of widget, so I just like maybe even use this kind of docking library that we have in ImGui
+
+23
+00:01:55,900 --> 00:02:00,299
+要创建某种程度上类似于编辑器或界面的东西，它不会像爆炸一样
+to create somewhat of like an editor or an interface, it's not going to be like bang
+
+24
+00:02:00,300 --> 00:02:04,575
+让我们从一无所有变成一种完整的PBR延迟渲染器
+let's just go from nothing to having like a full kind of PBR deferred renderer
+
+25
+00:02:04,800 --> 00:02:11,825
+所有的事情都是这样处理的，所有的事情都没有，休息一下，会有一些我很关心的地方
+that does everything and processing and everything just kind of without, taking a break, there are gonna be bits in which I'm like a care
+
+26
+00:02:11,825 --> 00:02:16,100
+好吧，现在让我们把重点放在其他事情上，所以不希望你们太失望，如果发生这种情况
+well now let's focus on something else, so I just don't want you guys to be too disappointed, if that happens
+
+27
+00:02:16,100 --> 00:02:24,666
+我要写这个渲染器，就像我写渲染器一样，不会有任何类似于我所做的修改
+I'm going to write this renderer, as I would write a renderer, there's not gonna be any kind of like modification that I'm doing
+
+28
+00:02:24,666 --> 00:02:30,275
+因为这是一个视频系列，我只是有点按我的方式做，希望那是你们会喜欢的东西
+just because this is a video series, I'm just kinda kinda do it my way, and hopefully that's kind of something that you guys will be into
+
+29
+00:02:30,275 --> 00:02:36,150
+但我们拭目以待，显然我总是乐于接受反馈，评论部分对我来说真的很重要
+but we'll see, obviously I'm always open to feedback, and the comments section is really important to me
+
+30
+00:02:36,150 --> 00:02:42,075
+我的意思是我过去喜欢看diff，复制我之前写的代码，但很明显你们不喜欢那样
+I mean I used to just like look at diff, and copy the code that I wrote earlier, but clearly you guys didn't like that
+
+31
+00:02:42,075 --> 00:02:46,150
+所以我现在对代码进行了现场测试，我甚至不知道今天要写什么代码
+so I've now rattled code live to the point, where I'd actually don't even know what code I'm gonna write today
+
+32
+00:02:46,400 --> 00:02:51,375
+但希望一切都会好起来，不管怎样，闲聊够了，让我们谈谈我们今天到底在做什么
+but hopefully it's gonna be good, anyway, enough chit chat, let's talk about what we're actually doing today
+
+33
+00:02:51,375 --> 00:02:58,100
+因此，渲染器需要的第一个东西是上下文，我们需要渲染上下文，现在我们已经渲染了
+so the first thing that we need for a renderer is a context, we need a rendering context, now we have rendered
+
+34
+00:02:58,533 --> 00:03:03,200
+我真的不知道我们以前在Hazel中渲染过三角形和OpenGL吗，因为他们不记得了
+have we rendered the triangle and OpenGL in Hazel before, I don't actually know, because they don't remember
+
+35
+00:03:03,550 --> 00:03:06,999
+但我们需要一个渲染上下文，同样，渲染架构视频非常有用
+but we need a rendering context, again, that rendering architecture video is really useful
+
+36
+00:03:06,999 --> 00:03:15,125
+我之所以一直在谈论那个，是因为它包含了我们需要一个渲染接口的事实
+and that kind of cover the reason I keep talking about is, is because it kind of covers the fact that we need a rendering api
+
+37
+00:03:15,500 --> 00:03:19,400
+就像渲染器和渲染接口一样，这是渲染接口的一部分
+like a renderer and then a rendering api, right, this is part of the rendering api
+
+38
+00:03:19,400 --> 00:03:24,275
+这对于我们为用户使用的每个接口所代理的每个渲染器来说都是不同的
+this is something that's going to be different for each renderer that we act for the user for each api that we use
+
+39
+00:03:24,666 --> 00:03:28,725
+所以说接口，我指的是OpenGL DirectX、Vulcan之类的东西
+so by api, I mean things like OpenGL DirectX, Vulcan, that kind of stuff
+
+40
+00:03:28,725 --> 00:03:32,699
+对吧，我们需要方法来创建接口的上下文
+right, and we need a way to create context for that api
+
+41
+00:03:32,700 --> 00:03:39,450
+所以在OpenGL中，它非常简单，事实上glfw为我们处理了几乎所有的内容，它非常简单
+so in OpenGL, it's really really simple, and in fact glfw handles pretty much all of it for us, it's super simple
+
+42
+00:03:39,975 --> 00:03:45,075
+对于Vulcan来说，要复杂得多，就像其他一样，对吧，我们除了做这些之外
+for Vulcan, it's a lot more complicated, like everything else is, right, we need to create apart from like doing things
+
+43
+00:03:45,075 --> 00:03:49,450
+就像选择逻辑和物理设备一样，这意味着只需选择要使用的GPU
+like picking the logical and physical device, which means just picking which GPU to use
+
+44
+00:03:49,450 --> 00:03:55,875
+然后为它和其他东西创建一个类似于Vulcan的设备，我们还需要创建交换链之类的东西
+and then creating like a kind of a Vulcan side device for it and all that stuff, we also need to create things like the swap chain
+
+45
+00:03:56,800 --> 00:04:01,968
+这要简单得多，因为我们首先要从OpenGL开始，别担心，我们会接触Vulcan的
+this this is a lot more simple, because we're dealing with our OpenGL to begin with, don't worry, we will get the Vulcan
+
+46
+00:04:02,300 --> 00:04:07,374
+Hazel将在未来的某个时候支持Vulcan，当我们接触Vulcan的时候，我们会跨越那个
+Hazel will support Vulcan at some point in the future, and we'll kind of cross that bridge, when we get that there
+
+47
+00:04:08,050 --> 00:04:12,666
+但现在在OpenGL中，它非常简单，所以我现在不打算创建10亿个类
+but for now in OpenGL, it's dead simple, so I'm not going to create a billion classes right now
+
+48
+00:04:12,666 --> 00:04:16,846
+我们的十亿个文件可以做所有这些不同的抽象的事情，直到我们真正需要
+our billion files that kind of do all of these different abstract things, until we actually need to
+
+49
+00:04:17,266 --> 00:04:23,600
+但我将创建一个OpenGLContext的文件，它将包含OpenGL实际渲染所需的所有东西
+but I will create an OpenGL context kind of file, which will contain everything that OpenGL needs to actually render things
+
+50
+00:04:24,100 --> 00:04:31,125
+我们将决定如何将其从Window类中抽象出来，它现在就在Window类中
+and we're gonna kind of decide how we abstract that away from basically the window class in which it kind of it kind of lives there right now
+
+51
+00:04:31,933 --> 00:04:39,225
+因为很明显，我们已经编写了上下文创建和交换链代码，还有什么要说的呢
+because obviously we have written the kind of context creation and also the swap chain code, what else is there to say really
+
+52
+00:04:39,466 --> 00:04:44,075
+我现在只想跳到Hazel，看看我们是否有一个三角形，如果我们能在屏幕上看到一个三角形
+I just want to jump into Hazel right now, and take a look at if we have a triangle, if we can get a triangle on the screen
+
+53
+00:04:44,400 --> 00:04:50,150
+然后我们将开始实际剥离代码并创建上下文类，我们将讨论
+and then we'll start actually kind of stripping that code out and creating our context class, and we'll kind of talk about
+
+54
+00:04:50,375 --> 00:04:55,894
+我们为什么要做那个，以及它将如何运行，所以让我们跳转到代码中，看看我们有什么
+why we're doing that, and how it's gonna work as well, so let's just jump on over into the code, and see what we have
+
+55
+00:04:56,133 --> 00:05:03,733
+好了，这是Window类，更具体地说，这是WindowsWindow类，在我们的初始化代码中
+alright, so this is the Window class, this is the WindowsWindow class to be more specific, so inside our initialization code
+
+56
+00:05:03,733 --> 00:05:10,575
+我们有这三行代码，对吧，如果我们看一下它的实际作用，也就是MakeContextCurrent
+we kind of have these 3 lines, right, we have this MakeContextCurrent, if we look at what that actually does
+
+57
+00:05:11,575 --> 00:05:17,950
+你们会看到这个窗口基本上有一个上下文类，对吧，它与我们现在实际做的非常相似
+you'll see that basically this window has a context class, right, it's very similar to what we're actually doing now
+
+58
+00:05:18,466 --> 00:05:22,575
+我们有一个Window类，在这种情况下，那就是我们的WindowsWindow
+we've got a Window class, that's kind of our you know WindowsWindow in this case
+
+59
+00:05:23,466 --> 00:05:28,825
+但是，我们所没有的，我们需要的，以及这期的目的就是创建这个上下文类
+but then what we don't have, and what we need, and what the purpose of this episode is, is to create this context class
+
+60
+00:05:29,866 --> 00:05:36,650
+这个Context类将基本上包含特定的上下文，所以图形呈现特定于上下文
+and this Context class is going to basically contain context specifics, so graphics kind of rendering context specific
+
+61
+00:05:36,650 --> 00:05:40,100
+所以在其他方面，OpenGL在这个意义上是特定的代码
+so in other ways, OpenGL specific in this sense code
+
+62
+00:05:40,100 --> 00:05:43,599
+对吧，所以这个window->context.makeCurrent
+right, so this window->context.makeCurrent
+
+63
+00:05:43,600 --> 00:05:49,946
+同样，glfw将根据你们使用的上下文（可能是OpenGL类或Vulcan）进行操作
+again is something the glfw will do based on the context that you're using could be OpenGL classes or Vulcan
+
+64
+00:05:50,625 --> 00:05:54,700
+那基本上就是它要做的，它只会接收window句柄
+that's essentially what that will do, it will just kind of take the window handle
+
+65
+00:05:54,700 --> 00:06:00,675
+然后将该window句柄设置为我们实际使用的渲染接口的渲染目标或上下文
+and then set that window handle as the rendering target or context for the rendering api that we're actually using
+
+66
+00:06:01,575 --> 00:06:07,300
+glfw会为我们做那个，这样我们就不必像Windows特定的代码那样去设置OpenGL
+and glfw will kind of do that for us, so that we don't actually have to touch like Windows specific code to set up an OpenGL
+
+67
+00:06:07,733 --> 00:06:14,700
+Vulcan的上下文也一样，所以他们从Vulcan.dll中检索某些指针来为Windows设置
+kind of context same with the Vulcan as well, and so they're kind of retrieving certain pointers from the Vulcan dll to set this up for windows
+
+68
+00:06:14,925 --> 00:06:23,000
+那基本上是通过khr扩展chronos扩展完成的，而不是做最后的事情，而是为我们做的
+and that's you know done via essentially khr extensions chronos extensions, instead of doing the last stuff, kind of does it for us
+
+69
+00:06:23,000 --> 00:06:27,517
+很多错，对于Vulcan，我们可能也会使用glfw
+which is great, for Vulcan, we probably will use glfw as well
+
+70
+00:06:27,600 --> 00:06:33,466
+虽然在我自己的个人项目中，Vulcan总是手动完成所有事情，所以我们将再次看到
+although in my kind of own personal Vulcan projects have always done everything manually, so we'll see again
+
+71
+00:06:33,466 --> 00:06:39,200
+正如我所说，当接触那些时，我们将跨越困难，现在正用OpenGL，因为它是能用的最简单的
+as I said, we'll cross that bridge, when we get there, we're doing OpenGL for now, because it's it's the most simple api to use
+
+72
+00:06:40,266 --> 00:06:45,875
+然后是SwapBuffers，对吧，就是我说的交换通道，非常简单，它不适合我们，对吧
+and then there's SwapBuffers, right, which is the swap channel I'm talking about again, super simple, it doesn't for us, right
+
+73
+00:06:46,333 --> 00:06:50,450
+所以我们基本上需要调用这行代码，但我不想从window执行这行代码
+so we essentially need to call this Lana code, and this line code, but I don't want to do it from the window
+
+74
+00:06:50,800 --> 00:06:59,900
+我想从实际的Context类执行，你们可能会想，如果glfw已经抽象了，我们为什么要搞那个
+I want to do it from the actual Context class, and you might be like why why are we doing that, if glfw already abstruct stuff for us
+
+75
+00:06:59,900 --> 00:07:01,850
+为什么我们要添加另一个抽象层
+why are we adding another layer of abstraction
+
+76
+00:07:02,266 --> 00:07:09,125
+原因是这肯定不是我们想要支持的全部，毕竟glfw支持OpenGL和Vulcan，这太棒了
+the reason is this is definitely not all we want to support, glfw supports OpenGL and Vulcan, which is fantastic
+
+77
+00:07:09,466 --> 00:07:15,175
+但我们真正需要的是对DirectX和Metal的支持，对吧，甚至可能是其他接口
+but what we actually need is also support for DirectX and Metal, right, possible even other apis
+
+78
+00:07:15,176 --> 00:07:20,400
+如果我们，比如，我不知道，比如PS4或者其他，我想要以后证明，基本上就是我要说的
+if we, like, I don't know, go onto the PS 4 or anything, I want a kind of future proof, there's basically what I'm saying
+
+79
+00:07:20,400 --> 00:07:26,975
+但DirectX将百分百支持，几乎可以肯定的是，Metal也将得到支持，但在未来会进一步下降
+but DirectX will hundred percent be supported, Metal as well almost definitely, but way further down in the future
+
+80
+00:07:27,925 --> 00:07:31,725
+因此，我们不能在这儿调用glfwMakeContextCurrent 
+so because of that, we can't just have glfwMakeContextCurrent here
+
+81
+00:07:32,000 --> 00:07:35,500
+对吧，因为意味着每个Window都是我们曾创建的Window
+right, because this implies that every Window is Window that we ever make
+
+82
+00:07:35,750 --> 00:07:39,600
+也就是初始化glfwContext，glfwContext意味着
+will initialize a glfwContext, glfwContext means that
+
+83
+00:07:39,600 --> 00:07:46,325
+要么OpenGL要么Vulcan，那么从这段代码中到底怎么得到DirectX上下文，做不到，对吧
+it's going to be either OpenGL or Vulcan, so how on earth from this code do, we say we want a DirectX context, we can't, right
+
+84
+00:07:46,666 --> 00:07:52,128
+那是一个问题，这就是为什么需要将其抽象为一个类，我们将基本上就叫它OpenGLContext
+and that's a problem, which is why this needs to be abstracted out into a class that we're going to call OpenGLContext essentially
+
+85
+00:07:53,366 --> 00:07:57,150
+然后这当然也会加载OpenGL，某种扩展，对吧
+and then this of course also loads OpenGL, kind of extensions, right
+
+86
+00:07:57,600 --> 00:08:03,533
+再说一次，DirectX甚至Vulcan都不需要那样做，所以这些东西实际上是特定于接口的
+again, not something that needs to be done for DirectX or even for Vulcan, so this stuff is really kind of api specific
+
+87
+00:08:03,533 --> 00:08:09,450
+那是一个目标，把那个东西移出去并创建自己的类
+and that's kind of the goal, it's going to be to kind of move that stuff out and create it, kind of put it into its own class
+
+88
+00:08:09,750 --> 00:08:15,225
+同样，那个类的实现将取决于我们实际选择的接口
+which again will, the implementation of that class will be dependent on which api we actually pick
+
+89
+00:08:15,825 --> 00:08:20,300
+而且我的意思是，接口也将在运行时被选中，对吧，所以在运行时
+and also I mean apis are going to be picked at runtime as well, right, so at runtime
+
+90
+00:08:20,566 --> 00:08:27,766
+比如我们运行OpenGL Vulcan或DirectX，就能够决定使用Windows，因为它支持这3个
+we'll be able to decide on Windows, for example if we run OpenGL Vulcan or DirectX, since that platform supports all 3
+
+91
+00:08:30,175 --> 00:08:35,150
+如果向下滚动点，看到OnUpdate，就会有glfwPollEvents，很好，但也有glfwSwapBuffers
+and then if we scroll down a bit and OnUpdate, we've got PollEvents, which is great, but then we've got SwapBuffers
+
+92
+00:08:35,700 --> 00:08:43,150
+同样，这是窗口的OnUpdate函数，这是我们想要刷新窗口的时候，所以那并不是真正的
+again this is kind of the window OnUpdate function, this is when we want to refresh our window, so that's not something that really kind of
+
+93
+00:08:43,550 --> 00:08:50,825
+要知道，glfwSwapBuffers并不是我们真正为DirectX或Metal或正用的接口所做的事情
+you know, this glfwSwapBuffers is not something that we really do for you know DirectX or Metal or whatever we're using
+
+94
+00:08:50,825 --> 00:08:53,475
+我的意思是它不会是Metal，对吧，因为这是WindowsWindow
+I mean it's not gonna be Metal, right, because this is WindowsWindow
+
+95
+00:08:53,825 --> 00:08:57,175
+但不管怎样，对于DirectX，这就不是我们想要的
+but anyway, for DirectX, not something we want
+
+96
+00:08:58,250 --> 00:09:03,875
+这将是完全不同的，对吧，所以正因为如此，我们需要，我们不能只执行glSwapBuffers
+it'll be completely different, right, so because of that, we need to, we can't just do glSwapBuffers
+
+97
+00:09:03,875 --> 00:09:11,775
+我们基本上需要做些事情，比如m_Context.SwapBuffers()，现在这甚至可能是你们知道的
+we need to essentially do something like m_Context, you know, SwapBuffers, now this might even be something like you know
+
+98
+00:09:11,775 --> 00:09:17,650
+如果我们真的想变得酷，那可能就是，你们知道的，m_Context.GetSwapChain()()
+if we wanted to really be cool, it might have been be context, you know, it GetSwapChain
+
+99
+00:09:18,100 --> 00:09:22,733
+然后你们知道，Flush()，或者我不知道它可能是，接口可能会随着时间的推移而改变
+and then you know, flush, or I don't know it might be, the api will probably change over time
+
+100
+00:09:22,733 --> 00:09:29,100
+特别是如果我们决定实现Vulcan，就像不是那种通过glfw的方式
+especially if we decide to implement Vulcan as is like kind of not a through glfw kind of route
+
+101
+00:09:29,566 --> 00:09:34,350
+因为那确实简化了的，但我们会看到，你们知道，在这种情况下，可能必须从根本上做这些
+because that does simplify things, but we'll see, you know, in that case, we might have to do stuff like this essentially
+
+102
+00:09:34,350 --> 00:09:40,675
+我们可能必须为所有接口建立抽象才能做到那个，但目前我认为那还是挺不错的
+and we might have to set up abstractions for all the apis to be able to do that, but for now I think that's pretty good
+
+103
+00:09:41,600 --> 00:09:46,350
+你们知道，m_Context.SwapBuffers()是有意义的，而且它显然会接触SwapChain
+context you know, SwapBuffers is kind of makes sense, and it's clearly gonna touch the SwapChain
+
+104
+00:09:46,350 --> 00:09:49,200
+所以我现在对这种接口很满意
+so I'm pretty happy with this kind of api for now
+
+105
+00:09:49,200 --> 00:09:57,800
+所以我们就把它放在那里，这样我们马上就可以把空白填好，这儿也一样，很简单
+so we'll kind of just leave that there, just so that we can fill in the blanks in a minute, here as well, pretty simple
+
+106
+00:09:59,800 --> 00:10:06,775
+很可能就是m_Context = new OpenGLContext()，那将只是在那里创建上下文
+could definitely be something like contexts equals new OpenGLContext, and that will kind of just create the contexts there
+
+107
+00:10:07,100 --> 00:10:12,850
+我其实不想做那个，虽然我真的要这么做，但m_Context可能是一个变量
+I don't actually want to do that though I'm actually going to, the context is probably going to be a staff variable
+
+108
+00:10:12,850 --> 00:10:18,125
+它只是自动初始化，并可能执行一些检查以确保它实际上是有效的
+that just gets initialized automatically, and may perform some checks to make sure, it's actually valid
+
+109
+00:10:18,850 --> 00:10:25,550
+我只是在想我想怎么做，嗯，现在有一个栈变量可能不是最好的选择
+I'm just thinking about how I want to do this, mmm now having a stack variable probably isn't the best thing to do
+
+110
+00:10:25,550 --> 00:10:33,875
+因为它实际上需要某种多态性，就像我们可能有一个派生类一样
+since it will actually need to be kind of polymorphic in the sense, that like we might have a derived class 
+
+111
+00:10:34,666 --> 00:10:40,100
+那取决于我们实际选择的接口，它们还必须是某种上下文选择
+that is depending on the api that we actually choose, they're also going to have to be some kind of context selection
+
+112
+00:10:40,575 --> 00:10:48,900
+所以我认为归根结底，m_Context很可能只是指针，在这种情况下，我们现在只移动一行代码
+so I think that ultimately speaking, context will most likely be just a pointer in which case, we'll just move a line here for now
+
+113
+00:10:50,466 --> 00:10:59,650
+m_Context甚至可能是静态的，是的，m_Context的所有权是我们没有真正考虑过的
+context might even be something that's static, yeah the ownership of context is something that we haven't really thought about
+
+114
+00:11:00,166 --> 00:11:08,550
+那有点重要，因为你们知道，如果Window本质上拥有上下文，那是一种实现它的方法
+that's kind of important, because you know, should the window essentially own the context, that's that's a one way of doing it
+
+115
+00:11:08,550 --> 00:11:17,000
+如果看看Window，我通常喜欢那样做，让Window拥有上下文
+if we look at window, I usually like doing that, having the window own the context
+
+116
+00:11:17,000 --> 00:11:23,625
+我想我在我写过的几乎所有东西中都是这样做的，但我仍然希望上下文是静态的
+I think I've done that in pretty much everything I've ever written, but I still do like the context to be something that is static
+
+117
+00:11:23,625 --> 00:11:30,950
+因为它不是你们所知道的渲染上下文，所以几乎每个窗口都至少有一个渲染上下文，对吧
+because it's not something that you know a rendering context, you almost always have one of them at least per window, right
+
+118
+00:11:30,950 --> 00:11:36,925
+你们不会有多个渲染上下文，只是试着想想，我的意思是你们可以做一些高级的事情
+you're not going to have multiple rendering contexts, just trying to think, I mean there are advanced things you could do it
+
+119
+00:11:36,925 --> 00:11:39,575
+总有你们能做的事，对吧，我只是想那个说清楚
+there's always things that you can do, right, I just want to make that clear
+
+120
+00:11:39,575 --> 00:11:45,200
+事实上，我只是从屏幕返回到相机，甚至保存这个，你们总是可以做一些事情
+in fact I just pop back from the screen to the camera to even save this, there's always things that you can do
+
+121
+00:11:45,200 --> 00:11:49,500
+你们可能想修改这个设计，我也想表达一下
+that you might want to kind of modify this design for, I want to kind of make that express as well
+
+122
+00:11:49,750 --> 00:11:55,200
+我们现在决定的设计不会是最终的，它们会像以往一样容易改变
+designs that we decide on right now are not going to be final, they're going to be liable to change just like anything ever
+
+123
+00:11:56,466 --> 00:12:03,875
+我能想到的一件事是一些场景，这是你们可能想做一些事情，比如有一个窗口
+one thing I can think of is some scenario, this is you might you might want to do something like have a window
+
+124
+00:12:03,875 --> 00:12:09,400
+然后在那个窗口内，有一个类似分割的视图，然后使用DirectX对其中的一半进行取整
+and then inside that window, have like kind of a split view maybe, and then half of it's being rounded using DirectX
+
+125
+00:12:09,400 --> 00:12:16,232
+其中一半是使用批量取整的，那是人们以前做过的事情，事实上EA在
+half of it's being rounded using bulk, and that's something that people have done before, in fact EA's kind of healthy on
+
+126
+00:12:16,400 --> 00:12:24,250
+就像EA的种子检索引擎一样，EA也有一种公开的PPT，我可以在下面的评论部分链接
+like EA's the seed kind of research engine that EA has is a public kind of powerpoint presentation that I can link in the comment section below
+
+127
+00:12:24,250 --> 00:12:28,550
+如果你们感兴趣，或者对描述感兴趣，例如
+if you're interested, or in the description, that's something that for example does
+
+128
+00:12:29,225 --> 00:12:35,250
+DirectX和Vulcan在同一种帧中同时渲染，就像在同一窗口中并排渲染一样
+DirectX and Vulcan rendering at the same time in the same kind of frame, like in the same window, side by side
+
+129
+00:12:35,250 --> 00:12:40,875
+例如，在开发Vulcan时，对于渲染器，他们可以很容易地将其与DirectX进行比较
+so that they can, as they develop you know Vulcan, for example, they can kind of compare it easily to the DirectX for renderer
+
+130
+00:12:40,875 --> 00:12:48,175
+看看这两种渲染器在视觉效果上，本质是否有任何差异
+and see if there are any kind of discrepancies between the 2 rendering kind of visuals essentially
+
+131
+00:12:48,466 --> 00:12:56,825
+所以你们总是可以做些事情，像那样可能会破坏设计，但至少对于我们现在正在做的事情
+so there are always things that you can do, like that might break this design, but for what we're doing right now at least
+
+132
+00:12:56,825 --> 00:13:05,475
+我觉得静态上下文是很合理的，你们在Hazel要做的就是创建窗口
+I feel like a static context is pretty reasonable, what you're gonna do in Hazel is you're gonna kind of open up a window
+
+133
+00:13:05,475 --> 00:13:10,450
+你们将为DirectX创建渲染上下文，仅此而已，真的没有任何理由去改变
+you're going to create a rendering context for a say DirectX, and that's it, you really don't have any reason to change
+
+134
+00:13:10,733 --> 00:13:13,900
+如果你们确实有理由改变，基本上就会重新构建整个过程，对吧
+if you do have a reason to change, you're going to basically recreate the whole thing, right
+
+135
+00:13:13,900 --> 00:13:18,950
+所以你们会想，拆掉窗口，然后想创建个新窗口，可能会使用Vulcan或类似的东西
+so you're going to be, like I want to tear down my window, then want to create a new window, which might use Vulcan or something like that
+
+136
+00:13:18,950 --> 00:13:26,133
+是吧，也许从那个意义上说，你们甚至可以打开两个窗口来使用，但现在还是为了保持简单
+right, and maybe in that in that sense, you could even have 2 windows open that would use that, but again just to keep things simple for now
+
+137
+00:13:26,133 --> 00:13:29,525
+因为我们可以花几个小时讨论这个，事实上我们已经讨论了很多
+because we could spend hours discussing this, in fact we've already been discussing this a lot
+
+138
+00:13:30,100 --> 00:13:37,425
+但我认为，我们现在真正应该做的和可以做的基本上是保持简单，看到有一个窗口
+but I think that what we really should do and could do for now is basically keep it simple, and see that we have a window
+
+139
+00:13:37,425 --> 00:13:44,000
+我们有个渲染上下文，在这里有个渲染上下文，那就是你们在Hazel中渲染的，完成的上下文
+we have a rendering context, that's here we have one rendering context, that's what you use to render in Hazel, that's one context done
+
+140
+00:13:44,000 --> 00:13:49,075
+好吧，让我们回到这儿，好吧，我想那就是我现在要做的
+okay, let's get back into it, okay, so that's what I'll kind of do for now I think
+
+141
+00:13:49,533 --> 00:13:56,875
+然后，我们还可以创建一个指向该上下文的静态接口，以便将来可以从任何地方访问它
+and then we can also create kind of a static interface to that context, so that we can access it from anywhere in the future
+
+142
+00:13:56,875 --> 00:14:04,966
+但我现在要做的是在WindowsWindow中，我可能会创建一些基本的渲染上下文
+but what I will do for now is inside WindowsWindow, I will probably create essentially some kind of rendering context
+
+143
+00:14:04,966 --> 00:14:14,675
+所以我们看到RenderingContext，我甚至不知道该怎么称呼它，因为可能是GraphicsContext
+so we'll see RenderingContext, I'm not even sure what to call this,  because probably a GraphicsContext
+
+144
+00:14:16,500 --> 00:14:24,205
+我们将它设为* m_Context，对吧，然后这是在其中返回WindowsWindow::Init()的东西
+we'll make it a pointer m_Context, right, and then this is something that return WindowsWindow Init
+
+145
+00:14:24,600 --> 00:14:30,350
+你们知道，在这个时候，可能想说基于属性，即使你们可以定义它，但我要做的只是说
+you know me we might want to say at this point in time based on a property even you could define it, but what I'm going to do is just say
+
+146
+00:14:30,350 --> 00:14:40,775
+现在的渲染上下文将是一个new OpenGLGraphicsContext，我们可以称之为OpenGLContext
+that the rendering context right now is going to be a new CpenGLContext dry GraphicsContext, OpenGL, we can just call it OpenGLContext
+
+147
+00:14:40,775 --> 00:14:50,966
+很明显，这将是图形，我会把它放在CORE_INFO下面，这不重要，不仅仅是cpp代码在哪里
+it's obviously going to be graphics, I'll put that under the CORE_INFO, this doesn't, it doesn't only matter where the cpp code's gonna be
+
+148
+00:14:50,966 --> 00:14:55,199
+因为我不会在这个初始化中做任何事情，就像在这个构造函数中一样，我们不会做任何事情
+because I'm not gonna do anything in this Initialization, like in this constructor, we're not gonna do anything
+
+149
+00:14:55,200 --> 00:15:01,866
+所以，不管是在glfw之前还是之后，我们可能想把它放在glfw之后，但并不是那么重要
+so it doesn't matter, if it's really before or after glfw, we might want to put it after, but not really that important
+
+150
+00:15:01,866 --> 00:15:07,175
+因为这里是它实际要初始化的地方，那就是我们要执行以下代码的地方
+because over here is where it's actually going to be initialized, and that's where we're going to do the following code
+
+151
+00:15:07,175 --> 00:15:15,200
+对吧，所以现在这应该属于那行代码，对吧，然后我们要做所有那些
+right, so this now kind of belongs inside that line of code, right, and then we're gonna do all that
+
+152
+00:15:15,200 --> 00:15:19,200
+很明显，我们要做的就是SwapBuffers，这将是在这个上下文中进行的
+and then obviously we're gonna do the SwapBuffers thing, which is gonna be inside context right over here
+
+153
+00:15:19,366 --> 00:15:25,100
+好了，现在我差不多完成了，让我们继续创建它，所以我想做的是在里面
+okay, so now I'm pretty much done, let's go ahead and create that, so what I want to do is inside
+
+154
+00:15:26,300 --> 00:15:31,660
+你们知道的，让我们确保我们在显示所有文件中，是的，我们实际上与渲染没有任何关系
+you know wellm let's just make sure we're in show all files, yep we don't actually have anything to do with rendering
+
+155
+00:15:31,660 --> 00:15:44,508
+所以我将添加一个新文件夹Renderer，然后在其中创建一个GraphicsContext.h文件
+so I'll add a new folder called Renderer, and then inside there, I'm gonna make a header file called GraphicsContext.h
+
+156
+00:15:46,000 --> 00:15:55,675
+很明显，我们将把它放在Hazel命名空间中，然后是GraphicsContext，然后在OpenGL中
+we're gonna obviously put this into the Hazel namespace GraphicsContext, and then inside OpenGL
+
+157
+00:15:55,675 --> 00:16:06,675
+我还将创建一个新项目和一个头文件，它将被称为OpenGLContext，然后还会创建个cpp文件
+I'm also going to create a new item and a header of file, it's going to be called OpenGLContext, and then we're going to also create a cpp file
+
+158
+00:16:07,325 --> 00:16:23,373
+就叫OpenGLContext，包含pch和OpenGLContext.h，然后namespace Hazel，直接复制那个
+which is called OpenGLContext, that's going to include our pch, and the OpenglContext file, namespace Hazel, just copy that
+
+159
+00:16:25,000 --> 00:16:34,575
+放入头文件中，class OpenGLContext:public GraphicsContext，也许该叫RenderingContext
+put it into the header file class OpenGLContext, public GraphicsContext, maybe we should have called a RenderingContext
+
+160
+00:16:34,575 --> 00:16:41,675
+因为它是渲染器，无论如何，我现在真的不太关心名称，我们可能会根据我的心情改变它们
+because it's the renderer, anyway, I really could not care less about names right now, we might change them depending on my kind of mood
+
+161
+00:16:42,766 --> 00:16:50,566
+但我们只能说这是在Hazel/Renderer/GraphicsContext.h中，很酷，所以上下文就是那样
+but we'll just say this is gonna be in Hazel/Renderer/GraphicsContext, cool, so that's how context essentially that
+
+162
+00:16:50,566 --> 00:16:55,000
+我们可能只需要保持那样，我们可以称之为上下文，可以在渲染器中包含实质内容
+we probably could just keep it call, we could just call it context, could substance inside the renderer
+
+163
+00:16:55,000 --> 00:17:00,125
+但因为我们没有像渲染器那样使用命名空间，所以我认为它更适合称为GraphicsContext
+but because we're not using name spaces like renderer, I thought it make more sounds to actually call it GraphicsContext
+
+164
+00:17:01,500 --> 00:17:06,266
+这将再次成为一种普通的接口，其中将包含以下内容
+this is going to be again just a normal kind of interface, which will have certain things like in this
+
+165
+00:17:06,400 --> 00:17:17,533
+而且可能还有SwapBuffers，我会让这些函数变成纯虚，对吧，现在非常平淡，简单
+and also probably SwapBuffers, very very bland for now, I'll make these things pure virtual, right, very bland for now, very simple
+
+166
+00:17:17,533 --> 00:17:22,350
+我们会尽可能地简单，因为首先，渲染会变得足够复杂
+we're gonna keep it as simple as we need to, because well first of all, rendering's gonna get complicated enough
+
+167
+00:17:23,050 --> 00:17:26,450
+我想在整个系列中尽我最大的努力让它尽可能简单，对吧
+and I want to try my best throughout this series to keep it as simple as possible, right
+
+168
+00:17:26,450 --> 00:17:32,125
+但也因为OpenGL现在真的很简单，尤其是配合glfw使用
+but also because OpenGL really is that simple for now, especially with glfw
+
+169
+00:17:33,300 --> 00:17:41,666
+很明显，这将覆盖这些内容，现在很明显，当我们创建一个OpenGLContext
+so this obviously is going to override this stuff, now here's the thing clearly, when we create something like an OpenGLContext
+
+170
+00:17:41,966 --> 00:17:45,875
+我们需要一种能控制窗口的句柄，对吧
+we're going to need some kind of handle to the windows that we can actually control things, right
+
+171
+00:17:47,366 --> 00:17:50,499
+基本上，我们只需要一个glfw窗口句柄
+basically we're going to just take in a glfw window handle
+
+172
+00:17:50,500 --> 00:17:56,825
+我实际上要从构造器开始，好了，所以构造器只是
+and I'm actually going to do this from the constructor, okay, so the constructor is just kind of going to
+
+173
+00:17:57,350 --> 00:18:02,425
+我就叫这个glfwWindow吧，构造函数，或者我们现在可以调用这个window句柄
+I'll just call this glfwWindow, the constructor, or maybe we can just call this window handle for now
+
+174
+00:18:02,575 --> 00:18:11,400
+这样，如果我们从glfw更改，它仍然是一个窗口句柄，这有点道理，所以基本上我要说的是
+that way if we change from glfw, it will still be a window handle, it kind of makes sense, so basically what I'm saying
+
+175
+00:18:12,000 --> 00:18:19,925
+我可能会做的就是在这里做个声明GLFWWindow，所以我们不必把它包含在内
+and what I might do is just make a forward declaration GLFWWindow here, so we don't have to include it
+
+176
+00:18:21,333 --> 00:18:28,899
+所以基本上我们要做的就是设置属性和窗口句柄，对吧，那就是我们在构造函数中要做的
+so basically what we're gonna do here is just set that property and window handle, right, that's what we're gonna do in the constructor
+
+177
+00:18:28,900 --> 00:18:45,925
+这意味着我们需要进入WindowsWindow，包含Hazel/Renderer/GraphicsContext，就在这儿
+which also means that we need to go into WindowsWindow over here, I'll include our context, azel/Renderer/GraphicsContext.h do that there
+
+178
+00:18:47,066 --> 00:18:54,300
+这个文件我将包含在OpenGLContext.cpp中，我不知道为什么它不能在头文件之间切换
+this thing I'll include in OpenGLContext.cpp, I don't know why it's not toggling between header file
+
+179
+00:18:56,075 --> 00:19:04,475
+cpp文件，但不论如何，我们有了构造函数和Init，这就是OpenGLContext，然后去掉纯虚
+cpp file, but anyway, so we got this constructor, we got Init, this is OpenContext, we get moved pure virtual stuff
+
+180
+00:19:04,475 --> 00:19:15,350
+这里是override，然后从我们实际的窗口，那可能是我们不需要的东西，从实际的窗口中
+and this is override, and then from our actual Window, that's gonna be stuff that we don't need, from our actual window
+
+181
+00:19:16,200 --> 00:19:25,375
+那就是实际要设置窗口的地方，所以就是m_Window，显然要在实际创建窗口之后进行设置
+that's where we're actually going to set our window, so m_window, and obviously we're going to do that after we actually create the window
+
+182
+00:19:25,375 --> 00:19:33,250
+那么我们将创建上下文，然后初始化该上下文，好吧，那么OpenGLContext，好像有点问题
+so we'll create the context, and then we'll initialize that context, okay, so OpenGLContext, it's not happy with that
+
+183
+00:19:33,900 --> 00:19:45,550
+我们有了图形上下文，然后在这里，包含Hazel/Platform，在哪，直接是Platform，是吧
+so we've got our graphics context, and then over here, we will use Hazel/Platform, where is it, it's not just platform, is it
+
+184
+00:19:46,200 --> 00:19:54,450
+就是Platform/OpenGL/OpenGLContext.h，好吧，很酷，应该会让大部分错误都消失
+yeah Platform/OpenGL/OpenGLContext.h, allright, cool, that should make most things go away here all the errors, yeah cool
+
+185
+00:19:55,400 --> 00:20:01,250
+好了，差不多就那样了，我们有了窗口，现在可以做我们需要的一切了，那对我来说很好
+alright, and that's pretty much it, so we have the window, and now we can kind of do everything we need, and that looks pretty good to me
+
+186
+00:20:01,400 --> 00:20:12,575
+所以复制，剪贴这块代码，进入Init，我想我们还没有创建它，我们将把它放在那里
+so we'll copy, we'll grab this land code, we'll go into Init, which I guess we haven't created yet, and we will just put that in there
+
+187
+00:20:12,575 --> 00:20:21,350
+所以让我们实际创建这些东西，是的，它真的不认为有我，啊，当然拼写错误了，会的
+so let's actually make all this stuff, yeah it really doesn't think that have I, ah of course I miss belt it, well I would
+
+188
+00:20:21,600 --> 00:20:29,225
+那就是原因，Gontext，我想知道你们看了多久才意识到我有多笨
+that's why, Gontext, I wonder how long you guys were watching that for before you realize how stupid I was
+
+189
+00:20:31,933 --> 00:20:37,275
+你们可能在对屏幕大喊大叫，就像Cherno，你在搞什么，好了，创建方法实现
+you're probably yelling at your screens being like what are you doing cherno, okay, create method implementations 
+
+190
+00:20:37,275 --> 00:20:50,650
+我们要做的就是m_WindowHandle(windowHandle)，在OpenGLContext的Init做那个
+and then obviously here, the only thing we're really going to do is m_WindowHandle(windowHandle), OpenGLContext, Init gonna do that
+
+191
+00:20:53,575 --> 00:21:03,525
+这是m_WindowHandle，然后还需要glad，所以在这里所做的就是删除了OpenGL依赖项
+this is the windowHandle, and then glad, we also need glad, so one of the things we've done here is we've removed OpenGL dependencies
+
+192
+00:21:03,525 --> 00:21:08,525
+对吧，所以Glad是特定于OpenGL的，glfw虽然不是，但Glad是
+right, so glad is not OpenGL, glad is OpenGL specific, glfw isn't, but glad is
+
+193
+00:21:08,950 --> 00:21:11,933
+所以那是另一个我们已经移除的库，现在从窗口移除了
+so that's another thing that we've kind of taken and are now removed from window
+
+194
+00:21:11,933 --> 00:21:16,600
+因此，OpenGL中不再有什么特别的联系，因为这种事情在这里发生
+so there's nothing really, the ties that specifically took in OpenGL anymore, because this stuff kind of happens here
+
+195
+00:21:16,600 --> 00:21:23,275
+这真的很酷，然后我们还将进入WindowsWindow，然后使用我们有的SwapBuffers代码
+which is really cool, and then we'll also go into WindowsWindow, and then take that SwapBuffers code that we had
+
+196
+00:21:23,700 --> 00:21:30,596
+实际上，把它移到这里的SwapBuffers中，很简单，然后是我们这里的m_WindowHandle
+and actually move it into here into SwapBuffers, allright, really easy, and then window handles obviously, what we have over here
+
+197
+00:21:31,075 --> 00:21:35,525
+我们可以做一些事情，比如断言，以确保m_WindowHandle确实存在
+and we could do things like assert to make sure that that m_WindowHandle actually exists
+
+198
+00:21:36,075 --> 00:21:45,877
+所以你们知道，WindowHandle，窗口句柄是空的，如果我们想做的话，可以做些基本检查
+so you know, WindowHandle, handle is now window handles and all, we could do some basic checking if we wanted to
+
+199
+00:21:46,200 --> 00:21:52,325
+但我真的认为这真的非常简单，我们真的不需要添加任何东西来让它变得超级复杂
+but I honestly think this is really dead simple, and we don't really need to add anything to make it super complicated
+
+200
+00:21:53,100 --> 00:22:00,550
+好吧，酷，现在我觉得还有别的事情，我想解决，但我真的不记得了，好吧，这是个错误
+okay, cool, now there was something else I feel like, I wanted to address, but I don't really remember, okay, well this is an error
+
+201
+00:22:01,333 --> 00:22:08,650
+这实际上是什么结构，所以在src中，我们有Platform/OpenGL，然后不是context
+what actually is the structure of this, so inside src, we do have Platform/OpenGL, and then yeah not context context
+
+202
+00:22:09,333 --> 00:22:15,100
+好了，很酷，让我们构建，看看是否有任何错误或警告之类，然后运行它，希望它能运行
+okay, cool, let's build everything, see if we get any errors or warnings or anything, and then we can run it in a, hopefully it'll work
+
+203
+00:22:15,700 --> 00:22:21,750
+好吧，我们确实收到了警告，之前使用class，现在用struct，那是因为当我们
+okay, so we do get warnings, type name first seen using 'class' now seen using 'struct' yep, that's because when we even get
+
+204
+00:22:23,675 --> 00:22:34,066
+哦，是的，我可能会拼写错误，上下文可能不会，这很奇怪，无论如何，那应该是struct
+oh yeah I'd probably miss belt something here, context maybe not, that's odd, anyway, this should be struct
+
+205
+00:22:34,066 --> 00:22:40,450
+那就解决了那个警告，然后这是什么，找不到，找不到与之相关的东西
+that'll solve that warning, and then what's this, it's not found, can't find something to do with that
+
+206
+00:22:40,866 --> 00:22:46,175
+让我们再构建一次，好吧，没问题，也许是因为结构体的问题
+let's build again, okay, we're fine, maybe it was to do with the struct thing
+
+207
+00:22:47,600 --> 00:22:56,000
+让我们运行看看得到了什么，好了，酷，所以我们在这里进行，你们知道，可以做点什么
+let's just run see what we get, there you go alright, cool, so we have this going on here, you know, we could do something
+
+208
+00:22:57,200 --> 00:23:03,325
+就像在SwapBuffers中，如果真的想测试一下，我们可以试试我们紧张的工作，无法保证
+like inside SwapBuffers, as if we really wanted to test it out, we could maybe try our nervous work, no guarantees
+
+209
+00:23:03,325 --> 00:23:11,266
+但我们可以试试shell的即时模式，嗯，你们知道，我甚至不知道，如果它能让我们那样做
+but we could maybe try some immediate mode from shell, um which you know, I don't even know, if it'll let us do that
+
+210
+00:23:11,266 --> 00:23:15,400
+那真的不可编译，哇，它真的不可编译
+let's just is that really not compile, wow it really doesn't compile
+
+211
+00:23:21,800 --> 00:23:33,500
+我不知道，我不知道我们能在这里做什么，这东西没有，那真的很有趣，不是吗
+I don't know, I don't know what we can do here, this stuff doesn't, that's really quite interesting, isn't it
+
+212
+00:23:33,933 --> 00:23:46,375
+这根本不存在，这里有什么，GL.h，我想已经包含了，但显然没有，我们将尝试做一些东西
+this stuff just doesn't exist, what's in here, GL.h, which I thought I included, but apparently I didn't, we're gonna try and do some stuff
+
+213
+00:23:46,933 --> 00:23:52,775
+我们可能做的另一件事是，我不知道这是否可行，我们可以尝试用一些数据创建顶点缓冲区
+the other thing we could potentially do, I don't know, if this will work though, is we could try and create a vertex buffer with some data
+
+214
+00:23:52,775 --> 00:23:58,600
+然后看看我们是否可以自动渲染，但是的，我有点希望即时模式能运行起来
+and then see if we can render it automatically, but yeah I kind of wished immediate mobile just would just work for us
+
+215
+00:23:58,600 --> 00:24:04,875
+但很明显，那太有意思了，不是吗，只是没有，我们有新的和包含的
+but apparently it just doesn't, that's so interesting, isn't it, it just does not, we have new and included
+
+216
+00:24:04,875 --> 00:24:08,375
+那可能是一件好事，我的意思是，无论如何，这可能行不通，因为我们使用的是核心模式
+that's probably a good thing, I mean it probably wouldn't work, anyway, because we are using the core profile
+
+217
+00:24:09,400 --> 00:24:15,650
+但无论如何，我的观点是，这实际上现在应该可以渲染了，就像以前一样
+but anyway, my point is that, this should actually now be capable rendering, just like it was before
+
+218
+00:24:16,366 --> 00:24:21,275
+我们没有任何东西可以测试，我的意思是你们可以看到清除颜色是粉红色，所以那很有希望
+we don't really have anything to test with, I mean you can see that the clear color is pink, so that's kind of promising
+
+219
+00:24:22,333 --> 00:24:27,175
+如果你们想知道清除颜色将由实际的渲染器类控制，而不是由上下文或类似的东西控制
+and if you're wondering the clear color will be controlled by the actual renderer class, not by the context or anything like that
+
+220
+00:24:27,966 --> 00:24:40,275
+事实上，更具体地说，这个glClear函数，现在实际上正在Application中运行
+and in fact to be a little bit more specific, this whole glClear thing, which right now actually is happening, inside application
+
+221
+00:24:40,566 --> 00:24:46,699
+从技术上讲，整个过程都发生在帧缓冲区，因此将有个渲染缓冲区，基本上是个帧缓冲区
+this whole thing will technically be happening on a frame buffer, so we'll have like a rendering buff for essentially a frame buffer
+
+222
+00:24:46,699 --> 00:24:52,525
+那只是我们的屏幕，对吧，然后它将包含比如清除之类的指令
+that will just be our screen, right, and then that will contain things like clear commands
+
+223
+00:24:52,933 --> 00:24:59,725
+那就是它的架构，不管怎样，那几乎是上下文类，对于OpenGL来说非常简单
+and that's going to be the architecture of that, anyway, that is pretty much the context class, really simple again for OpenGL
+
+224
+00:24:59,725 --> 00:25:03,900
+但现在我们在这里取得的最大成就是我们重新创建了渲染上下文
+but now the big thing that we've achieved here is we've recreating a rendering context
+
+225
+00:25:03,900 --> 00:25:07,699
+你们知道的，在这里是完全不独立的，我的意思是我们有OpenGL上下文
+and is completely yow kown independent here, I mean we have OpenGL context
+
+226
+00:25:07,700 --> 00:25:14,125
+我们应该能够说，嘿，我想要一个这样的DirectXContext，猜猜它所做的就是初始化
+and we should be able to just say, hey, I want a DirectX context just like that, and guess what all it does is init
+
+227
+00:25:14,125 --> 00:25:20,800
+它接收WindowHandle，它所做的只是Init和SwapBuffers，对吧，DirectX也需要这两个
+it takes in the WindowHandle, all it does is init and SwapBuffers, right, that DirectX also needs both of those things
+
+228
+00:25:21,175 --> 00:25:26,950
+我们可以有一个不同的实现，然后有了DirectX，很明显，将来可能会有窗口属性
+we can just have a different implementation, and suddenly we have DirectX, and then obviously maybe in window props in the future
+
+229
+00:25:26,950 --> 00:25:33,875
+当我们有多个接口时，我们会有一些，比如m_Data.API = props.API
+when we have multiple apis, we would have something along the lines of like m_Data you know .API or something equals props.API
+
+230
+00:25:34,566 --> 00:25:39,925
+然后基于此，我们可以做一些改变或其他事情，然后做出决定，甚至可以提前做出决定
+and then based on that, we could maybe do like a switch or something, and decide or maybe even ahead of time
+
+231
+00:25:40,700 --> 00:25:46,775
+而不是使用OpenGLContext，我们将使用DirectX或其他接口，希望你们喜欢这期视频
+that instead of using a OpenGLContext, where we would use a DirectX one or anything else, hope you guys enjoyed that video
+
+232
+00:25:47,066 --> 00:25:51,450
+如果你们喜欢，就为它点赞吧，也可以访问patreon.com/thecherno来帮助支持这个系列
+if you did, hit the like button, you can also help support the series by going over to patreon.com/thecherno
+
+233
+00:25:51,450 --> 00:25:55,650
+非常感谢你们，一如既往地感谢所有使本系列成为可能的朋友
+huge thank you as always to all the wonderful people that make this series possible
+
+234
+00:25:56,525 --> 00:26:01,625
+下次我们要继续并开始创建Renderer类，对吧
+next time we're gonna move on and start creating the renderer class, right, that's gonna be something 
+
+235
+00:26:01,625 --> 00:26:09,097
+那可能会被设计和重新设计很多次，但本质上，我们需要像ClearColor这样的指令
+that's gonna be probably designed and redesigned a billion times, but essentially we need that for things like the ClearColor
+
+236
+00:26:09,266 --> 00:26:15,066
+我们需要它来发出渲染指令，对吧，我们需要它来表示状态，我们需要它来表示很多事情
+we need that for issuing rendering commands, right, we need that for state, we need that for so many things
+
+237
+00:26:15,066 --> 00:26:19,850
+下次我们可能会，我们甚至可能会有一些设计视频，我现在不太确定
+and we're probably gonna, we might even have a bit of a design episode next time, I'm not really sure at this point
+
+238
+00:26:19,850 --> 00:26:26,106
+我已经卖掉了我生活中的一些东西，我需要在这个时候整理一下，因为要做些改变
+I've sold have a few things in my life that I need to sort out at this point in time, because making some changes
+
+239
+00:26:27,366 --> 00:26:31,799
+但是基本上，嗯，下次我想我们要从Renderer开始
+but yeah essentially um next time I think we're gonna start off with a Renderer
+
+240
+00:26:31,800 --> 00:26:35,414
+除非我意识到此时此刻还有其他重要的事情
+unless I kind of realize that something else is important that at this point in time
+
+241
+00:26:35,700 --> 00:26:39,866
+我有点忘了，但不管怎样，我希望你们喜欢这期视频
+I'm kind of I forgotten about, but anyway, I hope you guys enjoyed this video
+
+242
+00:26:39,866 --> 00:26:45,494
+我希望你们能像我一样高兴地回到Hazel，回到这个系列，下次见，拜
+I hope you guys are as happy as I am to be back into Hazel and into this series, I will see you next time, goodbye
+

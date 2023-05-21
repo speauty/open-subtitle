@@ -1,0 +1,2200 @@
+﻿1
+00:00:00,133 --> 00:00:06,375
+嗨，你们好，我是TheCherno，欢迎回到我的游戏引擎系列，上期讨论了渲染器接口抽象
+hey, what's up guys, my name is TheCherno, welcome back to my game engine series, so last time we took a look at renderer api abstraction
+
+2
+00:00:06,375 --> 00:00:13,900
+如果你们还没看过，就去看看那期视频吧，基本上只是把一堆代码抽到渲染接口对应的类
+check out that video, if you haven't already, we basically just pulled out a bunch of our code into specific classes that were kind of per render api
+
+3
+00:00:13,900 --> 00:00:18,925
+那么我们现在在处理的是OpenGL，所以创建了OpenGLVertexBuffer和OpenGLIndexBuffer类
+so we're dealing with OpenGL at the moment, so we created like an OpenGLVertexBuffer and OpenGLIndexBuffer class
+
+4
+00:00:19,600 --> 00:00:25,650
+那是专门用来处理那些渲染接口的，比如图元之类的东西
+there was specifically for dealing with those kind of render api, like primitives or just things essentially
+
+5
+00:00:26,400 --> 00:00:33,225
+在某种程度上，当我们从应用程序或游戏代码或渲染器代码中调用时，它就被抽象出来了
+in a way that was kind of abstracted out where, when we kind of call it from our application, or from our game kind of code, or from our renderer code
+
+6
+00:00:33,225 --> 00:00:38,800
+它并不关心底层实际使用的是哪个接口，所以如果还没有看过的话，一定要看看那期视频
+it doesn't care which api is actually used under the hood, so definitely check out that video, if you haven't already
+
+7
+00:00:38,800 --> 00:00:44,873
+今天我们会继续往下讲，但我们会特别讲缓冲区布局
+we're gonna kind of continue down that slope today, but we're specifically going to talk about buffer layouts
+
+8
+00:00:45,525 --> 00:00:52,800
+当我说缓冲区布局时，我指的是顶点缓冲区布局，对吧，已经接触过这个了
+and when I say buffer layouts, I mean I'm really talking about vertex buffer layouts, okay, we touched on this
+
+9
+00:00:53,066 --> 00:00:55,325
+我的意思是，我们在我的频道上已经大体谈到了这个
+I mean we've touched on this on my channel just in general
+
+10
+00:00:55,325 --> 00:00:59,425
+因为如果不处理顶点缓冲布局的话，你们就无法渲染任何东西
+because of course you can't really render anything without having to deal with vertex buffer layouts
+
+11
+00:00:59,700 --> 00:01:04,075
+我想我在OpenGL的系列中有一个专门的视频，我会试着把它链接起来
+I think I have a video specifically about that in the OpenGL story, so I'll try and link it up there
+
+12
+00:01:04,750 --> 00:01:09,300
+如果你们还没有看过的话，一定要去看看，一般来说，如果你们不熟悉OpenGL系列的话
+definitely check that out, if you haven't already, and in general, if you're not familiar with the OpenGL stories
+
+13
+00:01:09,300 --> 00:01:11,250
+我只会看一看所有的东西
+I would just take a look at pretty much all of it
+
+14
+00:01:11,475 --> 00:01:16,475
+因为那真的会帮助你们了解我们此刻在Hazel所构建的东西
+because that's really going to help you out with what we're kind of building here at this moment in Hazel
+
+15
+00:01:16,800 --> 00:01:21,600
+我还会继续讲那个OpenGL系列，可能在下周，可能贯穿整个下周
+and also I'm going to continue that OpenGL stories, probably next week, probably throughout this kind of next week
+
+16
+00:01:22,466 --> 00:01:28,000
+因为，再说一次，这对于深入研究这些概念非常重要
+because it's, again, it's going to be really important in kind of taking a deeper look at some of these concepts
+
+17
+00:01:28,000 --> 00:01:33,399
+那是我们在游戏引擎系列中所学到的，无论如何，今天我们将讨论缓冲区布局
+that we're learning here in the game engine series, so anyway, today we're going to talk about buffer layouts
+
+18
+00:01:33,400 --> 00:01:40,075
+所以那意味着什么，我们为什么需要它们，它们有什么作用，我们如何写它们
+so what does that mean, why do we need them, what do they do, and how do we write them in a way
+
+19
+00:01:40,500 --> 00:01:47,050
+那既抽象又适用于每个渲染接口，而且实际上对我们来说也很容易使用
+that is both abstract and works for every render api, but also is actually kind of easy for us to use 
+
+20
+00:01:47,050 --> 00:01:52,125
+因为那就是我所关心的，对吧，我想要我们在客户端写的代码
+because that's kind of what I'm all about, right, I want the code that we write on the client side
+
+21
+00:01:52,125 --> 00:01:59,150
+我们在游戏项目中写的代码，或者在渲染器中写的代码，都很漂亮
+the code that we actually write like inside our game kind of project, right, or inside our renderer, it's just be beautiful
+
+22
+00:01:59,766 --> 00:02:05,825
+那就是我想要的，那就是我的目标，对吧，外面实际上天黑了
+that's kind of what I go for, that's what I aim for, right, and it's actually getting dark outside
+
+23
+00:02:06,401 --> 00:02:08,475
+因为我今天把视频放得很晚，我只是在计划
+because I left this video pretty late today, I was just planning it
+
+24
+00:02:08,475 --> 00:02:15,125
+确保我把我想说的都说明白了，因为我真的很喜欢，我真的很想做好这期
+and just making sure that I had everything that I wanted to say figured out, because I really like, I really want to do this well
+
+25
+00:02:16,000 --> 00:02:22,075
+这特殊的一期，所有的都会跟着来，但你们知道这一期，所以如果天有点暗，我很抱歉
+this specific episode, all videos really come on, but you know this specific episode, so if it kind of gets darker, I'm sorry
+
+26
+00:02:22,333 --> 00:02:29,575
+因为它听起来就像一组半，不管怎样，重点是漂亮的代码，对吧，我认为那很重要
+because it is like the sounds about a set and half now, anyway, the point is beautiful code, right, I think that's really important
+
+27
+00:02:29,575 --> 00:02:36,000
+我认为如果你们写的代码，如果你们设计一个接口，写的代码，看起来很恶心
+I think that if the code that you're writing, if you design an api, and the code that your writing, just looks disgusting
+
+28
+00:02:36,000 --> 00:02:42,533
+或者只是很难处理，或不够简洁，那就是个问题，对吧，想想写文档
+or just is hard to do things with, or isn't concise enough, that's an issue, right, think about writing documentation
+
+29
+00:02:42,533 --> 00:02:49,266
+或者只是像英语SA那样写作，对吧，如果你们用一段又一段来描述同一个东西
+or just writing like an English SA or something like that, right, if you take paragraphs and paragraphs to kind of describe the same thing
+
+30
+00:02:49,266 --> 00:02:57,625
+你们就不能写出漂亮的，流畅的句子，那听起来不太好，这对读者不好
+and you just can't make really like nice, kind of flowing sentences, that doesn't really sound nice, it's not good for the reader reed
+
+31
+00:02:57,850 --> 00:03:04,050
+除此之外，并不是说它不好，除此之外，它实际上并不实用
+and it, and just apart from that, not just like it's just not nice, aside from that, it's just not like actually practical
+
+32
+00:03:04,050 --> 00:03:08,650
+这种方法不太管用，因为这个人可能会把你们的句子读很多遍
+it doesn't work as well, right like the person might have to read your sentence multiple times
+
+33
+00:03:08,875 --> 00:03:13,250
+或者他们可能不得不阅读更多的信息，否则他们必须理解
+or they might have to read a whole much more information that they otherwise would have to understand
+
+34
+00:03:13,250 --> 00:03:17,775
+你们想用英语SA说什么，对吧，当然还有英语SA
+what it is you're trying to say in your English SA, right and of course English SA
+
+35
+00:03:17,850 --> 00:03:22,275
+不管怎样，你们可能会有很高的工作量，所以可能会一遍又一遍地重复一些事情
+you're probably going for a high work count, anyway, so you might just reiterate stuff over and over again
+
+36
+00:03:22,900 --> 00:03:29,175
+但事实并非如此，通常情况下你们会尽量简洁，对吧
+but incur that's really not the case, usually like you actually are trying to be concise, right
+
+37
+00:03:29,950 --> 00:03:34,900
+一般来说，你们想要使用语法和句子，那在你们的SA中听起来都很不错
+and just in general, you want to use kind of grammar and sentences, that both kind of sound nice kind of in your SA
+
+38
+00:03:34,900 --> 00:03:42,625
+对吧，在你们的英语SA中，回到这个，但也有些东西实际上可以非常简洁很好地表达观点
+right, in your English SA, back to this, but also stuff that actually gets your point across very just concisely, and just nicely
+
+39
+00:03:42,625 --> 00:03:48,700
+这样人们就会想继续读下去，这样人们就会对你们想要做的事情形成一个良好的视觉形象
+so that the person kind of wants to keep reading, and so that the person forms a good visual, kind of mental image of what it is you're trying to do
+
+40
+00:03:48,933 --> 00:03:55,825
+一切都很漂亮，一切都很扎实，那就是我们想要通过这个引擎中的所有接口实现的
+and everything is just beautiful, and everything just feels solid, that's what we want to achieve with all of the apis in this engine
+
+41
+00:03:56,050 --> 00:04:04,882
+对吧，那就是我们想要做的，那并不容易做到，对吧，但因为使用的是像CPP，非常灵活
+right, that is what we want to do, that's not easy to do, right, but because we're using a language like CPP, it's extremely flexible
+
+42
+00:04:05,166 --> 00:04:10,175
+这实际上意味着我们可以做很多我们想做的事情，特别是缓冲区布局
+and it actually means that we can do a lot of what we're trying to do, and today specifically with buffer layout
+
+43
+00:04:10,175 --> 00:04:15,800
+我将向你们展示，做同样的事情可能有很多不同的方法
+I'm going to show you how, there's probably there's many different ways of essentially doing the same thing
+
+44
+00:04:16,831 --> 00:04:21,999
+但我想用一种看起来不错的方式来做，就像我们在讨论缓冲区布局一样
+but I want to do it in a way that actually looks good, like we're talking about a buffer layout
+
+45
+00:04:22,000 --> 00:04:29,600
+我们应该能够可视化代码，就像得到了一切，对吧，我得到了一切，就像不想要些奇怪的
+we should just be able to visualize the code, and be like I get everything, right, I get everything, like we don't want some weird
+
+46
+00:04:29,984 --> 00:04:35,075
+就像用一种奇怪的方式来写这个缓冲区布局的代码，那是没有意义的
+like weird kind of way of writing code for this buffer layout, where it just doesn't make sense
+
+47
+00:04:35,075 --> 00:04:39,968
+或者它只需要我们认真思考它是什么定义，不，我们希望它简单
+or it just requires us to really think about what it is where defining, no, we want it just to be easy
+
+48
+00:04:40,416 --> 00:04:48,075
+希望它真的很简单，因为如果它很简单，如果很漂亮，对吧，优雅，那么除了看起来很好
+we want it to just be really easy, because if it is easy, and if it is just so nice, right, and elegant, then apart from just looking good
+
+49
+00:04:48,075 --> 00:04:53,650
+我们对自己感觉很好，也是处理这些问题的人，这样很好，很容易
+and us feeling good about ourselves, and also are the people dealing with this, and being like this is great, this is so easy
+
+50
+00:04:53,835 --> 00:04:58,700
+除此之外，它还能减少代码中的错误，为什么，因为一切都是有意义的
+apart from that, it's also actually going to reduce the bugs in our code, why, because everything just makes sense
+
+51
+00:04:58,975 --> 00:05:04,829
+如果有什么问题，我们可以直观地发现，我们不需要只阅读文档，然后说
+and if something is wrong, we can intuitively kind of just pick up on that, we don't need to just read the documentation, and be like
+
+52
+00:05:05,166 --> 00:05:10,425
+我想那是错的，不，我们可以看到错误就在那里，因为它是这样放置的，错误很明显
+yeah, I guess that's wrong, no, we can just see the errors right there, because it's lay down in such a way, where errors are obvious
+
+53
+00:05:10,666 --> 00:05:15,175
+好了，那就是我们今天要讲的内容，我们要开始了，先看一看
+okay, that's what we're gonna talk about today, we're gonna jump in, and we're gonna take a look
+
+54
+00:05:15,925 --> 00:05:21,650
+只是一个我们实际拥有的例子，以及我们想要创建的东西
+just the practical example of what we actually have, as well as talk about what it is we're trying to create
+
+55
+00:05:21,650 --> 00:05:29,650
+我认为那是非常重要的，当你们谈论任何一种想设计的接口或任何一种复杂的概念时
+and I think that that's really important, when you talk about any kind of api that you want to design or any kind of complex concept
+
+56
+00:05:29,875 --> 00:05:36,475
+这就是这个实际在做什么，对吧，特别是顶点缓冲布局，它非常简单，我们正在做的就是
+it's what is this actually doing, right, and with vertex buffer layout specifically, it's very simple, you know, what we're doing is 
+
+57
+00:05:36,475 --> 00:05:45,050
+我们实际上是在告诉OpenGL，这个字节数组的数据，里面有什么，如何分解，有多少元素
+we're actually telling OpenGL, this byte array of data, what's in it, how is it broken down, you know, how many elements are there
+
+58
+00:05:45,400 --> 00:05:52,675
+有多少元素，你们知道，这是一个3分量的浮点数向量，对吧，或者只是3个独立的浮点数
+how many like what are the elements, you know, is this a 3 component vector of floats, right, or there's just 3 separate floats
+
+59
+00:05:53,400 --> 00:05:59,025
+你们知道，这是一个四种颜色的组件，它只是，也许它只是一个无符号整数
+you know, is this a four kind of component color housing specified, it's just just, maybe it's just an unsigned integer
+
+60
+00:05:59,025 --> 00:06:06,075
+或者它可能是四个浮点数之类的，对吧，可以是任何东西，就像如果只是个二进制数据
+you know, or maybe it's four several floats or something like that, right, it could be just absolutely anything, like if it's just a binary blob of data
+
+61
+00:06:06,075 --> 00:06:10,043
+这是我们的顶点缓冲区实际接收并上传到GPU的东西
+which is what our vertex buffer actually takes in and uploads into the GPU
+
+62
+00:06:10,366 --> 00:06:18,206
+我们需要一些方法来描述数据的布局，这意味着，前四个字节可能是浮点数
+we need some way to actually describe the layout of that data, which again means, you know, the first four bytes might be a float
+
+63
+00:06:18,350 --> 00:06:23,625
+第二个可能是另一个浮点数，然后第三个可能是另一个浮点数，那就是一行中的三个浮点数
+the second four bytes might be another float, and then the third four bytes might be another float, that's three floats in a row
+
+64
+00:06:23,933 --> 00:06:30,857
+那就是我们的三分量向量，它描述了顶点位置，那就是我们想要达到的
+that's our three component vector that describes our vertex position stuff like that, that's what we're trying to achieve
+
+65
+00:06:30,857 --> 00:06:35,425
+让我们试着用种优雅的方式来做，直接看个例子，然后看看我们是怎么做的，好了
+let's try and do it in an elegant way, let's jump in take a look at a practical example, and we'll see how we go, okay
+
+66
+00:06:35,425 --> 00:06:42,653
+那么上次我讲了这个三角形，今天我们要达到同样的目的，但要更优雅，更具体
+so last time I had this triangle, today we're going to basically aim to achieve the same thing, but a lot more elegantly and specifically
+
+67
+00:06:42,653 --> 00:06:46,950
+为了好玩，我们可能还会插入一些其他顶点属性，看看它们是如何运行的
+we're also going to maybe jam in some other vertex attributes for fun, just to kind of see how they work
+
+68
+00:06:46,950 --> 00:06:51,575
+也许我们会添加一个顶点颜色或者类似的东西，让我们关闭这个
+maybe we'll just throw on a vertex color or something like that, let's just close this
+
+69
+00:06:51,900 --> 00:06:57,575
+所以目前我们实际上是在指定缓冲区布局，如果没有，我们就不会在屏幕上看到任何东西
+so currently we are actually specifying a buffer layout, right, if we weren't, we wouldn't see anything on the screen
+
+70
+00:06:57,933 --> 00:07:03,975
+也就是这里，对吧，就是这两行代码，它说的是在顶点缓冲区内
+and that's this right here, okay, these two lines of code, what this is saying is inside our vertex buffer
+
+71
+00:07:04,025 --> 00:07:11,050
+我们创建的这个，在下标0处，有三个浮点数，对吧，它们没有标准化
+this one that we're creating, we have at index 0, three floats, right, they're not normalized
+
+72
+00:07:11,825 --> 00:07:21,475
+每个顶点之间的步幅就是这个大小，所以3个浮点数，12字节，偏移量是空的，对吧
+the stride between each vertex is that size, so three floats, 12 bytes, and the offset of this particular element is nothing, right
+
+73
+00:07:21,925 --> 00:07:29,175
+我不想过多地讨论它的原理，因为有个关于它的OpenGL视频，正如我所说，太阳正在落山
+now I don't really want to discuss how this works too much, because I do have an OpenGL video about it, and as I said, the sun is setting
+
+74
+00:07:29,475 --> 00:07:34,600
+我和我妻子还有其他事情要做，我不想在这里看两个小时，只是重复浪费你们的时间
+and I have like other stuff to do with my wife, and I don't want to see it here for two hours, just reiterating wasting your time
+
+75
+00:07:34,600 --> 00:07:43,000
+我只是描述了我已经知道的所有东西，所以一定要看看那期视频，但我不知道，就像这个
+I'm just describing everything that I already have already, so definitely check out that video, but I don't know, like that this is like
+
+76
+00:07:43,366 --> 00:07:47,400
+它可能很容易理解，所以如果你们不理解这一行代码
+it might be quite simple to understand, so if you don't understand this particular line of code
+
+77
+00:07:47,625 --> 00:07:53,000
+一定要看看那期视频，因为我不打算在这期讲太多
+make sure you check out that video, because I'm not going to really talk about it too much, I think in this episode
+
+78
+00:07:53,075 --> 00:07:58,925
+所以对于这一行代码，我想指出的是它的连接
+so a few things that I actually want to point out with this particular line of code is, I guess the linkages of it
+
+79
+00:07:58,975 --> 00:08:03,450
+所以它指的是什么，它连接的是什么，它对应的是什么，对吧
+so what it's referring to, what it's linked to, what it corresponds to, right
+
+80
+00:08:03,825 --> 00:08:08,675
+那么顶点属性实际上存储在顶点数组中，而不是顶点缓冲区中
+so vertex attributes specifically are actually stored in the vertex array, not the vertex buffer
+
+81
+00:08:08,675 --> 00:08:15,150
+现在它们描述顶点缓冲区中的数据，但是顶点数组是一种父类型
+now they describe data in a vertex buffer, however a vertex array is kind of the parent type, if you will
+
+82
+00:08:16,400 --> 00:08:22,225
+一个顶点数组可以包含多个缓冲区，我们实际上可以交叉我们的缓冲区
+and a vertex array can contain multiple buffers, right, we can actually inter leave our buffers
+
+83
+00:08:22,225 --> 00:08:28,100
+你们知道，在这个顶点中，对吧，在这个顶点中，什么类型的顶点，对吧，我们可以添加
+and have, you know, just in this one vertice like, right, in this one, what kind of vertices are, right, we could just add
+
+84
+00:08:28,100 --> 00:08:33,550
+你们知道，我们想要顶点颜色或者顶点法线什么的，我们实际上可以添加它，就像那样
+you know, we want a vertex color or vertex normal or something, we can actually just add it, like just Bam like that
+
+85
+00:08:33,866 --> 00:08:39,825
+这样你们就知道了所有的东西，在这种情况下我们所拥有的每一个顶点都会包含
+you know, and that way you know everything, every single vertex that we have is kind of going to contain in this case
+
+86
+00:08:39,825 --> 00:08:50,193
+也许是位置和法线，或者我们可以做的另一个是不把它交织在一起，这样就没有这些了
+maybe both a a position and a normal, right, or the other thing we could do is kind of just not inter leave it, so not have any of this
+
+87
+00:08:50,400 --> 00:08:57,175
+然后在这里创建另一种数组，另一个浮点数组，它有顶点和法线
+right, but then just make another kind of array here, right, another float array, which has had vertex normals
+
+88
+00:08:57,175 --> 00:09:03,075
+然后我们可以把它上传到一个单独的顶点缓冲区，我们可以为法线创建另一个顶点缓冲区
+and then we can actually upload that into a separate vertex buffer, we can create another vertex buffer just for the normals
+
+89
+00:09:03,075 --> 00:09:07,075
+然后另一个是颜色，然后另一个是，你们明白了，对吧
+and then another one for the colors, and then another one for, you get, you get the point, right
+
+90
+00:09:07,201 --> 00:09:14,150
+正因为如此，OpenGL并不关心你们怎么做，可以交叉所有数据，在上面有一个大顶点
+so because of that, OpenGL doesn't really care how you do that, you can interlet all your data, and have one big fat vertex above
+
+91
+00:09:14,150 --> 00:09:17,799
+这差不多就是你们想要的，顺便说一下，99%的情况下
+which is pretty much what you want, like 99 percent of the case by the way
+
+92
+00:09:17,975 --> 00:09:23,475
+或者你们可以把顶点缓冲区分成不同的实际顶点缓冲区，和不同的内存缓冲区
+or you can split up your vertex buffers into separate kind of actual vertex buffers, and separate buffers of memory
+
+93
+00:09:23,800 --> 00:09:28,000
+然后分别上传，没关系，因为这是一样的，对吧
+and then upload them individually, it doesn't matter, because this stays the same, right
+
+94
+00:09:28,175 --> 00:09:32,400
+只是在描述顶点数组的时候，你们碰巧在不同的顶点缓冲区中绑定
+it's just you happen to bind in different vertex buffers at certain times, when you actually describe your vertex array
+
+95
+00:09:32,400 --> 00:09:37,900
+我们可能会在下一期讨论这个问题，因为下一期我们将讨论顶点数组
+and we'll kind of maybe talk about that in the next episode, because next episode we're going to talk about vertex arrays
+
+96
+00:09:37,900 --> 00:09:43,775
+并将它们抽象到一个类中，这意味着这些东西，无论如何，我想让你们知道的是
+and actually abstracting them out into a class, which means this kind of stuff, anyway, what I want you to know is that
+
+97
+00:09:43,775 --> 00:09:49,775
+这个特殊的绑定，我启用了一个VertexAttribArray并指定，看看我的缓冲区的布局
+this particular binding this kind of, I'm enabling a VertexAttribArray and specify, and look at the layout of my buffer
+
+98
+00:09:50,133 --> 00:09:57,225
+它存储在一个顶点数组中，如果我绑定另一个顶点缓冲区，不需要重新定义这个
+that is stored in a vertex array, if I bind another vertex buffer, or something like if I don't need to redefine this
+
+99
+00:09:57,466 --> 00:10:02,950
+我所需要做的就是把这些东西保存到顶点数组中，如果我想重调它进行渲染的话
+all I need to do is this stuff gets saved into my vertex array, if I want to recall it for rendering
+
+100
+00:10:03,200 --> 00:10:11,175
+我只是再一次绑定顶点数组，就完成了，第二个信息是它直接绑定到着色器上
+I just simply bind my vertex array again, and it's done, okay, the second piece of information is that this is directly tied to our shader
+
+101
+00:10:11,475 --> 00:10:19,100
+如果我们看一个着色器，就像在这指定的，看这个，layout location = 0 vec3 a_Position
+right, if we look at a shader, like we've specified one here, look at this, layout location equals 0, vec3 a_Position, right
+
+102
+00:10:20,400 --> 00:10:25,840
+那就是这个数据，矢量的三个分量，对吧，三个浮点数，那就是矢量，对吧
+that's this piece of data, three component of vector, right, three floats, that's what a vector is, right
+
+103
+00:10:26,224 --> 00:10:31,450
+未标准化，3*sizeof(float), 也就是12字节，同样是这个类型的sizeof
+not normalized, 3 times the sizeof float, 12 bytes, again, the sizeof this type
+
+104
+00:10:31,850 --> 00:10:35,850
+Index 0, layout = 0，而不是location = 0，
+index 0, layout equals 0, rather location equals 0, 
+
+105
+00:10:36,200 --> 00:10:40,550
+对吧，那就是它的联系，如果我们突然想要一个法线
+right, that is what that's tied in with, if we suddenly want to take in a normal
+
+106
+00:10:40,650 --> 00:10:46,300
+对吧，我们把它放到位置1，我们用这个颜色，因为它是一个不同的类型，vec4
+right, we put that in location 1, let's just go with the color in this case, because it's a different type, a vec4
+
+107
+00:10:46,300 --> 00:10:54,950
+这将是我们的顶点颜色，对吧，我们要做的是复制这个，对吧，我们在下标1处有它
+and this will be our kind of vertex color, right, what we do, we do duplicate this, right, we have it at index 1
+
+108
+00:10:54,950 --> 00:10:59,775
+顺便说一下，我们还需要启用它，启用索引1，我们有四个浮点数
+and by the way, we also need to enable it, so enabling index 1, we have four floats
+
+109
+00:10:59,933 --> 00:11:06,375
+然后剩下的是一样的，除了这个变化，因为它是开着的，顺便说一下，这是错误的
+and then the press is kind of the same, except this changes, because that is on, this is wrong by the way
+
+110
+00:11:06,375 --> 00:11:13,025
+抱歉，这不是sizeof，这是stride，所以它实际上是每个顶点的sizeof，而不是元素的sizeof
+sorry, this isn't the sizeof, I should, this is the stride, so it's actually the sizeof each vertex, not the sizeof each element, right
+
+111
+00:11:13,575 --> 00:11:20,775
+它是数组中每个顶点之间的大小，如果我们有三个顶点，它是每个完整顶点的大小
+so it's kind of the size between each vertex in the array, so if we have three vertices, it's the sizeof each full vertex
+
+112
+00:11:20,850 --> 00:11:27,425
+在这个例子中，是位置和颜色的sizeof，也就是7*sizeof(float)
+which would be the sizeof both the position and the color in this case, which would actually be 7 times sizeof float
+
+113
+00:11:27,425 --> 00:11:31,375
+那对它们来说是一样的，所以这个变成了这个，对吧
+and that would be the same for both of them, so this changes to this, right
+
+114
+00:11:32,375 --> 00:11:39,550
+然后偏移量是，这个特定元素的偏移量，对吧，在缓冲区内，所以很明显这是vec3
+and then the offset is, the offset of this particular element, right, inside the buffer, so obviously this is vec3
+
+115
+00:11:39,550 --> 00:11:42,625
+那是12个字节，3个浮点数，对吧，就是12个字节
+that's 12 bytes, 3 floats, right, 12 bytes
+
+116
+00:11:43,075 --> 00:11:46,000
+所以这个的偏移量是12，所以它就是12，对吧
+so the offset of this is going to be 12, so it's simply 12, right
+
+117
+00:11:46,366 --> 00:11:55,425
+我们只需要将它强制转换为一个const void*，好了，所以那就是我们最终得到的
+and we just need to cast it to a const void pointer, okay, const, okay, so that's kind of what we end up with
+
+118
+00:11:55,566 --> 00:12:01,375
+但你们可以看到它直接绑定到我的着色器上，那就是我想在这里强调的一点
+but you can see that is directly tied to my shader, that's the kind of the point that I want to drive home right here is
+
+119
+00:12:01,550 --> 00:12:06,950
+它被绑定到我的着色器上，在OpenGL中它并不是绑定在两个着色器上
+it's tied to my shader, okay, and it's actually not really tied 2 shaders in OpenGL
+
+120
+00:12:06,950 --> 00:12:12,300
+在这种意义上，在这之间没有执行验证，在DirectX中，它是绝对执行的
+in the sense that there's no validation performed between that, in DirectX, it is absolutely performed
+
+121
+00:12:12,300 --> 00:12:16,950
+对吧，你们不能描述一个顶点缓冲区，直到绑定了一个着色器
+right, you can not describe a vertex buffer until you've bound a shader
+
+122
+00:12:17,300 --> 00:12:21,000
+好了，所以这实际上和OpenGL的原理有点不同
+okay, so it's actually a bit different than how OpenGL works
+
+123
+00:12:21,425 --> 00:12:26,500
+不管怎样，那就是我的观点，因为它与我的着色器紧密相连
+anyway, that's kind of my point, so because it's so heavily tied with my shader
+
+124
+00:12:26,775 --> 00:12:30,050
+我实际上想为我的缓冲布局做的是
+what I actually want to kind of do for my buffer layout is
+
+125
+00:12:30,050 --> 00:12:38,050
+我只是想在顶点缓冲区上设置一个缓冲区布局，现在我看到了，它们被绑定到顶点数组上
+I basically just want to be able to set a buffer layout onto a vertex buffer, right, now I did just see that, they're tied to vertex arrays
+
+126
+00:12:38,200 --> 00:12:47,075
+然而，布局描述，就像布局是特定于顶点缓冲区一样，它描述了实际内存缓冲区的布局
+however a layout describes, like a layout is specific to a vertex buffer, it describes a layout of an actual buffer of memory
+
+127
+00:12:47,566 --> 00:12:53,775
+OpenGL在顶点数组中存储状态，在DirectX中，在顶点缓冲区中
+so whilst OpenGL kind of stores the state in vertex array, in DirectX, that specifically on vertex buffer is
+
+128
+00:12:53,966 --> 00:13:00,275
+因为在DirectX中没有顶点数组这种东西，但除此之外，它对我们来说更有意义
+because there's no such thing as a vertex array in DirectX, but apart from that, it just makes, it just makes more sense to us
+
+129
+00:13:00,750 --> 00:13:07,525
+所以对我们来说，它们是否存储在顶点数组中并不重要，因为我们仍然可以解决这个问题
+so to us, it doesn't really matter that they're actually stored inside vertex arrays, because we can still kind of work around that
+
+130
+00:13:07,966 --> 00:13:14,999
+把它们存储在我们喜欢的任何地方，它只是在最后，在背后，当我们需要的时候，会做区分
+and store them wherever we like, it is just in the end, under the hood, we'll make that differentiation, when we need to
+
+131
+00:13:14,999 --> 00:13:21,950
+但是表面接口仍然应该将它设置到顶点缓冲区，现在我如何描述这个布局
+but the surface level api should still set it onto the vertex buffer, now how do I describe this layout
+
+132
+00:13:22,025 --> 00:13:26,275
+这儿有很多种实现方法，但我不想浪费你们的时间，只给你们看不好的解题方法
+well there's a lot of ways that you could do it, but I'm not going to waste your time, and show you all the bad ways of doing it
+
+133
+00:13:26,275 --> 00:13:32,021
+我会给你们展示一种很好的方法，也就是我所说的，我们想要有一种优雅的视觉表示
+I'll just show you a nice way of doing it, which is again what I'm talking about, where we want to kind of have an elegant visual representation of this
+
+134
+00:13:32,375 --> 00:13:35,077
+这不是很酷吗，如果我们描述这个布局
+wouldn't it be cool, if when we describe this layout
+
+135
+00:13:35,300 --> 00:13:42,275
+我们可以有这样的代码，就像这里，你们知道的，我们的布局等于
+we could somehow literally just have this kind of code, like right here, and just be like you know our layout equals
+
+136
+00:13:42,766 --> 00:13:51,725
+也许把这个放在括号里，我们的布局等于这样，现在让我，我刚刚意识到
+kind of maybe put this in brackets, our layout equals like that, right, now let me just, I just realized
+
+137
+00:13:52,400 --> 00:13:56,725
+我有一些我们不需要的空格，如果我们可以那样做，不是很好吗
+I've got white spaces on which we don't need, wouldn't it be nice, if we could just do something like that
+
+138
+00:13:57,175 --> 00:14:02,021
+那就是我们要做的，我们实际上要创建它，这样我们就能看到布局的视觉表现
+well that's kind of what we're gonna do, we're gonna actually literally make it, so that we can see a visual representation of our layout
+
+139
+00:14:02,366 --> 00:14:08,300
+所以我们的目标是有一个叫做BufferLayout类的东西，它看起来像这样
+so our goal is to have something that's maybe called a BufferLayout class, right, which is going to look like this
+
+140
+00:14:08,400 --> 00:14:13,800
+然后我们可能会得到每个元素都是这样定义的
+and then maybe what we'll have is each element is going to be kind of defined like this
+
+141
+00:14:13,975 --> 00:14:17,825
+好了，我们将通过使用一个初始化的列表来实现这个
+okay, and we're going to achieve this by just using an initialized list
+
+142
+00:14:17,825 --> 00:14:24,450
+可能把这些元素存储在一个向量中，现在我们不打算使用vec3或vec4，这里有一个GLM类型
+and probably storing these elements in a vector, now we're not going to use it vec3 or vec4, there's a glm types in this case
+
+143
+00:14:24,450 --> 00:14:28,750
+这里它们显然是OpenGL着色器语言中的glsl类型
+well and here they are obviously the glsl types inside the OpenGL shading language
+
+144
+00:14:29,900 --> 00:14:34,575
+但我们实际要做的是，创建一些枚举，来描述这个数据类型
+but what we're actually gonna do is, come up with some kind of enum, that describes this data type
+
+145
+00:14:34,766 --> 00:14:39,000
+所以我们本质上可能会创建一个枚举类ShaderDataType
+so we're essentially gonna probably create like an enum class called like ShaderDataType
+
+146
+00:14:39,350 --> 00:14:46,799
+这就是我们的跨接口跨平台，我们只是在shader中定义每种数据类型
+which will be kind of our cross api cross platform we're just kind of defining each data type that is inside a shader
+
+147
+00:14:46,799 --> 00:14:55,725
+那么比如vec3 vec4，你们知道float, int之类的，所以可能会用Float3来描述一个三分量
+so like vec3 vec4, you know float, int that kind of stuff, so we'll probably use something called like Float3 to describe a three component thing
+
+148
+00:14:56,533 --> 00:15:03,775
+你们知道的，vec3很酷，但我有点喜欢Float3，那就是HLSL的风格
+you know vec3 is cool, and all but I kind of like Float3, that's kind of the HLSL style way of doing things
+
+149
+00:15:03,775 --> 00:15:08,450
+我们可能最终会切换到HLSL着色器，如果你们愿意的话，也可以使用vec3
+and we are probably going to eventually switch to HLSL shaders, you can use vec3, if you want
+
+150
+00:15:08,450 --> 00:15:16,834
+因为那有点像我们的数学库，但我要用Float3来描述一个3分量的浮点数
+because that's kind of tied to our math library in like at the moment, but I'm just going to use Float3 to describe a 3 component float
+
+151
+00:15:17,000 --> 00:15:22,968
+对吧，因为这是有意义的，然后可能会给它一个名字，现在你们真的不需要给它一个名字
+right, because it makes sense, and then we'll probably give it a name, now you don't really need to give it a name
+
+152
+00:15:23,100 --> 00:15:30,150
+给它一个名字很有用，比如在DirectX中，我们需要提供某种字符串，你们以后会发现，但是
+it's useful to give it a name, like in DirectX, we will have to supply some kind of string, as you'll find out in the future, but
+
+153
+00:15:31,375 --> 00:15:34,650
+给它起个名字很好，这样你们就知道这实际上是什么了
+it's just nice to kind of give it a name, just so that you know what this actually is
+
+154
+00:15:34,950 --> 00:15:40,400
+如果你们想的话，可以把它叫做一样的东西，在这个例子中我就是这么做的，所以可能会有
+and if you want you can actually call it the same thing, which is what I'm kind of doing in this case, so we might have that
+
+155
+00:15:40,650 --> 00:15:43,950
+我们还是把颜色去掉吧，我的意思是，你们知道的，对颜色做同样的处理
+let's just get rid of this whole color thing, I mean essentially you do the same thing for color though
+
+156
+00:15:43,950 --> 00:15:49,200
+你们只需要创建vec，比如Float4，做所有这些，看起来会很漂亮，对吧，要去掉颜色
+you just make a vec, like a Float4 and do all of that, and that's gonna look really nice, right, we'll get rid of color here
+
+157
+00:15:50,066 --> 00:15:56,325
+我们会去掉这些东西，变回三个浮点数，我们会试着先渲染那个三角形
+and we'll get rid of this stuff, changes back to three floats, and we'll try and just render that triangle to begin with
+
+158
+00:15:56,800 --> 00:16:03,237
+好了，所以这是我的布局，然后我要设置布局，那就是我想要找到布局的方式
+okay, so this is my layout, and then I'll set my layout, and that's kind of it, that's actually how I wanted to find my layout
+
+159
+00:16:03,533 --> 00:16:08,333
+你们可以看到它变得非常漂亮，因为突然间我有了一个布局，里面充满了我需要的东西
+and you can see that it becomes really nice, because suddenly if I have a layout, that's full of like stuff that I need
+
+160
+00:16:08,333 --> 00:16:11,450
+你们知道的，我们可能有纹理坐标之类的东西
+you know, like you know, we might have like texture coordinates or something
+
+161
+00:16:13,150 --> 00:16:18,800
+你们知道的，有一些像贴图坐标和法线，然后还可能有颜色之类的
+and you know, you have something like tex coord and maybe normals, and then you might have like a color or anything
+
+162
+00:16:18,800 --> 00:16:23,375
+很容易看到这个缓冲区的布局，对吧，太棒了，那就是我所要做的
+it's just so easy to see the layout of this buffer, right, it's amazing, that's all I need to do
+
+163
+00:16:23,733 --> 00:16:30,875
+显然，如果我想要一个数组，比如，如果我想让它标准化，我可以添加第三个参数
+and obviously if I want to like have an array of things, like you know, if I want it to be normalized or not, I can maybe add third parameter
+
+164
+00:16:31,266 --> 00:16:35,800
+但这就是我们想要的，所以让我们来看看实现这一切的魔法
+but this is kind of what we're going for, so let's take a look at the magic to make this happen
+
+165
+00:16:36,333 --> 00:16:43,400
+所以我将在Buffer.h文件中定义所有这些代码，因为它与缓冲区布局和所有这些东西有关
+so I'm going to define all this code inside the buffer file here, because it is to do with buffer layouts and all that stuff
+
+166
+00:16:43,775 --> 00:16:54,950
+所以我要创建BufferLayout类，一个BufferLayout本质上包含一个BufferElements的向量
+so I'm going to make a class called BufferLayout, okay, and a BufferLayout is essentially going to contain a vector of BufferElements
+
+167
+00:16:55,966 --> 00:17:05,770
+好了，这些将被称为m_Elements，我马上给它一个getter来返回那个
+okay, and these are going to be called m_Elements, I'm immediately just going to give it a getter to return that
+
+168
+00:17:05,850 --> 00:17:13,322
+因为我们需要它，所以就是GetElements() const，它会返回m_Elements，好了
+because we are gonna need that, so GetElements const, and that will return m_Elements, okay
+
+169
+00:17:14,133 --> 00:17:21,075
+然后这些缓冲元素将是另一个类，实际上我将把它抽象成struct BufferElement
+and then these buffer elements are going to be another class, actually I'll pull this a struct BufferElement
+
+170
+00:17:22,025 --> 00:17:30,240
+这将包含所有我们需要指定的东西，好了，第一个属性，它将包含一个名字
+and this is going to contain all of the stuff that we need to actually specify, okay, so the first thing, it will contain is a name
+
+171
+00:17:31,600 --> 00:17:45,984
+那么就是std::string Name，我的意思是没有特定顺序，需要Offset和Size，还需要什么
+so std::string Name, I mean in no particular order, we need the Offset, we need the Size, we need, what else do we need
+
+172
+00:17:46,425 --> 00:17:53,100
+我猜是Count，因为我们可以有很多这样的东西，老实说，我不确定我们是否需要它
+the Count, I guess, because we can have like multiple of these, I'm not really sure if we need that, to be honest
+
+173
+00:17:53,100 --> 00:17:57,900
+因为我只是在想，我们肯定需要统一变量，如果我们有一个数组，但我们通常不需要
+because I'm just thinking about it, like we definitely need that for uniforms, if we have like an array, but we don't generally
+
+174
+00:17:58,133 --> 00:18:02,525
+我想如果我们只有那个ShaderDataType，它将是数据的类型
+I think if we just have that ShaderDataType as I said, which is going to be the Type of data
+
+175
+00:18:02,525 --> 00:18:05,066
+我们大概知道我们有多少个元素，不管怎么样
+we'll kind of know the count of how many elements we have, anyway
+
+176
+00:18:05,066 --> 00:18:08,650
+我们总是可以创建辅助函数来在两者之间进行转换，对吧
+and we can always create helper functions to kind of convert between the two, right
+
+177
+00:18:09,566 --> 00:18:15,885
+所以我们可能有Name，Type，Size，然后是Offset，我认为那应该足够了，对吧
+so we maybe have the Name, the Type, the Size, and then the Offset, and I think that should be enough, right
+
+178
+00:18:16,366 --> 00:18:25,418
+现在我们在这里构造这个的方法是先写类型，对吧，然后是实际的名称
+now the way that we constructed this over here was just by writing the type first, right, and then the actual name
+
+179
+00:18:25,418 --> 00:18:31,425
+所以我们在这里也可以这样做，我们只需要创建一个构造函数来允许那种构造，对吧
+so we can actually do that here as well, we just need to create a constructor that allows that kind of construction, right
+
+180
+00:18:31,825 --> 00:18:41,850
+所以我写const std::string& name，然后是ShaderDataType type，对吧
+so I'll write const std::string& name, and then ShaderDataType type, all right
+
+181
+00:18:42,566 --> 00:18:57,675
+然后在这里，我们将设置所有内容，因此Name将设置为name, Type是type, Size是0
+and then over here, we will set everything, so Name will set to name, the Type will set to type, Size will set to 0
+
+182
+00:18:57,925 --> 00:19:02,965
+老实说，Size，我们可以立即计算，我认为，因为那只是Type的sizeof
+to be honest, Size, we can calculate pretty much immediately, I think, because that's just the sizeof the Type
+
+183
+00:19:03,666 --> 00:19:09,100
+所以我们可能不需要设置它，尽管我们可以在这里设置一个默认值，然后我们将Offset设为0
+so we probably don't need to set that although, we can here as a default, and then Offset, we'll set a 0 Offset
+
+184
+00:19:09,100 --> 00:19:15,125
+只有有了context，我们才能计算，Offset是这个元素在布局中的偏移量
+we can really only calculate, once we have context, so Offset is going to be the offset of this element inside our layout
+
+185
+00:19:15,400 --> 00:19:21,475
+显然，要计算Offset，我们需要知道所有的元素，因为如果这是第二个元素
+so obviously to calculate the Offset, we need to be aware of all the elements in there, because if this is like the second element
+
+186
+00:19:22,333 --> 00:19:28,275
+它的Offset将是第一个元素的sizeof，对吧，因为这是它进入缓冲区的大小
+its Offset is going to be the sizeof the first element, right, because that's how much into the buffer it is
+
+187
+00:19:28,966 --> 00:19:32,775
+所以我们不能在这里计算，但是我们可以计算它的大小，所以可以那样做
+so we can't really calculate that just here, but we can calculate the size, so we might do that
+
+188
+00:19:33,450 --> 00:19:39,575
+总之，enum class ShaderDataType，我们可以这样做
+anyway, enum class ShaderDataType, right, and we can make this like
+
+189
+00:19:40,100 --> 00:19:45,700
+我的意思是，如果你们想，可以让这个像uint8_t或只是很小的东西，因为它真的不需要很大
+I mean, if you wanted to, you can make this like uint8_t or something just tiny, because it doesn't really need to be very big
+
+190
+00:19:47,200 --> 00:19:53,370
+从字面上说，这并不重要，你们知道的，我不是那种认为这不会序列化，这不是
+literally, it doesn't really matter, you know, I'm not one to just like this isn't gonna be serialized, this is not like
+
+191
+00:19:53,566 --> 00:19:58,500
+也许当我们尝试着完整地打包这些数据时，我们可以在以后来做那个
+maybe if it comes down to us trying to really pack this data entirely, we can do that in the future
+
+192
+00:19:58,800 --> 00:20:03,750
+但你们暂时不需要，我们有None，Float，Float2
+but you don't need to in the, like the time being, so we'll have None, we'll have Float, we'll have Float2
+
+193
+00:20:05,133 --> 00:20:14,784
+我们会有Float3，我们会有Float4，我们会有，我想我们还会有Mat3 Mat4
+we'll have Float3, we'll have Float4, we'll have, I guess we'll can do like Mat3 Mat4
+
+194
+00:20:16,933 --> 00:20:24,725
+这不仅仅是描述属性，顺便说一下，它可以描述所有东西，我们有Int，Int2, Int3, Int4
+this is not just gonna describe attributes, by the way, it can describe everything, we'll have Int, we'll have Int2 Int3 Int4
+
+195
+00:20:25,300 --> 00:20:33,175
+嗯，是的，那可能已经足够好了，我们可能有Struct或像统一变量之类，我们到了那里就会过
+um yeah that's probably good enough, we might have Struct or something for like Uniforms, we'll cross that bridge when we get there
+
+196
+00:20:34,150 --> 00:20:42,000
+好了，对我来说，看起来很好，这是个很好的基本类型，也可以有布尔，也许这里只写Bool
+okay, that looks pretty good to me, it is a good like basic type, you can have Boolean as well, maybe I'll just write Bool at the end here
+
+197
+00:20:42,133 --> 00:20:52,700
+好了，那很好，对吧，那描述了所有关于类型的内容，现在我关心的两件事是Size和Offset
+okay, that's pretty pretty good, right, so that describes all about types, now two things I'm concerned about is a Size and also the the Offset
+
+198
+00:20:52,700 --> 00:20:56,675
+我们可以拿上计算出来，所以我们能做的就是创建某种函数
+which we can calculate in a minute, so what we can do is create some kind of function
+
+199
+00:20:56,675 --> 00:21:02,175
+显然，这种ShaderDataType和实际大小之间的转换
+obviously the converts between this kind of ShaderDataType and an actual size
+
+200
+00:21:02,366 --> 00:21:12,125
+所以我们可以做的就是创建一个静态的uint32_t ShaderData，只实现ShaderDataTypeSize
+so what we can do is just create a static uint32_t ShaderData, you know, we can just do ShaderDataTypeSize I guess
+
+201
+00:21:12,600 --> 00:21:20,075
+ShaderDataTypeSize(ShaderDataType type)，然后这会简化我括号中的字母
+ShaderDataTypeSize(ShaderDataType type), and then this will simply my letter e seens at the jam
+
+202
+00:21:20,075 --> 00:21:25,925
+因为我不能在不用力的情况下输入它，这将是一个switch语句
+because I can't type it without pressing hard, this is just gonna be a switch to seem, this is just gonna be a switch statement
+
+203
+00:21:26,700 --> 00:21:32,650
+它基本上是在，是在我们有的类型上switch，所以就是ShaderDataType
+the go is between the basically, just switches on every single type that we have, so ShaderDataType
+
+204
+00:21:33,100 --> 00:21:42,875
+你们知道的，给它赋值Float，在这种情况下，它有点，然后我有，让我们现在是1,2,3,4
+you know, give it Float, and in this case, you know, it just kind of, and then I have, let's just go one two three four for now
+
+205
+00:21:43,700 --> 00:21:48,600
+这只是返回sizeof，浮点数是4个字节，所以它会返回那么多
+this just returns the sizeof it, so a float is four bytes, so it's gonna return that much
+
+206
+00:21:48,800 --> 00:21:59,575
+我们也会对其他的类型做同样的处理，Float2, Float3, Float4, Mat3, Mat4，试着更全面些
+and we'll also kind of do the same for pretty much everything else, so a Float2 Float3 Float4, Mat3 Mat4, I'm gonna try and be comprehensive
+
+207
+00:21:59,700 --> 00:22:05,350
+通常我喜欢加入这些东西，因为这只需要一点
+usually I like adding these things as like go, just because this just takes needle
+
+208
+00:22:05,350 --> 00:22:10,518
+这会花很多时间，让视频变得更复杂，但至少现在我要这么做
+this just takes a bunch of time, and makes the video more complicated, but I'll do it at least for this for now
+
+209
+00:22:10,518 --> 00:22:21,200
+因为它不会花太多时间，好吧，我想就那样了，所有这些，对吧，我可以把它们对齐一点
+because it shouldn't take too much time, all right, I think that's it, so all of these, right, I can just align these a bit, okay
+
+210
+00:22:22,266 --> 00:22:35,225
+所以Float2将是4*2，Float3将是3*4，Mat3将是3*3，因为是3×3矩阵
+so Float2 is gonna be 4 times 2, Float3 is gonna be times 3 times 4, right, a Mat3 is gonna be times 3 times 3, right, because the 3 by 3 matrix
+
+211
+00:22:36,000 --> 00:22:46,000
+Float4和4×4矩阵是一样的，它会是4，它会是，它会是，它会是2
+a Float4 is gonna be the same about 4 by 4 matrix, and it's gonna be 4, you know, and it's gonna be, and it two's gonna be that
+
+212
+00:22:46,950 --> 00:22:53,850
+你们可以理解这一点，然后是Bool类型，我不确定，我之前可能是1，我们会看到的
+that that you guys can get the point, and then a Bool probably, I'm not sure, I might be one by my before, we'll see about that
+
+213
+00:22:53,850 --> 00:23:00,525
+我们现在就把它设为1，如果我们什么都没有，显然是返回0，我们还应该在这里断言
+we'll just leave it as one for now, and obviously one of 10 0, if we have nothing, and also we should definitely assert here
+
+214
+00:23:01,566 --> 00:23:12,850
+HZ_CORE_ASSERT(false， "Unknown ShaderDataType")，不需要打印类型，因为在这中断
+HZ_CORE_ASSERT(false, "Unknown ShaderDataType"), okay, and we don't need to print out the type, because that will just break here
+
+215
+00:23:12,850 --> 00:23:19,600
+我们可以自己用调试器检查它，好了，一切都好了，希望我没有出错
+and we can just inspect it using the debugger ourselves, okay, there we go, that's everything, hopefully I didn't make any mistakes
+
+216
+00:23:19,600 --> 00:23:27,875
+我在这有点匆忙，但现在可以看到，每个数据的类型是什么，对吧，记住，现在是在缓冲区
+I was kind of hasteful here, but now we can actually see, what the type of each piece of data is, right, now this is in buffer, remember
+
+217
+00:23:28,075 --> 00:23:34,375
+当我们把这个移到着色器中并有更多的东西时，我们会处理这个，好了，很酷，对吧
+when we actually move this into shaders and have more stuff, we'll deal with that kind of, then okay, cool, right
+
+218
+00:23:34,766 --> 00:23:39,400
+所以我们现在要做的是计算这个大小，对吧，这里是大小
+so what we want to do now is actually calculate that size, right, so right here in size
+
+219
+00:23:39,400 --> 00:23:47,575
+我们已经可以调用ShaderDataTypeSize()，然后传递type，好了，然后我们就有了，漂亮
+we can already just call ShaderDataTypeSize(), and then passing the type, alright, and then we have that, beautiful
+
+220
+00:23:48,650 --> 00:23:55,975
+这只是BufferElement，当然不是，当我们创建BufferLayout时，对吧
+now and this is just BufferElement, of course not BufferElements, when we create a BufferLayout, right
+
+221
+00:23:56,350 --> 00:24:01,950
+我们想要做的是接收并初始化一个列表之类的
+what we want to be able to do is take in and initialize a list, right, so this kind of thing
+
+222
+00:24:02,100 --> 00:24:10,325
+这很有趣，因为最终，你们可以看到，我只是想取一个常数向量，对吧
+now this this is interesting, because ultimately, you could just see, I just want to take in like a constant vector, right
+
+223
+00:24:10,666 --> 00:24:16,154
+因为如果你们取一个向量，没什么关系，如果它是常量引用之类的，那就不那么烦人了
+because if you take in a vector, and it doesn't matter, if it's constant reference or whatever, that let it ease annoying me
+
+224
+00:24:17,266 --> 00:24:23,100
+这无关紧要，如果它是const引用或其他什么，但如果你们把它传进来，就像这样应该有用
+it doesn't matter, if it's const reference or whatever, but if you take that in, like this kind of should work
+
+225
+00:24:23,400 --> 00:24:28,925
+它没有，因为这里发生了2个隐式转换，但是你们看，如果我们取这个类型
+it doesn't, because there's 2 implicit casts happening, but just see that you know, you know, if we just take this type
+
+226
+00:24:29,075 --> 00:24:34,975
+从技术上讲，我们改变了它，使它成为这种类型，对吧，那实际上是可行的，对吧
+technically speaking, and we change that, and make it this type, right, that will actually work, right
+
+227
+00:24:35,333 --> 00:24:41,500
+所以你们实际上可以构造这样的东西，现在它不运行了，这个，我们把它放错了方向
+so you can actually construct something like this, now it's not working, this, yeah we've kind of put this the wrong way around
+
+228
+00:24:42,250 --> 00:24:48,475
+我不知道我是怎么做到的，也很简单，所以把类型放在前面，然后是实际列表中的名字
+I don't know how I did that, so easily as well, so we put the type first, and then the name in our actual list here
+
+229
+00:24:48,600 --> 00:24:51,125
+如果我们去掉这个，然后返回，它应该可以运行，好了
+so if we get rid of this, and get back, it should work, yeah there we go
+
+230
+00:24:51,533 --> 00:24:58,250
+然后你们能做的就是决定我要做一个布局，从我的布局中布局
+see and then what you can do is actually decide that I want to make a layout, layout from my layout, right
+
+231
+00:24:58,625 --> 00:25:04,700
+我不能把这个布局画出来，但不管怎样，你们懂的，但不幸的是，我不能这么做，好了
+can't really pull this layout, but whatever, you get the point, right, but unfortunately, I can't just do this, okay
+
+232
+00:25:04,950 --> 00:25:11,133
+因为有一个隐式强制转换可以将一个向量，比如一个初始化的列表转换为一个向量
+because there's one implicit cast to convert a vector, like an initialized list into a vector
+
+233
+00:25:11,133 --> 00:25:15,800
+和另一个隐式强制转换，将vector转换为BufferLayout，因为BufferLayout有一个构造函数
+and another implicit cast to convert the vector into a BufferLayout, because BufferLayout has a constructor
+
+234
+00:25:16,025 --> 00:25:23,375
+那需要一个向量，所以我们不能那样做，我们能做的是在这里输入一个初始化列表，对吧
+that takes in vector, so we can't actually do that, what we can do however is actually just take in an initializer list here, right
+
+235
+00:25:23,733 --> 00:25:32,150
+然后如果我们真的那样做了，对吧，那么你们知道，就可以在这里做const引用
+and then if we actually do that, right, then you know, you can do like your const reference here
+
+236
+00:25:32,675 --> 00:25:39,619
+如果我们这样做，你们可以看到效果很好，好了，漂亮，现在基本上得到了想要的，酷
+if we do that, you can see this works, okay, beautiful, so now we basically got exactly what we wanted, which is pretty cool
+
+237
+00:25:40,533 --> 00:25:45,450
+然后从这个，对吧，我们如何转化成一个向量，就像我说的，这显然是一个有构向量
+and then from this, right, how do we convert into a vector, well as I said, there's obviously a constructive vector
+
+238
+00:25:45,800 --> 00:25:48,925
+它接受一个初始化的列表，所以我们就这样做
+that takes in an initialized list, so we literally just do
+
+239
+00:25:50,375 --> 00:25:56,700
+我想我会这样做，可能是layout或elements，就像那样
+I guess I'll do, maybe layout or elements, will call it, just like that
+
+240
+00:25:58,600 --> 00:26:06,225
+好了，现在我们可以从这里构造一个这样的向量，所有我们说过的数据都在这个向量里
+okay, there we go, so now we can construct one of these from here, and all of the data that we've actually said is inside this vector
+
+241
+00:26:06,225 --> 00:26:12,575
+这很酷，一旦我们有了这个向量，我们实际上需要计算偏移量，我写计算偏移量
+which is very cool, now once we have that vector, we actually need to calculate the offsets, so I'll say calculate offsets
+
+242
+00:26:13,200 --> 00:26:19,450
+我们还需要一个信息，那就是步幅，步幅就是每个顶点的大小
+and there's one more piece of information that we need, and that is the stride, and the stride is the size of each vertex
+
+243
+00:26:19,450 --> 00:26:25,525
+它是完整顶点，所以所有的属性，所有这些的大小，只有在我们有了整个列表之后才知道
+it's complete vertex, so all of the attributes, the size of all of those together, that's only known after we had the whole list
+
+244
+00:26:26,100 --> 00:26:30,850
+和偏移量一样，我们可以计算它，一旦有了整个列表，不能在BufferLayoutElement中这样做
+same as the offset, right, so we can calculate that, once we have the whole list, we can't do that inside BufferLayoutElement
+
+245
+00:26:30,850 --> 00:26:36,950
+但我们可以在这里做那个，所以我们创建uint32_t m_Stride，默认设置为0
+but we can do that here, so we'll make a uint32_t called m_Stride, will set a 0 by default
+
+246
+00:26:38,266 --> 00:26:47,750
+CalculateOffsetsAndStride将是我们这里的一个漂亮函数，它将是private
+CalculateOffsetsAndStride will be a beautiful function that we have here, that's gonna be private, private
+
+247
+00:26:50,200 --> 00:26:57,225
+那么就是void CalculateOffsetsAndStride，它会遍历所有列表，我们这里的所有元素
+so void CalculateOffsetsAndStride, that's going to go through all of the list, all the elements that we have here
+
+248
+00:26:58,500 --> 00:27:09,125
+所以我想我们会看到，就是for (auto& element : m_Elements)，对吧
+so I guess we'll just see, for auto reference elements in this letter is really annoying me, in elements, right
+
+249
+00:27:09,125 --> 00:27:17,525
+我们要做的是在这里保持偏移量，然后我想我们可以在这里设置m_Stride = 0
+and what we're gonna do is we're gonna maintain an offset here, and then I guess we can set m_Stride equal to 0 here
+
+250
+00:27:17,525 --> 00:27:27,375
+以防我们重新计算什么的，这就是我们要做的，会看到element.Offset=offset
+just in case we recalculated or something, this is what we're gonna do, we're just gonna see that the element.Offset, right, is gonna be our offset
+
+251
+00:27:28,400 --> 00:27:39,750
+然后我们看到offset += element.Size，对吧，然后我们还会看到m_Stride += element.Size
+then we're going to see offset += element.Size, right, and then we're also going to see, m_Stride += element.Size
+
+252
+00:27:41,025 --> 00:27:48,425
+好了，所以那个应该会设置所有的偏移量，也会计算整个BufferLayout的stride
+okay, so that should set all the offsets, and all the, and also calculate the stride for our entire BufferLayout
+
+253
+00:27:49,700 --> 00:27:56,525
+嗯，我想就那么了，说实话，我们还没有做什么，我想所有的事情，我不知道
+um that's, I think that's about it, to be honest, what what haven't we done, I think everything's, well I don't know
+
+254
+00:27:56,525 --> 00:28:02,575
+我们应该检查下，看看是否有效，还没有m_VertexBuffer->SetLayout()，马上就会做那个
+we should just check it out, and see if it works, so um we haven't done m_VertexBuffer->SetLayout(), we'll do that in a second
+
+255
+00:28:03,075 --> 00:28:07,800
+我在这里放一个断点，启动这个，看看这个布局是不是我们想要的样子
+I'll just gonna put a break point here, launch this, and see if that layout is everything that we wanted to be
+
+256
+00:28:08,800 --> 00:28:15,025
+更潜在的是，我可能应该添加些其他的来做布局，因为你们知道，我的意思是，这会很无聊
+and more potentially, I should probably add something else that did a layout, because just you know, I mean, this is gonna be pretty boring
+
+257
+00:28:15,025 --> 00:28:22,725
+如果我们只有一个元素，但如果我们看一下，我们的布局只有一个元素，那是对的，就是12
+I think if we just have one thing in there, but if we take a look, so our layout has one element, that's right of 12, which is correct
+
+258
+00:28:23,550 --> 00:28:32,325
+这个位置的偏移量为0，大小为12，好了，看起来不错，让我们再测试一下，再添加两个
+and the position has an offset of 0 size of 12, okay, looks good, let's just to test it a bit more, I'm gonna add 2 more things
+
+259
+00:28:34,200 --> 00:28:46,400
+我要添加另一个Float3，然后是一个Float4，也许我要把Float4放在中间，只是让它有点不同
+I'm going to add a another Float3 and then a Float4, maybe I'll put the Float4 in the middle, just to make it a bit different
+
+260
+00:28:46,525 --> 00:28:52,550
+所以我们假装有正常的颜色，我们会看到它是什么样子的，好了，我要看到的，没有编译
+so we'll pretend that, we have normal in the color, we'll see what that looks like, okay, that I was gonna see, I didn't compile
+
+261
+00:28:52,550 --> 00:29:04,225
+但那是因为把逗号放在了错误的地方，让我们在这里再试下，layout，这个Stride是40，对吗
+but that's because we put the comma in the wrong place, let's just try again here, okay, so layout, this Stride is 40, is that correct
+
+262
+00:29:04,625 --> 00:29:12,075
+16+4+12，是正确的，24+16，大小为3
+so 16+4+12 yep, that's correct, 24+16, sizes 3
+
+263
+00:29:12,075 --> 00:29:16,200
+这些应该有正确的偏移量，偏移量为12，偏移量为28
+and these should have correct offsets, offset of 12 and offset of 28
+
+264
+00:29:16,366 --> 00:29:22,950
+很漂亮，好了，那么继续，布局很好，那很酷，那么现在让我们尝试用它来渲染一些东西
+beautiful, okay, so there we go, layout clearly works, and that is really cool, so now let's try and render something with it
+
+265
+00:29:23,425 --> 00:29:27,650
+我要做的是进入Buffer类，对吧，到Buffer.h文件
+what I want to do is go into our Buffer class, right, to our Buffer.h file
+
+266
+00:29:28,533 --> 00:29:40,300
+然后添加virtual void SetLayout() BufferLayout，把它作为常量引用 layout，等于0
+and just add you know a virtual void SetLayout(), right, BufferLayout, take that in as a constant reference layout, equals 0
+
+267
+00:29:40,550 --> 00:29:55,925
+然后还会有virtual const BufferLayout& GetLayout()，所以希望能够获取和设置布局，对吧
+and then we'll also have a virtual const BufferLayout& GetLayout(), so I want to be able to get and set the layout, right
+
+268
+00:29:56,650 --> 00:30:00,050
+我们会打开OpenGLVertexBuffer，或者GLBuffer
+we'll open up OpenGLVertexBuffer, or rather GLBuffer
+
+269
+00:30:01,150 --> 00:30:05,266
+在这里，这些都应该被覆盖，顺便说一下，不知道为什么它们没有
+and inside here, these should all be overrides by the way, not sure why they're not
+
+270
+00:30:05,266 --> 00:30:16,074
+因为我太懒了，现在我们会有const override，这两个，GetLayout
+because I was lazy I guess, so now we're gonna have constant override for all of this, and these two, well GetLayout
+
+271
+00:30:16,366 --> 00:30:27,700
+在这个作用域布局中，我们会有BufferLayout m_Layout, GetLayout会返回它
+so into a scope layout here, so we'll have BufferLayout m_Layout, m_Layout, GetLayout is just going to return it
+
+272
+00:30:28,133 --> 00:30:37,550
+感谢VS提供了这么？的格式，然后这个会设置它，对吧，所以就是m_Layout = layout
+and thank you visual studio for that horrendous formatting, and then this is just going to set it, right, so m_Layout equals layout
+
+273
+00:30:38,166 --> 00:30:43,000
+我要把这两个都做成，那还不错，好了，搞定，那么继续
+I'll make both these, yeah that's fine, okay, done, so there we go
+
+274
+00:30:43,175 --> 00:30:46,550
+我要把它们做成内联的，但是没有意义了，已经是了
+I was gonna make them inline, but there's no point, that is done
+
+275
+00:30:47,350 --> 00:30:54,525
+现在应该可以用这个来摇摆了，正如我提到的，这个特殊的代码是被设置在顶点数组中
+now we should be able to just rock and roll with this, now as I mentioned, this particular code is get, it gets set in the vertex array
+
+276
+00:30:54,666 --> 00:30:59,238
+我们将在下期视频中讨论，因为我们还没有抽象出来，所以现在我们只在这里做这些
+we'll talk about that next video, because we haven't abstracted that just yet, so for now we'll just do that stuff here
+
+277
+00:30:59,875 --> 00:31:04,150
+你们就会看到它是如何运行的，但在下一期，我们会把它移到合适的位置
+and you'll kind of see how it works, but in the next episode, we'll move it into the appropriate location
+
+278
+00:31:04,333 --> 00:31:09,875
+我可以在这里结束这一期，但我不打算这样做，因为我真的想看，这些东西的运行和渲染
+I could there end the episode here, but I'm not going to, just because I actually want to see, this stuff in action and rendering
+
+279
+00:31:09,875 --> 00:31:16,450
+我向你们保证过顶点颜色，为了让这个东西运行，我需要做的是遍历布局中的每个元素
+and I did promise you guys vertex colors, okay, so to make this stuff work, what I need to do is iterate through every element in the layout
+
+280
+00:31:16,750 --> 00:31:25,750
+现在我可以写些代码，比如const auto& element inside layout.GetElements，但不想这样做
+now I could write codes such as you know, for const auto& element inside layout.GetElements, but I don't want to
+
+281
+00:31:25,750 --> 00:31:29,925
+我只是想写这样的代码，这样看起来更好，那么在BufferLayout中
+I just wanna write code like this, because it just looks better, so in BufferLayout
+
+282
+00:31:29,925 --> 00:31:34,800
+我要做的就是和我们在Layer中做的一样的事情
+what I'm gonna do to make that happen is the same thing that we did inside a Layer
+
+283
+00:31:34,800 --> 00:31:40,925
+如果你们还记得，不好意思，在LayerStack中，我们实际上提供了迭代器begin和end
+if you remember which is where I actually, sorry inside LayerStack, we're actually provided iterators begin and end
+
+284
+00:31:40,925 --> 00:31:45,275
+所以如果复制这段代码，然后进入Buffer
+so if we copy this code, and then go into Buffer
+
+285
+00:31:45,600 --> 00:31:50,150
+在BufferLayout GetElements()中，我可以在这里提供个迭代
+inside BufferLayout GetElements(), I can just provide an iterated here
+
+286
+00:31:50,150 --> 00:31:55,200
+显然在这个例子中，它将是一个BufferElement而不是一个Layer
+obviously in this case, it's going to be a BufferElement instead of a Layer
+
+287
+00:31:55,825 --> 00:32:00,850
+然后这将是m_Elements begin和end
+and then this is just going to be m_Elements begin and end
+
+288
+00:32:01,350 --> 00:32:07,350
+好了，现在我们可以这样做了，看起来很不错，我们需要遍历布局中的每个元素
+and there we go, okay, so now we can just do that, which just looks nice, so we either I need through every element in the layout
+
+289
+00:32:08,225 --> 00:32:13,075
+我们只是想在这里做这样的事情，所以我们会跟踪我们要用到的下标
+and we just want to do this kind of stuff here, so we'll keep track of which index we're up to
+
+290
+00:32:14,666 --> 00:32:21,625
+对吧，可以只用一个常规的for循环，这是内置的，但这也可以，这里的上标是什么
+right, could have just used a regular for loops, that has built in, but this is also fine, what's up the index here
+
+291
+00:32:22,000 --> 00:32:30,400
+然后我们增加索引，这就是有趣的地方，好了，所以OpenGL需要的是
+and then we'll increment the index, now this is where it gets interesting, okay, so what we need for OpenGL is
+
+292
+00:32:30,700 --> 00:32:34,875
+我们不能只看到它，它是vec3，我们必须看到它实际上是3个浮点数
+we can't just see that, it's a vec3, we have to see that it's actually 3 floats
+
+293
+00:32:34,875 --> 00:32:40,700
+我们必须设置类型，然后是计数，就好像它不是一个变量，现在交互式，你们不需要做那个
+we have to set the type, and then the count, as if it's like not one variable, now interactives, you don't, you don't do that
+
+294
+00:32:40,700 --> 00:32:46,200
+你们看，这是一个四分量向量，或者这是一个三分量向量，或者一个二分量向量
+you just see, you know, this is a four component vector, or this is a three component vector, or a two component vector
+
+295
+00:32:46,933 --> 00:32:53,147
+所以那就是为什么，就像我没有，这就是为什么我没有把它写出来，就像，你们知道的
+so that's why, like I don't, that's why I haven't written this in a way, that is just like, you know
+
+296
+00:32:53,400 --> 00:32:59,400
+type和count，就像我们让type为float，然后count为3，那很奇怪，我不喜欢那样做
+type and count, as if we have type being float, and then count being 3, that's weird, I don't like doing it that way
+
+297
+00:32:59,925 --> 00:33:05,550
+无论如何，DirectX不是其中之一，所以我们在这里需要进行某种转换
+and DirectX isn't one of that way, anyway, so what we need here is some kind of conversion to take place
+
+298
+00:33:05,966 --> 00:33:12,094
+这就很好了，不管怎样，元素都有分量计数，因为这样就可以了
+so will be nice, if just regardless, elements just had a component count, right, because that will just make that work
+
+299
+00:33:12,366 --> 00:33:17,450
+所以让我们回到Buffer，把它加进去，BufferElement，会产生一点
+so let's go back into Buffer, and actually just add that in, so BufferElement, will make a little
+
+300
+00:33:18,325 --> 00:33:25,175
+可能是这里的某种GetComponentCount的东西，我们可能会
+um probably some kind of GetComponentCount thing here, right mmm, we can probably like
+
+301
+00:33:25,175 --> 00:33:32,100
+我不确定最好的方法是什么，我猜，我不认为，天气会经常冷到我们可以缓存它
+I'm not sure what the best way to do this would be, I guess, I don't think, it's gonna be cold often enough for us to cache that
+
+302
+00:33:32,100 --> 00:33:39,350
+rule在内存中，那会很烦人，也许我们可以看到GetElementCount
+and rule in the kind of just so that in memory, that'll be annoying, so maybe we can just see GetElementCount
+
+303
+00:33:41,725 --> 00:33:51,775
+然后我们可以在这里做一些转换，想想这个，如果我们在这里设置const，可能没问题
+and then we can maybe just do some kind of switch here, just thinking about this, yeah it's probably fine, if we just make const here
+
+304
+00:33:52,133 --> 00:34:11,625
+然后我们会在这里switch类型，如果有个ShaderDataType::Float3，就会返回3，好了
+and then we'll switch on the type here, and we'll see that, if we have a ShaderDataType::Float3, we'll just return 3, okay
+
+305
+00:34:12,225 --> 00:34:18,750
+那是一个组件，我们在这里返回0，并断言我们有一个未知类型
+and that is the component cap what we'll return 0 here, and assert saying that we have an unknown type
+
+306
+00:34:18,875 --> 00:34:25,325
+再说一次，这种情况不应该发生，但可能会发生，我想，因为我是个好人
+again this shouldn't really happen ever, but it might, and I guess, because I'm a good person
+
+307
+00:34:25,800 --> 00:34:32,900
+尽管我说过可能不会，会摸索出剩下的，我们从Float开始，然后有Float2 Float3 Float4
+even though I said I probably wouldn't, will feel out the rest of these, so we'll start with Float, then we'll have Float2, Float3,Float4
+
+308
+00:34:34,275 --> 00:34:51,875
+然后是Int，哦，Int2 Int3 Int4，还有Mat4之类的，当然，我们可能不需要Mat4和Mat3
+then Int, oops, Int2 Int3 Int4, what else we have Mat Mat4 and stuff, okay, sure, ah, we probably don't need Mat4 and Mat3
+
+309
+00:34:51,875 --> 00:34:56,166
+跟你们说实话，因为这其中之一会很好
+to be completely honest with you, because it's one of these gonna be well
+
+310
+00:34:56,166 --> 00:35:00,600
+我不知道，这是那里的组件计数，它不仅仅用于属性，所以我们可能需要它
+and I don't know, this is the component count of there, it's not gonna be used just for attributes, so we might need that
+
+311
+00:35:00,600 --> 00:35:07,496
+然后在这里，我想我们会有一个bool类型，这显然是1，这是4，这是3，这是2
+and then over over here, I guess we'll have a bool, so that's obviously 1, that's 4, that's 3, that's 2
+
+312
+00:35:07,800 --> 00:35:18,925
+那是1，Mat4将是4*4，Mat3将是3*3，Float4将是4 2 1，对我来说这看起来很好
+that's 1, Mat4 is going to be 4*4, Mat3 is gonna be 3*3, Float4 is gonna be 4, 2,1, alright, that looks pretty good to me
+
+313
+00:35:18,925 --> 00:35:26,950
+让我们把它TAB过来，让我们试着把它对齐，这样看起来更好看
+let's just tab this across, and let's kind of try and align this somewhat, just so that it looks nice
+
+314
+00:35:30,366 --> 00:35:34,750
+继续，好了，酷，那么继续，现在我们得到了元素计数
+and there we go, okay, cool, so there we go, now we've got the element count
+
+315
+00:35:37,500 --> 00:35:46,875
+抱歉，不是ElementCount，这是GetComponentCount，好了，所以这就是这里有多少个组件
+sorry, not ElementCount, this is GetComponentCount, okay, so this is just how many components essentially we have here
+
+316
+00:35:47,050 --> 00:35:49,650
+现在不幸的是，我们还需要，我们有了分量容量
+now unfortunately we also need, so we've got the component cap
+
+317
+00:35:49,650 --> 00:35:57,750
+但我们还需要实际的OpenGL类型，这就像base类型，我们不能有vec3，需要特别的float
+but we also need the actual OpenGL type, and this is like the base type, we can't have like vec3, we need specifically float
+
+318
+00:35:58,300 --> 00:36:04,900
+所以我们还需要一些东西来解决这个，现在不太喜欢我们实际拥有的类型，显然是在元素中
+so we also need something that figures that out, now I don't really like the type that we actually have, obviously is inside our element
+
+319
+00:36:05,225 --> 00:36:09,950
+它就像我们的，就像我们的element.Type
+and it is like our, like you know, we have like element.Type essentially
+
+320
+00:36:10,366 --> 00:36:16,550
+那是我们的ShaderDataType，我要做的是在这里写一个函数，它显然不会永远在这里
+that's our ShaderDataType, so what I'm gonna do is write a function up here, that's obviously not gonna live here forever
+
+321
+00:36:16,933 --> 00:36:25,350
+它会被调用，我们会让它返回，我们会让它返回一个GLenum，我猜就是那个类型
+it's gonna be called, we'll have it return a, we'll have it return a GLenum, which is what that type I guess
+
+322
+00:36:25,475 --> 00:36:29,100
+prime的VertexAttribPointer实际期望的类型是什么
+what the VertexAttribPointer of prime would actually expect the type to be
+
+323
+00:36:29,775 --> 00:36:35,950
+我们会看到ShaderDataTypeToOpenGLBaseType
+we'll see ShaderDataTypeToOpenGLBaseType
+
+324
+00:36:36,200 --> 00:36:42,099
+以防在ShaderDataType到OpenGL基类型之间有一个转换
+in case there's going to be a conversion between the ShaderDataType to the OpenGL base type
+
+325
+00:36:42,500 --> 00:36:45,325
+同样，我们会有一个关于类型的switch语句
+so again, we'll have a switch statement on type
+
+326
+00:36:46,250 --> 00:36:50,600
+哦，我的天，为我做了这些，那很酷，可能现在要做所有的事情，我不打算这样做
+oh my gosh, did that for me, that's pretty cool, might actually have to do all of it now, I wasn't planning to
+
+327
+00:36:50,800 --> 00:36:59,200
+这是我计划的一次，实际上没有做所有这些，但我想我现在必须做了，所以在这种情况下
+this is the one, this is the one time I was planning on, not actually doing all of these, but I guess I will have to now, so in this case
+
+328
+00:36:59,250 --> 00:37:08,625
+我们会返回GL_FLOAT，那实际上会是这样，我想对于很多这些来说，包括这个
+you know, we're gonna just return GL_FLOAT, and that's actually gonna be the case, I think for a lot of these, so this included
+
+329
+00:37:08,966 --> 00:37:13,675
+对吧，你们并不总是需要这个函数，但有时确实需要它
+right, and you you don't always need this function, but you do sometimes need it
+
+330
+00:37:13,675 --> 00:37:17,475
+我想对于那个，对于那个，它很好，所以这就是GL_INT
+and I guess for that, for that, it's fine, so this is GL_INT
+
+331
+00:37:18,525 --> 00:37:24,100
+我们还没有处理unsigned int，但是你们知道，如果以后真的需要它，那么可以这样做
+and we haven't dealt with unsigned int, but you know, if we really want that in the future, then we can just do that in the future
+
+332
+00:37:24,733 --> 00:37:33,875
+好吧，我不知道，我们只会有GL_BOOL，我不知道，因为这不是我们整天做的事情
+okay, I don't even know, we'll just have GL_BOOL I guess, I don't really know, because this isn't something that we do all day
+
+333
+00:37:34,425 --> 00:37:44,850
+所以未知就返回0，好了，酷，那么继续，现在我们要做的就是到这里
+so unknown that returns 0, okay, cool, so there we go, so now what we can do is actually go here
+
+334
+00:37:45,166 --> 00:37:51,700
+看到我们有ShaderDataTypeToOpenGLBaseType，那就是我们如何输出GL_FLOAT
+and see that we have ShaderDataTypeToOpenGLBaseType, and that's how we go out GL_FLOAT
+
+335
+00:37:51,700 --> 00:37:59,650
+现在它是否标准化了，这很容易做到，就是element.Normalized，我忘了标准化
+now whether it's normalized, again really easy to do, element.Normalized, oh my gosh, I forgot about normalization, didn't I
+
+336
+00:38:00,738 --> 00:38:05,950
+Normalized，如果那是真的，那么我们就返回GL_TRUE
+Normalized, so if that's true, then we'll do GL_TRUE
+
+337
+00:38:08,375 --> 00:38:10,425
+不管怎样，我忘了一些东西，否则就是GL_FALSE
+anyway, I forgot something, otherwise GL_FALSE
+
+338
+00:38:10,425 --> 00:38:18,600
+好了，stride显然是layout，不是element，而是layout.Stride, GetStride
+okay, the stride obviously is going to be layout, not element, but layout.Stride, GetStride
+
+339
+00:38:18,800 --> 00:38:21,025
+我以为我做到了，显然没有
+I thought I did that, apparently not
+
+340
+00:38:21,650 --> 00:38:28,250
+偏移量是element.Offset，然后我们将它转换为一个const void*
+and the offset is going to be element.Offset, okay, and we'll cast this to a const void pointer
+
+341
+00:38:29,000 --> 00:38:32,825
+好吧，有点难看，因为它太大了，但是我们有很长的代码行
+alright, bit hard to see, because it's pretty big, but there we have our huge line of code
+
+342
+00:38:33,466 --> 00:38:39,725
+我应该把它分成几行，我想我会把它分成几行
+which I probably should break into multiple lines, that I guess I will break it up into multiple lines
+
+343
+00:38:39,725 --> 00:38:46,575
+看看你们的人能看到所有的东西，所以我们会有所有这些东西
+just see your guys can see all of it, so we'll kind of have all of this stuff
+
+344
+00:38:46,950 --> 00:38:50,625
+我猜每一个参数都在几行上，就像这样，好了
+I guess every parameter on a several line, just like that, okay
+
+345
+00:38:51,800 --> 00:39:06,050
+和Normalized，所以需要加上这个，Buffer，bool Normalized，我也不知道，默认为false
+and Normalized, so we need to add that, so Buffer, bool Normalized, which again like I don't know, we'll just have it as false by default
+
+346
+00:39:06,050 --> 00:39:11,375
+现在还没有真正的方法来设置它，但可能有构造函数，我的意思是，看，让我们友好一点
+and no real way to set it for now, but we might have a constructor, I mean, look, let's just be nice
+
+347
+00:39:11,733 --> 00:39:19,175
+让我们看看bool，实际上我确定它都适用于初始化列表，但如果我们这样做，它是否有效
+let's just see bool, well I'm actually sure it's all work with initializer lists, but if we just do that, does that work
+
+348
+00:39:20,550 --> 00:39:27,475
+这还是可以的，很酷，所以我们现在可以选择性地指定它是否标准化了，所以标准化对
+yeah that still works, cool, so we can now optionally specify whether or not this is normalized, so normalization is good for
+
+349
+00:39:27,475 --> 00:39:34,025
+如果你们提供的是unsigned int类型，想让它自动转换成vec4类型或者浮点类型
+if you're supplying like an unsigned int essentially, and you want it to automatically convert into a vec4 or like floats
+
+350
+00:39:34,400 --> 00:39:39,325
+它实际上可以那样做，你们只是看到，提供了一个int型，它需要被标准化
+it can actually do that, you just see that, you're supplying an int, and that it needs to be normalized
+
+351
+00:39:40,100 --> 00:39:44,725
+你们就会得到那个，这个没有叫GetStride()的成员，所以你们现在能做的是
+and you'll get that, this has no member called GetStride(), yeah so what you can do now is
+
+352
+00:39:44,725 --> 00:39:49,975
+如果要将某物标准化，你们可以做那个，对吧，再说一次，我不确定
+if something were to be normalized, you could just do that, right, and again, not sure
+
+353
+00:39:51,000 --> 00:39:52,175
+所以这里你们不会做那个
+yeah so you wouldn't do that here
+
+354
+00:39:52,175 --> 00:39:59,500
+但如果你们有颜色作为它的参数，可能会尝试一下，为什么不呢，我今天感觉有点冒险
+but if you had like a color as it as an outside in, we might actually try that out, you know, why not, I'm feeling a bit adventurous today
+
+355
+00:39:59,500 --> 00:40:05,039
+我感觉我真的在做一些事情，尽管这期视频很长，不管怎样，我不讲了，那么就是GetStride
+and I'm feeling like actually doing stuff, even though this video is dragging on, anyway, I'll stop talking, so GetStride
+
+356
+00:40:05,166 --> 00:40:18,350
+我们需要添加，所以我们有stride, inline uint32_t GetStride() const，返回m_Stride
+we need to add that, so we have stride, inline uint32_t GetStride() const, return m_Stride
+
+357
+00:40:20,100 --> 00:40:25,450
+好了，我想就是那样，如果我按f5，现在应该可以运行了
+alright, I think that's it, like if I hit f5, now it should probably work
+
+358
+00:40:25,450 --> 00:40:32,775
+我们试试，还没有设置layout，严格来说，不需要这样做，因为我们只是从这里读取
+let's just try oh, and we haven't set layout, that's a, we don't have to, technically speaking, because we're just reading it from here
+
+359
+00:40:33,325 --> 00:40:39,800
+不管怎样，我们有一个？？？，好了，没有默认构造函数，所以需要添加默认构造函数
+anyway, we have a capalar, okay, no default constructor, that's a good point, so we need to add default constructors for all of these
+
+360
+00:40:40,275 --> 00:40:47,325
+对吧，BufferElement，因为它们需要被初始化还有BufferLayout，现在你们可以不那么懒了
+right, BufferElement, because they need to be initialized and BufferLayout, now you could be less lazy with this 
+
+361
+00:40:47,325 --> 00:40:55,725
+实际上给你们的东西全参数，它在这里运行，在这里不运行，现在不麻烦了
+and actually give your things to full parameters, it works for here, doesn't work for here, not gonna bother for now
+
+362
+00:40:56,066 --> 00:41:02,066
+好了，点击f5，看看会发生什么，好了，看我们有了三角形，多酷啊，真的很酷
+okay, let's hit f5, and see what happens, okay, look at that we have our triangle, how cool is that, that's really cool
+
+363
+00:41:02,066 --> 00:41:10,375
+上次我们也做过，现在尝试添加一个颜色，我要做的是在我的布局中，添加一个新的Float4
+we had that last time as well, let's try and actually add a color now, so what I'm gonna do is inside my layout, just add a new Float4
+
+364
+00:41:11,400 --> 00:41:20,615
+它将是我的颜色，然后我想进入着色器，并添加layout(location = 1) in vec4 a_Color;
+it's going to be my color, and then I want to go into the shader, and add layout(location = 1) in vec4 a_Color;
+
+365
+00:41:20,900 --> 00:41:25,175
+好吧，我现在不打算用它，让我们看看它是否有用，对吧
+okay, I'm not going to use it for now, let's just see if this even works, right
+
+366
+00:41:25,300 --> 00:41:32,875
+事实上，我甚至不需要在这里加上它，我们先把它拿出来，我可以把它从末端拿出来，这样我就可以撤销它了
+in fact I don't even have to add it here, let's just keep that out for now, I might just take it out of the end, so I can undo it
+
+367
+00:41:33,850 --> 00:41:39,467
+但这里所有东西都可以，我们唯一需要的就是这里的所有东西，我们指定一种颜色
+but everything should work here, the only thing we need is actually everything here, so let's specify a color
+
+368
+00:41:39,467 --> 00:41:43,525
+让我们把这个画成粉色，我想我们会看到1 0 1 1
+let's just make this thing pink, I guess we'll see 1 0 1 1
+
+369
+00:41:43,675 --> 00:41:49,435
+对吧，有点粉色，洋红色，所以每个顶点都是那个颜色
+right, that's kind of pink, magenta, so every vertex will be that color
+
+370
+00:41:49,500 --> 00:41:53,975
+然后我们可能一会儿就可以把它们相互作用，看看是什么样子，但现在我们先从粉色开始
+and then we can probably interplay between them in a minute as well, just to see what that looks like, but for now we'll start with pink
+
+371
+00:41:54,333 --> 00:41:59,750
+这意味着我们现在每个顶点有7个元素，所有东西都应该自动计算
+which means we now have, I guess 7 elements per vertex, everything should be calculated automatically though
+
+372
+00:41:59,866 --> 00:42:05,425
+那就是它的美妙之处，如果我们去掉这个，就会得到和上次一样的结果
+that's the beauty of this, and if we take away this, we should just get exactly the same result this last time
+
+373
+00:42:05,425 --> 00:42:10,650
+尽管我们的顶点缓冲区里有更多的东西，希望其他的东西都不需要改变，看看那个
+even though our vertex buffer has more stuff in it, hopefully everything else did not need changing, look at that
+
+374
+00:42:10,850 --> 00:42:15,850
+我们仍然得到三角形，即使顶点缓冲区不同，显然被破坏了，偏移量正常工作
+we still get our triangle, even though our vertex buffer is different, clearly destroyed, and the offsets are working correctly
+
+375
+00:42:16,133 --> 00:42:21,125
+否则它不会，你们知道，它会把接下来的三个顶点读成这样，我们的三角形看起来就不一样了
+otherwise it wouldn't, you know, it would read the next three vertices as being this, and our triangle would look different
+
+376
+00:42:22,225 --> 00:42:30,300
+让我们恢复颜色并在里面设置颜色，我们需要把这个给片段着色器
+let's bring back the color and actually set the color inside, okay, so we need to give this to the fragment shader
+
+377
+00:42:30,666 --> 00:42:44,400
+所以我们就会看到，out vec4 v_Color，复制粘贴到这里，调用它，就是in vec4 v_Color
+so we'll see, out vec4 v_Color, copy that, paste that here, call it, in vec4 v_Color
+
+378
+00:42:45,133 --> 00:42:53,250
+然后我们要设置color = v_Color，我在这里做这个，就在这个后面覆盖它，f5运行
+and then we're going to set color equals v_Color, okay, I'll just do that over here, right after this one to override it, f5
+
+379
+00:42:53,700 --> 00:43:00,002
+我们得到了一个黑色三角形，这不是，对吧，那是因为我忘记设置颜色了
+okay, so we get a black triangle, which isn't, right, that's because I forgot to actually set the color
+
+380
+00:43:00,075 --> 00:43:06,525
+很尴尬，你们可能认为我的缓冲布局代码不对，但实际上不是这样的
+awkward right, you guys probably thought that my awesome buffer like layout code just wasn't right, but that's not actually
+
+381
+00:43:06,525 --> 00:43:14,375
+但它实际上是运行的，因为我已经重载了，所以我们有一个粉红色的三角形，很酷
+yet it is actually in fact working, because I have roaded, so you know, all right, there we have a pink triangle, pretty cool
+
+382
+00:43:14,725 --> 00:43:19,475
+我要做的最后一件事就是改变颜色，这个顶点的颜色是粉色
+last thing I'll do is actually just change the color, right, so the color of this vertex I leave is pink
+
+383
+00:43:19,800 --> 00:43:25,475
+这个顶点的颜色，我设为蓝色之类的，我把这个去掉，这些都是半色
+the color of this vertex, I will set to like blue or something, so I'll get rid of this, and these are very half colors
+
+384
+00:43:25,475 --> 00:43:28,050
+显然，在这种情况下，我并不是想成为一个艺术家
+obviously I'm not trying to be like an artist in this case
+
+385
+00:43:28,400 --> 00:43:31,775
+现在我猜他们中的一个可能喜欢黄色或其他东西
+and now I guess what's that maybe one of them to like yellow or something
+
+386
+00:43:33,050 --> 00:43:37,900
+点击f5，看看会发生什么，现在我们已经定义了VertexBuffer
+let's hit f5 and see what happens, okay, so now we have actually defined VertexBuffer
+
+387
+00:43:37,900 --> 00:43:43,925
+我们之前有粉色黄色和绿色蓝色，我不能，老实说，我不能提交这个代码
+we have pink yellow and green blue before, I can't honestly, I can't commit this code
+
+388
+00:43:43,925 --> 00:43:45,075
+因为它看起来绝对是垃圾
+because it just looks like absolute trash
+
+389
+00:43:45,366 --> 00:43:50,883
+所以我要做的是，我要让它看起来更好看，所以会看到0.8和0.2，这样就不会一直这么做
+so what I'll do is make something, I'll make it just look nicer, so we'll see 0.8 and 0.2, just so that we're not kind of going all the way
+
+390
+00:43:51,625 --> 00:43:57,475
+实际上这需要是0.8，所以会看到0.8，我只是把颜色降低点，这样它们就不会那么刺眼了
+actually this needs to be 0.8, so we'll see 0.8, I'm just scaling the colors down a little bit, so they're not as harsh
+
+391
+00:43:57,475 --> 00:44:03,525
+因为我真的很喜欢加一些其他的颜色，否则就像你们看到的那样，看起来很糟糕
+because like honestly like and adding a bit more of other colors in, because otherwise like it just as you saw it, just looks so bad
+
+392
+00:44:04,100 --> 00:44:10,933
+我真的有点讨厌它，这样看起来会更好，如果我还没看到会发生什么，我们就点击
+I really kind of hate it, this will make it look a lot nicer, so let's just hit, if I haven't seen what happens
+
+393
+00:44:10,933 --> 00:44:15,375
+我得把这句话印在t恤上，因为这显然是我最喜欢的现金短语了好吧，好了，真漂亮
+I need to get that points on a t shirt, because apparently it's my favorite cash phrase ever ever, okay, beautiful
+
+394
+00:44:15,475 --> 00:44:22,771
+我们有了三角形，所有的测试都在运行，所有这些东西，你们知道的，布局都在正常运行
+there we have our triangle with all of our test cars working, all of this stuff is now you know the layouts are all working correctly
+
+395
+00:44:22,950 --> 00:44:32,325
+显然，我们需要做的是把这个叫做SetLayout(layout)，我想我们能做的很酷
+obviously what we actually need is to do is call this SetLayout layout, okay, and I guess what we can do just to be really cool
+
+396
+00:44:32,325 --> 00:44:39,700
+只是为了确保它能正常运行，只是为了确保我们从VertexBuffer中获得布局，这个不行吗
+is just to make sure that works, is just to make sure that we kind of get the layout from the VertexBuffer, this is not gonna work 
+
+397
+00:44:39,700 --> 00:44:49,775
+因为它显然是常数，我们不允许const，那很有趣，我们绝对应该，需要个构造函数来实现它
+because it's constant apparently, and we don't allow Constance, that's fun, we definitely should, we need a constiturator to make that happen
+
+398
+00:44:51,275 --> 00:44:59,875
+我不知道，我认为那会运行的，但我猜不是，所以我猜我们还需要返回一个const_iterator
+which I don't know, I thought that that would kind of just work, but I guess not, so I guess we need to also return a const_iterator
+
+399
+00:45:01,600 --> 00:45:14,599
+这是有趣的，const, const，是的，我想那应该可以了，好了，把它放在这里
+which is you know fun, const, const, yeah I guess that that should work, okay, done, and I'll actually put that in here
+
+400
+00:45:14,600 --> 00:45:19,825
+为了确保我们不能访问那个布局，这个在我们说过之后就被销毁了
+just to make sure that we can't even access that layout thing, so this actually gets destroyed in this case after we've said it
+
+401
+00:45:20,266 --> 00:45:22,025
+所以现在它应该从另一个东西开始
+so now it should be started in the other thing
+
+402
+00:45:22,550 --> 00:45:27,150
+我猜很明显你们可能在把它放在这里之前把它带入一个变量
+and I guess that obviously you probably brings that into a variable before putting it here
+
+403
+00:45:27,150 --> 00:45:34,525
+但为了好玩，我把它放在这里，让我们点击f5，看看会发生什么
+but for fun, I'll just leave it here, let's hit f5 and see what happens
+
+404
+00:45:34,525 --> 00:45:37,600
+就是那样，那就是我的短语，一切都很好，漂亮
+yep that's it, that's my phrase, everything works, beautiful
+
+405
+00:45:38,225 --> 00:45:48,025
+最后，为了让它看起来更漂亮，我将使用const auto& layout = that
+and then finally just to clean it up and make it super nice, I'll just do auto const a reference layout equals that
+
+406
+00:45:49,200 --> 00:45:55,897
+我把这个放到这里，检查一下代码，现在它已经准备好提交了
+and I'll just pop this in here, and just check that code, and then now it's like ready to commit
+
+407
+00:45:56,866 --> 00:46:03,600
+看起来很不错，好了，就是那样，那就是BufferLayout，我刚刚写的东西非常强大
+and it will look nice, okay, that's it, so that is BufferLayout, this is very powerful what I've just written
+
+408
+00:46:03,675 --> 00:46:08,775
+对吧，就像这些东西真的很好，在你们的引擎中有这样一个系统真的很令人满意
+right, like this stuff is really nice, really satisfying to have a system like this in your engine
+
+409
+00:46:09,133 --> 00:46:13,225
+因为这样你们就可以在脚本中做得很好，可以从视觉上看到布局
+because that way you can just be really nice in the script, you can see that you can visually see layout
+
+410
+00:46:13,600 --> 00:46:15,325
+对吧，我看这里，我看到了什么
+right, I look over here, what do I see
+
+411
+00:46:15,625 --> 00:46:20,550
+vec3 a_Position vec4 a_Color，float3 a_Position float4 a_Color
+you know vec3 a_Position, vec4 a_Color, you know float3 a_Position, float4 a_Color
+
+412
+00:46:20,550 --> 00:46:26,166
+这里的所有东西都和这里显示的完全一样，这太神奇了，对吧，那就是你们想要的东西
+everything's here in exactly the same way that it appears here, which is just amazing, right, that's the kind of stuff you want
+
+413
+00:46:26,166 --> 00:46:30,675
+你们不会想自己去做，比如摆弄数字，计算步幅，做所有那些事情
+you don't want to be doing, like fiddling with numbers, working out strides, doing all that stuff yourself
+
+414
+00:46:30,675 --> 00:46:35,475
+不，你们这样描述你们的数据，这对DirectX来说是可以接受的
+no, you describe your data in this way, it's going to be acceptable for DirectX
+
+415
+00:46:35,475 --> 00:46:41,550
+它会被OpenGL接受，一切都会正常运行，它会很漂亮，你们知道，如果你们做了一个
+it's going to be acceptable for OpenGL, everything's going to work, it's going to be beautiful, and you know, if you make a
+
+416
+00:46:41,550 --> 00:46:47,870
+如果你们犯了这样的错误，就会清楚看到，这是不同的，对吧，就会看到，那是如何运行的
+if you make a mistake like this, you know, you are look clearly, it's different, right, and that will you can see, kind of how that works
+
+417
+00:46:47,966 --> 00:46:53,500
+所以这就是我用优美的代码写出来的想法有点像那篇英语文章
+so this is kind of the idea of what I was getting out with nice elegant code kind of like that English essay
+
+418
+00:46:54,200 --> 00:46:59,112
+希望那是有意义的，我希望你们能从中学到一些东西
+hopefully that makes sense, and I hope that you guys can learn something from this
+
+419
+00:46:59,200 --> 00:47:04,350
+下次我还是想把这个移动到VertexArray，然后是这个东西
+now next time again I do want to move this into VertexArray, and then this actual stuff, this actually
+
+420
+00:47:04,700 --> 00:47:11,700
+实际上就像找这些VertexAttribPointer，它会在OpenGLVertexArray中，就像你们知道的类
+this actually like figuring out these VertexAttribPointer, that will be in the OpenGLVertexArray, like you know class
+
+421
+00:47:12,600 --> 00:47:17,800
+总之，我希望你们喜欢这期视频，如果喜欢的话，就为它点赞吧
+so that'll be all kind of done through there, anyway, I hope you guys enjoyed this video, if you did, hit a like button
+
+422
+00:47:17,800 --> 00:47:21,025
+你们也可以访问patreon.com/thecherno来支持这个系列
+you help support the series by going over the patreon.com/thecherno
+
+423
+00:47:21,025 --> 00:47:24,150
+如果喜欢那期，请帮助支持这个系列
+please help support this series, if you liked that episode 
+
+424
+00:47:24,150 --> 00:47:31,622
+因为所有这些人的支持使这些事情成为可能，现在如果你们想跳过，看看我写的东西
+because all the support from all those people is what makes this kind of stuff possible, now if you do want to skip ahead and see what I've written
+
+425
+00:47:31,622 --> 00:47:35,600
+我有一个完整的PBR渲染，我已经展示了几次，可能会做一期视频
+and I've got like a full PBR render, I've shown it off a few times, probably will make a video
+
+426
+00:47:35,800 --> 00:47:41,425
+比如在这周的某个时候展示一下，但如果你们现在就想访问源代码
+like specifically showing it off sometime this week maybe, but if you want access to that source code just right now
+
+427
+00:47:41,475 --> 00:47:47,475
+今天你们可以去patreon.com/thecherno，它帮助你们了解系列，就会得到那个
+today you can just go ahead and go to patreon.com/thecherno, it helps about series, and you will get access to that
+
+428
+00:47:47,966 --> 00:47:55,000
+现在告诉我你们的想法，对于整个BufferLayout的想法，我很喜欢这种处理方式
+now let me know what you thought, what you thought of this whole kind of BufferLayout, I quite like this way of dealing with it
+
+429
+00:47:55,000 --> 00:47:59,300
+我可能都不喜欢，或者我觉得可能没有更好的办法了，他们会这么做的
+I probably wouldn't even like gun in, or I feel like there's probably no better way, they're gonna do this
+
+430
+00:47:59,300 --> 00:48:04,475
+除非你们实际上，我不知道，这很奇怪，你们能做的显然是传递着色器
+unless you actually, maybe I'm like, I don't know, it's be weird, what you could do is obviously pass the shader
+
+431
+00:48:04,475 --> 00:48:07,475
+然后再看看贴图的原因它们是有联系的
+and then just figure out what it is cause in drug tax they're linked, anyway
+
+432
+00:48:07,723 --> 00:48:12,700
+但如果你们传递shader，你们就会知道你们的属性到底是什么
+but if you pass the shader, and you just kind of figure out what your attributes actually are
+
+433
+00:48:12,700 --> 00:48:18,550
+然后你们自动设置并验证缓冲区布局，也许那样会更健壮，因为那样
+and then you automatically set and validate the buffer layout like that, maybe that would be even more robust, because that way
+
+434
+00:48:18,775 --> 00:48:24,023
+没有代码复制，并且布局将从着色器自动计算出来
+there be 0 Codeplication, and the layout would be automatically figured out from the shader
+
+435
+00:48:24,023 --> 00:48:28,575
+但除了做这样的事情，我觉得没有必要，说实话，你们得到了这些东西
+but aside from doing stuff like this, I don't feel like that's necessary, to be honest, you get this stuff
+
+436
+00:48:28,575 --> 00:48:33,825
+对吧，你们就可以有一个VertexBuffer，分享到布局，一切都可以正常运行
+right, and you can have a VertexBuffer, and your share to kind of layout correctly, and everything you should just work
+
+437
+00:48:33,966 --> 00:48:38,333
+所以请在下面的评论区告诉我你们的想法，希望我教会了你们一些新东西
+so let me know what you what you thought in the comment section below, hopefully I taught you guys something new
+
+438
+00:48:38,333 --> 00:48:47,959
+这样你们就能写出更优雅的代码了，那是我的希望，但不管怎样，下次，就是VertexArray
+and you kind of are now able to just write more elegant code, that's my hope, but anyway, next time, as I said VertexArray
+
+439
+00:48:48,066 --> 00:48:53,725
+我们想继续下去，把今天在Application类中写的一些代码移到顶点数组中
+we want to kind of get on with that, and actually move some of this code that we've written here today in the Application class into vertex arrays
+
+440
+00:48:53,966 --> 00:48:58,700
+如你所见，外面很黑，因为它已经持续了这么长时间，下次见，拜
+as you can see, it's dark outside, because that's how long its episodes been going for, I will see you next time, goodbye
+

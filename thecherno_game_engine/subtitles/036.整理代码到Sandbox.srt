@@ -1,0 +1,1210 @@
+﻿1
+00:00:00,133 --> 00:00:05,075
+嗨，大家好，我是TheCherno，欢迎回到我的游戏引擎系列，所以上期，我们讨论了相机
+hey, what's up guys, my name is TheCherno, welcome back to my game engine series, so last time, we talked about cameras
+
+2
+00:00:05,075 --> 00:00:09,050
+我们创建了一期相机板书的视频，如果你们还没有看过那期的话，一定要去看看哦
+and we created an autograph camera, definitely check out that video, if you haven't already
+
+3
+00:00:09,300 --> 00:00:16,131
+今天，在这周中期的特别节目中，我们实际上将把大量代码转移到实际的Sandbox程序中
+and today, in this special mid week episode, we're actually going to be moving a lot of our code into the actual Sandbox application
+
+4
+00:00:16,131 --> 00:00:20,375
+我将向你们展示一些技巧，告诉你们如何以一种更好的方式设置它
+and I'll show you guys a few tricks with how you can kind of set that up in a bit of a better way
+
+5
+00:00:20,966 --> 00:00:25,533
+所以我决定把这一期改成一周中的一期，只是因为它看起来像是一个小变化
+so I decided to make this a mid week episode, just because it's like kind of like a minor change
+
+6
+00:00:25,533 --> 00:00:28,675
+我们并没有真正学到什么新东西，那就是重构代码和搬来搬去
+we're not really learning anything new, which is refactoring code and moving in around
+
+7
+00:00:29,000 --> 00:00:33,775
+所以我认为，如果我像往常一样在周日制作一期新视频，对你们不公平
+and so I didn't think it would be fair to you guys, if I just kind of made a new video on like Sunday as usual
+
+8
+00:00:33,775 --> 00:00:37,600
+然后就是这个重大的失望，居然不是那样，太失望了
+and then it's just like this major disappointment, not that, this is gonna be a major disappointment
+
+9
+00:00:37,600 --> 00:00:39,200
+顺便说一句，你们肯定还是应该看看这期视频
+you should definitely still watch this video by the way
+
+10
+00:00:39,600 --> 00:00:43,733
+但让我知道你们对周中期视频的总体看法，我们将继续讨论Hazel
+but let me know what you think about mid week episodes in general as we kind of move on with Hazel
+
+11
+00:00:43,733 --> 00:00:48,650
+我们开始做越来越多的事情，而且变得更加令人兴奋，我可能会考虑一周做两期
+and we start doing more and more stuff, and it gets more exciting, I might consider doing two episodes a week
+
+12
+00:00:48,766 --> 00:00:52,426
+所以，直接去评论吧，让我知道你们的想法，我可能会在以后那样做
+so just drop a comment, and let me know what you think about that, and I might do that in the future
+
+13
+00:00:53,100 --> 00:00:57,500
+patreon.com/theCherno是支持的最好方式，感谢所有让这系列成为可能的人
+patreon.com/TheCherno is the best way to support this series, thank you to everyone who made this series possible
+
+14
+00:00:57,766 --> 00:01:03,550
+如果你们继续在那里帮助支持该系列，你们将可以访问我的私人开发仓库Hazel
+if you go ahead and help support the series there, you'll get access to my private development repository of Hazel
+
+15
+00:01:04,333 --> 00:01:09,150
+我希望我们有比所有这些东西更多的最后代码，嗯，然后你们也可以早点收到视频
+I wish we've got much more of last code than all this stuff, um and then you also get videos early
+
+16
+00:01:09,150 --> 00:01:14,175
+就像你们可以访问一个关于Discord的私人频道，在那里我们可以更详细地谈论这些事情
+and like you can get access to a private channel on Discord, where we kind of talk about these things in more detail
+
+17
+00:01:14,175 --> 00:01:20,700
+你们可以基本上帮助计划这些视频，真的很酷，好了，所以让我们重构一下我们的代码
+and you can kind of just um, essentially help plan these videos, which is really cool, um okay, so let's refact to our code
+
+18
+00:01:21,466 --> 00:01:25,550
+那么上期我们有了整个相机系统，位置，旋转
+so last time we had this whole camera system, position, rotation
+
+19
+00:01:26,333 --> 00:01:30,600
+我还给了你们一些作业，看看你们是否能让相机对用户的输入做出反应
+I also gave you guys some homework to actually see if you could make the camera respond to user input
+
+20
+00:01:30,600 --> 00:01:35,166
+我们今天也会实现那个，那将是今天视频中有趣的部分
+and we'll actually do that today as well, that's gonna be the fun part of today's today's video
+
+21
+00:01:35,166 --> 00:01:38,825
+但我们首先需要做的是，我显然不太喜欢在Application内的这些东西
+but what we need to do first of all is, I don't like that this stuff obviously is inside Application
+
+22
+00:01:39,133 --> 00:01:44,050
+我们有个SandboxApp，如果我们看这里，它是个实际的独立应用，这是我们的exe文件
+we have a SandboxApp, if we look over here, it's an actual separate application, this is our exe file
+
+23
+00:01:44,133 --> 00:01:49,425
+在这一点上，Hazel只是一个静态库，这个SandboxApp是一切都应该存在的地方
+Hazel is just a static library at this point, this SandboxApp is where everything should exist
+
+24
+00:01:49,825 --> 00:01:54,566
+让我们讨论一下如何做到这一点，因为这个ExampleLayer，我们在这里有这个Sandbox
+so let's talk about how we can do that, because this example layer, this kind of Sandbox that we have here
+
+25
+00:01:54,566 --> 00:02:00,325
+这个例子基本上就是我们的游戏，对吧，它可能只是一个3D应用程序，不一定是游戏
+this example that is our game essentially, right, and it could be like just a 3D application, doesn't have to be a game
+
+26
+00:02:00,566 --> 00:02:05,445
+但在这种情况下，这只是我们的一种应用程序，对吧，这是我们的实际应用
+but in this case, it's just this is kind of our app, right, this is our actual application
+
+27
+00:02:05,733 --> 00:02:08,850
+所以这就是特定于该应用程序的所有代码所在的位置
+so this is where all of the code that is specific to this application should be
+
+28
+00:02:09,525 --> 00:02:14,025
+我想要做的第一件事就是把这些东西清理一下，我们有类似于ExampleLayer的东西，很好
+first thing I want to do is clear all this stuff up, we have like example layer, which is fine
+
+29
+00:02:14,766 --> 00:02:20,050
+我们有OnUpdate，它目前只是像输入轮询一样测试，所以我们可以去掉那个
+we have OnUpdate, which at the moment just tests out like input polling, so we can get rid of that um
+
+30
+00:02:20,733 --> 00:02:23,550
+我们还有一个测试ImGuiRender，我们也不需要它了
+we also have a test, ImGuiRender, which we don't need either amount
+
+31
+00:02:23,875 --> 00:02:28,750
+然后我们有一个OnEvent，当我们按下某个键或其他键时，就像你们知道的那样
+and then we've got an OnEvent, when we press a certain key or whatever, it like just you know
+
+32
+00:02:28,750 --> 00:02:32,625
+这是一种对事件的响应，对输入事件的响应，而不是轮询
+this is the kind of responding to event, um to input events rather than polling
+
+33
+00:02:32,700 --> 00:02:34,925
+所以我们可以去掉所有的代码，因为我们不需要那些
+so we can get rid of all that code, because we don't need any of that um
+
+34
+00:02:36,500 --> 00:02:38,925
+现在它将进入Applicatioin，并开始带一些参数
+now it's going to enter application, and start carrying the stuff across
+
+35
+00:02:39,400 --> 00:02:44,375
+所以这个while循环实际上就是我们所需要的，所以我就把这些都剪掉
+so this while running loop is actually kind of what we need, so I'll just cut this all
+
+36
+00:02:45,066 --> 00:02:49,625
+我将把这些内容留在这里，基本上就是层更新和ImGui更新
+and I'll leave this stuff here, which is basically just layer updating and also ImGui updating
+
+37
+00:02:49,925 --> 00:02:57,150
+这就是主要的游戏循环，我猜是应用循环，然后在这，把这个放到OnUpdate中
+um this is our main kind of game loop I guess our Application loop, and then over here, I'll just put this into OnUpdate
+
+38
+00:02:57,150 --> 00:03:00,475
+现在这不会立即起作用，我们必须重新编写一些代码才能使其运行起来
+now this isn't gonna immediately work, and we'll have to refact us some code to make it work
+
+39
+00:03:00,733 --> 00:03:06,000
+接下来，我将向该ExampleLayer中添加一些私有成员
+so let's go ahead and do that, I'm gonna add some private members into this ExampleLayer
+
+40
+00:03:06,366 --> 00:03:09,200
+如果我们返回到Application，它基本上将是我们使用的所有内容
+if we go back to Application, it's basically gonna be everything that we used
+
+41
+00:03:09,733 --> 00:03:14,075
+所以我们有所有共享指针的东西，我们有相机，我想可能就是那样了
+so we had all this shared pointer stuff, we had the camera, I think that's probably it
+
+42
+00:03:14,075 --> 00:03:22,900
+所以着色器和顶点数组，我将回到这里，我们将把它作为私有字段添加到SandboxApp
+so the shader and the vertex array, I'll go back here, and we'll add this into our SandboxApp over here as just private fields
+
+43
+00:03:23,300 --> 00:03:27,499
+现在我们需要一些东西来清理这一切，嗯，Hazel应该有我们需要的一切
+now we're gonna need some stuff to clean this up, um Hazel should have everything we need
+
+44
+00:03:27,500 --> 00:03:31,733
+虽然我们已经很久没有添加到Hazel中了，所以我们肯定需要扩展一下
+we haven't added stuff to Hazel in ages though, so we definitely need to kind of expand that
+
+45
+00:03:31,733 --> 00:03:35,925
+我们在渲染器中什么也没有找到，正如你们所看到的，这里是这里，所以让我们先清理一下
+we find nothing in the Renderer, as you can see is here is here, so let's just clean that up
+
+46
+00:03:36,300 --> 00:03:40,575
+所以我们需要Hazel/Renderer，让我们看看这里有什么，我们真的需要所有这些东西
+so we need to have um Hazel Renderer, let's see what's in here, we need to have all of this stuff really
+
+47
+00:03:40,900 --> 00:03:49,975
+所以我们可以包含Renderer，RenderCommand，再次记住，有些东西将包含其他东西
+so we could have Renderer, we can have like RenderCommand, and again remember some things will include other things
+
+48
+00:03:49,975 --> 00:03:54,966
+例如RenderCommand包含RendererAPI，对吧，它包含了VertexArray
+like for example RenderCommand includes RendererAPI, right, which includes VertexArray
+
+49
+00:03:54,966 --> 00:03:58,850
+所以你们不必真的把所有东西都放在这里，但无论如何这也是一个很好的练习
+so you don't have to actually put everything in here, but it's good practice too anyway
+
+50
+00:03:58,850 --> 00:04:04,300
+因为如果我突然从渲染器中删除和包含，其他所有东西都依赖，对吧
+because if I suddenly remove and include from Renderer, that everything else relied on, right
+
+51
+00:04:04,300 --> 00:04:08,225
+我将不得不在其他地方手动添加它来破解我的代码，我不想那样
+I'm gonna have to include it manually somewhere else gonna break my code, I don't want that
+
+52
+00:04:08,500 --> 00:04:16,025
+所以这是个很好的实践，基本上说，我希望在实际的HazelAPI中的所有东西都是公开的
+so it's pretty good practice, to say basically that everything that I definitely know I want in the actual HazelAPI to be kind of public
+
+53
+00:04:16,133 --> 00:04:22,584
+好了，这些东西应该包含在这里，我是按照Norris的特定顺序来做的，真的不是太重要
+right, um that stuff should be included here, and I'm doing this in Norris specific order, it doesn't really matter too much
+
+54
+00:04:23,600 --> 00:04:27,125
+但我用的是OrthographicCamera
+but I'm doing with OrthographicCamera
+
+55
+00:04:27,125 --> 00:04:32,533
+渲染程序中的几乎所有接口都应该暴露，RendererAPI不需要
+pretty much everything in that Renderer thing should be expose, RendererAPI doesn't need to be
+
+56
+00:04:32,533 --> 00:04:38,150
+所以我不会在这里添加它，但我认为其他所有东西，你们知道，应该是图形上下文也不需要
+so I'm not gonna add it there, um but everything else I think, you know, should be graphics context doesn't need to be either
+
+57
+00:04:38,450 --> 00:04:43,100
+请记住，那并不意味着，因为它们没有在这里列出，它们是私人的，显然它们不是
+um keep in mind, that doesn't mean that, because they're not listed here that they're private, obviously they're not
+
+58
+00:04:43,375 --> 00:04:48,366
+如果你们知道的其他东西，比如Renender包含RenderCommand，它包含RendererAPI
+um if something else you know like Renderer includes RenderCommand, which includes RendererAPI
+
+59
+00:04:48,366 --> 00:04:52,500
+所以RendererAPI实际上是可访问的，只是没有在这里明确列出，仅此而已
+so RendererAPI is actually accessible, it's just not listed here explicitly, that's all
+
+60
+00:04:53,375 --> 00:04:55,325
+因为实际上并不需要使用它
+because it's not really needed to be used
+
+61
+00:04:55,800 --> 00:05:00,894
+所以我可能会做一些，我可能会把所有的资源放在这里
+so I might just do some, I might just put all the kind of resources down here
+
+62
+00:05:01,200 --> 00:05:04,000
+让我们看看，这样我们就可以有基于Renderer和RenderCommand的渲染工具
+um let's see, so we can have Renderer and RenderCommand based render stuff
+
+63
+00:05:04,266 --> 00:05:07,525
+然后可能像Buffer、Shader和VertexArray的资源
+and then maybe like um resources like buffer shader of VertexArray
+
+64
+00:05:07,766 --> 00:05:13,075
+然后就像这里的其他类型的渲染器基元一样，对吧，所以我们开始，这里有一些东西
+and then like other kind of Renderer primitives here, right, so we kind of begin to um have some stuff here
+
+65
+00:05:13,075 --> 00:05:17,975
+如果我们想的话，我们可以在这里放一个小分隔符，让我们知道
+and we could put like a little divided here if we wanted to that just kind of let us know that
+
+66
+00:05:19,100 --> 00:05:28,275
+这是与渲染器相关的东西，好了，我想我们还需要两个点，也许再多一个
+this is Renderer related things, okay, and I think we need two more dots, maybe one more
+
+67
+00:05:28,275 --> 00:05:33,250
+这有点难说，好了，很好，酷，我们开始了，我们有我们的渲染器东西，漂亮
+it's kind of hard to tell, yep okay, good, cool, so there we go, we've got our Renderer stuff, beautiful
+
+68
+00:05:33,400 --> 00:05:37,350
+因此，现在我们需要确保我们位于Hazel命名空间中
+so now we need to actually make sure that we're in the Hazel namespace
+
+69
+00:05:37,350 --> 00:05:39,925
+现在我可以只使用namesapce Hazel，我不想这样做
+now I could just using namespace Hazel, I don't want to
+
+70
+00:05:39,925 --> 00:05:46,375
+因为这只是一个例子，我真的想说明这个例子实际使用了什么
+because this is an example and I want to really kind of just make that point of what is actually used by the example
+
+71
+00:05:46,650 --> 00:05:53,150
+好了，那么哪些是来自Hazel的，哪些不是，目前我们只是在这里找到共享指针
+right, so what is from Hazel and what isn't, and currently we just have shared points to find here
+
+72
+00:05:53,533 --> 00:05:58,850
+我想在未来我们会为共享指针创建一个新的我们可以使用它的名称
+I think in the future we are going to actually uh create a new name for shared pointers that we can use
+
+73
+00:05:59,250 --> 00:06:03,875
+但那将是另一期视频，我们稍后会讨论，所以这也将是一个Hazel的构造
+um but that's gonna be another video, we'll talk about that later, so this will also be like a Hazel construct
+
+74
+00:06:03,875 --> 00:06:07,000
+因为在以后，我们可能还希望将其更改为其他名称
+because in the future, we also might want to change it to something else
+
+75
+00:06:07,200 --> 00:06:11,700
+因为我们不想依赖于这个内存管理，对吧
+because we don't want to kind of rely on this is for memory management um necessarily, right
+
+76
+00:06:12,148 --> 00:06:20,800
+好了，OrthographicCamera也是Hazel的，这个东西是Hazel的，这个也是，好了，太棒了
+okay, OrthographicCamera is also Hazel, this stuff is Hazel, and so is that, okay, brilliant
+
+77
+00:06:21,000 --> 00:06:23,975
+所以现在我们需要在Application中实际创建一些东西
+so now we need to actually create some of the stuff back in Application
+
+78
+00:06:23,975 --> 00:06:31,875
+我要复制相机，对吧，拿着它，把它剪下来，放在这里，好了
+I'm gonna steal camera, right, just gonna take that, and cut it, and put it here, all right
+
+79
+00:06:33,025 --> 00:06:37,500
+然后，这个VertexArray.reset，以及我们这里的几乎所有东西
+and then um this VertexArray.reset, and just pretty much everything that we have here
+
+80
+00:06:37,500 --> 00:06:43,825
+我们所有的着色器，我要把它剪掉，这样我们的Application构造就会变得如此简单，对吧
+all of our shaders all that stuff, I'm gonna cut it um, so that our Application constructor goes down to just being as simple as this, right
+
+81
+00:06:44,275 --> 00:06:47,725
+我要把它粘贴到，现在有几个地方你们可以把这个放进去
+um and I'm going to paste it into, now there's a few places you could put this in
+
+82
+00:06:48,125 --> 00:06:55,299
+你们可以看到，我们有SandBox构造，只执行了PushLayer，对吧
+um you can see that, we have the Sandbox constructor, which does PushLayer, right
+
+83
+00:06:57,566 --> 00:07:02,333
+然后Push Layer实际上创建了新的ExampleLayer，并在这运行这段代码，但如果尝试那样做
+and then push layer actually does new example layer, and runs this code here, however if we try and do that
+
+84
+00:07:02,333 --> 00:07:08,300
+你们可能会发现它实际上不起作用，原因是实际发生的情况是这是Application，对吧
+you might find that it does actually doesn't work, and the reason is what actually happens is this is Application, right
+
+85
+00:07:08,733 --> 00:07:12,766
+Application构造函数，实际上不，它应该可以运行的
+Application constructor, well actually no, it should work
+
+86
+00:07:12,766 --> 00:07:17,250
+因为Application构造函数创建窗口并执行所有这些操作，并且仅在完成之后
+because the Application constructor creates the window and does all of that stuff, and only after that's done
+
+87
+00:07:18,600 --> 00:07:22,933
+因为这是一个默认的构造函数，所以基本上它将被称为
+because this is a default constructor, so basically it will be called um
+
+88
+00:07:23,133 --> 00:07:27,600
+你们知道基本上是那样的，对吧，就在我们把这一层推入这个之前
+you know like that essentially, right, just first before we push this layer in um
+
+89
+00:07:27,600 --> 00:07:29,933
+它实际上应该在上下文中创建我们的渲染器
+it should actually create our Renderer in context and everything
+
+90
+00:07:29,933 --> 00:07:33,150
+因此，如果我们希望在构造函数中执行所有操作，那么应该是安全的
+so it should be safe to do everything in the constructor if we wanted to
+
+91
+00:07:33,150 --> 00:07:36,100
+如果不是，那么你们始终可以创建类似于装饰函数
+if it's not, then you can always create like an ornament function
+
+92
+00:07:36,400 --> 00:07:40,500
+那肯定是在，你们知道的，一些东西基本上已经初始化之后发生的
+that definitely happens after you know stuff has been initialized basically
+
+93
+00:07:41,466 --> 00:07:47,500
+所以，我所说的东西已经被初始化了，我的意思是特别像图形渲染上下文
+so and by stuff has been initialized I mean specifically like the graphics rendering context
+
+94
+00:07:48,000 --> 00:07:52,675
+因为在我们没有上下文之前，我们显然不能创建所有这些渲染器资源
+because we obviously can't create like all of these renderer resources before we have a context
+
+95
+00:07:53,425 --> 00:07:56,950
+好了，再来一次，我可以使用namespace，但我不想
+okay, so just bring the Hazel here again, I could use the namespace, but I don't want to
+
+96
+00:07:56,950 --> 00:08:04,166
+因为我想非常明确地说明什么是Hazel，什么不是，好了，然后我们有着色器
+because I want to be really explicit about what is Hazel and what isn't, um okay, and then we have shader
+
+97
+00:08:05,666 --> 00:08:10,300
+因为你们可以看到，就像这种给我们带来的清晰度，我们可以看到所有最长的Hazel
+because you can see, like the clarity that this kind of gives us, right, we can see everything the longest Hazel
+
+98
+00:08:10,600 --> 00:08:15,148
+好了，我认为这差不多就是那样了，让我们看看我们的代码，我认为我们没有其他东西
+okay, and I think that's pretty much it, let's look over here in our code, I don't think we have anything else really
+
+99
+00:08:16,000 --> 00:08:20,075
+所以我认为那应该是可行的，让我们试着运行这段代码，看看会发生什么
+so that should just work I think, let's just try and run this code and see what happens
+
+100
+00:08:20,350 --> 00:08:24,603
+好了，你们可以看到，运行的代码给我们的结果与我们在上期视频中得到的结果相同
+okay, so you can see, that running, that code gives us the same result as we had in the previous video
+
+101
+00:08:24,900 --> 00:08:31,025
+所以我们已经成功地重构了所有内容，并将其移到SandboxApp类中，那真的很容易做到
+so we've successfully refacted everything and moved it into the SandboxApp class, that was really easy to do
+
+102
+00:08:31,366 --> 00:08:35,675
+现在让我们继续下去，看看我们是否可以添加一些类似箭头键的输入或其他东西
+now let's go ahead and see if we can add some kind of like arrow key input or something
+
+103
+00:08:35,875 --> 00:08:39,250
+使我们的相机能够移动，对吧
+to just make our camera able to move, right
+
+104
+00:08:39,800 --> 00:08:44,600
+那么为了实现那个，让我们进入OnEvent，并响应某些事件
+so to do that, let's come over here into OnEvent, and react to certain events
+
+105
+00:08:44,800 --> 00:08:48,866
+因此，这将是事件调度程序系统的一个很好的示例
+so this is going to be a really good example of the event dispatcher system
+
+106
+00:08:48,866 --> 00:08:52,475
+所以如果我们打开Event文件，我们可以看到我们有这个EventDispatcher
+so if we open up the event file, we can see we have this EventDispatcher
+
+107
+00:08:52,900 --> 00:08:55,419
+它能够调度某些类型的事件
+which is capable of dispatching certain types of events
+
+108
+00:08:55,733 --> 00:09:01,966
+因此，我们将通过创建EventDispatcher和基本的实例来使用它
+so we're gonna use that by creating the EventDispatcher and basically Disney an instance
+
+109
+00:09:01,966 --> 00:09:12,700
+Dispatcher的堆栈实例，dispatcher，它将接受event，然后就是dispatcher.Dispatch()
+a stack instance of the dispatcher, right, dispatcher, which is going to take in the event, and then we'll see dispatcher.Dispatch()
+
+110
+00:09:13,533 --> 00:09:18,825
+然后是事件的类型，所以这将是一个Hazel::KeyPressedEvent，对吧
+and then the type of event, so this is going to be a Hazel::KeyPressedEvent, right
+
+111
+00:09:19,100 --> 00:09:23,925
+我们将使用，我认为内部，它在哪里，可能在Core.h
+and we're going to use the, I think inside, where is it, inside core maybe
+
+112
+00:09:24,266 --> 00:09:27,500
+我们有这个HZ_BIND_EVENT_FN，这就是我们想要使用的，对吧
+we have this HZ_BIND_EVENT_FN, which is what we kind of want to use, right
+
+113
+00:09:27,800 --> 00:09:35,400
+所以这个HZ_BIND_EVENT_FN，然后会在这里给它一个函数，所以就是OnKeyPressedEvent
+so this HZ_BIND_EVENT_FN and then we're gonna give it a function here, so we'll see OnKeyPressedEvent
+
+114
+00:09:36,966 --> 00:09:54,850
+这将是Hazel::KeyPressedEvent，那么这是什么，ExampleLayer::OnKeyPressedEvent
+and it's gonna be Hazel::KeyPressedEvent events, so what is this, ExampleLayer::OnKeyPressedEvent
+
+115
+00:09:56,866 --> 00:10:01,933
+我认为就是那样，那就是所有的宏定义需求，很好，所以我们就把它放进去
+I think that's it, that's all the macro needs yep, great, so we just put that in
+
+116
+00:10:01,933 --> 00:10:06,225
+现在如果它遇到其中一个，这就是，让我们看看为什么不起作用
+and now if it encounters one of these, and this is, so let's see why that's not working
+
+117
+00:10:06,700 --> 00:10:10,566
+这与返回bool的事件函数有什么关系
+what does this spatch one an event function, which is functioned returns bool
+
+118
+00:10:10,566 --> 00:10:15,375
+好了，所以这是一个空的，确保我们返回bool，好了，那个错误消失了，很好
+okay, so yeah this is a void, make sure we're returning bool, okay, and yep that error goes away, great
+
+119
+00:10:15,733 --> 00:10:20,275
+Bool是指我们是否希望它是，比如阻塞，因为如果你们查看Application
+so bool is whether or not we want it to like block, so because if you look at Application
+
+120
+00:10:20,725 --> 00:10:25,875
+你们可以看到发生的事情是，我们会仔细检查每一层，并调度事件
+um you can see that what happens is that uh, we'll go through every layer and dispatch the event
+
+121
+00:10:25,875 --> 00:10:28,800
+但是，如果它已经被处理，那么我们中断，所以我们停止调度
+however if it's already been handled, then we break, so we stop dispatching
+
+122
+00:10:28,800 --> 00:10:34,000
+我们停止将其传播到更多层，对于KeyPressedEvent，就像我们不在乎可以影响一切一样
+and we stop propagating it to further layers um with KeyPressedEvent, like we don't care can affect everything
+
+123
+00:10:34,266 --> 00:10:39,075
+当我们不想阻止和使用输入时，在这种情况下返回true或false都无关紧要
+when we don't want to block and consume the input, um it doesn't matter if you return true or false in this case
+
+124
+00:10:39,475 --> 00:10:42,650
+因为我们没有任何其他层来阻止按键事件
+because we don't have any other layers where key events are gonna be blocked
+
+125
+00:10:43,000 --> 00:10:47,000
+我认为ImGui自己会处理，所以无论如何它都不会阻止它
+um I think ImGui does his own handling, so it's not gonna block it from that anyway
+
+126
+00:10:47,425 --> 00:10:53,733
+但假设我们有一个类似的用户界面层，当你们输入用户界面层时，你们知道你们不想要这个
+um but if suppose we did have like a UI layers, and when you type in the UI layers, you know like you don't want um
+
+127
+00:10:54,100 --> 00:10:58,125
+你们知道，因为你们的用户界面中有一个类似文本字段的内容，所以你们不希望字符移动
+you know, because you have like a text field in your UI, you don't want the character to move
+
+128
+00:10:58,300 --> 00:11:01,350
+如果你们使用，如果你们键入WASD键，因为你们正在输入文本
+if you use the, if you type the WASD keys, because you're entering text
+
+129
+00:11:01,733 --> 00:11:04,375
+在这一点上，你们返回true，当你们知道，当你们想要阻止它时
+that's at which point you return true, when you know, when you want to block that
+
+130
+00:11:04,966 --> 00:11:17,475
+让我们来看看这个，所以如果event.GetKeyCode()==HZ_KEY_LEFT，会向左移动，对吧
+um okay, so let's check this out, so if event.GetKeyCode() is HZ_KEY_LEFT I guess, we'll move left, right
+
+131
+00:11:17,866 --> 00:11:25,075
+所以我们要做的就是我们有这个相机，很棒，但实际上会有glm::vec3 m_CameraPosition
+so the way that we'll do that is we have this camera, which is great, but I'm actually going to have a glm::vec3 m_CameraPosition
+
+132
+00:11:26,200 --> 00:11:34,825
+好了，我们从构造函数内部的m_CameraPosition开始，就是0，对吧
+okay, and we're gonna start off this camera position over here inside the constructor as being just zero, right
+
+133
+00:11:35,500 --> 00:11:41,150
+所以我想我不知道我们能不能像那样写0，我们能不能，我想我们不能
+so I think I don't know if we can supply 0 like that, can we actually, I don't think we can
+
+134
+00:11:43,700 --> 00:11:45,200
+让我们看看那样是否会编译
+let's see if that even compiles
+
+135
+00:11:46,000 --> 00:11:50,400
+因为我认为我们需要具体地使用三个，或者可能不使用，也许那会起作用
+because I think that we need to specifically use three or maybe not maybe that will work yeah
+
+136
+00:11:50,400 --> 00:11:54,225
+好了，很好，它应该可以，所以有一个构造函数，只需要一个缩放
+okay, good, yeah it should, um so that there's a constructor, that just takes a scaler
+
+137
+00:11:54,525 --> 00:11:59,475
+所以在这种情况下，对吧，我们想要获取那个cameraPosition，我们想要把它向左移动
+um so in this case, right, we want to take that camera position, and we want to move it left
+
+138
+00:11:59,666 --> 00:12:05,600
+好了，我们将相机向左移动，所以为了实现那个，我们只需说x-=某一速度
+right, we're moving the camera left, so to do that, we just say dot x minus equals a certain speed
+
+139
+00:12:05,800 --> 00:12:14,925
+所以就是m_CameraSpeed，好了，这将是我们在这里定义的浮点数
+so m_CameraSpeed will see, okay, and this will be a float that we define here for example
+
+140
+00:12:15,350 --> 00:12:22,250
+所以就是float m_CameraSpeed，我们开始的时候大概是0.1左右，这可能太快了
+so float m_CameraSpeed, we're gonna start it off as being like 0.1 or something, which is probably gonna be too fast
+
+141
+00:12:23,100 --> 00:12:26,500
+现在，我的意思是这里有一个很大的问题，对吧
+now at the moment, I mean there's a huge problem here, right
+
+142
+00:12:26,500 --> 00:12:29,875
+因为如果我的意思是每一帧都有事件被调度，对吧
+because if I mean events get dispatched every frame, right
+
+143
+00:12:30,166 --> 00:12:38,650
+这在某种程度上取决于我们的实际移动速度、实际渲染帧速率，或者应用运行的速度
+this is gonna be kind of dependent on our actual speed of movement, our actual rendering frame rate, or how fast our application runs
+
+144
+00:12:38,933 --> 00:12:45,500
+我们确实想要使用DeltaTime，很可能我不会真的，就像你们可能不想把它作为事件来做
+we do want to use something called delta time, and most likely I would not really, like you might not want to do this as an event
+
+145
+00:12:45,733 --> 00:12:52,225
+你们可能只想通过轮询在OnUpdate中这样做，对吧，我也可以向你们展示如何实现那个
+you might want to just do this like in the OnUpdate function via polling, right, and I can show you guys how to do that as well
+
+146
+00:12:52,600 --> 00:12:59,200
+但是要正确实现那个，我们需要实际找出我们的应用的运行速度，并计算DeltaTime
+but to do that properly, we'll need to actually find out how fast our application is running, and calculate something called DeltaTime
+
+147
+00:12:59,500 --> 00:13:04,875
+因此，我们实际上移动了相机，而不考虑应用的实际运行速度
+so that we actually moved the camera independent of how fast our application is actually running
+
+148
+00:13:05,200 --> 00:13:12,425
+当然即使打开了v-sync，意味着应用的运行速度是每秒60帧或每秒60次更新
+because of course even if we have v-sync turned on, which would mean that this app is running as 60 frames per second or 60 updates per second
+
+149
+00:13:12,800 --> 00:13:20,000
+例如有人有个144Hz的监视器，以每秒144次的速度运行，除非它看起来不能那么快地渲染
+someone has a 144 hertz monitor for example, it will run at 144 times per second unless it's like not able to render that quickly
+
+150
+00:13:20,333 --> 00:13:26,500
+所以在这种情况下，相机会移动得更快，所以那是需要考虑的事情，我们以后会这样做
+so in which case the camera will move faster, so that's stuff to think about that, we'll do in the future
+
+151
+00:13:26,500 --> 00:13:31,748
+但现在，非常简单的事情，我们先做左右方向键
+but for now, really easy stuff, we'll do KeyLeft, we'll do KeyRight
+
+152
+00:13:33,925 --> 00:13:42,050
+这基本上使我们的相机位置增加了空间，所以我们向右移动，然后上下移动也会这样做
+which basically increments our camera position right by the space, so we move right and then up and down is going to do the same to
+
+153
+00:13:42,050 --> 00:13:46,400
+为什么，所以如果我们向下移动，我们想要将相机向下移动，所以是负数
+why, so if we move down, we want to move the camera down, so negative
+
+154
+00:13:46,825 --> 00:13:49,425
+然后如果我们按向上箭头，我们想要向上移动它
+and then if we press the up arrow, we want to move it up
+
+155
+00:13:49,900 --> 00:13:53,399
+最后，在我们做这些事情之前，我们想要做的是在OnUpdate内部
+and then finally what we want to do is inside OnUpdate, before we do this stuff
+
+156
+00:13:53,400 --> 00:13:59,375
+我们希望将相机的位置设置为m_CameraPosition，好了，我们暂时还不会考虑旋转
+we want to set our camera's position to be in camera position, okay, we won't worry about rotation yet
+
+157
+00:13:59,800 --> 00:14:07,075
+我把它保留为0，让我们点击f5，看看会发生什么，好了，这是我们的应用，如果按左或右
+I'll just leave that at zero, let's hit at f5 and see what happens, okay, so here is our app, and if I press left or right
+
+158
+00:14:07,366 --> 00:14:10,250
+你们可以看到它在移动，现在这是个KeyPressedEvent
+you can see it moves, now this is a KeyPressedEvent
+
+159
+00:14:10,575 --> 00:14:13,725
+正如你们所看到的，它只在按键被按下时才做出反应
+and as you can see, it's only reacting, when the key is actually pressed
+
+160
+00:14:13,725 --> 00:14:18,650
+然后重复，对吧，所以我们得到了这种非常笨重的移动，根本不是我们想要的
+and then repeated, right, so we get this kind of really chunky movement, it's not really what we want at all
+
+161
+00:14:19,475 --> 00:14:25,499
+因为它是一个事件系统，对吧，它对按键做出反应，这意味着我可以像这样
+because it's an event system, right, it reacts to key presses, it means that I can just be like blah blah blah blah
+
+162
+00:14:25,500 --> 00:14:30,733
+就像我在这里按向左，对吧，我不知道这些奇怪的声音是怎么回事
+like I'm pressing left here, right, doom doom doom doom doom, and I don't know what's up with these weird noises
+
+163
+00:14:30,733 --> 00:14:35,333
+我正在制造。。。但不管怎样，它移动了我的实际相机那么多，这是很棒的
+I'm making weather way, but anyway, it's moving my actual camera that amount, which is great
+
+164
+00:14:35,333 --> 00:14:38,000
+如果你们想浏览菜单，这个东西非常适合
+this stuff is great for like, if you want to navigate through a menu
+
+165
+00:14:38,300 --> 00:14:42,650
+但如果你们真的想要流畅，比如引擎游戏或其他什么
+but if you actually want smooth in like in engine gameplay or whatever
+
+166
+00:14:42,933 --> 00:14:46,625
+你们想要正确地移动你们的角色或相机，这些东西都是垃圾
+and you want to actually move your character or your camera properly, this stuff is rubbish
+
+167
+00:14:46,800 --> 00:14:49,200
+因此，让我们继续，不使用事件系统
+so let's go ahead and not use an event system
+
+168
+00:14:49,200 --> 00:14:54,750
+而是使用，并按照你们应该使用的方式使用OnUpdate函数
+and use, and use out OnUpdate function like you're supposed to
+
+169
+00:14:54,750 --> 00:14:59,775
+好了，让我们进入OnUpdate，而不是做所有这些
+okay, so let's go over here into OnUpdate, and instead of doing all of this
+
+170
+00:14:59,775 --> 00:15:11,875
+所有这些东西，那么就是if (Input::IsKeyPressed(HZ_KEY_UP))
+all of this stuff, we just want to say if input::IsKeyDown or IsKeyPressed HZ_KEY_UP or whatever
+
+171
+00:15:11,875 --> 00:15:14,563
+事实上，我只是想复制这些东西，因为它会很愚蠢
+in fact I'm just gonna copy this stuff, because it's gonna be stupid
+
+172
+00:15:15,533 --> 00:15:28,050
+因此不再是event.GetKeyCode()，而是Input::IsKeyPressed，当然这是Hazel::Input
+so instead of writing event.GetKeyCode(), we instead do IsKeyPressed just like that, of course this is Hazel::Input
+
+173
+00:15:29,866 --> 00:15:44,250
+所以可以复制它，把它放在这里的任何地方，对吧，那么应该发生什么，显然会删掉这些
+so we can copy this and put it all everywhere over here, right, so now what should happen, and will obviously get rid of all of this stuff
+
+174
+00:15:46,166 --> 00:15:51,675
+事实上，我会完全去掉它，因为我们现在不需要它，我想保持这个代码的干净
+and in fact I'll get rid of this completely, because we don't need it right now, and I want to keep this code pretty clean um
+
+175
+00:15:52,466 --> 00:15:59,450
+我们现在要做的就是点击f5键，现在在更新循环中，每次更新，只要按下左键就可以进行
+what we're going to do now is just hit f5, and now in the update loop, whenever we like if the left keys pressed every single update
+
+176
+00:15:59,450 --> 00:16:02,025
+它实际上会移动我们的相机，所以这应该是完全丝滑的
+it will actually move our camera, so this should be completely smooth
+
+177
+00:16:02,333 --> 00:16:05,481
+这就是你们从一个真正的游戏中期待的东西
+and this is the kind of stuff that you would expect from an actual game
+
+178
+00:16:06,266 --> 00:16:09,800
+所以你们可以看到，当我现在移动的时候，它就会移动，这很棒
+so as you can see, when I move right now, it moves, which is awesome
+
+179
+00:16:09,800 --> 00:16:14,850
+现在，如果你们有一个更高频刷新监视器，它可能会移动得很快，以至直接移出屏幕
+now if you have a higher fresh ray monitor, it might move, so quickly that it just moves off the screen
+
+180
+00:16:14,966 --> 00:16:19,425
+对吧，如果你们打开了v-sync，如果你们关闭了v-sync，那么就像RIP
+right, if you've got v-sync turned on, um if you have beating turned off, then like rip
+
+181
+00:16:19,666 --> 00:16:25,050
+好了，这将使它以每秒1000或2000 4000兰特的速度运行，而你们根本看不到这个
+right, this is gonna just run it up 1000 or 2000 4000 rans per second, and you're not gonna see this at all
+
+182
+00:16:25,300 --> 00:16:30,825
+但你们每秒可以看到它60次，这还不错，好吧，就那样，我们可以移动相机
+but you can see it 60 times per second, this isn't bad, okay, so that's it, we can move our camera
+
+183
+00:16:30,950 --> 00:16:36,350
+让我们看看我们是否也能旋转我们的相机，所以我要做的就是说
+um let's see if we can rotate our camera as well, so what I'll do is I'll just say that
+
+184
+00:16:38,200 --> 00:16:45,400
+如果我们有，顺便说一句，你们可能应该做的是，对于上下可能需要elif
+if we have, oh and by the way, what you probably should do is, like an elseif or something for up and down
+
+185
+00:16:45,400 --> 00:16:50,675
+否则，你们实际上可能会取消彼此的动作，所以我会说，else if
+otherwise you can actually end up canceling each other's like movement, so I'll say that we'll say else if
+
+186
+00:16:51,666 --> 00:16:56,125
+如果我们这样做，这意味着这个键优先于这个键，这通常是好了
+and if we do that, it means that this key has precedence over this key, which is usually fine
+
+187
+00:16:56,900 --> 00:17:04,750
+我可能会说向上优先于向下，所以向上移动，向上，好了，酷，就这样
+I might say up has precedence over down though, so up moves it, up, okay, cool, so there we go
+
+188
+00:17:04,750 --> 00:17:14,275
+所以如果我可以说，如果按下a键，对吧，我们可能会说旋转，相机旋转，这是我没有的
+so if I might say, if the a key is pressed, right, we might say that the rotation, camera rotation, which I don't have
+
+189
+00:17:15,500 --> 00:17:22,000
+让我们创建一个称为m_CameraRotation的浮点数，我们会将其设置为0
+let's make a float called m_CameraRotation, we'll set that equal to zero
+
+190
+00:17:22,533 --> 00:17:29,125
+如果我们按下a键，我想就是m_CameraRotation -= m_CameraSpeed
+um if uh we press the a key camera rotation minus equals camera speed I guess
+
+191
+00:17:29,866 --> 00:17:35,400
+你们可能应该把这个拆分一下，有一个相机的旋转速度，所以我们会看到相机的移动速度
+um you should probably break this up, and have like a camera rotation speed, so we'll see camera move speed
+
+192
+00:17:35,400 --> 00:17:39,325
+使用Alt+Shift+r调出VA重构这个
+although factor this alt shift r with visual assist camera move
+
+193
+00:17:40,300 --> 00:17:44,950
+我该怎么做，应该是cameraMoveSpeed，而不是cameraMoveRotation，cameraMoveSpeed
+well what do I do, cameraMoveSpeed not cameraMoveRotation, cameraMoveSpeed
+
+194
+00:17:45,466 --> 00:17:52,375
+然后是cameraRotation，然后是cameraRotationSpeed，好了
+and then cameraRotation, and then cameraRotationSpeed, okay
+
+195
+00:17:53,300 --> 00:18:00,874
+哎呀，我不知道我是怎么做到的，这显然就是那样，我会为这个做0.1
+whoops I don't know how I did that, this is obviously just gonna be that, and I'll do 0.1 for this
+
+196
+00:18:01,533 --> 00:18:05,050
+这样我们就可以有一个独立的移动和旋转速度
+so that way we can have an independent speed for movement and for rotation
+
+197
+00:18:06,000 --> 00:18:17,150
+所以我们会看到m_CameraRotation -= m_CameraRotationSpeed
+so we'll see cameraRotation minus equals cameraRotationSpeed
+
+198
+00:18:19,133 --> 00:18:26,175
+然后至于d键，我们会看到它正向旋转
+and then with the d key, we'll see that it rotates in a positive direction
+
+199
+00:18:26,750 --> 00:18:30,799
+好了，让我们看看我们得到了什么，好了，所以a和d绝对不做任何事情
+okay, so let's see what we get here, alright, so a and d do absolutely nothing
+
+200
+00:18:30,800 --> 00:18:35,333
+因为我忘了把相机的旋转插入到我们的旋转中
+because of course I forgot to actually plug in camera rotation into our rotation
+
+201
+00:18:35,333 --> 00:18:40,400
+我们仍在将旋转设置为0，所以让我们正确地这样做，然后看看会发生什么
+we're still setting our rotation to zero, so let's just do that properly, and then see what happens
+
+202
+00:18:40,775 --> 00:18:47,000
+好了，我们开始了，所以a和d旋转相机，虽然很慢，因为它不是，我想它是以度为单位的
+alright, there we go, so that a and d rotate the camera, that's very slow though, because it isn't, I guess it is in degrees
+
+203
+00:18:47,366 --> 00:18:50,775
+所以我们可能想把它改成2.0之类的
+so we probably want to change this more to like tube or something like that
+
+204
+00:18:51,050 --> 00:18:55,200
+而且你们可以看到，你们可能会看到它实际上是朝着另一个方向旋转的
+um and furthermore you can see that, you might see that it's actually rotating it the other way
+
+205
+00:18:55,575 --> 00:19:00,550
+所以当我减去等于cameraRotationSpeed，它实际上是在旋转
+um so when I do minus equals cameraRotationSpeed, um it's actually rotating
+
+206
+00:19:00,666 --> 00:19:04,975
+这看起来就像是我在旋转物体而不是相机，因为它应该朝另一个方向移动，不是吗
+it almost looks like I'm rotating the object instead of the camera, because it should be going the other way, shouldn't it
+
+207
+00:19:05,350 --> 00:19:13,025
+那是因为正旋转实际上是向右旋转，而负旋转是顺时针旋转
+um that's because a positive rotation actually rotates this way right, and a negative rotation rotates clockwise
+
+208
+00:19:13,333 --> 00:19:21,225
+那就是它的运行方式，因此，如果按下a，你们实际上想做一个+=cameraRotationSpeed
+that's just the way that it works, so because of that, you actually want to do a plus equals to the cameraRotationSpeed, if we press a
+
+209
+00:19:21,225 --> 00:19:24,050
+如果我们想要旋转，我们想要将相机向左旋转
+and if we wanted to rotate kind of, we wanted to rotate the camera left
+
+210
+00:19:24,533 --> 00:19:29,925
+然后减去，如果我们按下d键，就像负旋转一样
+and then minus equals door do like a negative rotation, if we press the d key
+
+211
+00:19:30,166 --> 00:19:34,375
+我们来解决这个问题，然后按f5键，我们应该做对了，对吧
+so let's fix that and press f5, and we should get this right, 
+
+212
+00:19:34,725 --> 00:19:38,333
+所以现在我基本上可以移动我的相机了，对吧，我可以旋转我的相机了
+so now I can basically move my camera, right, and I can rotate my camera
+
+213
+00:19:38,333 --> 00:19:43,921
+那一切都和你们预期的一样，好吧，现在我们有了一个移动的东西，很难说
+and that all works as you would expect, okay, so now we have a moving thing, it's kind of hard to tell
+
+214
+00:19:43,921 --> 00:19:49,325
+因为我们只渲染了一个，对我们来说很容易改变它或等待，它不是
+because we're just rendering one thing, pretty easy for us to change it or wait, it's not
+
+215
+00:19:49,325 --> 00:19:53,575
+因为目前我们渲染事物的方式只是通过我们的顶点位置
+because at the moment the way that we render things is only by our vertex positions
+
+216
+00:19:53,966 --> 00:20:00,500
+所以我们实际上需要做的是能够在不同的位置渲染对象，对吧
+so what we actually need to do is be able to render objects in different positions, right
+
+217
+00:20:01,566 --> 00:20:05,925
+我们现在不能这样做，当我们提交一些东西时，就像是一个带有烘焙顶点的顶点数组
+which we can't do right now, when we submit something, that's it, it's just like a vertex array with his baked vertices
+
+218
+00:20:05,925 --> 00:20:10,350
+然后是着色器，我们没有办法说我希望这个对象有这个变换
+and then a shader, we have no way of saying I want this object to have this transform
+
+219
+00:20:10,800 --> 00:20:15,100
+那就是我们需要做的事情，我们可能会下期做，另一种选择是
+and so that's something that we need to do, we might do that next episode, the other alternative is
+
+220
+00:20:15,966 --> 00:20:24,050
+正如我现在所说的，这些东西实际上就是我们的应用程序实际更新的速度
+this stuff as I said right now is bound to actually just be the speed at which our application is actually updating
+
+221
+00:20:25,133 --> 00:20:26,525
+我们希望这个独立于那个
+we want this to be independent of that
+
+222
+00:20:26,900 --> 00:20:30,733
+所以我们需要引入一种叫做增量时间的东西，基本上做适当的时间类型的步骤管理
+so we need to introduce something called delta time and basically do proper time kind of step management
+
+223
+00:20:31,800 --> 00:20:35,400
+所以那就是我们所能做的另一个选择，我们下一次可能会做这两个中的一个
+so that's another option of what we what we can do, we'll probably do one of those two next time
+
+224
+00:20:35,400 --> 00:20:40,199
+我想我只是想把DeltaTime去掉，因为那是你们知道的，我们应该很早就知道
+I think I just want to get delta time out of the way, because that's something that you know, we should have pretty early on
+
+225
+00:20:40,200 --> 00:20:45,075
+这将使我们能够修复所有关于代码的东西，并使其真正为你们所有人正确运行
+and it will just enable us to fix all about code kind of, and make it actually run for all of you guys properly
+
+226
+00:20:45,533 --> 00:20:48,299
+无论如何，希望你们喜欢这个视频，如果你们喜欢的话，就为它点赞吧
+anyway, hope you guys enjoyed this video, if you did, hit the like button
+
+227
+00:20:48,300 --> 00:20:52,375
+你们也可以通过访问patreon.com/theCherno来帮助支持该系列
+you can also help support the series by going over to patreon.com/TheCherno
+
+228
+00:20:52,375 --> 00:20:55,875
+在那里你们会提前得到下期视频，并可以访问我提到的Hazel开发分支
+where you'll get episodes early and access to the Hazel development branch as I mentioned
+
+229
+00:20:57,366 --> 00:21:00,799
+所以我们有两个问题，我今天想在这里做的两件事
+so we have kind of two issues, two things that I want to do here today
+
+230
+00:21:00,800 --> 00:21:03,475
+我们设法从Application类中移除了一切
+we managed to kind of get everything out of the Application class
+
+231
+00:21:03,475 --> 00:21:06,975
+我们的Application类现在实际上是干净的，让我们回到Application类
+our Application class is actually clean now actually, let's go back to the Application class
+
+232
+00:21:07,400 --> 00:21:13,325
+因为我认为不，不，我确实这样做了，我以为我忘了从头文件中删除内容
+because I think that no, no, I actually did, I thought that I forgot to remove stuff from the header file
+
+233
+00:21:14,066 --> 00:21:18,266
+但不，我们在这里做得很好，我们实际上可以去掉这个HazelAPI，我们不再需要它了
+but no, we're pretty good here, we can actually get rid of this HazelAPI, we don't need that anymore
+
+234
+00:21:18,266 --> 00:21:22,066
+这个东西包含几乎所有的东西，着色器、缓冲区和顶点数组
+this stuff includes almost everything, um yeah shader of buffer about vertex array
+
+235
+00:21:22,066 --> 00:21:25,133
+那就是我所说的东西，我们不再需要那些包含了
+that's the stuff I was talking about, um we don't need any of those includes anymore
+
+236
+00:21:25,133 --> 00:21:29,475
+如果你们不再需要你们的内容，清理它们是很重要的，因为有些东西人们经常会忘记
+it's important to clean up your includes, if you don't need them anymore, because there's something that people often forget
+
+237
+00:21:29,775 --> 00:21:36,333
+但是你们可以看到我们的Application类非常好而且干净，只有79行
+um but you can see that our Application class is really nice and clean again, like 79 lines occurred
+
+238
+00:21:36,333 --> 00:21:40,599
+很漂亮，我们的SandboxApp实际上什么都有
+beautiful, and our SandboxApp actually has everything
+
+239
+00:21:40,600 --> 00:21:44,533
+这很好，因为这实际上是我们使用Hazel引擎实际渲染的一个例子
+so that's good, because it's actually an example of us using Hazel engine to actually render something
+
+240
+00:21:44,533 --> 00:21:47,066
+甚至还添加了交互功能，这非常酷
+and even add interaction to it, which is pretty cool
+
+241
+00:21:47,066 --> 00:21:54,050
+好了，所以下期，我们可能会看看增量时间，它是如何运行，以及为什么一开始就需要它
+okay, so next time, we're probably gonna take a look at delta time, and how that works, and why we need it even in the first place
+
+242
+00:21:55,133 --> 00:21:58,450
+那应该会很有趣，所以我们下期再见，拜
+and that should be a lot of fun, so I'll see you guys in next episode, goodbye
+

@@ -1,0 +1,1968 @@
+﻿1
+00:00:00,083 --> 00:00:04,110
+嗨，大家好，我叫TheCherno，欢迎回到我的游戏引擎系列
+hey, what's up guys, my name is TheCherno, welcome back to my game engine series
+
+2
+00:00:04,283 --> 00:00:09,825
+那么上期我们说了相机，特别是相机背后的理论，计划好了所有那些
+so the last time, we talked about cameras and specifically the theory behind cameras, and we planned all of that out
+
+3
+00:00:10,216 --> 00:00:12,750
+你们还没有看过那期视频，一定要去看一下
+you guys haven't seen that video, definitely check it out
+
+4
+00:00:12,850 --> 00:00:15,316
+我给你们布置了一个作业，让你们自己解决这个问题
+I gave you guys a homework of trying to work this out yourself
+
+5
+00:00:15,316 --> 00:00:20,816
+所以希望你们已经做到了，如果你们还没有，停止这期视频，回去看上期，真的需要试一试
+so hopefully you've done that, if you haven't yet, stop this video, go back and watch that one, really have a go
+
+6
+00:00:20,816 --> 00:00:25,275
+因为这个系列主要是教你们，如何制作游戏引擎以及它们是如何运行的
+because this series is all about trying to teach you guys, how to make game engines and how they work
+
+7
+00:00:25,275 --> 00:00:31,249
+你们不会学到任何东西，除非你们真的自己做这些事情，而不是简单地抄袭我所做的
+and you're not gonna learn anything, unless you actually do this stuff for yourself, rather than just copying down what I do
+
+8
+00:00:31,250 --> 00:00:36,349
+所以一定要那样做，如果你们还没有的话，我想感谢所有让这个系列成为可能的赞助人
+so definitely do that, if you haven't already, I want to thank all the patrons that made this series possible
+
+9
+00:00:36,350 --> 00:00:42,375
+Patreon.com/theCherno是你们支持本系列的方式，非常感谢所有支持本系列的人
+patreon.com/TheCherno is how you can support this series, thank you so much to everyone who is supporting
+
+10
+00:00:42,375 --> 00:00:46,000
+因为那使这个系列成为可能，我非常感谢你们所有人
+because that's what makes it stuff possible, and I'm so grateful to all of you
+
+11
+00:00:46,216 --> 00:00:50,864
+如果你们想要更早看到视频，或者想访问我已经为这个引擎编写的高级源代码
+if you want videos early, or you want access to super advance source code that I've already written for this engine
+
+12
+00:00:51,875 --> 00:00:55,649
+查看描述中的链接，patreon.com/thecherno
+check out the link in the description, patreon, patreon.com/TheCherno
+
+13
+00:00:55,650 --> 00:00:58,725
+好了，相机，我们已经做了所有的理论，我们知道它们是如何运行的
+okay, cameras, we've done all the theory, we know how they work
+
+14
+00:00:58,725 --> 00:01:02,725
+让我们深入研究C++代码，并实际实现它们
+let's just dive in and go into the C++ code, and actually implement them
+
+15
+00:01:02,950 --> 00:01:07,883
+好了，我们在两期之前做的是我们创建了这个渲染器，我们有Renderer::BeginScene
+okay, so what we did two episodes ago is we created this Renderer, and we had Renderer::BeginScene
+
+16
+00:01:07,883 --> 00:01:11,475
+我们有Renender::Submit和Renender::EndScene，我们有所有这些东西
+we had Renderer::Submit, we had Renderer::EndScene, we had all of this stuff
+
+17
+00:01:11,650 --> 00:01:16,716
+上期我们了解了背后的所有理论，所以今天我们就不需要再讲了
+and last episode we learned about all of the theory behind that, so we don't need to cover that again today
+
+18
+00:01:16,716 --> 00:01:21,100
+我们已经在上期视频中实现了那个，这很棒，因为这意味着我们完全知道要做什么
+we've done that in the last video, which is awesome, because it means that we know exactly what to do
+
+19
+00:01:21,300 --> 00:01:23,750
+对吧，所以我们需要某种方式
+right, so we need some kind of way
+
+20
+00:01:23,750 --> 00:01:29,900
+首先在开始将数据提交给渲染器之前，让我们先处理相机方面的事情，需要一个相机
+first of all, let's just deal with the camera side of things before we begin submitting that data to the Renderer, we need a camera
+
+21
+00:01:30,250 --> 00:01:33,356
+好了，那么相机是什么，它是视角矩阵和投影矩阵
+right, so what is the camera, it's of view matrix and it's a projection matrix
+
+22
+00:01:33,750 --> 00:01:35,725
+让我们创建某种类型的类来存储所有这些内容，
+let's create some kind of class to store all of that, 
+
+23
+00:01:36,175 --> 00:01:39,575
+那么在Renderer下，我将添加一个新项，一个头文件
+so inside that Renderer, I'm going to add a new item, it's going to be a header file
+
+24
+00:01:40,450 --> 00:01:45,749
+我将它命名为OrthoGraphicCamera.h，我只是想明确地说明这是一种什么样的相机
+I'm going to call it OrthoGraphicCamera.h, I just want to be really explicit about what kind of camera this is
+
+25
+00:01:45,750 --> 00:01:52,216
+因为我们当然也会有一个透视相机或某种我们将来可以移动的相机
+because we're also going to have of course a PerspectiveCamera or some kind of camera that we can move in the future as well
+
+26
+00:01:52,216 --> 00:01:54,675
+所以现在，这只是一个OrthoGraphicCamera
+so for now though, this is just going to be an OrthoGraphicCamera
+
+27
+00:01:55,750 --> 00:02:03,401
+现在为了让事情更简单，我们要包装下这个的创建，所以你们会看到我马上要做的事情
+now to make things easier, we are going to kind of wrap the creation of this, so what you'll see me do in a minute
+
+28
+00:02:03,401 --> 00:02:10,825
+我只想把glm包含在这里，我们实际上要做的是，所以就是OrthoGraphicCamera
+and I just want to include glm here, what we're actually going to do is, so OrthoGraphicCamera
+
+29
+00:02:11,325 --> 00:02:13,325
+我的意思是，我不必将文件命名为OrthoGraphicCamera
+I mean I didn't have to call the file OrthoGraphicCamera
+
+30
+00:02:13,325 --> 00:02:15,400
+因为我可以只将所有的相机放在一个文件中
+because I could have just put all the cameras in one file
+
+31
+00:02:16,116 --> 00:02:23,249
+那可能是个错误，但没关系，我们会暂时保持这个，当创建一个OrthoGraphicCamera时
+so that may have been a mistake, but it's okay, we'll keep this explicit for now, when we create an OrthoGraphicCamera
+
+32
+00:02:23,250 --> 00:02:27,316
+我们得到这个构造器，我不想接收像投影矩阵一样的东西，我们可以，对吧
+and we get this constructor, I don't want to take in like a projection matrix, we could, right
+
+33
+00:02:27,316 --> 00:02:33,350
+这可能只是一个通用的Camera类，就像直接在投影矩阵和视图矩阵上运行一样
+this could just be such a generic camera class that it just like works directly on projection matrix and view matrix
+
+34
+00:02:33,850 --> 00:02:39,375
+但我想让它更有趣，更灵活，所以我们要做的是，我们只需要接受一个浮点数
+but I want to make this a bit more fun, a bit more flexible, so what we'll do is we'll just kind of take in a float
+
+35
+00:02:39,525 --> 00:02:44,483
+那就是left，本质上是一个浮点数，那就是right，一个浮点数，那将是bottom
+that's going to be like our left, essentially a float, that's going to be our right, a float, that's going to be bottom
+
+36
+00:02:44,483 --> 00:02:50,316
+还有一个浮点数，这将是top，所以这正是一个实际的正交矩阵想要的，对吧
+and a float, that's going to be top, so this is exactly what a what an actual orthoGraphic matrix wants, right
+
+37
+00:02:50,316 --> 00:02:55,549
+它想要的基本上是边界，现在，正交矩阵是一个矩阵，而不是像浮点数一样
+it wants basically the bounds, now an orthoGraphic matrix is a matrix that instead of having like a float4
+
+38
+00:02:55,650 --> 00:03:01,725
+它就像，因为本质上就像一个长方形，特别像一个立方体，但它也可以像一个矩形
+it has like, because essentially just like a rectangular prism, that is like especially like a cube, but it can be like a rectangle
+
+39
+00:03:02,050 --> 00:03:08,325
+我们定义了一种左右下上，也有在远边界上的近边界，通常是正交圆环
+and we're defining kind of left right bottom top, and there's also near on far bounds, typically for orthographic round ring
+
+40
+00:03:08,483 --> 00:03:14,650
+如-1表示近距离，1表示远距离，那就是将使用的默认设置，因此不会在这实际用它们
+like -1 for near and 1 for far is fine, that's the default we're going to use, so we're not going to actually take them in here
+
+41
+00:03:15,216 --> 00:03:20,949
+如果你们愿意，你们可以通过提供该API使其更强大，但我不会费心
+if you wanted to, you could make this a bit more powerful by providing that api, but I'm not gonna bother
+
+42
+00:03:20,950 --> 00:03:27,400
+因为我们真的没有它的用例，而且这个东西可能也是暂时的，我们已经写过了，好了
+because we don't really have a use case for it, and this stuff is also somewhat temporary probably, and we'll be written, okay
+
+43
+00:03:27,400 --> 00:03:30,850
+那么在数据方面实际上需要什么，在数据方面需要什么，
+so what do we actually need in terms of data, well we know what we need in terms of data, 
+
+44
+00:03:31,100 --> 00:03:33,775
+我们需要一个mat4，这是m_ProjectionMatrix
+we need a mat4, that's our m_ProjectionMatrix
+
+45
+00:03:35,283 --> 00:03:42,850
+我们需要一个mat4，这是m_ViewMatrix，好了，现在实际上需要跟踪相机的位置
+and we need a mat4, this our m_ViewMatrix, ok, now we actually need to keep track of where the camera is
+
+46
+00:03:43,016 --> 00:03:48,650
+比如相机的位置等等，现在我们不想在m_ViewMatrix中执行此操作，因为我们要做的是
+like the position of the camera and all of that as well, now we don't want to do this inside the m_ViewMatrix, because what we'll do is
+
+47
+00:03:49,150 --> 00:03:54,850
+就像每帧一次，当我们计算相机的位置时，我们想要重新计算这个ViewMatrix
+like once per frame essentially when we calculate where our camera is, we want to recalculate this ViewMatrix
+
+48
+00:03:56,250 --> 00:04:03,975
+这必须是相机的实际变换矩阵的逆矩阵，对吧，那就是ViewMatrix
+this has to be the inverse of like the actual transformation matrix of the camera, right, that's what the ViewMatrix is
+
+49
+00:04:04,283 --> 00:04:07,075
+所以我们可以有另一个矩阵，实际上是变换矩阵
+so we could have another matrix is actually the transformation matrix
+
+50
+00:04:07,350 --> 00:04:12,275
+当然，你们只需求逆矩阵，就可以得到原始矩阵，所以那也是我们可以做的
+but of course you could just invert the inverted matrix to get your original matrix back, so that's something we can do as well
+
+51
+00:04:13,650 --> 00:04:19,325
+但本质上，我想要做的是，我想通过使用m_position来跟踪位置，对吧
+but essentially what I want to do is, I want to keep track of the position by just using m_Position, right
+
+52
+00:04:19,616 --> 00:04:24,349
+在旋转方面，我的意思是，我们可以跟踪旋转
+and in terms of the rotation, I mean, we could like keep track of the rotation
+
+53
+00:04:24,350 --> 00:04:29,917
+通过使用类似于？？？角度的矢量，或者使用类似于四元数之类的
+either by using like a vec3 of oiler angles, or by using like a quaternion or something like that
+
+54
+00:04:30,683 --> 00:04:38,050
+但你们并不是真的旋转正交相机，你们可以旋转它们，就像你们知道的那样沿着z轴旋转
+but you don't really rotate orthographic cameras, you can rotate them, like you know along like the z axis
+
+55
+00:04:38,716 --> 00:04:45,283
+但如果你们想做这样的旋转，你们真的可以，你们知道，保持旋转为浮点数，那很不错
+but if you want to do a rotation like that, you can really just, you know, keep rotation as a float, and that's going to be fine
+
+56
+00:04:45,283 --> 00:04:52,150
+我会把它设置0，好了，所以我们有，我们可能真的需要的所有东西，正交相机
+and I'll finish lays that to 0, okay, so there we have, all of our that we could possibly need really for orthographic camera
+
+57
+00:04:52,883 --> 00:04:59,550
+让我们继续，为我们想要的一切提供一些函数，所以想要某种方式来检索这些矩阵，对吧
+let's go ahead, and provide some functions for everything we want, so we want some kind of way to retrieve these matrices, right
+
+58
+00:04:59,950 --> 00:05:04,275
+所以我们可以有，我不知道，如果你们想的话
+so we can have a, and I don't know, like if you wanted to
+
+59
+00:05:04,275 --> 00:05:09,449
+也可以缓存ViewProjectionMatrix，所以m_ViewProjectionMatrix
+you could also cache the ViewProjectionMatrix, right, so m_ViewProjectionMatrix
+
+60
+00:05:10,516 --> 00:05:19,050
+因为你们可能不想要，所以可能仍然需要将它们分开，但也可能经常这样请求
+because you might not want, you might still need them separated, but you might also be requesting this like very often
+
+61
+00:05:19,050 --> 00:05:24,950
+你们不想每次都做乘法运算，也不想自己缓存，所以你们可以这样做，同样取决于你们
+and you don't want to do the multiplication every time or cache it yourself, so you could do that, again, this is up to you
+
+62
+00:05:24,950 --> 00:05:31,649
+因为如果这样做，请记住，你们为这个类多使用了64字节的内存，我不知道通常这不是问题
+because if you do that, keep in mind, you are using 64 more bytes of memory for this class, I don't know usually it's not a problem though
+
+63
+00:05:31,650 --> 00:05:36,670
+所以我们要这样做，好了，我们有位置，所以让我们继续创建SetPosition函数
+so we're gonna do that, okay, so we have position, right, so let's go ahead and make a SetPosition function
+
+64
+00:05:36,883 --> 00:05:43,100
+那实际上可以让我们设置位置，所以我将使用const GLm::vec3&，这就是position
+that will actually let us set the position, so I'll take an const glm::vec3&, which is gonna be position
+
+65
+00:05:43,883 --> 00:05:50,600
+然后我只需将m_position设置为position，这样就可以将相机放置在世界上的某个位置，对吧
+and then I'm just gonna set m_Position to position, so that lets us actually position the camera somewhere in the world, right
+
+66
+00:05:51,475 --> 00:06:02,200
+我们还会做一个SetRotation，只是个浮点数，rotation，所以就是Zed旋转，沿着z轴旋转
+we'll also do a SetRotation, which will just be a float, rotation, so again this is going to be zed rotation, rotation along the z axis
+
+67
+00:06:03,616 --> 00:06:08,516
+因为我们实际上不需要任何其他的正交相机旋转，因为这也是一个基本的2D相机
+because we don't really need any other rotation for an orthographic camera, because again this is basically a 2D camera
+
+68
+00:06:08,516 --> 00:06:13,325
+想象一下，对于2D来说，你们并不是真的沿着x轴或y轴旋转物体
+picture it that way, you don't really rotate things along the x or the y axis for 2D
+
+69
+00:06:13,325 --> 00:06:16,916
+那会给你们带来奇怪的结果，你们可能不想要
+that's gonna give you weird results that you probably don't want
+
+70
+00:06:16,916 --> 00:06:21,750
+显然，如果这是一台正交相机，就像你们正在创建的3D建模应用一样
+again obviously if this is an orthographic camera for like a 3D modeling application you're making
+
+71
+00:06:21,883 --> 00:06:28,000
+然后你们仍然想要，你们知道的，xy和z旋转，但在这个特定的场景中
+then you still want to have, you know, xy and z rotation, but in this particular scenario
+
+72
+00:06:28,000 --> 00:06:34,249
+我把它想象成一个专门用于2D渲染的正交相机
+I'm picturing this as more of just an orthographic camera that specifically is for like 2D rendering
+
+73
+00:06:34,250 --> 00:06:40,316
+那就是为什么我要这样做，在2D中，我们只有一个通道，就像我们只有2个维度一样
+that's why I'm doing it this way, and in 2D, we only have one access anyway, like we only have 2 dimensions
+
+74
+00:06:40,316 --> 00:06:46,016
+所以我们能做的就是沿着z轴旋转，好了，就是那样
+so therefore rotation along the z axis is all we can do, okay, so that's that
+
+75
+00:06:46,016 --> 00:06:49,975
+我也想要这个的获取器，所以就是float GetPosition()
+I also want to have getters for this, so float GetPosition
+
+76
+00:06:50,616 --> 00:06:57,100
+抱歉，不是浮点型，const glm::vec3& GetPosition() const {return m_Position}，对吧
+sorry, not float, const glm::vec3& GetPosition() const {return m_Position}, right
+
+77
+00:06:57,100 --> 00:07:01,308
+然后对于旋转，我会做同样的事情，所以float GetRotation()
+and then for rotation, I'm gonna do the same thing, so float GetRotation
+
+78
+00:07:04,516 --> 00:07:14,575
+这将是旋转，常量，无法输入我今天想要输入的内容，返回m_Rotation，好了，太棒了
+and this will be rotation, const, can't type what I want to type today, return m_Rotation, okay, wonderful
+
+79
+00:07:14,850 --> 00:07:18,200
+所以在我看来这是一个非常可靠的API
+so that looks like a pretty solid api to me
+
+80
+00:07:18,475 --> 00:07:23,875
+现在让我们继续并实际创建这个，当我们做这件事的时候
+now let's go ahead and actually create this now, when we do this stuff
+
+81
+00:07:24,216 --> 00:07:30,733
+看看这就是问题所在，当我们做这件事时，有SetPosition，显然没有方法来检索矩阵
+see if this is the thing, when we do this stuff, right, we've got SetPosition, obviously we don't have any ways of retrieving matrix, by the way
+
+82
+00:07:31,000 --> 00:07:36,683
+但当我们执行SetPosition和SetRotation时，可能需要更新实际的几个矩阵
+but when we do SetPosition SetRotation, we probably need to update the actual few matrix
+
+83
+00:07:36,683 --> 00:07:43,645
+除非我们有某种更新功能，它会为我们实现那个，所以这再次取决于你们
+unlesswe have some kind of update function, which does that for us, so this again is up to you
+
+84
+00:07:44,516 --> 00:07:49,200
+如果我们处理的是相机，即响应鼠标移动，你们可以实现OnUpdate函数
+if we're dealing with a camera, that's responding to mouse movements, you could implement an OnUpdate function
+
+85
+00:07:49,516 --> 00:07:53,916
+或者甚至将其与事件系统挂钩，然后重新计算矩阵
+or even hook this up to the event system and upon, then you'll be recalculating your matrices
+
+86
+00:07:53,916 --> 00:07:59,475
+但我要说的是，目前，我们的矩阵没有重新计算，所以我们需要做的是创建一个函数
+but what I'm saying is at the moment, our matrices do not get recalculate, so what we need to do is create a function
+
+87
+00:08:00,050 --> 00:08:07,425
+我们可以再次使用OnUpdate，但我想在本例中使用RecalculateViewMatrix，对吧
+we could use OnUpdate again, but I want for this example, which will be RecalculateViewMatrix, right
+
+88
+00:08:07,816 --> 00:08:13,316
+RecalculateViewMatrix基本上将是我们在设置某些内容时调用的函数
+and RecalculateViewMatrix is basically going to be a function that we call whenever we set something
+
+89
+00:08:13,316 --> 00:08:20,116
+因此，当我们设置旋转时，要重新计算ViewMatrix，当设置位置时，要重新计算ViewMatrix
+so when we set rotation, we want to recalculate the ViewMatrix, when we set position, we want to recalculate the ViewMatrix
+
+90
+00:08:20,116 --> 00:08:25,483
+显然，我们希望在设置值之后执行此操作，因此RecalculateViewMatrix位于此处
+and we want to do this by the way after we set the value obviously, so RecalculateViewMatrix goes here
+
+91
+00:08:25,483 --> 00:08:29,150
+我仍然在保持这种内联，因为这并不是什么大不了的事
+I'm still keeping this kind of inline and in one line, because not that big of a deal
+
+92
+00:08:29,150 --> 00:08:32,883
+但你们知道，如果你们想把它放到CPP文件或类似的文件中
+but you know, if you want to drop that into a cpp file or anything like that
+
+93
+00:08:32,883 --> 00:08:39,267
+然后那将是完全好的和适当的，好了，这就是我们所拥有的，还需要种方法来检索这些
+then that will be totally fine and appropriate, okay, so this is what we've got, we also need a way to retrieve these things
+
+94
+00:08:39,450 --> 00:08:49,975
+简单，创建const glm::mat4& GetProjectionMatrix() const，返回m_ProjectionMatrix
+so very easy, I'm just gonna make a const glm::mat4& yet GetProjectionMatrix() const, which will return m_ProjectionMatrix
+
+95
+00:08:50,250 --> 00:08:52,442
+对吧，你们可以为这个创建个设置器
+right, again you could make setters for this
+
+96
+00:08:54,175 --> 00:08:56,483
+在这一点上，你们真的可以做你们想做的任何事情，直接做
+at this point, you could really do whatever you want, you could just make them
+
+97
+00:08:56,483 --> 00:09:02,525
+你们可以把它变成一个结构体，用公共字段来代替，不，我不知道，相机是如此灵活
+you can make this a struct and have public fields instead, there's no, I don't know, cameras are such a flexible
+
+98
+00:09:02,800 --> 00:09:08,975
+你们知道，API通常，你们可以调用VPMatrix，ViewProjectionMatrix，我喜欢非常明确的
+you know, api usually, that you could call VPMatrix, a ViewProjectionMatrix, I like to be quite explicit
+
+99
+00:09:09,316 --> 00:09:15,425
+特别是因为这个系列是关于教你们这些东西是如何运行的，所以我们再来一次
+especially because this series is about teaching you guys how this stuff works, so we'll do that again
+
+100
+00:09:15,550 --> 00:09:20,200
+ViewProjectionMatrix，ViewMatrix和ProjectionMatrix，很好，在我看来一切都很好
+ViewProjectionMatrix, ViewMatrix and ProjectionMatrix, good, everything looks pretty good to me
+
+101
+00:09:21,650 --> 00:09:29,316
+现在可以直接创建这个构造函数，那实际上是这个文件中唯一的东西，让我们包含hzpch
+now we can just make this constructor, that actually ended up being the only thing, in this file, let's include hzpch
+
+102
+00:09:29,750 --> 00:09:38,175
+和OrthogicCamera.h，namespace Hazel，到这里来，我们将去掉这个命名空间
+and OrthographicCamera.h, namespace Hazel, go over here, we'll get rid of this namespace
+
+103
+00:09:39,250 --> 00:09:41,483
+这实际上是要做的是创建矩阵
+what this is going to do is actually make the matrix
+
+104
+00:09:41,483 --> 00:09:50,300
+好了，所以m_ProjectionMatrix基本上是一个glm::orthographic，我想它叫ortho
+right, so m_ProjectionMatrix is going to be basically a glm::orthographic, ortho I think it's called
+
+105
+00:09:50,950 --> 00:09:59,916
+我总是忘记它的实际位置，所以看起来像在glm扩展中，就像mat4之类的
+I forgot the actual, I always forget where this actually is, so it looks like it's in glm extension, like mat4 or something
+
+106
+00:10:00,116 --> 00:10:11,149
+所以我认为它是glm/gtc/matrix_transform.hpp，然后是left和right，你们可以看到
+so I think it's glm/gtc/matrix_transform.hpp, yep okay, and then this takes left, right, and you can see
+
+107
+00:10:11,150 --> 00:10:14,875
+这个实际上有一个只取bottom和top的函数，我想它们也有一个取近取远的
+this actually has a function that just takes bottom top, I think they've also got one that takes near far
+
+108
+00:10:15,516 --> 00:10:22,925
+我不确定，如果不这样做，让我们看看是否会这样做，看看它是做什么的，试一试，看看
+I'm not sure, if we don't, let's see if we go to this, and we look at what it does, let's take a try and take a look
+
+109
+00:10:23,050 --> 00:10:29,825
+因为这很难读懂它在近距离和远距离上的实际作用，所以在这里很难看到
+because this is quite hard to read of what it actually did for near and far, so a little bit hard to see here
+
+110
+00:10:30,883 --> 00:10:37,349
+但它应该使用的地方的正交，比如近和远，例如这里
+but ortho for the place where it's supposed to use like near and far, which for example is here
+
+111
+00:10:37,350 --> 00:10:45,475
+你们可以看到，它只使用缺省值1，因此你们可能可以使用该值为0，但我将提供-1和1
+you can see, it just uses a default value of one, so you could probably zero with that, but so I'm going to provide -1 and 1
+
+112
+00:10:45,716 --> 00:10:48,825
+这样我们才能真正知道这些值是什么，而不是依赖于某种glm
+just so that we actually know what those values are, and we're not relying kind of glm
+
+113
+00:10:49,350 --> 00:10:54,700
+好了，那就足够了，差不多就是那样，现在我们根本不需要重新计算这里的视图矩阵
+okay, that's finally enough, that's pretty much it, now we don't need to recalculate the ViewMatrix here at all
+
+114
+00:10:54,700 --> 00:10:59,550
+我们实际上需要那个函数，不确定为什么VA不是这样的，RecalculateViewMatrix
+oh we actually need that function, not sure why visuals just didn't make it, RecalculateViewMatrix
+
+115
+00:10:59,550 --> 00:11:02,400
+这是在我们更改实际转换之后发生的事情
+so this is something that happens after we change the actual transform
+
+116
+00:11:03,116 --> 00:11:09,750
+无论是通过设置位置还是设置旋转，所以我们需要做的是首先计算实际的矩阵
+whether it be by setting the position or setting the rotation, so what we need to do is calculate the actual matrix first
+
+117
+00:11:09,750 --> 00:11:15,040
+我将向你们展示这方面的全部代码，你们可能可以通过不是每次都做所有事情来优化它
+and I'll show you guys the whole kind of code for this, you could probably optimize it by not doing everything every time
+
+118
+00:11:16,150 --> 00:11:19,525
+但我们仍然要这样做，只是你们可以看到它是如何运行的
+but we're still gonna do that, just that you guys can see how it works
+
+119
+00:11:19,725 --> 00:11:22,391
+所以我们有了转换矩阵，现在会是什么
+so we have our transformation matrix, now what is this gonna be
+
+120
+00:11:22,816 --> 00:11:30,075
+所以我们要取，这会是position*rotation，所以首先是取position
+so we're gonna take, it's gonna be position times rotation, so the first step is to take the position
+
+121
+00:11:30,075 --> 00:11:35,283
+并实际计算出矩阵的平移，所以这就是glm::translate
+and actually work out a translation of matrix from that, so that's just going to be glm::translate
+
+122
+00:11:35,283 --> 00:11:40,249
+所有这些东西都在matrix_transform头文件中，glm::translate，我们将使用一个基本矩阵
+and all this stuff is in that matrix_transform header, glm::translate, we're going to take a base matrix
+
+123
+00:11:40,250 --> 00:11:44,949
+这将是像这样的单位矩阵，然后我们将按给定的向量对其进行转换
+which is going to be the identity matrix like that, and then we're going to translate it by a given vector
+
+124
+00:11:44,950 --> 00:11:49,435
+现在向量是position，对吧，那就是我们得出这个结果的方式
+now the vector is going to be position, right, so that's how we kind of wind up with this
+
+125
+00:11:49,916 --> 00:11:55,575
+然后我们要做的是将它乘以rotation，所以就是glm::rotate
+then what we're going to do is multiply it by rotation, so glm::rotate
+
+126
+00:11:56,550 --> 00:12:03,975
+我们要旋转的mat4在单位矩阵中，然后是我们要旋转的角度
+the mat4 that we're going to be rotating is just again in identity matrix, and then the angle of which we're going to rotate
+
+127
+00:12:03,975 --> 00:12:12,998
+它就是rotation，然后我们将沿着哪个轴旋转，就是glm::vec3(0,0,1)，好了，这是那个轴
+it is going to be rotation, and then along which axis we're going to rotate, it is going to be glm::vec3(0,0,1), okay, so there's that axis
+
+128
+00:12:14,250 --> 00:12:17,375
+现在写这个的方法很少，我的意思是，
+now few ways of writing this, I mean 
+
+129
+00:12:17,875 --> 00:12:22,100
+从技术上讲，你们实际上可以做的是，这是因为它包含一个基矩阵
+what you could actually do technically speaking is because this takes in a base matrix
+
+130
+00:12:22,416 --> 00:12:31,100
+你们可以把它分成两行，所以你们知道，在这里，transform等于rotate
+you could actually break this up into two lines, so that you do, you know here transform equals rotate
+
+131
+00:12:31,100 --> 00:12:37,050
+然后像这样旋转变换矩阵，然后这样做，我不喜欢那样做
+and then which kind of rotate the transform matrix like this, and you do all that, I don't like doing it that way
+
+132
+00:12:37,650 --> 00:12:43,750
+因为读起来很混乱，我不是很喜欢，所以我通常会做这样的事情，对吧
+because it's just to be confusing to read, I don't really like it, so what I usually end up doing is something like this, right
+
+133
+00:12:44,100 --> 00:12:50,716
+所以我把它分成两行，这样就可以更清楚地看到它，但基本上只是在这里总是用mat4
+so and I'm broken it up into two lines, so that you guys can see it more clearly, but basically we just, we always use mat4 here, right
+
+134
+00:12:50,716 --> 00:12:57,400
+我们只做平移和定位，这就是平移矩阵，然后我们手动将自己乘以旋转矩阵
+and we just do translate and position, that does the translation matrix, and we multiplied ourselves manually by the rotation matrix
+
+135
+00:12:57,816 --> 00:13:03,000
+我将不得不检查性能，看看从实际矩阵开始是否比从单位矩阵开始更好
+I'll have to look into performance to see if it's actually better to just start with an actual matrix instead of identity
+
+136
+00:13:03,283 --> 00:13:08,683
+当我们创建这些矩阵时，但对我来说，这实际上更有意义，因为我们基本上是在说
+when we create these matrices, but to me, this actually just makes more sense, because we're basically just saying
+
+137
+00:13:08,683 --> 00:13:12,116
+如果glm一开始没有取这个矩阵，我会很高兴的
+and I would love it, if glm didn't take in this matrix in the first place
+
+138
+00:13:12,116 --> 00:13:17,320
+因为然后我们可以做平移位置并旋转它，你们知道，像这样旋转，漂亮
+because then we could just do translate position and rotate it, you know, rotation like that, and that would be beautiful
+
+139
+00:13:17,616 --> 00:13:22,850
+但是API做到了，所以那就是它的方式，好吧，很酷，你们可能应该使用它
+but the api does that, so that's just the way it is, okay, cool, and you are probably supposed to use it
+
+140
+00:13:22,850 --> 00:13:28,416
+实际上把前面的矩阵放在这里，但我想这在数学上更有意义
+by actually putting in the previous matrix here, but again this kind of makes more sense mathematically I guess
+
+141
+00:13:28,416 --> 00:13:34,325
+因为你们不是从其他矩阵开始，他们不知道乘法顺序或类似的东西
+because you're not starting from other matrix, and they're not knowing about multiplication order or anything like that
+
+142
+00:13:34,683 --> 00:13:39,975
+那就是我们的变换矩阵，很漂亮，但我们需要反转它，所以当我们实际设置视图矩阵时
+so that's our transform matrix, that's beautiful, but we need to invert it, right, so when we actually set our view matrix
+
+143
+00:13:40,216 --> 00:13:47,950
+我们需要做的是glm::inverse(transform)，所以要取转换矩阵，并对它求逆
+what we need to do is do glm::inverse(transform), so we're taking our transform matrix, and we're inverting it
+
+144
+00:13:47,950 --> 00:13:53,310
+就像我们在上期的理论视频中所说的，好了，就是那样
+just like we talked about in that theory video in the last episode, okay, and that's it
+
+145
+00:13:53,483 --> 00:13:59,310
+现在，我们显然还需要计算我们的ViewProjectionMatrix，在本例中为glm
+now we obviously also need to calculate our ViewProjectionMatrix, which is going to be in this case glm
+
+146
+00:13:59,683 --> 00:14:07,249
+只是m_ProjectionMatrix*m_ViewMatrix，好了，那就是我们的m_ViewProjectionMatrix
+sorry, just m_ProjectionMatrix times m_ViewMatrix, alright, and that's our m_ViewProjectionMatrix, now I am
+
+147
+00:14:07,250 --> 00:14:10,050
+我把它写成了ViewProjectionMatrix，而不是ProjectionViewMatrix
+I did write it as ViewProjectionMatrix, not ProjectionViewMatrix
+
+148
+00:14:10,816 --> 00:14:15,525
+所以我写了一种DirectX风格或行主风格，尽管它是这样的，所以这可能有点令人困惑
+so I kind of wrote a DirectX style or row-major style, even though it's like this, so that might be a bit confusing
+
+149
+00:14:15,750 --> 00:14:20,025
+但请记住，glm是以列为主的，因为我们处理的是OpenGL，而且它基于OpenGL
+but just remember glm is column-major, because we're dealing with OpenGL, and it's based on OpenGL
+
+150
+00:14:20,750 --> 00:14:27,150
+所以我们需要做这个顺序的乘法，而不是这个顺序，如果用行主风格，它将不会正确运行
+so we need to do the multiplication this order, not this order, if you do it the a row around, it will not work correctly
+
+151
+00:14:27,200 --> 00:14:35,999
+所以这不是你们想要的，好了，酷，只要撤销这一切，就应该差不多了
+okay, so this is not what you want, okay, cool, just undo all that, that should be pretty much it
+
+152
+00:14:35,999 --> 00:14:41,475
+对吧，所以每次我们改变位置或旋转，我们重新计算整个矩阵，酷，听起来不错
+right, so every time we change position or rotation, we recalculate this whole matrix, cool, sounds good to me
+
+153
+00:14:42,483 --> 00:14:47,416
+让我们继续尝试并使用它，因此在Application内部，我们真的应该将这些移到SandboxApp中
+let's go ahead and try and use this, so inside Application, we really should move all this stuff into SandboxApp
+
+154
+00:14:47,416 --> 00:14:53,849
+我可能应该在一期中途这样做，因为我真的不想花一期在这上面
+I probably should do that maybe in like a midway episode, because I don't really want to spend an episode on that anyway
+
+155
+00:14:53,850 --> 00:14:58,825
+所以我们将包含Hazel/Renender/OrthographicCamera.h
+so we'll do include Hazel/Renderer/OrthographicCamera.h
+
+156
+00:14:59,600 --> 00:15:05,016
+我要做的是，我将弹出到头文件中，然后我将只创建
+what I'll do is, I'll pop over into the header file, and I'm just gonna make
+
+157
+00:15:05,016 --> 00:15:13,050
+这不一定是这样的，这不一定要像引用一样，像共享指针或者像唯一指针之类的
+and this doesn't have to be like this, this doesn't have to be like a reference, like a shared pointer or like a unique point or anything
+
+158
+00:15:13,050 --> 00:15:21,975
+从字面上讲，我们可以在堆栈上这样做，然后我们必须在构造函数中为它指定一些值
+we can literally just make this kind of on the stack like that, and then we'll have to in the constructor, actually specify some values for it
+
+159
+00:15:22,283 --> 00:15:27,283
+所以我们需要左和右，近和远的所有东西，所以我们可以只做我的第一个
+so we need the left and right, near and far all of that stuff, so we can just do myist one one
+
+160
+00:15:27,283 --> 00:15:32,350
+因此，我们实际上将向它提供与现在使用的相同的值，也就是当不提供任何类型的矩阵时
+so we'll actually feed it the same values that have been used right now, which is when we don't provide any kind of matrix
+
+161
+00:15:32,850 --> 00:15:39,450
+好了，我们有相机，它提供了所有的东西，让我们甚至不移动它，不需要移动它
+okay, so we have camera, which provides all that stuff, let's not even move it, we don't need to move it
+
+162
+00:15:40,016 --> 00:15:47,016
+顺便说一句，现在你们知道，视图矩阵，所以当我们实际上错过了一件我们应该做的事情
+by the way at the moment just so you know, the view matrix, so when we actually missed one thing that we should have done
+
+163
+00:15:47,283 --> 00:15:52,000
+这是因为如果我们请求这个ViewProjectionMatrix，现在它将给我们提供单位矩阵
+and that is because if we request this ViewProjectionMatrix, right, now it's gonna give us identity like nothing
+
+164
+00:15:52,000 --> 00:15:57,808
+实际上我甚至不知道，我认为默认情况下，它创建了单位矩阵，但说实话，它可能不会
+oh actually I don't even know, I think by default, it creates identity, but it might not to be honest
+
+165
+00:15:58,000 --> 00:16:00,675
+我不知道，如果一个更好的创建单位矩阵
+I don't know, if a better create identity Butterfield
+
+166
+00:16:01,500 --> 00:16:04,316
+但无论如何，如果它不是，我们可以只是设置它，只是为了确保
+but anyway, if it doesn't, we can just set it just to be sure
+
+167
+00:16:04,316 --> 00:16:13,416
+但无论如何，都需要设置它，因为现在将这个ViewProjectionMatrix设置为projection*view
+but anyway, we need to set it anyway, because we need to set this ViewProjectionMatrix right now to be projection times view, right
+
+168
+00:16:13,416 --> 00:16:19,116
+因此基本上还需要在构造函数中运行这段，这样就有了一个有效的ViewProjectionMatrix
+so this basically we need to run this code in the constructor as well, so that we have a valid ViewProjectionMatrix
+
+169
+00:16:19,116 --> 00:16:23,550
+为了确保我可以真正将ViewMatrix设置为这样的值
+and just to make sure  I can actually set ViewMatrix to one like that
+
+170
+00:16:23,550 --> 00:16:27,050
+这将创建一个单位矩阵，好了，那样就完成了
+which will create an identity matrix, okay, so that's done
+
+171
+00:16:27,316 --> 00:16:32,450
+很好，很漂亮，所以回到Application，我有个有效的ViewProjectionMatrix
+great, beautiful, so back an Application, I have a valid ViewProjectionMatrix
+
+172
+00:16:32,450 --> 00:16:34,850
+需要得到它，并实际将它放入着色器
+I need to get it and actually put it into my shader
+
+173
+00:16:35,450 --> 00:16:38,716
+那么我该怎么做呢，我用了一种叫做统一变量的东西
+so how do I do that, well I use something called a uniform
+
+174
+00:16:38,716 --> 00:16:47,016
+统一变量基本上只是每DrawCall的一种值，实际上我可以从CPU端将其设置到我的着色器
+and a uniform is basically just a per DrawCall kind of value that I can actually set to my shader from the cpu site
+
+175
+00:16:47,016 --> 00:16:54,066
+在这种情况下，从C++端访问它的方式是，我们将在顶点着色器中创建一个
+so from the C++ side in this case, so the way that it's accessed is, we'll create one in the vertex shader
+
+176
+00:16:55,050 --> 00:17:01,016
+它将被写成统一变量，然后是mat4类型，然后我喜欢使用u_前缀
+it's just going to be written as a uniform, and then the type which is mat4, and then I like to use a u_ prefix
+
+177
+00:17:01,016 --> 00:17:07,426
+为了让我们知道它是统一变量，这将是ViewProjectionMatrix，就可以了
+just to let us know that it's a uniform, this is going to be the ViewProjectionMatrix, okay, just ViewProjection is fine
+
+178
+00:17:07,916 --> 00:17:13,749
+然后我们要做的是在gl_Position中，我们将把这个ViewProjection乘以这个position
+and then what we're going to do is in gl_Position, we're going to multiply this ViewProjection by this position
+
+179
+00:17:13,750 --> 00:17:18,049
+好了，同样在DirectX中，你们可以用另一种方式来做，你们可能不会使用
+okay, so again in DirectX, you've kind of do it the other way around, and you probably wouldn't use
+
+180
+00:17:18,050 --> 00:17:24,350
+你们可能在hlsl中也使用了m，但不管怎样，在glsl中只有ViewProjection乘以
+you probably using mile as well in hlsl, but anyway, in glsl is just ViewProjection times
+
+181
+00:17:25,083 --> 00:17:31,400
+本例中的是我们的实际顶点位置，显然这只适用于该着色器
+the switch in this case is our actual vertex position, and obviously this is just for this shader
+
+182
+00:17:31,683 --> 00:17:36,016
+因此，我们将把它复制到下一个着色器中，因为我们也有一个BluShader
+so we'll copy that into the next shader as well, because we have a blueShader as well
+
+183
+00:17:36,016 --> 00:17:40,600
+所以，ViewProjection，然后ViewProjection*，就是那样
+so ViewProjection, and then ViewProjection times, and that's it
+
+184
+00:17:40,600 --> 00:17:44,116
+你们可以在任何地方使用统一变量，可以只写统一变量
+and you can use uniforms anywhere, you can just write uniform
+
+185
+00:17:44,150 --> 00:17:50,925
+你们知道，例如，uniform vec4 u_Color，然后你们可以将实际的颜色引入到这个中
+you know uniform vec4 u_Color for example, right, and then you can take in an actual color into this
+
+186
+00:17:50,925 --> 00:17:59,550
+用那个颜色，而不是这个颜色，给那个蓝色，蓝色长方形，任何你们想要的颜色
+and use that color say instead of this color to give that a blue, the blue rectangle any kind of color you want
+
+187
+00:17:59,900 --> 00:18:01,400
+无论如何，我们现在已经有了
+okay, anyway, we've got that now
+
+188
+00:18:02,125 --> 00:18:08,808
+如何实际设置，对吧，所以我们需要的是设置统一变量的地方，现在我们还没有这样的想法
+how to actually set this though, right, so what we need is somewhere to set that uniform, now we don't have that api in such idea yet
+
+189
+00:18:09,083 --> 00:18:16,016
+所以让我们继续，看看如何设置一个4乘4的矩阵，所以我们要做的就是做一个函数
+so let's go ahead, and see how to set a 4 by 4 matrix, so what we do is we'll just make a function
+
+190
+00:18:16,016 --> 00:18:23,225
+我将把它称为UploadUniformMat4，这是有道理的
+I'm going to call this UploadUniformMat4, right, this makes sense
+
+191
+00:18:23,725 --> 00:18:27,125
+我们将包含glm，因为我们应该知道它是什么
+we will include glm, because we should know what it is
+
+192
+00:18:28,283 --> 00:18:36,775
+然后我们要做的是获取个const glm::mat4&，它将成为我们的矩阵，我将从它创建一个实现
+and then what we want to do is take a const glm::mat4&, which is going to be our matrix, I'll just create an implementation from that
+
+193
+00:18:37,416 --> 00:18:43,749
+现在我们需要做的是确保我们的程序实际上是绑定的，现在我将假设你们手动执行此操作
+now what we need to do is make sure that our program's actually bound, now I'm going to assume that you do that manually
+
+194
+00:18:43,750 --> 00:18:49,449
+因为如果我们想要上传一大堆矩阵或一大堆统一变量，我们不想每次都保持绑定
+because if we want to upload a whole bunch of matrices or a whole bunch of uniforms, we don't want to keep binding in every time
+
+195
+00:18:49,616 --> 00:18:55,950
+所以我会强制你们在上传这个矩阵之前绑定这个程序
+so I'm going to actually mandate that you actually bind the program before you actually upload this matrix
+
+196
+00:18:56,350 --> 00:19:00,750
+所以这只是上传部分，但基本上我们需要确保我们喜欢glm的程序
+so this is just gonna do the upload part, but basically we need to make sure that we like you know glm's program first
+
+197
+00:19:01,116 --> 00:19:10,875
+然后我们要做glUniformMatrix4fv，现在f表示它是浮点型，v表示它是浮点型数组
+and then we're gonna do glUniformMatrix4fv, now f means it's float, v means it's an array of floats
+
+198
+00:19:10,875 --> 00:19:21,516
+因为很明显一个矩阵是16个浮点数，所以得到的第一个是个位置，那么这个矩阵到底在哪里
+because obviously a matrix is 16 floats, so the first piece of information here we have is a location, so where on earth is this matrix
+
+199
+00:19:22,250 --> 00:19:27,283
+要做到这一点，我们需要检索实际位置，现在我们已经将变量命名为
+so to do that, we need to retrieve the actual location, now we've called a variable something
+
+200
+00:19:27,350 --> 00:19:34,300
+我们将其命名为VP，命名为u_view Projection，所以我们实际上想要做的是检索它
+we've called it vp, we've called it u_ViewProjection, right, so what we actually want to do is retrieve that
+
+201
+00:19:34,716 --> 00:19:42,316
+我们可以通过调用glGetUniformLocation来做到这一点，我们要做的是传入m_RendererID
+and we can do that by calling glGetUniformLocation, okay, what we do with this is we pass in the program, which is m_RendererID
+
+202
+00:19:42,450 --> 00:19:48,016
+然后我们传递一个实际的名称，所以在这种情况下，它将是，投影矩阵，显然我想要硬编码
+and then we pass in an actual name, so in this case, it would be, you you know projection matrix, obviously what I want to hard code that
+
+203
+00:19:48,083 --> 00:19:59,975
+所以我们只接受名称，名称，就是const std::string& name，然后我们还将接受矩阵
+so we're just taking name, and name will be a const std::string& name, and then we'll take into matrix as well
+
+204
+00:20:00,250 --> 00:20:08,250
+所以这个名称将复制它，粘贴到这里，这将被命名，这给我们提供了一些类似的结果
+so this name will copy that, paste it into here, this is going to be named, this gives us some kind of like result
+
+205
+00:20:08,250 --> 00:20:14,116
+基本上它会给我们个整型，我相信，整型会决定，如果我回到这里，我可以看到给个整型
+essentially it's going to give us an int I believe, and the int will just determine, and if I go back to here, I can see gives us an int
+
+206
+00:20:14,116 --> 00:20:20,283
+这个int将确定这是否有效，是否有效
+yep this int will determine whether or not this is, whether or not is valid
+
+207
+00:20:20,283 --> 00:20:28,683
+如果它给我们-1，这实际上意味着它不存在，只需要执行name.c_string()，那就是位置
+so if it gives us -1, it actually means that it doesn't exist, and we just need to do name.c_string(), okay, so that's our location
+
+208
+00:20:28,683 --> 00:20:36,375
+让我们假设那在现在是有效的，可能在下一期也许我们可以用更好的方式来看看统一变量
+let's assume that worked for now, probably next episode maybe we might take a look at uniforms in just a better way
+
+209
+00:20:36,375 --> 00:20:40,716
+因为这期视频是关于实现相机的，所以我们用一个常量
+because this video is about implementing the camera, we take a const
+
+210
+00:20:40,716 --> 00:20:43,850
+这不是我们给出的浮点数，而是我们给出的矩阵数
+so this is not how many floats for giving is how many matrices we're giving
+
+211
+00:20:43,850 --> 00:20:48,949
+我们给出了一个矩阵，所以我们写了一个转置的矩阵，不管我们是否应该转置这个矩阵
+we're giving one matrix, so we write one transposed, whether or not we should transpose the matrix
+
+212
+00:20:48,950 --> 00:20:52,871
+所以如果你们是在列主排序中，因为你们使用的是一个列主数学库
+so if you were in row major ordering, because you were using like a row major math library
+
+213
+00:20:53,283 --> 00:20:58,883
+或者像DirectX数学之类的，你们只需转置矩阵，只需键入GL_TRUE
+or like a DirectX math or something like that, you just need to transpose your matrix, you would just type in GL_TRUE
+
+214
+00:20:58,883 --> 00:21:05,962
+它将为你们转置它，我们使用的是列主数学，已经是列主矩阵，所以我们只需输入GL_FALSE
+and it would transpose it for you, we're using column major maths, already column major matrixes, so we just type in GL_FALSE
+
+215
+00:21:06,350 --> 00:21:11,642
+最后，这是指向值的指针，是较新的从glm检索该值的方法，但通常
+and then finally this is the point to the value, newer's ways to retrieve this from glm, but usually
+
+216
+00:21:11,950 --> 00:21:20,449
+我使用glm::value_ptr，然后使用矩阵，这将返回一个指针，现在为了使用value_ptr
+I use glm::value_ptr, and then matrix, and that gives us back an actual point, now in order to use value_ptr
+
+217
+00:21:20,450 --> 00:21:28,275
+你们需要包含它，而我不知道它在哪里，glm/gtc可能是value_ptr
+you need to include it, and I have no idea where it is, glm/gtc maybe value_ptr
+
+218
+00:21:29,083 --> 00:21:36,816
+或者是gtc/value_ptr，我不知道它在哪里，好吧，所以它实际上是
+or is it gtc/value_ptr, I don't know where this thing is, man, okay, so it's actually
+
+219
+00:21:36,816 --> 00:21:43,950
+我在谷歌上搜索，glm/gtc/type_ptr.hpp，所以谢谢，不管怎样，然后就这样做了
+I googled its glm/gtc/type_ptr.hpp, so thanks for that, anyway, there we go, okay, and then we do that
+
+220
+00:21:43,950 --> 00:21:49,483
+那就是我们如何将统一变量的mat4上传到着色器中，所以现在我们知道可以做的是
+that's how we upload a uniform mat4 into our shader, so now that we know that what we can do is
+
+221
+00:21:49,483 --> 00:21:52,750
+我们不会在这里上传它，我们会在绘制之前上传它
+and we're not going to upload it here, we're going to actually upload it before we draw
+
+222
+00:21:53,083 --> 00:21:58,688
+好了，我们要做的就是至少测试一下，一旦我们绑定了着色器
+okay, what we want to do is just to test this out at least, is once we bind our shader
+
+223
+00:21:59,016 --> 00:22:08,272
+我们希望上传UploadUniformMat4，这将是m_Camera.GetViewProjectionMatrix()
+we want to upload, UploadUniformMat4, and this is going to be m_Camera.GetViewProjectionMatrix()
+
+224
+00:22:08,550 --> 00:22:15,516
+好了，然后显然需要给它个名字，我们把我们的统一变量叫什么，u_ViewProjection
+okay, and then obviously we need to give it a name, and what do we call our uniform, u_ViewProjection
+
+225
+00:22:15,516 --> 00:22:20,650
+我们只需将其放入字符串中，那就是我们在着色器中实际设置该变量的方式
+so we just put that into the string like that, and that's how we actually set that variable in our shader
+
+226
+00:22:20,900 --> 00:22:28,683
+我们将对此做同样的事情，所以着色器，然后UploadUniformMat4，完成
+we're going to do the same thing for this, so shader, and then UploadUniformMat4, done
+
+227
+00:22:28,683 --> 00:22:34,950
+如果运行它，我们应该看到与前面完全相同的结果，并注意到首先在这里绑定着色器
+now if we run this, we should see, hopefully the exact same result as before, and note that we're binding the shader first here
+
+228
+00:22:35,400 --> 00:22:41,912
+所以继续下去，看看得到了什么，实际上得到了第一个构建错误，所以很棒，相机是未知的
+so let's go ahead, and see what we get, we actually got first of build errors, so that's fantastic, camera is unknown
+
+229
+00:22:42,683 --> 00:22:48,950
+那是因为我认为我们在CPP文件中包含了Camera，而我们应该在这里这样做
+that's because I think we included camera into our cpp file, whereas we should have done that in here
+
+230
+00:22:49,083 --> 00:22:55,616
+所以我们就把它留在这里，试着重新构建，希望这次能成功，好了，构建成功
+so we'll just leave that here, try and build again, hopefully it worked this time, alright and build was successful
+
+231
+00:22:55,616 --> 00:23:01,416
+这是我们运行它，你们可以看到，现在得到了相同的结果，很好，试着改变这个看看
+here's us running it, and you can see, we get the same result now, that's great, let's try and change this matrix and see
+
+232
+00:23:01,750 --> 00:23:08,075
+如果我们真的取得了什么，那么回到我们的CPP文件中，我会试着把它变得更大
+if we actually achieved anything, so back in our cpp file, I'm gonna try and make this a lot bigger
+
+233
+00:23:08,316 --> 00:23:13,416
+好了，所以它就像-1，现在可以肯定的是，我要做的实际上是把它变大
+right, so it's like -1, right now sure, what I'm gonna do is actually make it bigger
+
+234
+00:23:13,416 --> 00:23:20,083
+如果我把它放大，如果打开这里的Photoshop，然后用鼠标绘图，这是当前的屏幕，对吧
+and if I make it bigger, if I just open photoshop here, and just draw with the mouse, this was our current screen, right
+
+235
+00:23:20,083 --> 00:23:24,550
+这是-1，这是1，我要做的是把它变大，对吧
+this was -1, this was 1, what I'm gonna do is make it bigger, right
+
+236
+00:23:24,616 --> 00:23:30,149
+所以，如果我把它设置为-2，它会突然变得这么大，对吧
+so what that's gonna do, if I set it to -2, is suddenly it's gonna be like this big, right
+
+237
+00:23:30,316 --> 00:23:34,949
+这实际上意味着我的顶点位置，如果我们马上回到这里
+what that actually means in practice is that my vertex positions, which if we go back here for a second
+
+238
+00:23:35,050 --> 00:23:47,916
+我的顶点位置过去是三角形的-0.5到0.5，如果我的顶点位置是那个，对吧，这意味着这是0
+my vertex positions used to be like -0.5 to 0.5 for the triangle, if my vertex positions were that, right, it means that this was 0 0
+
+239
+00:23:47,916 --> 00:23:51,883
+所以这是-0.5，三角形是这样的，对吧，那太可怕了
+so this was like -0.5, the triangle looked like this, right, and that's awful
+
+240
+00:23:51,950 --> 00:23:56,683
+但你们有点明白了，三角形看起来是那样的，我认为它实际上是这样开始的
+but you kind of get the point, the triangle looked like that or whatever, I think it actually started like that
+
+241
+00:23:56,916 --> 00:24:02,216
+如果我把这个变成-2，突然那个-0.5实际上会更像这里
+if I make this -2, suddenly that -0.5 is actually going to be like more here
+
+242
+00:24:02,216 --> 00:24:05,450
+所以三角形会是这样的，一切都会变得更小
+so the triangle is going to be like that is going to be, everything is going to be smaller
+
+243
+00:24:05,483 --> 00:24:10,825
+因为我已经把屏幕上边界和下边界的左右边界做得更大了
+because I've made the left and right bounds on the top and bottom bounds of my screen a lot bigger
+
+244
+00:24:11,225 --> 00:24:20,949
+所以如果我在这里进行修改，x和y都是-2，2和-2，所有的东西都应该更小
+so if I go over here into this and modified, so that it's -2,2, and -2,2 on both x and y, everything should be smaller
+
+245
+00:24:20,950 --> 00:24:25,850
+因为我所做的只是扩大了范围，所以在这个场景中相机可以看到更多的东西
+because what I've done is just made the bounds bigger, so the camera can kind of see more in this scenario
+
+246
+00:24:26,716 --> 00:24:28,906
+你们可以看到，我们开始了，一切都要小得多
+and you can see, there we go, everything's a lot smaller
+
+247
+00:24:29,416 --> 00:24:34,575
+现在我讨厌的一件事，自从我们开始做这个，就是这个的实际纵横比，对吧
+now one thing that I've hated, since we've kind of started this, is the actual aspect ratio of this, right
+
+248
+00:24:34,883 --> 00:24:37,950
+显然，如果我们在这里查看我们的实际代码
+so obviously if we look in our actual code here
+
+249
+00:24:38,200 --> 00:24:41,650
+你们可以看到我们正在定义一个正方形，对吧，这是一个正方形
+you can see that we're defining a square, right, this is a square
+
+250
+00:24:41,883 --> 00:24:49,516
+它在每个轴上都是-0.75到0.75，它是一个正方形，但它渲染为矩形
+it's -0.75 to 0.75 in every axis, it's a square, but it's rendering as a rectangle
+
+251
+00:24:49,516 --> 00:24:57,316
+为什么因为矩阵，当然，我们的投影是从-2：2或-1：1这两个
+why because the matrix of course our projection is from -2:2 or -1:1 in both of these
+
+252
+00:24:57,316 --> 00:25:02,549
+但是这个窗口不是正方形的，如果把窗口做成正方形，我的意思是没有正确地搞出来
+however this window is not square, if we make the window square like that, I mean we haven't said that up properly
+
+253
+00:25:02,550 --> 00:25:07,883
+但你们可以看到，在我们实际重现这个之前，它在预览中看起来是正确的
+but you can see it kind of gets it kind of looks right in the preview before we actually rerender this
+
+254
+00:25:08,450 --> 00:25:18,400
+所以我们要做的是将这个实际的比如投影矩阵设置为与我们的实际场景相同的纵横比
+so what we want to do is actually set this actual like projection matrix to be the same aspect ratio of our actual scene
+
+255
+00:25:18,400 --> 00:25:24,749
+现在它不一定要像你们知道的那样，以像素之类的单位，只要是正确的纵横比就行了
+right, now it doesn't have to be, like you know, in pixels or anything like that, it just has to be the right aspect ratio
+
+256
+00:25:24,816 --> 00:25:31,600
+很明显，我们做了一个窗口，我想是1280乘720，宽高比是16:9
+now clearly, we've made a window, I think that's 1280 by 720, that's a 16:9 aspect ratio
+
+257
+00:25:31,850 --> 00:25:38,175
+所以我实际上可以做的是在x轴上做一些类似于-1.6到1.6的
+so what I actually could do is just do something like -1.6 to 1.6 on the x axis
+
+258
+00:25:38,550 --> 00:25:49,016
+然后在y轴上从-0.9到0.9，现在这显然是16:9，对吧，让我们继续试一试
+and then -0.9 to 0.9 on the y axis, and now this obviously is going to be 16:9, right, so let's go ahead and try with this
+
+259
+00:25:49,016 --> 00:25:53,883
+我们应该得到一个正方形，你们可以看到这个正方形现在是正方形
+and we should get an actual square square, and you can see that this square is now square
+
+260
+00:25:53,883 --> 00:25:59,116
+现在这个三角形看起来很高，不是很好，但我们实际上渲染了一个正方形，这很酷
+now this triangle looks very tall now, and not as nice, but we're actually rendering a square, which is pretty cool
+
+261
+00:25:59,116 --> 00:26:06,816
+所以我就到此为止了，现在API明智地说，我们并不完美，对吧，因为我们必须做的是
+so I'm just gonna leave it at that, now API wise, we're not perfect, right, because what we're having to do
+
+262
+00:26:06,816 --> 00:26:11,083
+就像我们得到了我们想要的百分之百的结果，但是BeginScene没有取相机
+like we've got the result we want hundred percent, but BeginScene not taking a camera
+
+263
+00:26:11,083 --> 00:26:18,150
+就像我们在上期中决定的那样，所以我要做的是跳到这里，进入Renderer
+like we kind of decided we would in the previous episode, so what I'm gonna do is hop over here, into the Renderer
+
+264
+00:26:18,150 --> 00:26:22,350
+实际上是让这个接收相机的，现在我们又是如何接收相机的
+and actually make this take in a camera, now how we take in a camera again
+
+265
+00:26:22,683 --> 00:26:27,883
+我确实说过，我们可以像引用相机一样，或者我们可以复制相机，或者我们可以做任何事情
+I did say that we can take in like a reference to a camera, or we can copy the camera or we can do whatever
+
+266
+00:26:28,283 --> 00:26:32,883
+我绝对不想复制整个Camera类，因为如果我们查看整个Camera类，它就像
+I definitely don't want to copy the whole Camera class, because if we look at the whole Camera class, it's like
+
+267
+00:26:33,150 --> 00:26:39,949
+4个矩阵就像一个3分量向量和一个浮点数，所以本质上就像4个矩阵加上一个4分量向量
+4 matrices are like a 3 component vector and a float, so it's like 4 matrices plus a 4 component vector essentially
+
+268
+00:26:39,950 --> 00:26:44,850
+这太像我不想复制所有数据了，如果有什么不同的话，那就是我们只需要一个复制投影矩阵
+that's too much like I don't want to copy all that data, if anything we just need a copy projection matrix
+
+269
+00:26:45,716 --> 00:26:51,716
+所以我可以做的是，在BeginScene中，我可以基本上引用一个正交相机
+so what I could do is, in BeginScene, I could just take in essentially a reference to an orthographic camera
+
+270
+00:26:51,716 --> 00:26:54,650
+它来自哪里并不重要，但我引用了它
+doesn't really matter where it comes from, but I'm taking in a reference to it
+
+271
+00:26:54,650 --> 00:26:59,316
+所以它可以从指针，从任何地方的一个共享Renderer，因为在这种情况下，我想要做的是
+so it could be from a point, from a shared point anywhere, because what I kind of want to do in this case is
+
+272
+00:26:59,316 --> 00:27:04,683
+也许只是复制矩阵，对吧，但你们会看到我们实际上做的比这更多
+maybe just copy that matrix, right, but you'll see that we'll actually kind of do more than that
+
+273
+00:27:05,150 --> 00:27:08,483
+但不管怎样，那就是我想要做的正交相机
+but anyway, that's kind of what I want to do for orthographic camera
+
+274
+00:27:08,483 --> 00:27:12,449
+我实际上也可以有一个共享指针，然后在场景中引用它
+I could just actually also have a shared point, and then get a reference to that in scene
+
+275
+00:27:12,450 --> 00:27:16,749
+但正如我提到的，这并不是我们真正想要的设计，至少现在不是
+but as I mentioned, that's not really the design we want to go for, at least not right now
+
+276
+00:27:17,083 --> 00:27:21,516
+因此，正交相机应该在BeginScene中，那意味着
+so orthographic camera is going to be inside a BeginScene, okay, so what that means is that
+
+277
+00:27:21,516 --> 00:27:27,916
+我必须包含这个，所以包含OrthogicCamera.h，那意味着当我们开始场景
+and I'll have to include this, so include OrthographicCamera.h, what that means is that when we BeginScene
+
+278
+00:27:27,916 --> 00:27:30,883
+现在我们必须提交一个相机，这正是我们想要的
+now we have to actually submit a camera, which is exactly what we want
+
+279
+00:27:32,216 --> 00:27:38,249
+下一步是我们还需要绑定适当的着色器并上传这个统一变量的mat4
+the next step is we need to also bind the appropriate shader and upload this uniform mat4
+
+280
+00:27:38,683 --> 00:27:42,150
+这意味着，当我们现在提交要渲染的内容时
+what that means is that when we submit something for rendering now
+
+281
+00:27:42,150 --> 00:27:47,916
+我们需要知道应该使用哪个着色器来渲染它，对吧，这意味着
+we need to be aware of what shader it should be rendered with, right, so what that means is that
+
+282
+00:27:47,916 --> 00:27:53,283
+此函数现在需要接收有关此几何图形的材质的信息
+this function now needs to take in information about the material of this geometry
+
+283
+00:27:53,283 --> 00:27:59,749
+对吧，所以基本上在这种情况下，我们只有一个着色器，材质只是为了在统一变量上共享它
+right, so basically in this case, all we have is a shader, right, and a material is just to share it on a set of uniforms
+
+284
+00:27:59,750 --> 00:28:01,483
+那将是存储在网格中的东西
+and that will be something stored in a mesh
+
+285
+00:28:01,483 --> 00:28:05,749
+因此，换句话说，在未来，这将基本上是一个常量引用
+so in other words, in the future this will just take it in basically a constant reference
+
+286
+00:28:05,816 --> 00:28:12,250
+就像指向实际网格的常量指针一样，我在粗略计算的对象中表示引用
+like a constant point to an actual mesh, I said references in a rough counted object
+
+287
+00:28:12,250 --> 00:28:15,516
+但基本上它只会引用一个网格
+but basically it's just going to take a reference to a mesh
+
+288
+00:28:16,216 --> 00:28:23,250
+仅此而已，但现在，我们没有明显带有网格或类似东西的材质，所以只需要个顶点数组
+and that's it, but right now, we don't have materials obviously with meshes or anything like that, so we're just taking a VertexArray
+
+289
+00:28:23,250 --> 00:28:25,350
+然后我们实际上还会引入一个着色器
+and then we're actually gonna take in a shader as well
+
+290
+00:28:25,416 --> 00:28:34,450
+所以就是const std::shared_ptr，好了，那就是渲染时使用的着色器
+so const std::shared_ptr, okay, and that's going to be the shader with which you render
+
+291
+00:28:34,683 --> 00:28:38,150
+所以我会把这个复制到这里，我不知道你们是否想先看着色器
+so I'll copy this into here, and I don't know if you want to take in the Shader first
+
+292
+00:28:38,150 --> 00:28:43,750
+或shader2，或者你们想做的任何事情，这在某种程度上取决于你们，在这里包含Shader
+or the Shader second or whatever you want to do, it's kind of up to you, we'll include Shader over here
+
+293
+00:28:44,716 --> 00:28:47,716
+无论如何，这都是暂时的，所以我不会花太多心思
+this is temporary in anyway, so I'm not putting too much thought into it
+
+294
+00:28:47,750 --> 00:28:53,116
+但基本上我们在这里要做的实际上是绑定着色器，并不重要
+but basically what we want to do here is actually bind the Shader, doesn't matter
+
+295
+00:28:53,116 --> 00:28:59,616
+你们知道，OpenGL无关紧要，你们是先上传还是再上传，然后我们想真正上传那个相机
+you know, OpenGL doesn't matter if you do it first or second, and then we want to actually upload that camera
+
+296
+00:28:59,616 --> 00:29:03,683
+但是相机在这里，整个类都是静态的，所以我们没有办法存储它
+but the camera is here, and this whole class is static, so we have no way of storing it
+
+297
+00:29:03,750 --> 00:29:08,716
+那么这是如何运行的呢，在传统上，你们需要渲染器拥有的某种支持数据
+so how is that going to work, well again traditionally, you need some kind of backing data that the Renderer has
+
+298
+00:29:08,716 --> 00:29:13,283
+我们目前没有这样的东西，如果你们想的话可以
+we don't have anything like that at the moment, you could if you wanted to
+
+299
+00:29:13,350 --> 00:29:19,049
+所以，这在某种程度上取决于你们，你们怎么做，但基本上我要做的是做一个
+so it's kind of up to you, how you do this, but basically what I'm gonna do is make a
+
+300
+00:29:19,650 --> 00:29:24,683
+我将创建一个由SceneData的结构体，在本例中
+I'm gonna make a struct pulled SceneData, right, and then this is going to have in this case
+
+301
+00:29:25,025 --> 00:29:37,258
+一个投影矩阵，所以就是glm::mat4 ViewProjectionMatrix，我会有个静态的SceneData指针
+a projection matrix, so glm::mat4 ViewProjectionMatrix, okay, and I'm gonna have a static SceneData point
+
+302
+00:29:37,883 --> 00:29:45,449
+这完全取决于你们想怎么做，这就像，我不知道，我们将来会修改这个设计
+now this is totally up to you how you want to do this, this is like, I don't know, we're going to revise this design in the future
+
+303
+00:29:45,450 --> 00:29:50,883
+因为我们突然遇到了一个渲染器，不是100%静态的，而是需要持久化的状态
+because we suddenly run into a Renderer, there's not 100% percent static, but needs to persist with state
+
+304
+00:29:51,616 --> 00:29:54,716
+所以你们最终怎么做取决于你们，现在我们就这样做
+so it's up to you how you end up doing that, for now we're just going to do it this way
+
+305
+00:29:55,516 --> 00:30:06,950
+SceneData基本上将在我们的实际渲染器的整个生存周期内存在，对吧
+SceneData is going to be basically something that's going to live for the entire duration of our actual of our actual Renderer, right
+
+306
+00:30:07,750 --> 00:30:12,716
+我们只有一个，所以完全可以堆在那里分配，并将其保留为b
+and we're only gonna have one of them, so it's totally fine to just heap allocate that there, and leave it as b
+
+307
+00:30:13,716 --> 00:30:18,550
+因此，当我们开始一个场景时，我想要做的是访问SceneData
+so what happens here is when we begin a scene, what I want to do is access SceneData
+
+308
+00:30:18,675 --> 00:30:18,683
+and set the viewProjectionMatrix to be camera, yet ViewProjectionMatrix
+
+309
+00:30:18,683 --> 00:30:22,867
+将viewProjectionMatrix设置为Camera，但将ViewProjectionMatrix设置为
+and set the viewProjectionMatrix to be camera, yet ViewProjectionMatrix
+
+310
+00:30:22,867 --> 00:30:22,875
+将viewProjectionMatrix设置为Camera，但将ViewProjectionMatrix设置为
+
+311
+00:30:22,875 --> 00:30:25,316
+好了，那是一种SceneData
+okay, and that's kind of the SceneData
+
+312
+00:30:25,316 --> 00:30:35,250
+最后在这里，在绑定这个之后，想要上传那个统一变量的mat4，也就是u_ViewProjection
+and then finally over here, after we bind this, we want to upload that uniform mat4, it's going to be u_ViewProjection
+
+313
+00:30:36,316 --> 00:30:42,749
+它将是m_SceneData->View ProjectionMatrix，好了，只需仔细检查，这是一个视图投影
+and it's going to be m_SceneData->ViewProjectionMatrix, okay, just double check, yeah it is a view projection
+
+314
+00:30:42,750 --> 00:30:48,416
+我认为这可能是一个视图投影矩阵，好了，就这么简单
+I thought it might have been a view projection matrix, okay, that's done, all right, okay, that's as simple as it is
+
+315
+00:30:49,716 --> 00:30:53,249
+要设置这个，我们需要接收一个着色器，并且需要接收一个顶点数组
+to just set this up, we need to take in a Shader, and we need to take in a VertexArray
+
+316
+00:30:53,716 --> 00:30:57,750
+我可能会做的是，实际上，我已经决定了，我想要这样做，我不知道为什么我没有
+what I might do is actually, I've decided that, and I wanted to do that, I don't know why I didn't
+
+317
+00:30:57,750 --> 00:31:02,716
+但我确实想先拥有Shader，因为我们真的不能，就像VertexArray那样
+but I actually do want to have the Shader first, because we can't really, like a VertexArray great west admitting that
+
+318
+00:31:02,716 --> 00:31:07,883
+但我们需要知道，在某种程度上，Shader比实际的几何数据更重要
+but we need to know the Shader is kind of more important, I think than the actual geometry data in a way for this
+
+319
+00:31:08,016 --> 00:31:12,649
+因为着色器在某种程度上指定了我们渲染的方式以及我们渲染的内容
+because the Shader kind of specifies how we're rendering and then what we're rendering
+
+320
+00:31:13,083 --> 00:31:20,316
+我只是更喜欢这种方式或顺序，好了，所以在这里我们首先提交Shader，所以BluShader
+so I just kind of like that way or order of things more, okay, so in here we submit the Shader first, so blueShader
+
+321
+00:31:20,316 --> 00:31:27,816
+然后提交顶点数组，然后在这里，再次提交着色器，然后是顶点数组，然后猜猜是什么
+and then we submit the actual VertexArray, and then over here, again we submit the Shader, and then the VertexArray, and then guess what
+
+322
+00:31:27,850 --> 00:31:33,750
+这个消失了，现在不需要这样做了，所以我们有一个BeginScene，我们有两个提交
+this disappears, this now does not need to be done, so we have a BeginScene, we have two submissions
+
+323
+00:31:33,883 --> 00:31:38,316
+我们有一个EndScene，就是那样，它会响应我们的相机，一切都会很棒
+and we have an EndScene, and that's it, and it's gonna respond to our camera, and everything's gonna be amazing
+
+324
+00:31:38,316 --> 00:31:41,750
+让我们运行这段代码，看看我们得到了什么
+let's just run this code, and see what we get
+
+325
+00:31:41,750 --> 00:31:46,283
+好了，正如你们所看到的，我们得到了和上次一样的结果，是不是很酷
+okay, and as you can see, we get the same result as last time, isn't that cool
+
+326
+00:31:47,716 --> 00:31:53,716
+基本上就是那样，你们可以看到，我们所做的就是用一个特殊的正交投影来创建一个相机
+so that is basically it, you can see that really, all we do is we just create a camera with a particular orthographic projection
+
+327
+00:31:53,716 --> 00:31:56,100
+现在我们没有设置位置或任何东西，让我们只是为了好玩
+now we didn't do set position or anything, let's do that for fun
+
+328
+00:31:56,100 --> 00:32:00,016
+所以我要做的是设置m_Camera，我将设置位置
+so what I'll do is I'll set m_Camera, I'll set the position
+
+329
+00:32:00,016 --> 00:32:05,349
+我们应该测试一下，我会将位置设置为偏移一点，所以我们不想移动得太远
+yeah we should test that out for sure, I'll set the position to be offset a bit, so we don't want to go too far
+
+330
+00:32:05,350 --> 00:32:11,349
+也许x和y都是0.5，对吧，因为如果我们移动太远，一切都会出界
+maybe 0.5 in both x and y, right, because if we go too far, everything is going to be off the bounds
+
+331
+00:32:11,350 --> 00:32:16,916
+所以把相机的位置设置为0.5，然后看看会发生什么，好了，正如你们所看到的，移动相机
+so let's just set our camera's position to 0.5 here, and see what happens, okay, and as you can see, we move the camera
+
+332
+00:32:16,916 --> 00:32:22,950
+现在我们将相机移动到哪里，我们将相机0.5和0.5移动，所以我们将相机向右和向上移动
+now where do we move the camera, we move the camera 0.5 0.5, so we move the camera right and up
+
+333
+00:32:22,950 --> 00:32:27,625
+你们可以看到这已经移动了，向下，向右，向下和向左，这是相反的
+and you can see that this has moved, down, right, down and left, which is the opposite
+
+334
+00:32:27,625 --> 00:32:30,516
+所以很明显我们的反转运行正常
+so obviously our inverting is working correctly
+
+335
+00:32:31,016 --> 00:32:36,549
+最后，我要做的是实际设置旋转，因此我们将看到Camera->SetRotation()
+and then finally what I want to do is actually set the rotation, so we'll see camera->SetRotation()
+
+336
+00:32:37,250 --> 00:32:43,616
+对吧，这样做可能更好，实际上不设置位置，这样它就不会在其他地方旋转
+right, and it might be better to do that without setting the position actually, just so that it doesn't rotate somewhere else
+
+337
+00:32:43,616 --> 00:32:50,483
+因为如果我们两个都旋转，它会有点脱离屏幕，但我们基本上只会旋转45度
+because if we rotate both, and it's gonna be a bit off the screen, but we'll basically just rotate everything 45 degrees
+
+338
+00:32:50,716 --> 00:32:56,750
+看看它给了我们什么，好了，所以它没有给我们任何东西，很奇怪，所以应该诊断
+and see what that gives us, okay, so it's given us nothing, which is quite strange, so we should probably diagnose that
+
+339
+00:32:57,216 --> 00:33:06,483
+首先，我非常愚蠢地认为，我甚至考虑过旋转，无论它是否以弧度为单位
+first of all, I very stupidly, I think did even consider the rotation, in terms of whether it would be in radians or not
+
+340
+00:33:06,483 --> 00:33:10,449
+显然，我认为它将以弧度为单位，所以我们实际上应该将其转化为弧度
+obviously I think it will be in radians, so we should actually cast this into radians
+
+341
+00:33:11,716 --> 00:33:19,016
+然后我们有我们的平移和旋转，所以实际上应该都是正确的
+and then we have our translation and our rotation, so that should actually all be correct
+
+342
+00:33:19,016 --> 00:33:24,916
+所以让我们再试一次，看看我们能得到什么，好了，再一次没什么，那总是很有趣
+so let's go ahead and try that out again, and see what we get, okay, so yeah again nothing, that's always fun
+
+343
+00:33:24,916 --> 00:33:28,049
+让我们继续尝试并调试它，我想要调试它的第一件事之一是
+let's go ahead and try and debug this, one of the first things I want to do to debug it is
+
+344
+00:33:28,050 --> 00:33:32,849
+实际上，尝试将旋转设置为一个相当小的值，如0.5
+actually try and set the rotation to a pretty small value, like 0.5
+
+345
+00:33:33,350 --> 00:33:39,016
+我还想看看实际的Camera API，在这里可以看到，我实际上是正确设置了所有内容
+I also want to take a look at the actual camera API, here to see that, I'm actually setting everything correctly
+
+346
+00:33:39,016 --> 00:33:44,883
+旋转被设置为旋转，我在计算视图矩阵，所以那都是正确的
+so yes rotation is being set to rotation, and I am in factory calculating the view matrix, so that's all correct
+
+347
+00:33:46,550 --> 00:33:52,116
+那很奇怪，但如果我们将其设置为一个较低的值，应该会看到，不，实际上什么也看不到
+yeah that's quite strange, but if we set it to a low value, we should see, no, we actually see nothing
+
+348
+00:33:52,116 --> 00:33:58,483
+很奇怪，好吧，让我们从诊断所有的数字开始，无论何时发生这样的事情
+that is quite peculiar, okay, so let's just start by diagnosing all the numbers, whenever something like this happens
+
+349
+00:33:58,483 --> 00:34:03,250
+真正深入研究并查看矩阵中的数字是什么真的很重要
+it's really important to actually dive in and see what the numbers that you're getting in your matrix are
+
+350
+00:34:03,250 --> 00:34:08,550
+对于一些人来说，这可能很难，他们要体验矩阵，但我应该没问题
+and this can be hard for some people, who to experience with matrices, but I should be fine
+
+351
+00:34:08,650 --> 00:34:13,716
+所以RecalculateViewMatrix是一切发生的地方，让我们看看我们的旋转是0.5
+so RecalculateViewMatrix is where everything happens, let's see what our rotation is 0.5
+
+352
+00:34:13,816 --> 00:34:23,683
+我们的位置是好的，我们的位置没有设置，所以我猜glm实际上根本不会初始化我认为可能
+our position is okay, our position is not set, so I guess glm doesn't actually initialize things like at all I think maybe
+
+353
+00:34:24,250 --> 00:34:27,716
+我的印象是，它只会设置为0，但它没有
+I was under the impression that, that would just get set to 0 0, but it didn't
+
+354
+00:34:27,716 --> 00:34:33,250
+所以那是一个小问题，这个浮点数，当然，我们实际上设置为0，所以那很好
+so that's a bit of an issue, this float of course we did actually set to 0, so that's good
+
+355
+00:34:33,250 --> 00:34:39,883
+但位置不会被设置为零，那就是问题所在，所以我们需要确保我们这样做
+but position doesn't get set to zeros, that would be the issue, so we need to make sure that we do that
+
+356
+00:34:40,416 --> 00:34:49,416
+所以我会到这里来定位，只是确保，将其设置为0，可能可以这样做，如果不能，就这样做
+so I'll come over here to position, just make sure that, I set that to 0, I might be able to just do that, or if not I'll just do that
+
+357
+00:34:50,250 --> 00:34:58,516
+现在如果我回到这里，我会再次将其更改为45，为了让它更好一点，让我们启动这个
+and now if I go back here, I'll again change this to be 45 instead, to make it a bit better, let's just launch this
+
+358
+00:34:58,516 --> 00:35:04,283
+现在一切都正常了，我想，好了，正如你们所见，一切都成了45度角
+and now everything should just work I think, okay, and as you can see, everything is on a 45 degree angle
+
+359
+00:35:04,283 --> 00:35:07,716
+现在，我们应该能够稍微移动相机，而不会出现任何问题
+now we should be able to move the camera slightly as well with no issue at all
+
+360
+00:35:08,116 --> 00:35:14,049
+重要的是要测试两者，比如平移和旋转确实有效
+it's important to test the both, like translation and rotation actually works
+
+361
+00:35:14,050 --> 00:35:21,516
+所以我们会试着把它移动到1或其他位置，但1可能太多了，再移动0.5次，会尝试移动0.5
+so we'll try and move it like maybe 1 or something, 1 might be too much though, 0.5 again, we'll try and move it 0.5, whoops
+
+362
+00:35:21,516 --> 00:35:28,150
+确保我们将其作为3分量向量给出，它应该可以正常运行
+make sure that we give this as a 3 component vector, and it should just work
+
+363
+00:35:28,450 --> 00:35:33,749
+好了，你们可以看到我们都旋转和平移了我们的相机，一切似乎都不正常
+okay, so you can see that we've both rotated and translated our camera, and everything seems to work incorrectly
+
+364
+00:35:33,750 --> 00:35:39,249
+当然是这样做的，旋转还是正确的，不是绕着新原点旋转
+of course is doing that, the rotation still is correct, is not rotating around the new origin point
+
+365
+00:35:39,250 --> 00:35:41,850
+它以正确的顺序进行，这真的很重要
+it's doing in the right order, which is really important
+
+366
+00:35:41,850 --> 00:35:45,483
+所以我们继续，我们有旋转，我们有平移，我们有相机
+so there we go, we've got rotation, we've got translation, we've got cameras
+
+367
+00:35:46,750 --> 00:35:53,350
+对于你们来说，有一点功课要做，如果想自己做些事情，实际上就是试着做这个位置和旋转
+a bit of homework for you guys, if you want to do something yourselves is actually try and make this position and rotation stuff
+
+368
+00:35:53,350 --> 00:35:58,316
+试着用WASD键或方向键或类似的东西来控制相机
+try and control the camera using like the WASD keys or the arrow case or something like that
+
+369
+00:35:58,350 --> 00:36:02,916
+因此，你们可以连接到事件，然后根据它设置位置或旋转
+so you can hook on into events, and then set positions or rotations based on that
+
+370
+00:36:02,916 --> 00:36:08,416
+所以如果你们做不到这一点，对于家庭作业来说，那会是一个很好的小扩展练习
+so see if you couldn't do that, for homework, that will be quite a little good little extension exercise
+
+371
+00:36:08,650 --> 00:36:13,083
+但总而言之，你们可以看到，当我们开始用相机启动场景时，一切都是多么的干净
+but to summarize, you can see, how clean everything is, when our beginning a scene with a camera
+
+372
+00:36:13,083 --> 00:36:24,450
+通过接收所有内容，获得Shader，Shader使用视图投影匹配来实际设置CameraData
+and then with admitting everything, they get the Shader, the Shader uses the view projection matches to actually set the CameraData, right
+
+373
+00:36:24,683 --> 00:36:27,049
+显然现在，我们正在绑定和设置着色器
+obviously right now, we're binding and setting Shaders for everything
+
+374
+00:36:27,050 --> 00:36:32,449
+所以，如果我用相同的着色器渲染一大堆这样的东西，它每次都会设置它
+so if I render a whole bunch of these with the same Shader, it's going to set it every time
+
+375
+00:36:32,450 --> 00:36:35,050
+所以我们显然要做的是，当我们提交时
+so what we want to do obviously is when we submit
+
+376
+00:36:35,050 --> 00:36:39,816
+我们想要存储着色器和顶点数组，以及类似于列表的任何其他几何体
+we want to store the Shader and the VertexArray, any other geometry in like a list
+
+377
+00:36:39,816 --> 00:36:44,916
+然后你们知道，基本上是把它们组合在一起，但现在，你们可以看到，这种简单的做事方式
+and then kind of you know batch them together essentially, but for now, you can see that, this kind of simple way of doing things
+
+378
+00:36:45,216 --> 00:36:49,849
+效果非常好，所以我们就这样吧，这就是关于相机的所有要说的
+works wonderfully, so there we go, that's pretty much all there is to say about cameras
+
+379
+00:36:50,316 --> 00:36:55,250
+下一次我确实想要，也许可以稍微扩展一下着色器统一变量是如何运行的
+next time I do want to actually, maybe expand a little bit on how shader uniforms work
+
+380
+00:36:55,250 --> 00:37:02,249
+但这可能并不是很有必要，我认为我在游戏引擎系列中根本没有涵盖统一变量
+but it might not be really quite necessary, I don't think I haven't covered uniforms at all in the game engine series
+
+381
+00:37:02,250 --> 00:37:05,883
+但现在可能还没有必要
+but there might not be necessary just yet
+
+382
+00:37:05,883 --> 00:37:13,616
+我认为我们潜在探索的另一个更好的事情可能是整个模型矩阵的事情
+I think what another better thing for us to explore potentially might be this whole model matrix thing
+
+383
+00:37:14,350 --> 00:37:19,149
+所以让我们拭目以待，我仍然会根据我认为更好的决定做出决定，但那就是相机
+so we'll see, I'll still make my decision based on what I think is better, but that is cameras
+
+384
+00:37:19,216 --> 00:37:21,849
+好了，我希望你们喜欢这个视频，如果喜欢的话，就为它点赞吧
+okay, I hope you guys enjoyed this video, if you did, and hit that like button
+
+385
+00:37:21,850 --> 00:37:26,450
+如果你们尚未访问patreon.com/thecherno，可以通过访问帮助支持该系列
+you can help support the series by going already patreon.com/thecherno, if you haven't already
+
+386
+00:37:27,083 --> 00:37:29,283
+一如既往地非常感谢所有帮助支持本系列的人
+huge thank you as always to everyone who helps support the series
+
+387
+00:37:29,283 --> 00:37:34,416
+你们可以提前一周获得下一个视频，还可以访问Hazel的源代码
+you can get the next video a week early, and you also get access to the source code for Hazel
+
+388
+00:37:34,916 --> 00:37:40,550
+Hazel开发分支，在那里我用PBR渲染器和其他一大堆非常酷的东西做了一个3D场景
+the Hazel development branch where I've done like a 3D scene with a PBR Renderer, and a whole bunch of other really cool stuff
+
+389
+00:37:40,550 --> 00:37:43,349
+动画也在里面，一切都很酷
+animation is in there, everything's really cool
+
+390
+00:37:44,250 --> 00:37:47,925
+下一次，就像我说的，也许一些图形可以做一些事情
+next time, as I said, maybe some graphics do things
+
+391
+00:37:47,925 --> 00:37:53,016
+也许是模型矩阵之类的东西，我们将看到这种东西是如何联系在一起的
+ maybe the model matrix kind of stuff, we'll see how this kind of ties in together
+
+392
+00:37:53,016 --> 00:37:58,349
+因为我们可以通过很多途径来实现这一点，但你们可以看到
+because there's a lot of pathways where we could go down into to make this stuff happen, but you can see that
+
+393
+00:37:58,350 --> 00:38:07,216
+我真的很想有一个周中的插曲，可能只是把这个东西从Application类明显移到SandboxApp中
+oh and I really want to have like a mid week episode probably to just move this stuff away from the Application class obviously and into our actual SandboxApp
+
+394
+00:38:07,216 --> 00:38:10,416
+所以我可能也会这么做，不管怎样，下次见，拜
+so I'll probably do that as well, anyway, I'll see you guys next time, goodbye
+

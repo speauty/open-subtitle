@@ -1,0 +1,1735 @@
+﻿1
+00:00:00,000 --> 00:00:03,075
+嘿，伙计们，我叫TheCherno，欢迎回到我的游戏引擎系列
+hey, what's up guys, my name is TheCherno, welcome back to my game engine series
+
+2
+00:00:03,280 --> 00:00:08,000
+所以就像昨天，我才下飞机，在欧洲呆了五个半星期，时差反应很严重
+so I just got off a plane like yesterday, and I'm super jet lagged been in Europe for like the last five and a half weeks
+
+3
+00:00:08,275 --> 00:00:12,375
+所以这期视频有点乱，原谅我，但是我很累
+so this video is kind of going to be a little bit all over the place, forgive me, but I'm very very tired
+
+4
+00:00:12,840 --> 00:00:18,875
+无论如何，欢迎回到我的游戏引擎系列，上期说了变换，如果你们还没看的话，就去看看吧
+anyway, welcome back to my game engine series, last time we talked about transforms, check out that video if you haven't already
+
+5
+00:00:18,875 --> 00:00:24,250
+今天我要和你们说说材质了，我们要介绍一下材质，为什么它们会存在
+and today I'm going to talk to you about materials, we're going to have a bit of an introduction to materials, why they exist
+
+6
+00:00:24,250 --> 00:00:28,100
+我们将如何使用它们，为什么我们在游戏引擎中需要它们
+how we're going to use them, why we need them in game engines
+
+7
+00:00:28,375 --> 00:00:32,450
+我不会用图表之类的创作深入的视频了，我会保存它
+I'm not going to make an in-depth video with like diagrams or anything, I'm going to save that
+
+8
+00:00:32,450 --> 00:00:37,600
+只要是关于材质和以后的任何东西，我向你们保证
+and just have that be about materials and whatever in the future, I promise you guys that
+
+9
+00:00:37,600 --> 00:00:40,320
+我知道我之前说过，这将是一堆深入的视频
+I know that I've said, it's going to be a bunch of in-depth videos
+
+10
+00:00:40,320 --> 00:00:44,500
+如果有人收集了深入的视频，我保证会制作，请顺便在评论区中发一下
+If anyone has a collection of the in-depth videos, I promise to make, please post it in the comments by the way
+
+11
+00:00:44,825 --> 00:00:47,275
+因为我将像下周左右开始研究它们
+because I'm going to start working on them like next week or so
+
+12
+00:00:48,300 --> 00:00:54,675
+但是我们将对什么是材质做一个基本的概述，我们将很快进入一个非常基本的材质系统
+but we're just going to have a bit of a basic overview of what materials are, we're going to quickly jam in a very basic material system
+
+13
+00:00:54,925 --> 00:00:59,595
+甚至不是一个材质系统，只是为了让你们知道一切实际上是如何联系在一起的
+not really even a material system, but just to kind of give you the idea of how everything ties together practically
+
+14
+00:01:01,025 --> 00:01:07,550
+今天就是那样的，然后我想下期我们可能会继续讲着色器或纹理
+and that's going to be kind of it for today, and then I think next time we might continue on with shaders or textures
+
+15
+00:01:07,550 --> 00:01:13,550
+因为纹理也是我想做的事情，但是无论如何，先说说材质吧，比如为什么需要材质系统
+because textures are also something that I want to get done, but anyway, let's talk about materials, like why do we need a material system
+
+16
+00:01:13,625 --> 00:01:17,775
+那么现在，让我先运行一下代码，看看做到哪儿了
+so right now, let me just maybe launch our code, and we'll see what we actually have
+
+17
+00:01:17,975 --> 00:01:21,520
+好吧，我们已经绘制了这个三角形，并且能够旋转和移动
+okay, so we had this triangle, and we were able to like rotate it and move it around
+
+18
+00:01:21,520 --> 00:01:23,850
+我猜我们基本上可以移动相机
+and we basically could move the camera around I guess
+
+19
+00:01:24,000 --> 00:01:29,664
+然后还有一堆贴图，我们用单独的变换将它们渲染为单独的对象，上期也做了
+And then we had like a bunch of tiles that we were rendering as separate objects with separate transforms as well we did last episode
+
+20
+00:01:29,800 --> 00:01:36,850
+因此假设想绘制其中一个三角形，或者比如其中一个正方形一样，因为决定绘制每个正方形
+so suppose that we wanted to make one of those triangles, like I don't know, or like one of those squares as we kind of decide to draw each square
+
+21
+00:01:36,850 --> 00:01:40,000
+我们想让它们成为不同的颜色，那么那到底是如何做到的呢
+we want to make them a different color, so how does that work exactly
+
+22
+00:01:40,050 --> 00:01:46,325
+到目前为止，我们知道着色器的存在，作为一种基本上告诉GPU如何处理得到的数据的方式
+well so far we know that shaders exist, as a way to essentially tell our GPU what to do with data that it gets
+
+23
+00:01:46,375 --> 00:01:50,900
+我们实际上是如何意识到我们屏幕上的数据，对吧
+how we actually realize I guess that data onto our screen, right
+
+24
+00:01:50,900 --> 00:01:59,025
+我们有顶点位置，我们有屏幕坐标之类的，我们需要绘制某些几何图形
+we have vertex positions, we have you know our screen kind of coordinates or whatever, we need to draw certain geometry
+
+25
+00:01:59,025 --> 00:02:04,625
+我们会调用绘制指令DrawCall，实际上就比如把两个三角形组成一个正方形，对吧
+we've given a draw command, a draw call to actually draw like say two triangles to make up like a square, right
+
+26
+00:02:05,500 --> 00:02:08,850
+我们已经有了所有的数据，但是我们如何实际绘制它，我们把什么放在屏幕上
+we've got all that data, but how do we actually draw it, what do we put on the screen
+
+27
+00:02:08,850 --> 00:02:14,700
+顶点着色器负责处理那个，然后我们如何着色这些像素，这些像素是什么颜色的
+vertex shader takes care of that, and then how do we shader those pixels, those pixels, what color do they amount to
+
+28
+00:02:15,080 --> 00:02:20,000
+片段着色器或像素着色器会处理那个，所以那就是着色器，就是个程序，它决定了所有
+the fragment shader or the pixel shader deals with that, so that's what a shader is, it's a program, which determines all that
+
+29
+00:02:20,000 --> 00:02:27,100
+如果你们不太熟悉的话，就去看看OpenGL系列中的有关着色器的视频吧，应该在那个系列
+and if you're kind of rusty on that, check out either my OpenGL series on shaders or the actual shaders, I think video in this series
+
+30
+00:02:27,100 --> 00:02:30,875
+因为那也很有用，所以着色器就是做那些的，对吧
+because that was quite informative as well, that's what a shader does, right
+
+31
+00:02:31,250 --> 00:02:35,175
+所以那很棒，我们知道你们现在应该能做的是，如果我想想
+so that's great, and we know that what you should be able to do right now is, if I see
+
+32
+00:02:35,175 --> 00:02:41,960
+将三角形设置为红色，你们应该能够进入着色器并实际更改代码，并使其输出红色
+make the triangle red, you should be able to go into the shader and actually change the code and just make it output a flat red color
+
+33
+00:02:42,100 --> 00:02:46,920
+简单，对吧，因为现在是蓝色的，就会改变一些数字，突然这个着色器要输出红色
+easy, right, because I'm putting blue, I'll change some numbers around, suddenly this shader is going to output red
+
+34
+00:02:46,920 --> 00:02:54,575
+我们甚至称它为blueShader，但在现实世界中，我们喜欢编写比那更灵活的着色器
+and I think we even call this the blue shader, but in the real world, we like to write shaders that are a lot more flexible than that
+
+35
+00:02:54,700 --> 00:03:02,850
+你们不想只写个blueShader的着色器，那就完了，原因是着色器是，它就像程序，对吧
+you don't want to just write a shader that's like your blue shader, and that's done, the reason is that shaders are, it's like a program, right
+
+36
+00:03:02,850 --> 00:03:05,725
+毕竟你们也不会写个只计算一个数字的程序
+you wouldn't write a program which just calculates a single number
+
+37
+00:03:06,000 --> 00:03:13,075
+最好编写一个包含两个输入的程序，然后像将它们加在一起之类的，然后给你们答案
+it would be much better to write a program which takes in two inputs, and then like adds them together or whatever, and then gives you your answer
+
+38
+00:03:13,325 --> 00:03:19,075
+那不是更有用吗，你们可以有个程序，计算10加5，对吧，就是那样
+isn't that much more kind of useful, you could have a program, which computes 10 plus 5, right, and that's it
+
+39
+00:03:19,075 --> 00:03:21,600
+那就是你们的程序，太棒了，它居然可以计算10加5，太神奇了
+that's your program, great, it can compute 10 plus 5, it's amazing
+
+40
+00:03:21,925 --> 00:03:25,550
+但是如果我要写个程序，要求用户输入两个数字，然后将它们加在一起，该怎么办
+but what if I make a program which asks the user for two numbers and then adds them together
+
+41
+00:03:25,550 --> 00:03:31,925
+它实际上变得更强大，更有用，和着色器一样的道理，对吧
+how much more powerful, how much more useful does that actually become, same deal with shaders, right
+
+42
+00:03:31,925 --> 00:03:35,575
+我们可以写一个只输出红色的着色器，完全可以
+we could write a shader that just outputs red, totally fine
+
+43
+00:03:35,575 --> 00:03:38,500
+我们就叫它RedShader，已经有了个BlueShader，为什么没有RedShader
+we could call it the RedShader, great, we've got a BlueShader, why not have a RedShader
+
+44
+00:03:38,875 --> 00:03:44,375
+但是，如果我可以创建一个着色器，将一些数据作为输入，然后输出该颜色，该怎么办
+but what if I could make a shader that takes in some data as an input, and then outputs that color
+
+45
+00:03:44,375 --> 00:03:46,925
+我可以称那个着色器为平面颜色着色器，对吧
+and I could call that shader the flat color shader, right
+
+46
+00:03:46,925 --> 00:03:51,375
+它要做的就是输入一个输入，可能是红色，可能是蓝色，可能是我能想到的任何颜色
+and all it would do is take in an input, which might be red, might be blue, might be any color I can think of
+
+47
+00:03:51,825 --> 00:03:59,050
+然后把所有的像素都染成那种颜色，对吧，那会有用得多，那就是一种材质的来源
+and then shades all the pixels to that color, right, that would be a lot more useful, wouldn't it, and that's kind of where a material comes in
+
+48
+00:03:59,425 --> 00:04:03,150
+因为我们要做的是尽可能灵活地编写着色器，对吧
+because what we do is we write our shaders as flexible as possible, right
+
+49
+00:04:03,150 --> 00:04:06,975
+可能是由工程师或技术艺术家之类的人写的
+might be written by like, you know, an engineer or a technical artist or something like that
+
+50
+00:04:07,340 --> 00:04:12,650
+然后所有其他正在制作游戏的艺术家，他们需要能够真正让游戏看起来不错
+and then all the other artists, who are working on the game, who need to be able to actually make the game look good
+
+51
+00:04:12,650 --> 00:04:17,975
+也许科技艺术家也会进来，把数据输入现成的着色器，对吧
+and maybe the tech artists as well, they're going to come in and feed data into that ready-made shader, right
+
+52
+00:04:17,975 --> 00:04:23,875
+他们不需要了解着色器，他们只知道它需要这些输入，输入可以是真正定义的任何东西
+they don't have to know anything about the shader, they just know that it takes these inputs, and inputs could be anything really that define
+
+53
+00:04:24,100 --> 00:04:28,225
+那种材质，那种表面应该是什么样的，对吗
+what that material, what that surface kind of should be like, right
+
+54
+00:04:28,225 --> 00:04:31,625
+所以那可能是任何颜色，可能是纹理
+so that could be anything from like the color, could be like a texture
+
+55
+00:04:31,625 --> 00:04:37,100
+什么样的定义表面可以像其他表面属性一样，比如它有多粗糙或光滑，对吧
+which to kind of defines the surface could be like other surface properties, such as how rough or smooth is it, right
+
+56
+00:04:37,325 --> 00:04:42,450
+是金属吗，是塑料吗，我们这里也有PBR，可能是法线映射，对吧
+is it a metal, is it a plastic, we're kind of getting to PBR here as well, Um, could be a normal map, right
+
+57
+00:04:42,450 --> 00:04:47,550
+它只是定义了额外的细节，所以当我们进行光线计算时，它看起来比它详细得多
+which just defines extra detail, so that when we do our lighting calculations, it looks like, it's a lot more detailed than it is
+
+58
+00:04:47,750 --> 00:04:49,800
+我们实际上可以做很多不同的事情
+we have a lot of different things that we can actually do
+
+59
+00:04:49,950 --> 00:04:55,725
+还有其他东西也被使用，比如光线方向，相机方向，所有需要输入到着色器中的东西
+there's other things that are used as well, like light direction, camera direction, all that stuff that's required to be input into the shader
+
+60
+00:04:56,025 --> 00:05:01,550
+尽管这种东西通常是由渲染器而不是由材质处理的，但你们也应该明白我的意思
+although that kind of stuff is usually handled by the renderer and not by the material, but you kind of get my point
+
+61
+00:05:01,550 --> 00:05:07,975
+我们输入了很多东西，显然可以通过顶点属性输入
+there's a lot of stuff that we kind of feed in, and obviously it could be fed in somewhat through the vertex attributes
+
+62
+00:05:08,125 --> 00:05:09,450
+那就是我们一直在做的事情
+that's kind of what we've been doing in a way
+
+63
+00:05:09,450 --> 00:05:15,275
+比如你们知道的，我们用这个三角形的位置，来计算它的颜色，对吧
+like for example, you know, we use the position of this triangle, I think, um, to actually work out its color, right
+
+64
+00:05:16,275 --> 00:05:20,175
+因为我们有不同的颜色，那就是，我不知道，那是一种颜色吗
+cause we have a varying color and that is, I don't know, is that a color
+
+65
+00:05:20,620 --> 00:05:27,750
+我认为，在某种程度上，我认为对于三角形，我们只是将颜色计算为位置或类似的颜色
+I think at some point, I think for the triangle, we were just calculating the color to be like positions or something like that
+
+66
+00:05:29,025 --> 00:05:35,175
+那就是，你们知道的，为位置取顶点属性，然后实际计算
+that's done by just, you know, taking in the vertex attribute for the position and then actually calculating
+
+67
+00:05:35,175 --> 00:05:38,725
+你们知道的，哪个片段位于插值处，我们得到所有这些颜色
+you know, which fragment lies where interpolating and we get all these colors
+
+68
+00:05:39,250 --> 00:05:42,875
+没关系，我们显然可以有一个顶点颜色，对吧
+that's fine and all, and we could obviously have a vertex color, right
+
+69
+00:05:43,225 --> 00:05:50,175
+但那显然又是，被烘焙到数据中的东西，如果我想能够即时改变这种情况，对吧
+but that obviously is again, something that's baked into data, what if I want to be able to change that kind of on the fly, right
+
+70
+00:05:50,575 --> 00:05:58,400
+那就是获得整个数据的地方，有堆数据，然后有个着色器，这些数据被称为统一变量，对吧
+and that's where we get the whole data, having a bunch of data and then having a shader, and that data is called a uniform, right
+
+71
+00:05:58,400 --> 00:06:05,550
+我们有统一变量，基本上是我们可以在绘制之前将其传输到着色器的数据片段
+we have uniforms, which is basically pieces of data that we can transmit to the shader at like before we draw
+
+72
+00:06:06,025 --> 00:06:14,375
+它是在每次绘制时完成的，对吧，然后那样，当决定实际绘制时，就需要实际找到数据
+and it's done kind of per draw, right, and then that way, when we decide to actually draw something and it needs to actually find that data
+
+73
+00:06:14,375 --> 00:06:19,525
+你们可以从统一变量中访问数据，就那样，现在可以看到是红色的，它将是蓝色的
+you can just access the data from the uniform, and that's it, we can now see that it's going to be red, it's going to be blue
+
+74
+00:06:20,020 --> 00:06:21,975
+所以那就是材质的本质
+so that's what a material essentially is
+
+75
+00:06:21,975 --> 00:06:27,950
+就是个着色器，它定义了所有内容，它的代码说，这是我将要使用的算法
+it's a shader, which defines how everything, it's the code that says, this is kind of the algorithm I'm going to use
+
+76
+00:06:27,950 --> 00:06:34,250
+这就是确定最终颜色的结果，但它需要输入，这些输入被称为统一变量
+this is what's going to happen to determine that final color, but it needs inputs, and those inputs are called uniforms
+
+77
+00:06:34,550 --> 00:06:41,050
+那就是材质，是一堆统一变量，着色器和数据，就是那样
+and that's what a material is, it's a bunch of uniforms and a shader Shader and data, that's all it is
+
+78
+00:06:42,013 --> 00:06:47,898
+在我见过的每个游戏引擎中，它几乎都是这样的，它总是一个着色器和一堆统一变量
+and it's pretty much that way in every game engine that I've ever seen, it's always a shader and a bunch of uniforms
+
+79
+00:06:48,200 --> 00:06:53,450
+正如我所说，我们可能会在一段深入视频中看到一个更技术性的概述
+and we might take a look at a more technical overview of that, as I said, in an in-depth video
+
+80
+00:06:53,450 --> 00:06:56,400
+但本质上，我只是想让你们记住，那就是全部
+but essentially I'm just trying to put into your heads that, that's really all it is
+
+81
+00:06:56,400 --> 00:07:03,475
+显然，这些系统的复杂性可能是巨大的，因为即使我们确实希望着色器具有灵活性
+obviously the complexity of these systems can be enormous, because even though we do want our shader to be flexible
+
+82
+00:07:03,475 --> 00:07:11,550
+就像我说的，我们不希望它变得灵活到非常慢，像一堆检查一样，如果要检查我们想要的
+as I said, we don't want it to be flexible to the point of being very slow and doing like a bunch of if checks to check is this what we want
+
+83
+00:07:11,740 --> 00:07:16,850
+因为你们本质上可以创建一个超级着色器，包含了所有可能的东西，对吧
+because you can make an uber shader essentially, which is like just every possible thing, right
+
+84
+00:07:16,850 --> 00:07:23,225
+你们可以为游戏创建一个着色器，那就是所有的可能性，对吧，但那有点，相当糟糕的
+you can have one shader for your whole game, and that's all of the possibilities, right, but that's somewhat, that's pretty bad
+
+85
+00:07:23,225 --> 00:07:27,850
+就像你们不想那样，所以在现实世界中最终发生的是一个聪明的
+like you don't want that, and so what ends up happening in the real world is an intelligent
+
+86
+00:07:27,850 --> 00:07:33,700
+就像你们编写的着色器编译器一样，它将基本上通过着色器并确定实际需要什么
+like shader compiler that you've written will essentially go through the shader and determine what is actually needed
+
+87
+00:07:33,950 --> 00:07:39,092
+然后抓取所需内容的所有不同构建块，将其组合成一个着色器
+and then kind of grab all the different building blocks of the stuff that's needed, combine that into a shader
+
+88
+00:07:39,092 --> 00:07:46,375
+然后将其创建为着色器，因此最终会有300个着色器，而不是一个会做300个操作的着色器
+and then just create that as a shader, so instead of having one shader that can do 300 things, you end up having 300 shaders
+
+89
+00:07:47,150 --> 00:07:53,225
+即使你们写了一个，也要稍后再讨论，因为我们肯定会在将来的某个时候添加那样的系统
+even though you wrote one, so more on that later, because we're definitely going to add a system like that sometime in the future
+
+90
+00:07:53,225 --> 00:07:56,975
+这很有用，但是无论如何，我不想坐在这里聊几个小时
+it's very useful, but anyway, I don't want to sit here talking for hours
+
+91
+00:07:57,250 --> 00:08:03,625
+我绝对可以，特别是因为我有点炸，但我想直接去写一些像这样的东西
+I definitely could, especially because my mind is a bit fried, but I want to get in and basically write something like this
+
+92
+00:08:03,675 --> 00:08:07,800
+但是我们的目标是尝试用不同的颜色创建其中一些正方形
+but our goal is going to be to try and make some of these squares in different colors
+
+93
+00:08:08,700 --> 00:08:13,425
+我们将通过创建材质，然后提交材质来实现那个
+and we're going to do that by making a material, and then kind of submitting that material
+
+94
+00:08:13,650 --> 00:08:15,740
+除了我们实际提交的几何
+alongside our geometry that we actually submit
+
+95
+00:08:15,740 --> 00:08:21,900
+然后通常会发生的是，如果你们有个网格或模型类
+and then usually what would happen is, if you have like a mesh or a model class, essentially
+
+96
+00:08:21,900 --> 00:08:27,625
+其中包含你们实际渲染的所有几何图形，通常也具有与之相关的材质
+which contains all of your geometry that you actually render, that also usually has materials associated with it
+
+97
+00:08:27,625 --> 00:08:30,575
+因为很明显，如果你们看看游戏引擎
+because obviously if you kind of look at a game engine
+
+98
+00:08:32,150 --> 00:08:38,325
+在某种程度上就是在写你们的资产，从来没有处理到这个级别的代码
+you kind of author your assets in a way that you're never dealing with code to this level, usually,
+
+99
+00:08:38,325 --> 00:08:40,525
+除非你们喜欢实验或搞东西
+unless you're like experimenting or playing around with stuff
+
+100
+00:08:40,850 --> 00:08:46,875
+通常，艺术家会创建3D模型，他们显然想在某种工具中对其应用材质
+usually artists will kind of make a 3D model, and they obviously want to apply a material to it in some sort of tool
+
+101
+00:08:47,300 --> 00:08:50,125
+所以这个模型和那个材质是联系在一起的，对吧
+and so that model gets linked with that material, right
+
+102
+00:08:50,125 --> 00:08:55,550
+因为如果你们把材质与几何分开，就很奇怪，但是通常情况并非如此
+because it would be very weird if you kind of like, yes, you can have materials separate to geometry, but usually that's not the case
+
+103
+00:08:55,550 --> 00:09:01,700
+我是说，想想看，如果建造这个房间，你们想在游戏引擎中渲染它，这是张木桌，对吧
+I mean, think about it, if you're building this room and you want to render it in your game engine, this is a wooden table, right
+
+104
+00:09:01,700 --> 00:09:06,425
+你们可以为木桌创建几何，然后把木质材质应用于其中
+you make the geometry for the wooden table, and then you apply the wooden material to it
+
+105
+00:09:06,425 --> 00:09:10,820
+你们永远不会想把它们分开，因为那就是事实，对吧
+you would never want to separate them, because that's just the way that this is, right
+
+106
+00:09:10,820 --> 00:09:15,100
+我的意思是如果你们正在建造真正动态的东西，材质可能会随着时间的推移而退化或改变
+I mean, if you're building really dynamic stuff, the material might degrade or change over time
+
+107
+00:09:16,075 --> 00:09:22,275
+总是有例外，但想法是我们想要个网格，并且有个材质，所以通常这两个是绑在一起的
+there are always exceptions, but the idea is that we want a mesh, and we have a material with it, so usually those two pieces are tied together
+
+108
+00:09:23,025 --> 00:09:29,300
+所以不会真的只是在那里写个材质，然后编码，绝对可以实现那个，我们肯定会支持
+so you wouldn't really just author a material right there and then encode, definitely can do that, we definitely will support that
+
+109
+00:09:29,650 --> 00:09:33,950
+但我只是想向你们展示我是否真的在用Hazel创作游戏的更大背景，或者在引擎中
+but I'm just trying to show you kind of the bigger picture of if I was actually building a game with Hazel, or with an engine
+
+110
+00:09:33,950 --> 00:09:40,020
+那个的运行原理，无论如何，我们将深入研究一下这段代码
+how would that work, anyway, we're going to go in and just literally play around with this code a little bit
+
+111
+00:09:40,020 --> 00:09:47,625
+这将更像是一个自由式视频，我只是在讨论我在做什么
+this is going to be kind of more of a freestyle video where I just kind of just discuss what I'm doing so much
+
+112
+00:09:47,625 --> 00:09:50,860
+我们并没有真正写最后的代码，但就只是像在谈论概念
+and we're not really writing final code, but we're just like talking about concepts
+
+113
+00:09:50,860 --> 00:09:53,325
+玩一下，实现一些系统
+and playing around with them, and implementing somewhat of a system
+
+114
+00:09:53,925 --> 00:09:57,700
+但是从本质上讲，如果我们只是考虑我们需要什么，那么我们需要一个材质类
+but essentially, if we just kind of think about what we need, so we need a material class
+
+115
+00:09:57,700 --> 00:10:05,075
+或者保存着色器的，那就是我们编译的着色器程序，然后需要些方法来为它定义数据
+or something which holds a shader, which again is our compiled kind of shader program, and then we need some way to define data for it
+
+116
+00:10:05,425 --> 00:10:11,000
+现在再说一次，这个系统通常会变得非常复杂，因为我们定义的数据
+now again, this system ends up being really complicated usually, because the data that we define
+
+117
+00:10:11,000 --> 00:10:18,675
+比如说，我们定义了什么数据，如何正确设置统一变量，如果统一变量不存在会发生什么
+like what to say, what data we define, how do we set uniforms properly, what happens if the uniform doesn't exist
+
+118
+00:10:18,675 --> 00:10:23,275
+我们是否需要首先实际检查着色器代码，用来查看实际存在哪些统一变量
+do we need to actually check the shader code first to see what uniforms even exist
+
+119
+00:10:23,380 --> 00:10:28,750
+所以那些是我们唯一可以设置的，然后还需要接受几乎任何类型的数据
+so those are the only ones that we can set, and then we also need to accept pretty much any kind of data
+
+120
+00:10:29,075 --> 00:10:33,575
+然后我们如何统一变量或直接访问常量缓冲区接口，对吧
+and then how do we interface with uniform buffers or direct access constant buffers, right
+
+121
+00:10:33,800 --> 00:10:37,450
+在这里，我们通常不是一个接一个地提交统一变量，而是提交一个常量缓冲区
+where instead of submitting uniforms one by one, we usually submit a constant buffer
+
+122
+00:10:37,675 --> 00:10:42,100
+我们可能有多个常量缓冲区，因为一个可能由渲染提交，或者一个可能由材质提交
+we might have multiple constant buffers, because one might be submitted by the render, or one might be submitted by the material
+
+123
+00:10:42,350 --> 00:10:46,925
+像往常一样大量的任务，因为游戏引擎相当复杂
+huge, huge, huge task as usual, because game engines are quite complicated
+
+124
+00:10:47,375 --> 00:10:51,725
+我们会慢慢解决这些问题，但我只是想通过展示一个简单的例子来介绍它们
+and we'll tackle these things slowly, but I just like to introduce them by showing a simple example
+
+125
+00:10:51,725 --> 00:10:56,025
+这样那些没有那么有经验的人就不会发现自己经常陷入困境
+so that people who aren't as experienced with this won't find themselves in the deep end as often
+
+126
+00:10:56,025 --> 00:11:00,375
+并且实际上能够理解这个，所以让我们深入到代码中，到处看看，看看能做些什么
+and will actually be able to make sense of this, so let's dive into the code and we'll just play around, and see what we can do
+
+127
+00:11:00,425 --> 00:11:07,375
+好吧，重要的是，如果你们要被这样的东西淹没啦，想想它到底是什么
+okay, so the important stuff again is just, if you get overwhelmed with stuff like this, think about what it actually is
+
+128
+00:11:07,725 --> 00:11:14,075
+正如我之前提到的，这是一堆代码，就是我们的着色器，目前有个顶点和片段着色器
+as I've mentioned before, it is a bunch of code, which is our shaders, right, we have a vertex shader and a fragment shader at the moment
+
+129
+00:11:14,275 --> 00:11:20,775
+我们将其存储在着色器中，Hazel::Shader对象中，那就是所需要的，然后就有了一堆数据
+we're storing that in a shader, in a Hazel::Shader object, which is fantastic, that's all we need, and then we have a bunch of data
+
+130
+00:11:21,125 --> 00:11:24,625
+所以我们现在根本没有用统一变量，不，用到了
+so we're not actually using uniforms at all at the moment, oh, no, sorry
+
+131
+00:11:24,625 --> 00:11:31,175
+我们的顶点着色器用于我们的变换和视图投影矩阵，那都没问题
+we are for our vertex shader for our transform and for our view projection matrix, and that's all fine
+
+132
+00:11:31,800 --> 00:11:36,050
+但我认为，我们从来没有真正在片段着色器中使用过统一变量
+but we've never actually used uniform, I think, in the fragment shader
+
+133
+00:11:36,325 --> 00:11:39,148
+那么首先，就让我们来看看我们的最终目标是什么
+so first of all, let's just take a look at what our end goal is
+
+134
+00:11:39,420 --> 00:11:48,475
+我想做这些，让我们看看，我想做，也许我会做两种不同类型的正方形
+I want to make these, let's just see, I want to make, maybe I'll make two different types of squares
+
+135
+00:11:48,475 --> 00:11:54,350
+所以我们有个正方形的网格，太好了，我希望其中一个是蓝色的，其中一个是红色的
+so you saw we had a grid of squares, that's great, I want one of them to be blue, one of them to be red, right
+
+136
+00:11:55,200 --> 00:12:01,300
+所以我要做的是，也许我们应该把一半做成蓝色，一半做成红色，我不确定
+so what I'll do is, so maybe we should make half of them blue, half of them red, I'm not sure
+
+137
+00:12:01,625 --> 00:12:04,680
+但基本上我要做的是，我要做的第一件事就是找到红色
+but basically what I'll do is, the first thing I'll do is find the red
+
+138
+00:12:04,680 --> 00:12:09,350
+所以我们会有redColor，本质上只是一种颜色，对吧
+so we'll have the red color, which will just essentially be a color, right
+
+139
+00:12:10,200 --> 00:12:14,150
+现在让我们拿我们的蓝色，因为我想做红色，同样的着色器
+now let's take our blue color, because I want to make the red color, the same kind of shader
+
+140
+00:12:14,650 --> 00:12:28,325
+所以我们会快速创建redColor和blueColor，都是vec4，然后这就是blueColor
+so we'll make redColor and a blueColor, and it'll be vec4, let's just do this quickly, and then this will be the blueColor
+
+141
+00:12:30,550 --> 00:12:37,375
+那就是blueColor，然后redColor会是0.8，0.2，0.3，好了，所以我们有两种不同的颜色
+that's blueColor, and then the red color will be just 0.8, 0.2, 0.3, okay, so we've got two different colors
+
+142
+00:12:38,180 --> 00:12:42,250
+我想让，我们可以替换这个
+I want to make, we can just literally alternate this
+
+143
+00:12:42,250 --> 00:12:51,025
+所以我能做的是，我基本上可以看到，if (i % 2) == 0，对吧，所以这只是基本上，应该是x
+so what I can do is I can see essentially that if i mod 2 equals 0, right, so this is just basically, sorry it's not i, it's x
+
+144
+00:12:51,475 --> 00:13:00,700
+所以当我们挨行看时，每一秒钟都等于0，对吧，所以0将是0，1不是0，2将是0等等
+so we're kind of, as we go through the rows, every second one will be equal to 0, right, so 0 will be 0, 1 will be not 0, 2 will be 0, etc
+
+145
+00:13:01,700 --> 00:13:07,260
+我想要做的实际上是设置这个着色器，这个blueShader的统一变量
+what I want to do for that is actually set this shader, this blue shader's uniform, which
+
+146
+00:13:07,260 --> 00:13:15,975
+我不认为，有个UniformMat4，我们会调用UploadUniformFloat4，将其设置为redColor
+I don't think we, we have a uniform map4, we'll do UploadUniformFloat4, we'll set this to be the redColor
+
+147
+00:13:17,125 --> 00:13:23,075
+否则我们会把它设置为blueColor，对吧，所以我们现在有了一个替换模式
+and then otherwise we'll set it to be the blueColor, right, so we kind of have an alternate pattern now
+
+148
+00:13:23,250 --> 00:13:29,575
+现在很明显，这根本没有效率，因为通常你们想把你们的材质批处理
+now obviously this is not efficient at all, because usually you would like to batch together your materials
+
+149
+00:13:29,650 --> 00:13:32,550
+换句话说，你们想尽可能少的做这些
+so in other words, you would like to do as few of these as possible
+
+150
+00:13:32,550 --> 00:13:36,950
+所以我实际上要做的是先渲染所有红色正方形，然后渲染所有蓝色正方形
+so what I would actually do is render all the red squares first, then all the blue squares
+
+151
+00:13:37,175 --> 00:13:42,725
+只是想让每个人都明白，这只是一个测试，我们不是在讨论效率，或者最佳的做事方式
+just want everyone to understand, this is just a test, and we're not talking about efficiency, or the optimal way of doing things
+
+152
+00:13:43,525 --> 00:13:47,025
+但我们基本上是这样做的，最终我们得到了一种交替的颜色模式
+but we basically do this, and we end up with an alternating pattern of colors
+
+153
+00:13:47,150 --> 00:13:50,800
+因此让我们进入Shader类，并确保我们有对应的函数
+so let's visit our shader class, and make sure that we have the right function
+
+154
+00:13:51,100 --> 00:13:58,025
+所以我们会有UploadUniformFloat4，顺便说一下，这个Shader类真的需要一些操作
+so we'll have UploadUniformFloat4, this really needs some work by the way, this shader class
+
+155
+00:13:58,025 --> 00:14:08,325
+所以也许那是接下来要做的，我的意思是，这里有很多事情需要做，我想应该是values
+so maybe that's something that I'll do next, because yeah, I mean, there's a lot of stuff that needs to be done here, have values, I guess
+
+156
+00:14:09,800 --> 00:14:22,050
+我会复制这个，粘贴到这里，我们会像往常一样获取位置
+I'll copy this, come over here, paste this in here, we'll get the location as usual
+
+157
+00:14:24,125 --> 00:14:27,675
+我看到有人评论说缓存位置，那是可以做到的
+I saw someone leave a comment about caching the location, yes, that can be done
+
+158
+00:14:28,225 --> 00:14:32,600
+那不是一种糟糕的方式，这是一种节省性能的快速小把戏
+that's not a bad way of just, that's a quick dirty way of just saving some performance
+
+159
+00:14:33,225 --> 00:14:37,550
+通常，在编译着色器时，通常不会提前计算所有位置
+usually you wouldn't, usually you'd calculate all locations ahead of time, when compiling your shader anyway
+
+160
+00:14:38,382 --> 00:14:45,125
+所以那不是我们真正要的，它是什么，Float4还是UniformVec，到底是什么函数
+so that's not something that we're really gonna, what is it, float4 uniform vec, what is the function
+
+161
+00:14:45,220 --> 00:14:54,900
+我不敢相信我不记得了，就是4f，好了，我们继续，我当然是靠记忆做的
+I can't believe I don't remember this, oh, it's just 4, 4v, 4fv, no, 4, 4f, okay, there we go, I'm doing this from memory of course
+
+162
+00:14:55,850 --> 00:15:02,575
+然后我们就得到了位置，然后是values.x，values.y，values.z和values.w
+and then we have the location, and then values x, y, z and w
+
+163
+00:15:04,275 --> 00:15:08,980
+通常你们基本上只有一个系统，读取着色器
+yeah, usually you would, you would basically just have a system, that reads the shader passes
+
+164
+00:15:08,980 --> 00:15:16,925
+传入着色器，从中获取所有统一变量，然后实际上像获取这些统一变量的位置，就在那里
+passes the shader, gets all the uniform values from that, and then actually like gets locations of all of those uniforms, just right there, and then
+
+165
+00:15:17,500 --> 00:15:22,550
+然后你们那样做，当编译着色器时，就那样，它们被保存了，因为着色器永远不会变，对吧
+and then you do that, when compiling your shader, that's it, that's done, they're saved, because the shader is never going to change, right
+
+166
+00:15:22,800 --> 00:15:24,625
+如果它确实发生了变化，那么你们显然就会重新编译它
+if it does change, then you obviously recompile it
+
+167
+00:15:25,650 --> 00:15:30,425
+这样你们还可以从中获得其他好处，例如验证，确保着色器确实存在
+and then that way, you also get other bonus things from that, like validation, making sure the shaders actually exist
+
+168
+00:15:31,200 --> 00:15:36,225
+这样做，因为你们知道了着色器及其类型，所以就知道缓冲区需要多大
+making like, since you're aware of the shaders and their types, you know how much how big your buffer needs to be
+
+169
+00:15:36,225 --> 00:15:43,800
+这样就可以把它们都存储在缓冲区里，这样就可以继续下去了，所以我们将来会这样做
+so that you can store all of them in a buffer, and that kind of just goes on that road, so we'll end up doing that in the future
+
+170
+00:15:43,925 --> 00:15:58,225
+所以我就叫它u_Color，也就是这个统一变量的名字，好吧，我会把它放在blueShader，对吧
+so I'll call this my u_Color, that's going to be the name of this uniform, okay, and I'll just make this inside the blueShader, right
+
+171
+00:15:58,300 --> 00:16:05,600
+所以蓝色着色器不会是一个平面颜色着色器，实际上会把它重命名为flatColor
+so the blue shader is not going to be a flat color shader, and I will actually go as far as to rename it flatColor
+
+172
+00:16:08,200 --> 00:16:13,900
+所以就明确了它实际上是什么，然后m_BlueShader也是
+so there's no confusion as to what it actually is, and then blue shader as well
+
+173
+00:16:17,700 --> 00:16:21,100
+好了，那么我们如何添加一个统一变量，简单
+okay, so how do we add a uniform, simple
+
+174
+00:16:21,100 --> 00:16:29,175
+我们只需输入uniform，然后类型vec4，然后是统一变量的名称u_Color
+we just type in the word uniform, and then the type vec4, and then the name of the uniform u_Color
+
+175
+00:16:29,600 --> 00:16:33,225
+现在我要做的就是输出color = u_Color，非常简单
+and now what I'm going to do is output color to be u_Color, pretty simple
+
+176
+00:16:33,225 --> 00:16:38,300
+可以使它成为vec3，并保持常量alpha，现在就是1，那很好，但是我们会那样做
+could have made this a vec3, and just kept the alpha constant, now it's one as well, that's fine, but we'll do that
+
+177
+00:16:38,375 --> 00:16:45,100
+也许你们可以下来尝试另一种方式，让我们点击f5，我们应该在我们的方阵中有些不同的
+maybe you guys can try the other way at home, let's hit f5, and we should get some kind of difference in our squares
+
+178
+00:16:45,100 --> 00:16:50,275
+现在有些，一半基本上应该是蓝色的，一半应该是红色的，好了，继续
+now some of them, half of them essentially should be blue, half of them should be red, okay, and there you go
+
+179
+00:16:50,425 --> 00:16:55,500
+所以你们可以看到一半是红色的，一半是蓝色的，那太完美了
+so you can see half of them are red and half of them are blue, that's perfect
+
+180
+00:16:56,140 --> 00:17:02,425
+所以引入了个材质，不是吗，我们就得到了个灵活的着色器，可以添加我们想要的任何颜色
+so we've basically introduced a material, haven't we, we've got a shader that is somewhat flexible, we can add any color we want
+
+181
+00:17:02,425 --> 00:17:07,625
+我们可以很容易添加ImGui来控制改变颜色，有趣，那可能是给你们的作业
+we can easily just add an ImGui to control to actually change the color, fun, fact that might be something you guys can do for homework
+
+182
+00:17:07,625 --> 00:17:12,850
+只需添加ImGui来控制，这样就可以真正玩这个颜色了，我们下期也会做那个
+just add an ImGui to control, so that you can actually play around with the color, and we can do that next time as well
+
+183
+00:17:14,375 --> 00:17:21,150
+但是从本质上讲，我们最终得到的是种方法，可以实际选择所需的颜色并设置到着色器中
+but essentially what we end up with is a way to actually pick any color we want and set it into the shader
+
+184
+00:17:21,575 --> 00:17:23,150
+然后渲染某些东西
+and then render something
+
+185
+00:17:23,150 --> 00:17:28,050
+它将具有该实际值，红色或那个蓝色值，非常酷
+and it will be with that actual value, with that red value or with that blue value, which is pretty cool
+
+186
+00:17:30,025 --> 00:17:33,775
+那一切都很好，但我们基本上从来都不想这样做，对吧
+that's all great, but we never want to do this like this way, essentially, right
+
+187
+00:17:33,775 --> 00:17:38,675
+我们实际上是在取着色器，然后调用UploadUniformFloat4，那有点奇怪
+where we actually kind of take the shader, and then we UploadUniformFloat4, that's weird.
+
+188
+00:17:39,075 --> 00:17:45,925
+相反，我们想要做的是定义某种材质，或多或少在可能看起来像这样的API中
+we, instead, what we want to do is define some sort of material, more or less in an API that probably looks like this
+
+189
+00:17:46,050 --> 00:17:51,875
+我们有Hazel，我可以向你们展示最终目标接口的样子
+where we have kind of Hazel and I can show you kind of what a, what a, like an end goal API might look like
+
+190
+00:17:52,550 --> 00:17:53,875
+因为我们今天绝对不会创建那个
+because we're definitely not going to make that today
+
+191
+00:17:54,200 --> 00:17:58,825
+但是，如果我创建材质，基本上，通常会取Material，可能会是MaterialRef
+but if I make a Material, essentially, usually I take a Material, probably have some kind of MaterialRef
+
+192
+00:17:58,975 --> 00:18:04,125
+因为我们将来会引入某种自动化的引用和计数系统
+because we'll introduce some kind of automated kind of reference and counting system in the future
+
+193
+00:18:04,975 --> 00:18:10,850
+但是现在，由于我们使用的是原始指针或智能指针之类的，所以让我们假装这是个引用
+but for now, since we're using kind of raw pointers or smart pointers or whatever, let's just pretend that this is a ref
+
+194
+00:18:10,960 --> 00:18:21,075
+我想我会向你们展示最终的方法，基本上我们可以创建材质，接收个Shader
+I guess I will show you the kind of final way, basically we can just make a material where we take a shader in
+
+195
+00:18:21,600 --> 00:18:27,000
+所以就是这个flatColorShader，对吧，你们用它做个材质，对吧
+so this flatColorShader, right, and you make a material out of that, right
+
+196
+00:18:27,000 --> 00:18:32,825
+然后通常这样做的实际上就是使用那个着色器
+and then what this does is, like typically what this would do is actually take that shader
+
+197
+00:18:32,900 --> 00:18:35,500
+获取关于着色器需要什么数据的所有信息
+get all of the information about what data that shader needs
+
+198
+00:18:35,500 --> 00:18:43,525
+换句话说，统一变量，特别是适用于实际类似材质的统一变量，对吧
+so in other words, the uniforms, specifically the uniforms that are applicable to, to actual like materials, right
+
+199
+00:18:43,575 --> 00:18:49,425
+例如，正如我之前提到的，如果我们看看这个着色器，决定我想要什么统一变量，对吧
+so for example, as I mentioned before, if we look at this shader, and we decide what uniforms do I want, right
+
+200
+00:18:49,425 --> 00:18:52,545
+我们可以取所有统一变量，那就是三个
+yes, we could take all of the uniforms, which would be three
+
+201
+00:18:52,825 --> 00:18:55,625
+顶点着色器中的这两个，片段着色器中的这一个
+it would be these two in the vertex shader, and this one in the fragment shader
+
+202
+00:18:56,250 --> 00:19:03,525
+虽然不好，因为视图投影矩阵不是，材质的那部分如何，也许有一个变换矩阵
+not good though, because a view projection matrix, that is not, how is that part of a material, maybe there is a transfer matrix
+
+203
+00:19:04,325 --> 00:19:06,160
+所以也许我们把片段着色器中的所有统一变量
+so maybe we take all the ones in the fragment shader
+
+204
+00:19:06,160 --> 00:19:14,875
+在这种情况下，它会起作用，但是如果，我不知道，比如uniform vec3 u_LightDirection
+in this case it will work, but what if we have like, I don't know, a uniform, a uniform vec3, you know, u_LightDirection
+
+205
+00:19:15,800 --> 00:19:20,187
+那有点奇怪，不是吗，我的意思是，为什么光线方向会是材质的一部分
+that's a bit weird, isn't it, I mean, why is a light direction part of a material
+
+206
+00:19:20,640 --> 00:19:26,425
+我总是看到这个，但是当你们设计东西的时候，确保它们有意义，对吧
+I see this all the time, but when you're designing things, make sure they make sense, right
+
+207
+00:19:27,100 --> 00:19:32,025
+比如这只兔子，在这个系列的每期中，我基本上就会拿起来
+this bunny here, which I've basically committed to picking up for every episode in this series
+
+208
+00:19:32,925 --> 00:19:37,025
+这只兔子这儿是什么材质的
+this bunny here, this is, what's the material of this
+
+209
+00:19:37,175 --> 00:19:42,400
+它与光从哪里来有什么关系吗，顺便说一句，不，没有关系
+does it have anything to do with, where the light is coming from, which is right there, by the way, no, it doesn't
+
+210
+00:19:42,400 --> 00:19:49,950
+当然当光线照射到它，它对光有特殊的反应，为什么，因为它有一种材质，对吧
+it's just, yeah, sure, the light hits it, it reacts a particular way to the light, why, because it's, well, it's got a material, right
+
+211
+00:19:50,150 --> 00:19:53,575
+它有某种形式，有个表面属性，它定义就像，你们知道的
+it's got some kind of form, it's got a surface property, that defines like, you know
+
+212
+00:19:53,575 --> 00:19:59,360
+这里就像毛茸茸的一样，实际上感觉很好，但是无论如何，它具有所有那些
+it's all like kind of furry here, and actually feels quite nice, but anyway, it kind of, it has all of that
+
+213
+00:19:59,360 --> 00:20:04,680
+它有一种材质，但它不在乎光从哪里来，那不是材料的一部分，对吧
+it's got a material, but it doesn't care where the light's coming from, that's not part of the material, right
+
+214
+00:20:04,680 --> 00:20:11,500
+我不能，就像改变光线方向不会改变这个兔子制成的材质一样，对吧
+I can't, like changing the light direction does not change the material that this bunny is made out of, does it, right
+
+215
+00:20:11,750 --> 00:20:14,684
+所以只要确保你们在脑子里想清楚事情
+so just make sure that you kind of think things through in your head
+
+216
+00:20:14,900 --> 00:20:21,000
+使用白板或一张纸，如果你们需要记下，问问自己，或者问别人，这个有意义吗
+use a whiteboard or a piece of paper, if you need to jot everything down, ask yourself, or ask someone else, does this make sense to you
+
+217
+00:20:21,000 --> 00:20:26,650
+应该吗，兔子的材质是否包含光线方向，答案是否定的
+should it, should the material for the bunny contain the light direction, the answer is no
+
+218
+00:20:27,260 --> 00:20:32,640
+所以正因为如此，你们不能只是取走所有统一变量，就那样，那就是属于那里的
+so because of that, it's again, you can't just take all the uniforms and be like, that's it, that's what belongs there
+
+219
+00:20:32,640 --> 00:20:37,626
+不，你们需要某种方式来决定渲染器应该设置哪些统一变量
+no, you need some kind of way to decide which uniforms should be set by maybe the renderer
+
+220
+00:20:37,900 --> 00:20:42,975
+所以像渲染器应该设置光线方向，应该设置视图投影，应该设置变换
+so like the renderer should set the light direction, should set the view projection, and should set the transform
+
+221
+00:20:42,975 --> 00:20:48,300
+变换是每个对象的，即使视图投影是每个场景的，光线方向也是如此
+transform is kind of per object, even though view projection is per scene, and so is light direction
+
+222
+00:20:49,900 --> 00:20:54,316
+但是我们还有另一组具体与材质有关的统一变量
+but we also have another group of uniforms, which is to do with specifically the material
+
+223
+00:20:54,316 --> 00:20:58,875
+所以我们需要取那些统一变量，需要创造足够的存储空间
+so we need to take those uniforms, and we need to basically create enough storage
+
+224
+00:20:58,875 --> 00:21:02,800
+就像某种备份缓冲区，它实际上存储了我们需要的所有数据
+like some kind of backing buffer, that actually stores all the data that we need
+
+225
+00:21:03,160 --> 00:21:06,000
+那通常是在创建一种材质时会发生的事情
+and that's typically what would happen upon constructing a material
+
+226
+00:21:06,225 --> 00:21:11,800
+一旦有了那个空间，我们就能做像材质一样的事情
+once we have that storage, we can, we'll be able to do things like material, you know
+
+227
+00:21:11,800 --> 00:21:21,550
+也许只是material->Set()，设置什么，我们想设置材质的颜色，对吧，就是redColor
+material, maybe just set, you know, and what are we setting, we want to set the color of the material, right, to be, you know, redColor
+
+228
+00:21:23,050 --> 00:21:29,400
+就是那样，现在还有材质和材质实例的概念，这就是材质实例
+and that's it, now there's also the concept of materials and material instances, which are material instances
+
+229
+00:21:29,400 --> 00:21:33,525
+本质上只是材质的一个实例，因为你们可能想要定义一个基本材质
+that are essentially just an instance of the material, because you might want to define a base material
+
+230
+00:21:33,860 --> 00:21:36,700
+例如，你们知道的，这个，我不知道，你们知道我的意思
+for example, you know, this, I don't, you know what I mean
+
+231
+00:21:36,700 --> 00:21:40,500
+就像比如创建redColor，因为现在变成了红色材质，不是吗
+like instead of making a redColor, because this now becomes a red color material, doesn't it
+
+232
+00:21:40,750 --> 00:21:45,820
+我是说，就像我把材料的颜色设置为红色，对吧，然后也许我会把它应用到我的网格上
+I mean, it's like I've set the materials color to red, right, and then maybe I'll apply it to my mesh
+
+233
+00:21:45,820 --> 00:21:50,264
+所以我有一个方形的网格，让我们看看，我有个squareMesh，对吧
+so I had like a square mesh, let's just see, I had like a squareMesh, right
+
+234
+00:21:50,550 --> 00:21:57,025
+然后我只是看到，你们知道的，SetMaterial之类的，让我们就用material，对吧
+and then I kind of just see, you know, set material or whatever to, let's just say material, right
+
+235
+00:21:58,250 --> 00:22:04,075
+或者也许我有个覆盖材质，我可以提供给渲染器，即使网格可能有个材质
+or, or maybe I have an override material I can supply to the renderer, which says that even though the mesh might have a material
+
+236
+00:22:04,075 --> 00:22:09,450
+我希望你们覆盖它并设置这个材质，那对于调试和其他类型的渲染情况很有用
+I want you to override it and set this material, that's useful for like debugging and also other kinds of rendering cases
+
+237
+00:22:09,850 --> 00:22:14,250
+但是无论如何，我在这里所做的是我创造了红色材质，太好了，它并不能真正解决任何问题
+but anyway, you know, what I've done here is I've created a red material, great, that doesn't really solve anything
+
+238
+00:22:14,250 --> 00:22:17,650
+所以我可能要做的就是有个平面颜色材质，这个就是
+so what I might do is have just a flat color material, which is this
+
+239
+00:22:17,650 --> 00:22:23,350
+然后从那里，我可能会创建个叫做materialInstance的东西，它是从这个材质派生的
+and then from there, I might create something called a materialInstance, which is derived from this material
+
+240
+00:22:23,800 --> 00:22:30,700
+但是有一组特定的数据，对吧，那不是每个对象唯一之类的
+but has a specific set of data, right, that isn't kind of that is unique per object or something like that
+
+241
+00:22:32,225 --> 00:22:42,604
+所以另一个例子可能是，可能是，我有一种基于物理的渲染金属材质，就像银，对吧
+so another example might be, might be, I have a kind of physically based rendering metal material, that's like silver, right
+
+242
+00:22:42,650 --> 00:22:50,506
+那可能是我的基础材质，但是我渲染的不同球体可能具有不同的粗糙度，或者可能有点破损
+that might be my base material, but different spheres that I render might have different roughness, or they might be a bit damaged
+
+243
+00:22:50,620 --> 00:22:56,700
+所以它们可能有不同的粗糙度或类似映射的镜面
+so they might have a different like roughness or like specularity kind of like map, essentially
+
+244
+00:22:56,700 --> 00:23:01,600
+就像你们应用的纹理一样，它决定了球体的某些部分看起来有点破旧，对吧
+like a texture that you apply that determines certain parts of the sphere look a bit beaten up, right
+
+245
+00:23:02,025 --> 00:23:05,700
+那就像是个材质实例，因为基础材质是银
+that would be like a material instance, because the base material is silver
+
+246
+00:23:05,700 --> 00:23:09,600
+就像你们创造的那种银色PBR材质
+it's like that kind of, you know, the silver PBR material that you've created
+
+247
+00:23:09,975 --> 00:23:15,625
+但是派生的可能有一些特殊的东西使得它独一无二
+but then the derived one might have a few kind of particular things, that makes it unique
+
+248
+00:23:15,625 --> 00:23:21,525
+因为很明显，你们不会经常渲染一个充满所有完全相同形状的场景
+because obviously you wouldn't often render a scene filled with everything that is exactly in the same shape
+
+249
+00:23:21,525 --> 00:23:24,950
+但有可能是相同的材质，在你们的场景中可能有很多木头，对吧
+it might be the same material, it might be a lot of wood in your scene, right
+
+250
+00:23:25,250 --> 00:23:34,250
+但它，你们知道的，很可能是不同类型的木材，或者质量不同，比如可能有点退变之类的
+but it, you know, it's likely that it's different types of wood or it's different like qualities, like it might be a bit degraded or whatever
+
+251
+00:23:34,250 --> 00:23:37,025
+所以我们最终得到了一个有点像这样的接口
+so we kind of end up with an API that somewhat looks like this
+
+252
+00:23:37,125 --> 00:23:40,150
+这是我实际上在私有分支所做的事情，可供赞助人使用
+and it's something that I've actually done in the private branch, that's available to patrons
+
+253
+00:23:40,150 --> 00:23:44,575
+顺便说一句，非常感谢所有使该系列成为可能的赞助人，patreon.com/thecherno
+by the way, huge thank you to all the patrons that make this series possible, patreon.com/thecherno
+
+254
+00:23:45,375 --> 00:23:49,850
+这些东西已经在那里完成了，所以我已经测试了这段代码，如果你们现在想看的话
+yeah, this stuff has already been done there, so I've kind of tested this code, and if you want to see it right now
+
+255
+00:23:49,850 --> 00:23:53,425
+你们可以帮助支持这个系列，就可以访问这些代码
+you can just help support the series, and you'll get access to all this lovely code
+
+256
+00:23:53,540 --> 00:23:59,875
+但是无论如何，回到这，所以已经完成了，但是本质上讲，可能会有MaterialInstanceRef
+but anyway, back to this, so I kind of have done this already, but essentially you might have like a MaterialInstanceRef
+
+257
+00:23:59,980 --> 00:24:03,100
+就像你们知道的，materialInstance
+which would be like your actual, you know, materialInstance
+
+258
+00:24:03,740 --> 00:24:11,275
+这只是，你们知道的，同样的事情，我们有一个Hazel::MaterialInstance(material)
+this would just be, you know, the same kind of thing where we have a Hazel::MaterialInstance, made from a material
+
+259
+00:24:12,450 --> 00:24:17,800
+然后我们可以为特定的材质设置某些类似的颜色，对吧，但就是那样
+and then we can set certain like colors to that specific material, right, but that's kind of it
+
+260
+00:24:17,900 --> 00:24:22,725
+然后你们最终会用一个特定的材质实例渲染些东西
+and then you end up with rendering something with a particular material instance
+
+261
+00:24:23,675 --> 00:24:29,000
+在这个例子中，你们不需要UploadUniformFloat4之类的，因为已经这样做了那个
+and in this example, you know, you don't need to UploadUniformFloat4 or whatever, because you've already done that
+
+262
+00:24:29,650 --> 00:24:36,200
+相反，如果我暂时注释这段代码，我们会继续，也许会提交一些东西
+we would instead, if I just kind of get rid of this code for now, we would instead go ahead and maybe submit something
+
+263
+00:24:36,200 --> 00:24:40,140
+不再使用着色器，我们会提交带有特定材质的东西
+we wouldn't use a shader anymore, we'd submit something with a particular material
+
+264
+00:24:40,140 --> 00:24:45,050
+然后那个材质要做的就是取决于我们在Renderer::Submit中绑定那个材质
+and then what that material would do is upon us binding that material inside Renderer::Submit
+
+265
+00:24:45,050 --> 00:24:51,740
+它不希望渲染器做这些东西，但最终我们基本上，我们找到了着色器，很好
+it wouldn't like the renderer does this stuff, that's fine, but ultimately we basically, we find, we find the shader, and that's fine
+
+266
+00:24:51,740 --> 00:24:53,325
+那都是需要的，必要的
+that's all needed, that's all necessary
+
+267
+00:24:53,575 --> 00:24:59,450
+但是对我们来说，下一步是实际获取该材质实例并将其绑定
+but then the next step for us would be to actually take that material instance and bind it
+
+268
+00:24:59,750 --> 00:25:04,100
+通过实现那个，它将绑定着色器并设置所有值
+and by doing that, what that does is it binds the shader and sets all of the values
+
+269
+00:25:04,420 --> 00:25:09,550
+它设置了我们实际存储的所有数据，也就是那个MaterialInstance
+that sets all of the data that we've actually are storing is that MaterialInstance
+
+270
+00:25:09,550 --> 00:25:15,340
+那就像，那太棒了，整个系统，很棒，你们真的可以扩展它
+and that's like, that's just fantastic, that whole kind of system, it's great, you can really extend it
+
+271
+00:25:15,340 --> 00:25:16,900
+你们可以让它变得非常强大
+you can make it really powerful
+
+272
+00:25:17,660 --> 00:25:25,300
+我甚至可能不打算这样做，但是我可以证明，也许下期，这种东西会有用，我不确定
+I might even like I don't wasn't planning on doing this, but I could show, maybe next time, this stuff kind of working, I'm not sure
+
+273
+00:25:25,475 --> 00:25:28,339
+有时我不确定解释其中一些事情的最佳方法是什么
+sometimes I'm not sure what the best way to explain some of these things are
+
+274
+00:25:28,575 --> 00:25:34,020
+我绝对想用一种正式的方式来做这件事，比如你们知道的，绘制图表之类的
+and I definitely want to kind of do this in more of like a formal way of like, you know, drawing diagrams and stuff
+
+275
+00:25:34,020 --> 00:25:39,850
+我认为那很重要，但是当我们在引擎中进入更复杂的主题时，有时有一个例子是很好的
+I think that's kind of important, but as we get into more complex topics in the engine, sometimes it's good to have an example
+
+276
+00:25:39,850 --> 00:25:43,420
+我试着用一些伪代码为你们做这件事，但也会写代码
+and I've tried to kind of do that for you with somewhat pseudocode, but also code that
+
+277
+00:25:43,420 --> 00:25:47,625
+看起来与我们正在努力的最终接口非常相似
+looks very similar to the final API that we're kind of working towards
+
+278
+00:25:47,975 --> 00:25:54,050
+但最终，你们会有些不同的，所以我可能会给你们看些开发分支的东西
+but ultimately, you know, you have kind of different like, so I might show you some of the development branch stuff
+
+279
+00:25:54,050 --> 00:26:01,075
+因为材质实例和材质，所有这些东西对于让它正常和快速地运行都是至关重要的
+because, you know, material instances, materials, all that stuff have been kind of vital to get that to work properly And quickly as well
+
+280
+00:26:01,075 --> 00:26:04,925
+因为同样，一旦你们有一堆使用不同材质渲染的对象
+because again, once you have a bunch of objects that you render with different materials
+
+281
+00:26:05,275 --> 00:26:09,125
+你们最终能够把它们批处理，你们知道的
+you end up kind of being able to batch them together, you know
+
+282
+00:26:09,125 --> 00:26:13,620
+这样你们就可以从本质上做一些渲染排序，这样就可以得到所有的红色方块
+so that you kind of do some render sorting essentially, so that you get all of like the red squares
+
+283
+00:26:13,620 --> 00:26:19,250
+就像我这里说的，然后是所有的原因是因为红色方形具有红色的材质实例
+as I said, here and then all of the why, because the red squares have the red MaterialInstance
+
+284
+00:26:19,620 --> 00:26:22,700
+因此，让我们知道，当我们将所有内容提交给渲染时，因为渲染程序
+so let's, you know, when we submit everything to the render, since to the renderer
+
+285
+00:26:22,700 --> 00:26:27,787
+因为我们不会一次渲染所有内容，假设在一个好的渲染器中，我们拥有所有的数据
+since we don't render everything at once, you know, hypothetically in a good renderer, we have all that data
+
+286
+00:26:27,787 --> 00:26:31,925
+然后到了排序的时候，我们可以看到，好吧，所有红色的东西都会先渲染
+and then when it comes time to sort it, we can see, okay, well, everything that's red will render first
+
+287
+00:26:31,925 --> 00:26:36,340
+所有蓝色的东西都会渲染第二个，这样我们只绑定两个材质，对吧
+everything that's blue will render second, that way we only bind two materials, right
+
+288
+00:26:36,340 --> 00:26:40,125
+我们绑定红色材质，用它渲染所有东西，绑定蓝色材质，用它渲染所有东西
+we bind the red material, render everything with it, bind the blue material, render everything with it
+
+289
+00:26:40,550 --> 00:26:44,625
+显然，仍然需要设置某些着色器属性 (例如变换)，那完全没问题
+obviously certain shader properties like the transform still needs to be set, that's fine
+
+290
+00:26:44,850 --> 00:26:51,800
+但至少我们不是每次想要渲染其中一个正方形时都设置颜色，因为渲染的是400正方形
+but at least we're not setting the color every time, every time we want to render one of these squares, because we are rendering 400 squares
+
+291
+00:26:51,900 --> 00:26:56,050
+我们做了400次材质翻转，那会比做更少需要更长的时间
+we did 400 material flips, that's going to take way longer than doing less
+
+292
+00:26:56,500 --> 00:27:02,025
+无论如何，我认为那可能就是我想向你们展示的东西了
+anyway, I think that's probably about it in terms of what I wanted to show you guys
+
+293
+00:27:02,800 --> 00:27:10,850
+但是，如果我们只是跳回到这里，纹理的原理相同，对吧，我的意思是，比如SetTexture()
+if we just jump back here for a sec, though, textures work the same way, right, I mean, you could make like a SetTexture
+
+294
+00:27:11,220 --> 00:27:15,625
+你们不一定要，因为我们还没有处理纹理，那是我们真正需要做的事情
+you don't necessarily have to, we haven't dealt with textures yet, that's something that we really need to do
+
+295
+00:27:16,325 --> 00:27:22,300
+但如果我们有个纹理类，就像我们可能有纹理一样，我们可能有反射贴图之类的
+but you know, if we had a texture or something like that, like we might have texture, we might have like an albedo map or something
+
+296
+00:27:23,000 --> 00:27:29,500
+我们基本上可以通过上传纹理引用之类的的方式来设置
+we can just set that basically by just uploading a texture reference or something like that in kind of the same way
+
+297
+00:27:29,500 --> 00:27:33,825
+或者可以更明确一点，这样你们就知道实际上在做什么，像SetTexture一样
+or you could be a bit more explicit, so that you know what you're actually doing and do like SetTexture
+
+298
+00:27:33,825 --> 00:27:37,450
+也许你们就有SetTexture，或者SetValue，可以根据自己的风格设计这个接口
+and maybe you have SetTexture, SetValue, you can design this API however you like
+
+299
+00:27:37,550 --> 00:27:40,725
+但本质上，它对纹理的运行方式一样
+but essentially, it works the same way for textures
+
+300
+00:27:40,975 --> 00:27:48,950
+材质或材质实例将存储一大堆基本上对纹理的引用
+and the material or the MaterialInstance would store a whole bunch of references essentially to textures
+
+301
+00:27:49,475 --> 00:27:55,520
+然后我们基本上可以渲染具有特定纹理的东西，因此它是一个非常不错的系统
+and then we could basically render something with a particular texture, so it's a really nice system
+
+302
+00:27:55,520 --> 00:27:58,125
+我真的很喜欢材质系统的整个概念
+I really like the whole concept of material systems
+
+303
+00:27:58,560 --> 00:28:03,000
+我一直很喜欢它，因为它太神奇了，实际上给了你们很多安全感
+I've always kind of liked it, because it's amazing, how much safety it actually gives you
+
+304
+00:28:03,250 --> 00:28:07,240
+在某种程度上，几乎就像智能指针，你们可以上传统一变量
+it's almost like smart pointers in a way, you could just upload uniforms
+
+305
+00:28:08,000 --> 00:28:13,475
+你们会看到第一次学习OpenGL或学习图形编程的人，他们在做什么
+you look at kind of people learning OpenGL for the first time, or graphics programming for the first time, what are they doing
+
+306
+00:28:13,750 --> 00:28:18,375
+通常他们创建一个着色器，他们可能会足够聪明来创建个着色器类之类的
+usually they create a shader, they'll be probably smart enough to create a shader class or something like that
+
+307
+00:28:18,650 --> 00:28:21,925
+然后是一个让他们设置变量和设置统一变量的接口
+and then an API that lets them set variables and set uniforms
+
+308
+00:28:21,925 --> 00:28:26,975
+他们可以做一些基本上最终验证的东西，确保统一变量的存在
+and they can make something essentially that ends up validating that, making sure stuff exists
+
+309
+00:28:26,975 --> 00:28:33,775
+如果位置等于-1，意味着没有统一变量，他们会记录它，或者在那里断言，以便可以调试
+maybe if location equals -1, which means the uniform couldn't be found, they log that, or they assert there so they can debug it
+
+310
+00:28:33,775 --> 00:28:34,700
+太好了
+that's all great
+
+311
+00:28:34,850 --> 00:28:39,650
+但是有材质系统，像一个合适的系统，在那里可以问着色器，嘿，把所有的统一变量给我
+but having a material system where you can actually, like a proper one, where you can ask the shader, hey, give me all of your uniforms
+
+312
+00:28:39,880 --> 00:28:44,475
+占用这么多空间，我可以将它们存储在缓冲区中，然后在需要时将其上传
+okay, occupy this much space, okay, I can store them in a buffer, and then upload them when needed
+
+313
+00:28:44,475 --> 00:28:50,525
+或者我可以有个材质实例，用这个或那个覆盖该缓冲区
+or I can have a material instance, which overrides that buffer and says this, this and that or whatever
+
+314
+00:28:52,025 --> 00:28:55,925
+这太神奇了，因为如果你们写得正确，这一切都不会出错
+it's just amazing, because nothing will ever kind of go wrong with this, if you write it properly
+
+315
+00:28:55,925 --> 00:29:00,275
+显然，那就是我们要做的，所以对此感到非常兴奋
+that's what we're going to do, obviously, so yeah, super excited for that
+
+316
+00:29:01,275 --> 00:29:06,200
+我们需要，在我们真正做到这一点之前，我们真的需要创建着色器类
+we need to, before we can actually do this, though, we really do need to build up our Shader class a little bit more
+
+317
+00:29:06,200 --> 00:29:11,850
+我的意思是，我们现在甚至不能从文件中读取着色器，所以那绝对是我想做的事情
+I mean, we can't even read shaders from files at the moment, so that's kind of definitely something that I want to do
+
+318
+00:29:12,160 --> 00:29:17,125
+我要问你们个重要的问题，已经问过了，但是我现在要正式问这个问题，所以听好了
+the other huge question that I have for you guys, and I have asked that, but I'm going to ask it formally right now, so listen up
+
+319
+00:29:17,381 --> 00:29:25,025
+我们现在是否要继续使Hazel成为完整的3D渲染器，还是要更多地关注2D
+do we want to proceed with making Hazel a full 3D renderer right now, or do we want to focus more on 2D
+
+320
+00:29:26,575 --> 00:29:33,825
+同样，材质较少，对2D非常有用，因为通常你们会在2D场景中渲染几乎所有内容
+again, materials less, so useful for 2D, because usually you would render pretty much everything in a 2D scene
+
+321
+00:29:33,825 --> 00:29:40,825
+除了像特殊效果或特殊的东西，只有一个着色器，所以你们真的不需要太多的材质
+aside from like special effects or special things with just a single shader, so you don't really need too many materials
+
+322
+00:29:40,825 --> 00:29:45,475
+你们可以只有一个2D渲染器，它基本上渲染颜色或纹理和形状，那就是你们所需要的
+you can just have a 2D renderer, which basically renders colors or textures and shapes, that's all you need
+
+323
+00:29:46,600 --> 00:29:49,059
+所以它会把这些东西放在后面，很好
+so it will kind of put this stuff on the back burner, which is fine
+
+324
+00:29:49,275 --> 00:29:55,750
+无论哪种方式，我们仍然需要重新访问着色器类，并且仍然需要100% 重新访问纹理
+either way, we still need to revisit our shader class, and we still need to 100% revisit textures
+
+325
+00:29:55,750 --> 00:30:00,470
+所以接下来我可能会做其中的一期，但真正的问题是，我要做个投票
+so I'll probably do one of those episodes next, but the real question is, and I'm going to make a poll
+
+326
+00:30:01,225 --> 00:30:06,520
+上次我做了一个投票，我真的不太喜欢它，因为我不知道如何正确地看到结果
+last time I made a poll, I didn't really like it too much, because I don't know how to see the results properly
+
+327
+00:30:06,600 --> 00:30:12,960
+上次我在投票中看到结果的方式是我自己看了视频，投了票，然后看到了百分比是多少
+the way I saw the results on my own poll last time was I watched the video myself, voted for something, then saw what the percentages were
+
+328
+00:30:13,175 --> 00:30:17,925
+我不知道有多少人投票，对此我一无所知，也许我应该更多地使用Google，但似乎很奇怪
+I don't know how many people voted, I don't know anything about it, I should probably Google more maybe, but it just seems weird
+
+329
+00:30:17,925 --> 00:30:22,475
+我甚至无法在分析中看到它，所以有点奇怪，但我将再次进行投票
+I couldn't even see it in my analytics, so it was a bit weird, but I'll make a poll once again
+
+330
+00:30:23,499 --> 00:30:28,811
+你们是否想进入2D方向并做出很酷的事情，例如快速的2D渲染器
+do you guys want to be going to 2D direction and make a cool, like blazing fast 2D renderer
+
+331
+00:30:29,000 --> 00:30:34,325
+让Hazel现在基本上可以制作2D游戏，然后把它润色，做好准备
+and just make Hazel able to make 2D games basically right now and just polish that up, make it ready to go
+
+332
+00:30:34,500 --> 00:30:39,950
+或者我们应该花更长的时间来制作3D渲染器，无论哪种方式，都将进行2D，然后继续3D
+or should we take a lot longer and make a 3D Renderer, either way, we're going to do 2D and then move on to 3D
+
+333
+00:30:40,300 --> 00:30:41,880
+无论哪种方式，内容都会在那里
+the content will be there either way
+
+334
+00:30:41,880 --> 00:30:50,320
+显然，我对3D充满热情，并且我想制作一个非常好的3D渲染器和一个好的3D游戏引擎
+obviously I'm very passionate about 3D, and I want to actually make a very good 3D Renderer and a good 3D game engine
+
+335
+00:30:50,320 --> 00:30:52,825
+所以不管怎样，它都会支持两者，我不可能忽视它
+so either way, it's going to support both, there's no way I neglect it
+
+336
+00:30:53,175 --> 00:30:56,575
+先做2D可能更有意义，只要它完成了
+might make more sense to do 2D first, just so that it's finished
+
+337
+00:30:56,975 --> 00:31:01,875
+你们实际上可以开始用Hazel制作游戏，看到它可以作为游戏引擎运行，那将是非常酷的
+and you guys can actually start making games with Hazel and seeing it actually work as a game engine, I think that would be very cool
+
+338
+00:31:02,575 --> 00:31:07,375
+显然，与适当的3D渲染器相比，它将花费更少的时间，因此那样做可能更有意义
+and obviously it's going to take less time, a lot less time than a proper 3D Renderer, so it might make more sense to do that
+
+339
+00:31:07,600 --> 00:31:12,680
+但是不管怎样，顺便说一句，我将继续OpenGL系列，所以你们会在那里看到3D的东西
+but either way, and I am going to continue the OpenGL series, by the way, so you'll see 3D stuff there
+
+340
+00:31:12,680 --> 00:31:17,850
+所以，如果你们担心在接下来的六个月里，这个频道现在根本不是3D频道
+so if you're worried about just this channel being not 3D at all now for the next six months
+
+341
+00:31:18,150 --> 00:31:24,275
+不用担心，因为无论哪种方式，我们肯定会继续OpenGL系列中的3D内容
+don't worry about that, because definitely we'll be continuing 3D stuff in the OpenGL series for sure, either way
+
+342
+00:31:24,775 --> 00:31:28,560
+但是如果你们想要2D或3D，让我知道
+but if you want that, if you want 2D or 3D, let me know
+
+343
+00:31:28,560 --> 00:31:33,550
+在投票中投票，我下次会看结果，并可能确定我们的方向
+vote in the poll, and I'll check the results next time, and probably determine where we're going
+
+344
+00:31:33,550 --> 00:31:35,800
+但是无论哪种方式，我们都在做着色器，所以不用担心
+but either way, we're doing the shader, so don't worry about that
+
+345
+00:31:35,800 --> 00:31:38,800
+无论如何，我希望你们喜欢这期视频，如果喜欢的话，就为它点赞吧
+anyway, I hope you guys enjoyed this video, if you did, please hit the like button
+
+346
+00:31:38,800 --> 00:31:43,400
+正如我前面提到的，patreon.com/thecherno是帮助支持本系列的最佳网址
+as I mentioned earlier, patreon.com/thecherno is the best place to help support this series
+
+347
+00:31:43,400 --> 00:31:47,450
+感谢所有让这个系列成为可能的人，下次见，拜
+thank you to all of you people who make this series possible, I will see you next time, goodbye
+

@@ -1,0 +1,1330 @@
+﻿1
+00:00:00,000 --> 00:00:03,520
+嗨，大家好，我是TheCherno，欢迎回到我的游戏引擎系列
+hey, what's up guys, my name is TheCherno, welcome back to my game engine series
+
+2
+00:00:03,675 --> 00:00:08,640
+那么上期我们讨论了TimeSteps和DeltaTime，以及我们需要讨论的所有时间
+so last time we talked about TimeSteps and DeltaTime and all the kind of time things that we needed to talk about
+
+3
+00:00:08,640 --> 00:00:16,320
+如果还没有看过那期视频，那一定要去看看，我们实际上正在向完整的小型系统迈进
+definitely check out that video, if you haven't already, and we actually are moving towards kind of a complete little minor kind of system
+
+4
+00:00:16,320 --> 00:00:21,750
+我想，我们用来制作2D可渲染对象、互动和世界游戏的东西
+that we have for making 2D renderable kind of objects and interaction and world games, I guess
+
+5
+00:00:22,080 --> 00:00:26,125
+对吧，因为我们现在有一个相机系统，我们有一个小相机系统
+right, because what we have at the moment is like we've got a camera system, we've got a little camera system
+
+6
+00:00:26,125 --> 00:00:28,240
+我们已经找到了提交几何图形进行渲染的方法
+we've got ways to kind of submit geometry for rendering
+
+7
+00:00:28,550 --> 00:00:36,575
+我们已经有能力对按键之类的做出响应，并像这样移动，但还不能移动对象
+we've got the ability to like respond to key presses and all of that kind of stuff, and move like, well, not move objects yet
+
+8
+00:00:36,575 --> 00:00:41,400
+但只要移动实际的相机，做那些有趣的事情，我们就得到了一个合适的渲染流，对吧
+but just move the actual camera and do all that fun stuff, we've got a proper kind of renderer flow, right
+
+9
+00:00:41,675 --> 00:00:48,480
+因此，下一步要继续做这个的是我们如何将对象放置在我们世界的不同地方，对吧
+so the next step in kind of continuing on with this trend is how do we place objects in different places in our world, right
+
+10
+00:00:48,480 --> 00:00:58,300
+因此，目前我们只能将所有对象放置在，比如根据顶点位置进行渲染
+so at the moment we only have the ability to put all the objects as like the objects will be rendered according to their vertex positions
+
+11
+00:00:58,300 --> 00:01:03,600
+对吧，就像我们在渲染三角形，正在渲染正方形或矩形
+right, so we have, like we're rendering a triangle, we're rendering a square or rectangle
+
+12
+00:01:03,600 --> 00:01:08,000
+它是正方形，以前是长方形，因为有投影矩阵，但现在它是正方形
+it's a square, it used to be a rectangle, because of the projection matrix, but now it's a square
+
+13
+00:01:08,275 --> 00:01:12,320
+所以我们把它们都在原点渲染，或者说，实际上不一定要在原点
+so we're rendering all of them kind of at the origin, or really like it doesn't have to be at the origin
+
+14
+00:01:12,320 --> 00:01:15,575
+不管怎么说，它的顶点位置就像是渲染的地方
+it's, whatever, the vertex positions like see that's where it gets rendered
+
+15
+00:01:16,100 --> 00:01:20,407
+但我想要做的，我们需要做的是真正看到
+but what I want to do, and what we need to be able to do is actually see that
+
+16
+00:01:20,725 --> 00:01:24,500
+我想用一个特殊的变换来渲染这个对象，对吧
+I want to render this object with a particular transform. right
+
+17
+00:01:24,650 --> 00:01:27,760
+并且那实际上是一种叫做模型矩阵的变换
+and that's actually that transform is something called like a model matrix
+
+18
+00:01:27,760 --> 00:01:32,240
+从本质上讲，它就像一个世界矩阵，它描述了比如位置
+essentially, it's like a world matrix, which describes like the position
+
+19
+00:01:32,600 --> 00:01:36,040
+旋转和变换，抱歉，应该是位置和缩放旋转
+the rotation and the transfer, sorry, the position, the rotation of the scale
+
+20
+00:01:36,040 --> 00:01:41,450
+所以就是它所在的3D世界中的实际实体的变换
+so the transform of the actual entity in the 3D world that it's in
+
+21
+00:01:41,975 --> 00:01:47,720
+对吧，那主要是对象如何被放到世界上各自的位置，对吧
+right, and that's primarily how objects get put into their respective places in the world, right
+
+22
+00:01:47,720 --> 00:01:53,080
+如果我们看这个兔子，比如说，对吧，我们有这个兔子，这就是我们的3D模型
+We have like, if we look at this bunny, for example, right, we have this kind of bunny, this is our 3D model
+
+23
+00:01:53,450 --> 00:01:59,050
+所以实际的兔子是由各种顶点位置和其他顶点属性组成的，对吧
+so the actual bunny is made up of various vertex positions and other vertex attributes, right
+
+24
+00:01:59,050 --> 00:02:01,700
+就像法线一样，你们知道，纹理坐标那些
+like normals, you know, texture coordinates that kind of stuff
+
+25
+00:02:02,125 --> 00:02:08,850
+但所有这些顶点的位置都是相对的，对吧，它们并不是相对于它在世界上的位置
+but all of these vertex positions are just relative to each other, right, they're not relative to where it is in the world, you know
+
+26
+00:02:09,050 --> 00:02:17,275
+我可以把兔子放在这里，我可以把兔子放在这里，对吧，但是它不会有任何
+I could put the bunny here, I could put the bunny here, right, however that's not going to, it's not going to, that's not going to have any
+
+27
+00:02:17,275 --> 00:02:22,930
+那应该不会对实际的顶点位置有任何影响，为什么，因为当我们为兔子建模时
+that shouldn't have any kind of effect on the actual vertex positions, why, because we kind of, when we model the bunny
+
+28
+00:02:23,300 --> 00:02:29,842
+我们可能在原点建模，或者只是在原点上建模，所以就像在地平面上样，建立了所有的顶点
+we model it like at the origin maybe, or just on top of the origin, so it's like on a ground plane like that, we build up all the vertices
+
+29
+00:02:30,175 --> 00:02:35,100
+并且那就是我们最终得到的兔子，对吧，然后当我们在3D世界中实际渲染它时
+and that's kind of the bunny that we end up with, right, and then when we actually render it inside a 3D world
+
+30
+00:02:35,500 --> 00:02:38,975
+我们对这些顶点应用额外的变换
+we apply an additional transformation to those vertices
+
+31
+00:02:39,375 --> 00:02:47,680
+它告诉计算机，实际上想要渲染兔子的位置，对吧，这样我们就可以使用相同的兔子模型
+which tells our computer where in the world we want to actually render this bunny, right, that way we can use the same bunny model
+
+32
+00:02:47,680 --> 00:02:53,840
+如果我们想在这里或那里运行一些东西，对吧，如果我们实际上只想根据顶点位置进行渲染
+if we want to run something here or there, right, if we actually wanted to only render according to vertex positions
+
+33
+00:02:54,075 --> 00:02:59,175
+我们必须修改兔子的顶点缓冲区，或者创建两个不同的对象或模型
+we'd have to modify the vertex buffer of the bunny, or create two different bunny objects or models
+
+34
+00:02:59,400 --> 00:03:01,200
+或者创建两个不同的顶点缓冲区
+or two different bunny vertex buffers
+
+35
+00:03:01,400 --> 00:03:07,175
+因为需要一个在这里，一个在这里，那不是我们想要的，我们想渲染完全相同的一组顶点
+because we want one bunny here and one bunny here, that's not what we want, we want to render the exact same set of vertices
+
+36
+00:03:07,175 --> 00:03:12,440
+然而我们实际上想要将这组顶点变换指定量，对吧
+however we actually want to transform that set of vertices by a certain amount, right
+
+37
+00:03:12,440 --> 00:03:18,925
+无论是平移，这是它在世界上的位置，旋转，这是它如何旋转或自适应，然后缩放
+whether that be translation, which is where it is in the world, rotation, which is how it's kind of rotated or oriented, and then scale
+
+38
+00:03:18,925 --> 00:03:21,050
+它有多大或多小，对吧
+how kind of big or small it is, right
+
+39
+00:03:21,300 --> 00:03:26,675
+所有这些都是一个变换矩阵，对于我们真正想要渲染的每个对象，我们都需要一个变换矩阵
+all of that is a transformation matrix and we need one of them for every single object that we really want to render
+
+40
+00:03:27,325 --> 00:03:33,560
+从总体上看，大多数游戏引擎使用的是ECS和实体组件系统
+and in the grand scheme of things, most game engines use something called an ECS and an entity component system
+
+41
+00:03:33,800 --> 00:03:39,720
+或者像某种类似形式的可组合游戏对象，但基本上我们有一组组件
+or like some kind of like form of composable game objects, but basically we have kind of a set of components, and they
+
+42
+00:03:39,825 --> 00:03:47,550
+它们被组合在一起，基本上就像个游戏对象，对吧，所以如果我们看起来像实体组件系统
+they are composed together into like essentially a game object, right, so if we look at like an entity component system
+
+43
+00:03:47,550 --> 00:03:54,760
+那基本上就是说，一切都是一个组件，对吧，我们有特定的数据，一组与之相关的数据
+what that basically says is that everything's a component, right, and we have a certain data, a set of data associated with it
+
+44
+00:03:54,760 --> 00:03:57,120
+然后我们也有一系列与之相关的系统
+and then we have a bunch of systems associated with that as well
+
+45
+00:03:57,800 --> 00:04:04,100
+那就是Hazel最终会有某种形式的ECS，对吧
+that's eventually what Hazel will have some form of ECS or ??? or something like that, right
+
+46
+00:04:04,900 --> 00:04:13,050
+但在出现这种情况之前，因为在那种情况下，变换实际上将是一个组件，那可能类似于
+but until that's the case, because in that scenario, then the transform will actually be a component, that's probably like
+
+47
+00:04:13,375 --> 00:04:19,225
+就像在大多数引擎中强制要求在所有对象上一样，它不一定是，因为你们可以，你们知道
+like it is in most engines mandated to be on all objects, it doesn't have to be, because you can, you know
+
+48
+00:04:19,225 --> 00:04:24,000
+如果你们想一想在一个？？？游戏中，在那里，对象可能是实际上不被渲染的东西
+if you think about it at an NCR game, object could be something that doesn't actually even get rendered, and in that
+
+49
+00:04:24,000 --> 00:04:27,875
+在这种形式下，它可能不需要像变换之类的
+in that form, it might not need to have, it like a transform or anything like that
+
+50
+00:04:27,875 --> 00:04:32,400
+但对于渲染的所有内容，我们将有一个变换组件，它是存储数据的位置
+but for everything that's get gets rendered, we'll have a transform component, which is where that data is stored
+
+51
+00:04:32,400 --> 00:04:37,440
+我们现在没有，我想我要把这只兔子放下来，但我们现在没有
+we don't have that at the moment, I'm going to put this bunny down, I think, but we don't have that at the moment
+
+52
+00:04:37,550 --> 00:04:44,240
+因此我们得到的只是这种Hazel渲染提交调用，它接收一个着色器和顶点数组
+so what we have instead is just this kind of Hazel render a submit call, that takes in a shader, that takes in a vertex array
+
+53
+00:04:44,318 --> 00:04:47,120
+那就是我们要进行的变换，所以我们基本上是说
+that's what we're going to take in a transform, so we're basically saying
+
+54
+00:04:47,120 --> 00:04:54,080
+我想要这个网格，它有一种材质，就是目前的着色器，以及顶点数组，就是目前的几何体
+I want this mesh, which has a material, which is our shader at the moment, and our vertex array, which is our geometry at the moment
+
+55
+00:04:54,080 --> 00:05:00,850
+它们最终将打包成一个网格对象，我们希望提交该对象，并希望在特定的变换中渲染它
+they'll eventually be collapsed into just one mesh object, we want to submit that, and we want to render it at a particular transform
+
+56
+00:05:01,175 --> 00:05:06,500
+当然，变换必须是每个网格的，对吧，它们必须是每个对象的，它们不能是整个场景的
+and of course, transforms have to be per mesh, right, they have to be per object, they can't be for the whole scene
+
+57
+00:05:07,050 --> 00:05:09,825
+我们的相机变换通常是针对整个场景的，对吧
+our cameras transform is usually for the whole scene, right
+
+58
+00:05:10,080 --> 00:05:14,975
+那就是我们在相机视频中谈到的，但对于实际的网格，对于我们渲染的3D对象
+That's what we talked about in the cameras video, but for actual meshes, for 3D objects that we render
+
+59
+00:05:15,325 --> 00:05:20,925
+对于每种对象，我们都需要一个单独的变换，那就是为什么它会被放入代码的那个部分
+we need a separate transform for each kind of object, that's why it's kind of put into that section of the code
+
+60
+00:05:21,850 --> 00:05:27,625
+总之，这很酷，因为我们正在经历，我们正在创造所有这种底层的东西
+anyway, this is cool, because we're going through, and we're creating all this kind of low level kind of stuff
+
+61
+00:05:27,625 --> 00:05:32,600
+最终那将是如此抽象，以至于你们不知道它将如何运行，就像我向你们保证的那样
+that eventually, that's, this is going to be so abstract that you guys will have no idea how it's going to work, like I promise you
+
+62
+00:05:32,750 --> 00:05:37,342
+我的意思是，Hazel的接口将会发生很大的变化
+like what's going to happen is that Hazel's API will change so much, I mean
+
+63
+00:05:37,440 --> 00:05:42,000
+我们甚至用C++做了这么多事情，现在那些永远也不会用C++做了
+we're doing so much stuff in even C++, now that will never be done in C++
+
+64
+00:05:42,000 --> 00:05:45,440
+在未来，我们将有一个级别编辑器，它将序列化一些指定的文件
+in the future, we'll have a level editor, it will serialize certain files
+
+65
+00:05:45,440 --> 00:05:49,280
+那些文件将在启动时被读取，那就是创建我们的对象的方式
+those files will be read on startup, that's how our objects will be created
+
+66
+00:05:49,475 --> 00:05:56,325
+很难理解Hazel是如何运行的，我对我解释这一切的方式真的很满意
+it'll be so like hard to understand how Hazel works that I really am happy with the way that I'm kind of explaining all this
+
+67
+00:05:56,425 --> 00:05:59,891
+并且花时间以这种方式实际设置它
+and taking time to actually set this up in this kind of way
+
+68
+00:06:00,640 --> 00:06:05,650
+尽管这是暂时的，而且我显然没有立即运行最终的引擎代码
+even though it is somewhat temporary, and I'm not obviously not running final engine code straight away
+
+69
+00:06:05,650 --> 00:06:08,300
+因为那基本上是不可能的，而且真的很无聊
+because that would be basically impossible and really boring to do
+
+70
+00:06:09,925 --> 00:06:12,480
+我正在做的是向你们展示一切是如何运行的，那就是
+what I'm doing is I'm actually showing you guys how everything works, and that's
+
+71
+00:06:12,525 --> 00:06:17,175
+我认为那真的很酷，因为在你们开始之前，引擎在这个阶段是运行的
+I think that's really cool, because seeing, an engine kind of work from this phase before you start
+
+72
+00:06:17,575 --> 00:06:19,750
+比如创建一个ECS，做所有这些事情
+like creating an ECS and doing all that stuff
+
+73
+00:06:20,075 --> 00:06:25,080
+首先，它帮助你们了解我们为什么需要ECS，并且总结一下，ECS到底是什么
+first of all, it helps you understand why we even need an ECS and actually what the ECS in the end of the day, at the end of the day
+
+74
+00:06:25,080 --> 00:06:27,900
+它会起作用，因为它真的会做我们在这里做的同样的事情
+it's going to do, because it's really going to do the same thing that we're doing here
+
+75
+00:06:27,900 --> 00:06:32,172
+它将以一种更抽象、更强大的方式，对吧，更灵活的方式
+it's just going to be in a much more abstract and powerful way, right, much more flexible way
+
+76
+00:06:32,840 --> 00:06:35,840
+虽然这有点牵强，但不管怎样，让我们开始吧
+whereas this is kind of just tied down a little bit, but anyway, let's jump in
+
+77
+00:06:36,075 --> 00:06:44,240
+让我们来看看变换矩阵，以及如何在不同的变换中实际渲染三角形和方形，还有件事
+Let's take a look at the transformation matrix and how we can actually render our triangle and our square at different transforms. and one thing
+
+78
+00:06:44,240 --> 00:06:48,675
+我想说的另一件事是，尽管在这种情况下，我们看起来是在渲染2D对象
+one other thing that I want to say is that even though it might appear that we're rendering 2d objects in this case
+
+79
+00:06:49,025 --> 00:06:54,000
+我的意思是，显然我们最原始的渲染是3D的，而我所解释的一切背后的理论
+I mean, obviously our oldest rendering is kind of 3d and the theory behind everything I'm explaining
+
+80
+00:06:54,225 --> 00:06:59,080
+就像你们知道的，网格，你们知道的，材质，顶点数组，变换，所有这些东西
+like you know, meshes, you know, materials, vertex arrays, you know, transforms, all of that stuff
+
+81
+00:06:59,080 --> 00:07:06,075
+这确实适用于2D和3D的渲染器，如果构建2D渲染器，我们会以不同的方式进行处理，对吧
+this is really applicable to a three to a 3D Renderer, if we built a 2D renderer, we would do it differently, right
+
+82
+00:07:06,400 --> 00:07:10,200
+就像我们不会有材质系统一样，例如没有真正的材质系统
+like we wouldn't have a material system, for example we don't really have a material system
+
+83
+00:07:10,425 --> 00:07:14,480
+但我们不会提交带有着色器的几何体，例如，我们不会
+but we wouldn't be submitting geometry with shaders, right, For example we wouldn't do
+
+84
+00:07:14,480 --> 00:07:20,560
+我们只是不会那样做，因为几乎所有的几何体实际上都会有一个着色器，对吧，就像
+we just wouldn't be doing that, because all the pretty much all the geometry would actually have a single shader, right, It's like
+
+85
+00:07:20,560 --> 00:07:25,080
+它就像我们的2D材质着色器，对吧，然后我们也不会
+it would be like our 2D material shader, right, and then also we wouldn't be
+
+86
+00:07:26,400 --> 00:07:31,950
+你们知道，就像很多东西是专门为3D编写的一样，对吧，就像我们不会
+you know, just like a lot of the ways that this stuff is written is specifically for 3D, right, Like we wouldn't be
+
+87
+00:07:32,000 --> 00:07:36,320
+我们也不会提交变换，所以没有着色器，没有变换，没有那些，因为什么，什么
+we wouldn't be submitting a transform either, so no shaders, no transforms, none of that, because what, what's
+
+88
+00:07:36,320 --> 00:07:41,520
+实际发生的情况是，当你们要求像2D图元一样绘制，比如正方形，你们知道的
+what actually happens is when you're real, when you request to draw like a 2D primitive, like a square, you know
+
+89
+00:07:41,520 --> 00:07:45,075
+基本上，2D渲染中的所有东西都将归结为一个四边形
+basically everything in 2D rendering is going to come down to being like a quad
+
+90
+00:07:45,550 --> 00:07:50,125
+当你们真的绘制一个四边形，在2D系统中，你们实际上会批量处理
+When you actually do draw a quad, um, in a 2D system, you, you'd actually batch that
+
+91
+00:07:51,475 --> 00:07:54,500
+一个你们想要渲染的其他四边形一样大的顶点缓冲区
+do like a big vertex buffer with other quads that you want to render
+
+92
+00:07:54,500 --> 00:07:57,200
+这样你们就可以用一个着色器在一个绘制调用中完成所有的事情，对吧
+so that you can do it all in one draw call with one shader, right
+
+93
+00:07:57,200 --> 00:08:02,650
+然而，使用3D渲染，你们通常，我的意思是，你们可以很明显地将东西组合在一起
+whereas with 3D kind of rendering, you typically, I mean, you can batch things together obviously
+
+94
+00:08:02,650 --> 00:08:08,075
+你们可以尝试按特定的渲染顺序对其进行分类，这样你们就可以将它们组合在一起
+and you can try and sort things into a particular render order, so that you kind of group things together
+
+95
+00:08:08,075 --> 00:08:10,250
+因此，使用此材质的所有内容都应该同时渲染
+so everything with this material should get rendered at the same time
+
+96
+00:08:11,300 --> 00:08:16,275
+但通常情况下，你们基本上使用单独的变换和材质渲染每个对象
+but in general, you basically render every object with a separate transform and a separate material potentially
+
+97
+00:08:16,675 --> 00:08:19,560
+对吧，而在2D中，它区别就很大了，所以这看起来可能是2D
+right, whereas in 2D, it's very different, so this might look 2D
+
+98
+00:08:19,560 --> 00:08:25,880
+但请记住，这个理论都适用于3D，事实上，当我们具体谈到2D渲染和Hazel时
+but just keep in mind that this theory is all applicable to 3D, and in fact, when we do touch on specifically 2D rendering and Hazel
+
+99
+00:08:25,880 --> 00:08:30,120
+我们还没有这样做，嗯，在那个时间点上，我想我会解释的
+which we haven't done yet, um, at that point in time, that's when I'll kind of explain, I guess
+
+100
+00:08:30,120 --> 00:08:34,350
+更多的差异，以及我们将如何在2D中实现这个，在我们撸码之前
+more of the differences, and also how we would do this in 2D, before we jump into the code
+
+101
+00:08:34,750 --> 00:08:40,725
+我只想对所有的赞助人表示衷心的感谢，patreon.com/thechurno是你们可以帮助支持的方式
+I just want to give a huge thank you to all the patrons, patreon.com/thechurno is where you can go to help support the series
+
+102
+00:08:42,200 --> 00:08:44,800
+你们会得到奖励，比如早点拿到视频
+you'll get rewarded by like just getting videos early
+
+103
+00:08:45,075 --> 00:08:49,056
+还可以进入类似的小组讨论，在小组讨论中我们谈论Hazel的未来和所有其他东西
+and also getting access to like group discussions in which we talk about the future of Hazel and all that stuff
+
+104
+00:08:49,350 --> 00:08:53,960
+还可以访问Hazel开发分支，就是我Hazal开发的私人开发分支
+and also access to the Hazel development branch, which is my kind of private development branch for Hazel
+
+105
+00:08:53,960 --> 00:09:01,200
+我基本上做了所有这些事情，比如PBR渲染，3D渲染，非常酷的东西
+in which I've basically done all of this stuff and more, like PBR rendering, 3D rendering, really cool stuff, Um, that's
+
+106
+00:09:01,200 --> 00:09:04,520
+基本上那里有一个完整的级别编辑，对吧，有一个完整的查看器之类的
+there's basically a full level editor there, right, there's a whole like viewer and everything
+
+107
+00:09:04,520 --> 00:09:08,040
+你们甚至可以使用用户界面插入你们自己的纹理，你们可以做很多事情
+and you can even just plug in your own textures using UI, and there's a lot of stuff you can do
+
+108
+00:09:08,400 --> 00:09:10,120
+所以一定要去看看啊，并帮助支持该系列
+so definitely check that out, and help support the series
+
+109
+00:09:10,475 --> 00:09:13,950
+让我们来看看模型矩阵和变换之类的
+let's jump in and take a look at model matrices and transforms and all that stuff
+
+110
+00:09:14,275 --> 00:09:20,360
+好了，就像我提到的那样，我们有这种BeginScene，Submit和EndScene
+okay, do as I mentioned, we have this kind of BeginScene, we have this kind of Submit. Um, and then we have an EndScene
+
+111
+00:09:20,360 --> 00:09:26,120
+那就是我们的渲染器的实际流程，所以我们现在实际上想要做的是在提交时
+that's kind of the actual flow of our Renderer, so what we actually want to do now is upon submission
+
+112
+00:09:26,120 --> 00:09:28,850
+我们需要在世界上定位我们的对象
+we need to position our object in the world
+
+113
+00:09:29,250 --> 00:09:34,120
+所以我们要做的基本上是把某种变换矩阵作为第三个参数插入到这里
+so what we're going to do is basically plug in some kind of transformation matrix as a third parameter into here
+
+114
+00:09:34,425 --> 00:09:41,200
+因此，我们的方法是，我们将转到Submit，然后在我这里的提交中，添加第三个参数
+so the way we'll do that is, we'll go to submit, and then inside my submission here, I'm going to add a third parameter
+
+115
+00:09:41,475 --> 00:09:47,725
+那就是const glm::mat4& transform，好了，就是那样，这只是一个变换矩阵
+here's going to be const glm::mat4, uh, transform, okay, that's it, it's just going to be a transform matrix
+
+116
+00:09:48,325 --> 00:09:57,075
+如果在这里提交，我们就会把它加进去，好了，然后会发生的是，非常简单
+if we go over here and to submit, we'll add that in, okay, and then what's going to happen is, uh, very, very simple
+
+117
+00:09:57,475 --> 00:10:03,225
+就像我们提交这个，或者我们上传这个ViewProjectionMatrix，对吧
+just the same way that we kind of submit this, or we upload this ViewProjectionMatrix, right
+
+118
+00:10:03,575 --> 00:10:10,100
+每次提交模型矩阵，我们将做完全相同的事情，现在这儿就是不一样的地方
+we're going to do the exact same thing, every time we submit with the model matrix, now here's the difference
+
+119
+00:10:10,575 --> 00:10:13,875
+所以在这里，我正在上传统一变量mat4
+so over here, I'm uploading the uniform mat4
+
+120
+00:10:14,600 --> 00:10:20,680
+每次提交就会把这个ViewProjectionMatrix上传到这个着色器中
+which is our view projection matrix into, um, into, into this shader for every single submission
+
+121
+00:10:20,920 --> 00:10:26,875
+虽然我实际上不需要那样做，但对于每个着色器每个场景，我真的只需要那样做一次，对吧
+whereas I don't actually need to be doing that, I only need to really do that once per shader per scene, right
+
+122
+00:10:27,350 --> 00:10:32,275
+所以那是一种，这不需要每次都做，现在每次都做
+so that's kind of, this does not need to be done every time, it's done every time at the moment
+
+123
+00:10:32,275 --> 00:10:37,575
+因为没有任何全局状态，而且使用了两个不同的着色器，无论如何，它们确实需要更新
+because we don't have any kind of global state, and also we're using two different shaders, now, anyway, and they do have to be updated
+
+124
+00:10:37,925 --> 00:10:42,320
+但是，如果你们在所有这些方面都使用单个的着色器或材质
+but if you're kind of using a single shader or a single kind of material across all of these things
+
+125
+00:10:42,320 --> 00:10:48,375
+实际上你们只需上传一次mat4，然后将所有对象渲染为单独的绘制调用，而不必进行更新
+you can actually just upload that uniform mat4 once and then render all the objects as separate draw calls without having to update that
+
+126
+00:10:49,512 --> 00:10:55,725
+但对于这个，我们实际上喜欢这个模型矩阵，对吧，所以我叫它u_ModelMatrix
+but with this one, we actually like with this model matrix, right, so I call it u_ModelMatrix
+
+127
+00:10:56,150 --> 00:11:02,800
+这实际上需要，我不知道，比如叫它ModelMatrixTransform
+this actually does need to be, I don't know, like I call it ModelMatrixTransform
+
+128
+00:11:02,800 --> 00:11:07,475
+老实说可能更有意义，所以我实际上把它叫做Transform，本来不打算做的，但真这么做了
+might make more sense to be honest. so I'm actually going to call it transform, I wasn't planning to, but I just did
+
+129
+00:11:08,525 --> 00:11:14,160
+我们要做的是将这个变换提交到这里，所以这需要每个对象都执行，每次我们提交
+what we're going to do is submit this transform into here, right, so this needs to be done per object. every time we submit
+
+130
+00:11:14,160 --> 00:11:18,720
+我们绝对需要这样做，现在在渲染器中，那不会立即渲染这样的东西
+we absolutely need to do that. now, in a Renderer, that doesn't render things immediately like this
+
+131
+00:11:18,720 --> 00:11:25,775
+你们可能会把这个实际的变换矩阵复制到一个64字节的
+and actually does queue it up, you'd probably copy this, actual transformation matrix into like a 64 bytes
+
+132
+00:11:26,050 --> 00:11:31,525
+你们可以将这64个字节复制到某种缓冲区中，那基本上就像是渲染命令的一部分
+you'd copy those 64 bytes into some kind of buffer, that would basically kind of be like part of your render command
+
+133
+00:11:32,360 --> 00:11:37,525
+因为通常情况下，当你们再次渲染3D对象时，对吧，希望在变换时实际渲染它们，那很正常
+because typically when you render again, 3D objects, right, you want to actually render them at a transform. that's normal
+
+134
+00:11:37,975 --> 00:11:45,440
+那就是渲染的运行原理，所以如果我们回到SandboxApp，我们可以再次默认做的就是
+that's how rendering works. so if we go back to SandboxApp, and what we could do again is just by default, you know
+
+135
+00:11:45,440 --> 00:11:52,500
+如果我转到头文件，默认情况下，我只会将其设置为glm::mat4(1.0f)，对吧
+if I go to the header file, by default, I'm just going to set this to glm::mat4(1.0f), right
+
+136
+00:11:54,025 --> 00:11:57,760
+它要做的就是给我们提供单位矩阵
+and what that's going to do is just basically give us the identity matrix
+
+137
+00:11:57,760 --> 00:12:00,440
+这意味着没有变换矩阵，对吧，它不是，它将是
+which means no transformation matrix, right, it's not, it's going to be
+
+138
+00:12:00,725 --> 00:12:04,050
+它不会应用任何变换，就像乘以一一样，对吧
+it's going to apply no transforms, the same as multiplying with one, right
+
+139
+00:12:05,075 --> 00:12:08,640
+如果我们不想的话，这样就不必提交变换
+so that we don't have to necessarily submit a transform, if we don't want to
+
+140
+00:12:08,640 --> 00:12:12,625
+这样一来，就像我现在就运行这段代码一样
+and that way, like if I was to just launch this code right now, as is
+
+141
+00:12:13,320 --> 00:12:19,750
+在没有实际添加变换的情况下，它应该渲染，我们应该得到相同的结果，我的意思是
+without actually adding a transform, it should render, and we should get the same results before, and I mean
+
+142
+00:12:19,750 --> 00:12:24,600
+显然，我甚至还没有准备好任何实际的统一变量，对吧，所以这样做可能是没有用的
+obviously I haven't even set up any of the actual uniform, so that's probably going to be useless doing this
+
+143
+00:12:26,250 --> 00:12:34,325
+所以让我们现在开始设置，对吧，所以我要去掉这个，所以我们有我们的视图投影
+so let's go ahead and set that up now, right, so we have, I'll just get rid of this, so we have our view projection
+
+144
+00:12:34,400 --> 00:12:39,416
+然后我们只需复制它，在它的下面，我们将有我们的u_Transform，对吧
+and then we're just going to copy that, and underneath that we're going to have our u_Transform, right
+
+145
+00:12:39,900 --> 00:12:46,750
+所以我们要做的是用变换乘以视图投影，然后再乘以顶点位置，对吧
+and so what we're going to do is we're going to multiply view projection by transform and then by our vertex position, right
+
+146
+00:12:47,150 --> 00:12:55,320
+所以我们将执行相同的操作，复制它，并将其添加到blueShaderVertexSrc中
+so it is adding that in, and we'll do the same, so I'll copy this, and add that into our blueShaderVertexSrc
+
+147
+00:12:55,320 --> 00:13:01,525
+对吧，我们的顶点着色器中显然有这个，现在我们就有了ViewProjectionModel
+right, so we have this obviously inside our vertex shader, and so now we have the ViewProjectionModel
+
+148
+00:13:01,525 --> 00:13:09,320
+变换矩阵乘以实际的顶点位置，我的意思是，现在应该可以给我们
+and the transformation matrix, being multi by together with the actual vertex position, okay, so that should now give us, I mean
+
+149
+00:13:09,320 --> 00:13:14,225
+我们应该立即进行测试，绝对不进行任何变换，并确保得到与以前相同的结果
+we should test this right now with absolutely no transform, and make sure that we have the same result as before
+
+150
+00:13:14,525 --> 00:13:21,400
+但这有点像正方形和三角形，还有一种相同的位置，对吧，所以如果我们这样做
+but it was just kind of like the square and the triangle and the kind of same position, right, so if we do that, yeah
+
+151
+00:13:21,400 --> 00:13:25,450
+我们有了它，然后我们可以移动相机，旋转相机，一切都是以同样的方式运行的
+we've got that, and then we can move the camera, and we can rotate the camera, and everything works in the same way
+
+152
+00:13:26,075 --> 00:13:28,700
+所以我现在要做的是，我实际上会插入一个矩阵
+so what I'll do now is, I'll actually plug in a matrix
+
+153
+00:13:29,550 --> 00:13:36,000
+因为我想要真正玩这个，而不是在这里有一个无聊的老矩阵
+so because I'm going to want to actually play around with this and not just have a boring old matrix in here
+
+154
+00:13:36,325 --> 00:13:40,650
+我想要做的实际上是在这里创建矩阵，这样我们就有了相机位置，那很好
+what I want to do is actually make the matrix over here, so we have the camera position, that's all great
+
+155
+00:13:41,125 --> 00:13:48,725
+但我也想做一个小变换，就叫m_SquareTransform，对吧
+but I also want to have a little transform, which I'll call square, maybe transform, right, Which
+
+156
+00:13:48,880 --> 00:13:59,825
+这个东西实际上是，你们知道吗，我要用vec3，取而代之的是SquarePostion，对吧
+and this thing is actually going to be, actually, you know what, I'm just going to make a vec3 instead called square, position, right
+
+157
+00:14:03,000 --> 00:14:10,400
+我想我可以在默认情况下将它设置为零，因为我们需要初始化它
+I think I can just by default set that over here to zero, because we need to initialize it
+
+158
+00:14:12,350 --> 00:14:18,425
+然后我要做的是，向左，向右，向上，向下，移动相机，对吧
+and then what I'll do is, so left, right, up, down, that moves the camera, right
+
+159
+00:14:18,750 --> 00:14:25,300
+我可能会做的就是使用I J K L键，因为就像A和D已经被用来控制旋转了，我不想搞混了
+what I might do is just make the I J K L keys, because like A and D is already taken for rotation, I don't want to mess with that
+
+160
+00:14:25,700 --> 00:14:33,925
+但我要做的是，我将基本上复制这个if语句并实现它，所以左边是J，右边是L
+but what I'm going to do is, I'm going to basically copy this if statement and implement it for, so left will be J, right will be L
+
+161
+00:14:36,225 --> 00:14:49,500
+I是向上的，向下的是K，所以那就是IJKL，对吧，我要把它们移动到我们的正方形位置
+I will be up, and down will be K, so the IJKL case, right, I'm going to take those and make them actually move our square position
+
+162
+00:14:51,125 --> 00:14:54,280
+所以现在我们应该可以移动正方形了，我想会很酷的
+so now we should be able to move the square, which will be quite cool, I think
+
+163
+00:14:55,650 --> 00:15:01,200
+所以我们要移动它，所以它有了CameraMoveSpeed，看起来不错
+so we're going to move it by, so it's got CameraMoveSpeed, which is like fine
+
+164
+00:15:01,200 --> 00:15:06,750
+但我想我要做的是，我会复制它，然后我会创建一个名为SquareMoveSpeed的变量
+but I think what I'll do is, I'll copy that, and I'll just make a variable called SquareMoveSpeed
+
+165
+00:15:06,750 --> 00:15:12,075
+我会将其设置为1，让它相当慢，所以我们将在这里看到SquareMoveSpeed
+and I'll just set it to like one, we'll make it quite slow, so we'll see SquareMoveSpeed over here
+
+166
+00:15:14,450 --> 00:15:18,625
+SquareMoveSpeed，当然，我们需要像现在这样将其与DeltaTime相乘
+SquareMoveSpeed, and of course we need to multiply it with DeltaTime as we're doing
+
+167
+00:15:19,675 --> 00:15:22,800
+现在我们有了正方形的位置，现在要准备创建矩阵了，好了
+and now we have square position, so now we're ready to make the matrix, okay
+
+168
+00:15:23,175 --> 00:15:28,925
+所以我要做的就是glm::mat4 transform = glm::translate()
+so what I'll do is, I'll say glm::mat4 transform = glm::translate()
+
+169
+00:15:29,225 --> 00:15:32,125
+然后我们可以直接放入m_SquarePosition，就那样
+and then we can just literally put in m_SquarePosition, and that's it
+
+170
+00:15:32,550 --> 00:15:37,400
+我们需要提供一个矩阵，变换正方形坐标
+and we need to provide a matrix that we want to transform square position
+
+171
+00:15:37,500 --> 00:15:46,640
+好了，酷，对吧，那应该可以了，至于变换，我想我们在相机里面已经实现了这个
+okay, cool, right, and that should just work right now for translate, we'll need, I think we did this inside camera
+
+172
+00:15:46,850 --> 00:15:53,350
+所以让我们直接复制，需要包含这个来实现那个，所以就把它粘贴在这里
+so let's just grab, we need this include to make that happen, so we'll just paste that in there
+
+173
+00:15:55,280 --> 00:16:02,425
+现在这应该可以用了，对吧，这样我就可以用这个特殊的变换来渲染我的正方形了
+and now this should just work, right, so I can just render my square with that particular transform
+
+174
+00:16:02,425 --> 00:16:07,750
+所以让我们继续运行，看看会发生什么，所以现在如果我们使用IJKL键
+so let's go ahead and just run that and see what happens, so now if we use the IJKL keys
+
+175
+00:16:08,100 --> 00:16:13,600
+我们应该能够移动我们的方块，应该很酷，你们可以看到，我可以做到，对吧
+we should be able to actually move our square around, which should be cool, and you can see, I can do that, right
+
+176
+00:16:13,950 --> 00:16:19,920
+你们可以看到，它是独立于三角形移动的，现在如果我移动相机，它会同时移动两个
+and you can see, it's moving separately from the triangle, now if I move the camera, it's going to move both of them, right
+
+177
+00:16:19,920 --> 00:16:24,275
+它会把它们朝相反的方向移动，而这会像那样移动它
+and it's going to move them the kind of opposite way, whereas this will just kind of move it like that
+
+178
+00:16:24,720 --> 00:16:30,500
+那真的很酷，这是我可以做的，那也很酷，我可以渲染一大堆这样的东西
+so that's really really cool, now here's what I can do, that's pretty cool as well, I can actually render a whole bunch of these
+
+179
+00:16:30,975 --> 00:16:35,075
+所以现在我们只渲染了一个正方形，它实际上很大
+so at the moment we're just rendering, just one square, and it's actually quite big
+
+180
+00:16:35,450 --> 00:16:40,925
+但我能做的实际上是用它来渲染某种基于贴图的系统，很明显，现在
+but what I could do is actually use this to render some kind of tile based system, right now, obviously
+
+181
+00:16:42,450 --> 00:16:46,875
+我在这里给出的例子只是某种程度上的，以便你们理解变换是如何运行的
+the examples I'm giving here are just kind of, so that you understand how the transformation works
+
+182
+00:16:47,300 --> 00:16:55,120
+不是渲染贴图的方式，因为你们显然不会像使用3D渲染那样渲染整个贴图
+not how you would render a tile map, because you clearly would not render like a whole tile map using kind of 3D rendering where you just, you know
+
+183
+00:16:55,120 --> 00:17:02,350
+让所有东西都作为单独的对象，使用单独的材质，并完成所有导致非常慢的操作
+have everything as a separate object with a separate material and do all that cause that's very slow, but just to give an example
+
+184
+00:17:03,325 --> 00:17:06,160
+你们可以做的是有一个小for循环，让我们看看
+what you could do is have a little for loop, that let's just see
+
+185
+00:17:06,160 --> 00:17:09,925
+我只想渲染成一堆这样的东西，就像一排五个这样的东西，对吧
+I just want to render like a bunch of these, like five of these in a row, right
+
+186
+00:17:10,400 --> 00:17:15,625
+所以我要做的就是提交，可能暂时不会渲染这个三角形
+so what I'm going to do is I'm going to submit, and I might just not render the the triangle for now
+
+187
+00:17:16,075 --> 00:17:21,275
+所以它们现在很大，没问题，但是它们很大，对吧，我不想它们这么大
+so they're very big right now, which is fine, but they're quite big, right, I don't want them to be so big
+
+188
+00:17:21,775 --> 00:17:30,320
+所以我实际上要做的是使用缩放，对吧，所以就是glm::mat4 scale
+so what I'm actually going to do is, uh, use, um, my scale, right, I'm going to make a glm::mat4 scale
+
+189
+00:17:30,320 --> 00:17:35,440
+我要做一个缩放矩阵，对吧，基本上就是这样，我们从这个开始
+I'm going to make a scale matrix, right, there's just going to basically, and we'll start off with this
+
+190
+00:17:35,675 --> 00:17:45,675
+基本上我们的方格会缩小到0.1，对吧，所以就是之前的0.1
+there's basically going to just scale down our, our cube make it like 0.1, right, so it's going to be 0.1 of the scale that it used to be
+
+191
+00:17:45,675 --> 00:17:48,775
+基本上是10%的大小，对吧，我把它缩小了很多，
+which is basically 10% as big, right, I'm making it a lot smaller,
+
+192
+00:17:49,275 --> 00:17:58,475
+所以我们得到了scale，至于postion，对吧，就是glm::vec3 pos
+so we got our scale,and of my position, right, and my position is gonna be, we will see glm::vec3 position
+
+193
+00:17:58,875 --> 00:18:01,150
+然后我们就，也许我们会开始。
+and then we'll just, maybe we'll start it off.
+
+194
+00:18:02,000 --> 00:18:05,120
+所以这会有多重要，如果我们看看这是什么，让我们一起运行
+so how big is this going to be, right, If we look at what this is, let's just work
+
+195
+00:18:05,120 --> 00:18:13,400
+试着把这个算出来，所以是1.5，对吧，1.5乘以1.5就是我们的实际大小
+try and work this out, so it's one and a half, right, so one and a half by one and a half is how big  our actual
+
+196
+00:18:14,040 --> 00:18:17,875
+我有点想把它做成一个，你们知道，让我们修改这个，让它变成一个单元
+I'm kind of want to make it one, you know, let's modify this, and let's make it one unit
+
+197
+00:18:17,960 --> 00:18:26,650
+所以基本上现在的正方形的宽度和高度是1个单位，考虑到那个，这将使它成为0.1个单位
+so basically the square right now is going to have a width and height of one unit, so with that in mind, this is going to make it 0.1 units
+
+198
+00:18:27,075 --> 00:18:33,880
+好了，我要做的是，我会设置位置，X位置是i乘以0.1，如果我那样做的话
+right, so what I'll do is, I'll set the position, the X position to be I times 0.1, if I do that
+
+199
+00:18:33,880 --> 00:18:40,520
+它要做的是，它将把所有东西隔开0.1，这不是很好，我要加上0.11，对吧
+what it's going to do is, it's going to space everything out by 0.1, that's not that great, I'm going to add 0.11, right
+
+200
+00:18:40,850 --> 00:18:46,640
+这会在每个正方形之间留下一点空隙，我会把这个设为零，那个设为零
+so that'll leave a little bit of a gap between each square, I'll set this to zero and that to zero
+
+201
+00:18:48,100 --> 00:18:52,080
+然后我要做的是构建我的矩阵，所以我将把这个变换
+and then what I'll do is I'll construct my matrix, so this transform I'll take down
+
+202
+00:18:52,080 --> 00:19:01,120
+我把它放在这里，这就是这个位置的变换，对吧，我将乘以这个scale
+I'll put it here, this is going to be translation of, this kind of position here, right, and I'm going to multiply that scale in as well
+
+203
+00:19:01,225 --> 00:19:04,480
+好了，我们把这个乘以scale，然后我们给它提供transform
+okay, so we multiply this with scale, and then we provide it with transform
+
+204
+00:19:04,480 --> 00:19:10,125
+所以现在应该发生的是，我们应该提交五个不同的正方形进行渲染，它们都将是蓝色的
+so now what should happen is, we should be submitting five different squares for rendering, they're all going to be blue
+
+205
+00:19:10,840 --> 00:19:18,240
+它们将是水平间隔的，就像从原点向右移动一样，如果我们不这样做
+and they're going to be kind of horizontally spaced, like going kind of from the origin really to the right, and if we don't
+
+206
+00:19:18,240 --> 00:19:23,240
+如果它们不能全部放在屏幕上，可能应该放在屏幕上，但如果它们不能，也应该小得多
+if they don't all fit into the screen, which they probably should, but if they don't, and they should be a lot smaller as well
+
+207
+00:19:23,240 --> 00:19:28,375
+因为我们缩小了它们，如果没有，我们可以随时移动相机到一个位置，那会更好，好了
+cause we scaled them down, if they don't, we can always move the camera into a position, that will be better, okay
+
+208
+00:19:28,575 --> 00:19:33,300
+就这样，我们有五个，你们可以看到，它们都是间隔开的，我们可以像那样移动，好了
+there we go, so we've got five, you can see, they're all spaced apart, and we can move just like that, okay
+
+209
+00:19:33,800 --> 00:19:41,925
+如果我们要让它变得更令人兴奋，我们所能做的实际上是将所有这些都移到
+if we were to make it even more exciting, what we could do is actually move all of this over
+
+210
+00:19:43,325 --> 00:19:48,875
+创建一个嵌套的for循环，在其中遍历X和Y，渲染了一个大约有20个这样的网格
+and make a nested for loop, where we go through X and Y, and let's just see, we render a grid of like 20 of these
+
+211
+00:19:50,050 --> 00:20:00,040
+所以我们要做的就是移动这个，这个变成了20，所以X就是那样写的
+so all we have to do is move this, this way changes 20 X, so X is going to be written like that
+
+212
+00:20:00,040 --> 00:20:07,160
+Y将被写在这里的Y位置，就是那样，对吧，那就是我们需要做的
+Y is going to be written here in the Y position, and that's, that's like it, right, That's all we need to do
+
+213
+00:20:07,160 --> 00:20:13,525
+如果我们再次按f5，应该会渲染一个20x20的网格，这是相当大的，希望性能没问题
+if we hit f5 again, we should, we're going to render a grid of 20 by 20, which is quite big, hopefully the performance will be okay
+
+214
+00:20:14,400 --> 00:20:21,120
+因为这大概是400个这样的，我的意思是性能不错，那么继续，对吧，我们可以
+cause that is like 400 of these, and yeah, I mean the performance is fine, so there we go, right, we can, we, you see
+
+215
+00:20:21,120 --> 00:20:26,225
+你们可以看到，我们实际上有一个贴图网格，更具体地说，我们正在测试实际的
+you can see that we've actually got a tile grid, and more specifically we're kind of testing the actual
+
+216
+00:20:28,375 --> 00:20:31,300
+我们实际上是在测试我们是否能够使用不同的变换来渲染对象
+we're actually testing us being able to render objects with a different transform
+
+217
+00:20:31,300 --> 00:20:33,560
+所以我们要做的是在这里提交20个不同的正方形
+so what we're doing is we're submitting 20 different squares here
+
+218
+00:20:34,000 --> 00:20:37,550
+如果我愿意，可以在这绘制个三角形，然后把它渲染到所有东西的上面
+and I can put a triangle here, if I want and render that on top of everything
+
+219
+00:20:38,800 --> 00:20:40,850
+就像我们以前做的那样，如果按f5运行
+like we were doing before do, if I hit f5
+
+220
+00:20:42,175 --> 00:20:50,960
+它可以通过代码，然后有了小三角形，我们可以移动相机
+and it can pass our code, then we have our little triangle, we can move the camera, and we used to be able to move the
+
+221
+00:20:52,300 --> 00:20:56,725
+我们过去可以移动实际的方块，但显然取消了这个，稍微清理一下这段代码
+we used to be able to move the actual squares, but obviously I took that away, okay, so let's clean up this code a little bit
+
+222
+00:20:56,900 --> 00:21:02,300
+我要去掉m_SquareMoveSpeed之类的，因为那是我们只是为了好玩而使用的变量
+I'm just going to get rid of the m_SquareMoveSpeed and all that, cause that was something that we use just for fun
+
+223
+00:21:02,960 --> 00:21:06,280
+我很可能会保留这里的网格
+and I'll probably end up leaving this kind of grid here
+
+224
+00:21:06,280 --> 00:21:10,275
+所以很明显，比例是不需要一直重新计算的
+so obviously the scale is something that you don't need to recalculate all the time
+
+225
+00:21:10,275 --> 00:21:15,050
+所以如果你们想的话，可以把它变成静态，或者你们知道的，让它成为属性
+so you could just make it a static if you want it to, and then, or just, you know, have it as a member.
+
+226
+00:21:15,975 --> 00:21:18,440
+然后我们唯一需要重新计算的就是位置
+and then really the only thing that we need to recalculate is the position
+
+227
+00:21:18,440 --> 00:21:23,280
+但由于位置改变，你们每次都需要重新计算这个变换矩阵
+but because the position changes, you do need to recalculate this transformation matrix every time
+
+228
+00:21:23,325 --> 00:21:29,775
+但那很正常，好吧，差不多就是那样，希望那是有意义的，现在真的很酷
+but that's, that's normal, okay, that's pretty much it, hope that makes sense, now it would be really cool
+
+229
+00:21:29,775 --> 00:21:34,160
+如果我们可以为每个贴图设置不同的颜色，对吧
+if we could actually set a different color for each of these tiles, right
+
+230
+00:21:34,160 --> 00:21:37,280
+然后我们就可以开始了，基本上有了一点时间图
+and then we can actually start, basically having a bit of a time map
+
+231
+00:21:37,280 --> 00:21:41,480
+尽管这不是真正的2D渲染，正如我所说，这仍然是一种3D渲染
+even though this isn't really 2d rendering, as I'm saying, this is still kind of 3D rendering
+
+232
+00:21:41,480 --> 00:21:45,200
+它不仅仅是3D渲染，因为它是OpenGL，而且OpenGL的一切在3D中
+it's not just 3D rendering, because it's OpenGL, and OpenGL is everything in 3D
+
+233
+00:21:45,200 --> 00:21:47,725
+不是，我不是这个意思，我的意思是
+it's not, that's not what I mean, what I mean is that
+
+234
+00:21:48,280 --> 00:21:52,275
+我们用来实际渲染的技术是基于每个对象的
+the technique we're using to actually render this is kind of on a per object basis
+
+235
+00:21:52,275 --> 00:21:59,880
+很明显那是一种3D的方式，现在我们下一次可以做的是
+so clearly that's, that's kind of like a 3D way of doing things, now what we can do next time
+
+236
+00:21:59,880 --> 00:22:03,200
+我下期可能会做的就是统一变量和材质
+and what I probably will do next time is talk about uniforms and materials
+
+237
+00:22:03,650 --> 00:22:10,225
+所以我们可以很容易地构建一个非常基本的材质系统，对吧
+so we can set up a very, very, very basic material system, really easily, right
+
+238
+00:22:10,225 --> 00:22:15,425
+我甚至可能会有下期视频，比如关于材质系统如何运行的理论视频
+and I might actually even have next video be like a theory video about how material systems work
+
+239
+00:22:15,825 --> 00:22:22,100
+然后可以实现个非常基本的材质系统，就是目前所需要的，只是为了获得更多的灵活性
+and then we can implement a very basic one, which is all we'll need for now, just to kind of get a little bit more flexibility
+
+240
+00:22:23,925 --> 00:22:26,975
+如果我实现了那个，就像你们基本上可以看到的
+and then if I do that, like basically where you can see that
+
+241
+00:22:26,975 --> 00:22:35,280
+我们正在将Hazel转移到一个位置，在那里它可以用来制作游戏之类的
+we're moving Hazel into an area, where it could be used to make games, or it could actually be somewhat usable to do things like that
+
+242
+00:22:35,280 --> 00:22:37,160
+很明显，我们没有类似的纹理之类的
+now obviously we don't have like textures or anything like that
+
+243
+00:22:37,160 --> 00:22:44,520
+那也是我真的很想做的事情，纹理，但就像是，我不知道，我觉得它
+that's something I really want to do as well, textures, but yeah, like it's kind of, I don't know, I feel like it's
+
+244
+00:22:44,520 --> 00:22:50,080
+有一些东西可以展示，而且很快就可以使用，那是很酷的
+it's cool to kind of actually have something to show, and have something that's actually usable pretty quick
+
+245
+00:22:50,080 --> 00:22:52,800
+因为你们可以看到，我们这里有一个引擎在运行，对吧
+cause you can see that, we've got like a bit of an engine going on here, right
+
+246
+00:22:53,075 --> 00:22:56,800
+我们能够在不接触OpenGL之类的情况下完成所有这些事情
+we're able to do all of this stuff without touching OpenGL or anything like that
+
+247
+00:22:57,550 --> 00:23:00,400
+这一切都很好用，我们可以提交要渲染的内容
+it all kind of just works, we can submit stuff for rendering, and
+
+248
+00:23:01,250 --> 00:23:05,800
+那一切都很令人兴奋，所以让我知道你们的想法，这可能是，我确实想补充一下
+that's all pretty exciting, so let me know what you think about that, it's probably, I do want to add in
+
+249
+00:23:06,450 --> 00:23:14,960
+添加至少一种方法来正确设置，对吧，而且我们可能很快就会处理纹理问题
+add in at least some kind of way to set uniforms properly, and also we'll probably end up dealing with the textures soon
+
+250
+00:23:15,250 --> 00:23:17,920
+然后，我认为我们可能会进入3D模式，进行网格加载
+and then after that, I think we might move into 3D and do meshes
+
+251
+00:23:17,920 --> 00:23:25,520
+除非人们特别希望我先做一个好的、快速的、非常快的2D或2D渲染器
+unless people specifically really want me to do like a good, fast, blazing fast 2D or 2D renderer first, because, if you do
+
+252
+00:23:25,520 --> 00:23:28,800
+然后我可能会这样做，无论如何，我希望你们喜欢这期视频，如果喜欢的话，就为它点赞吧
+then I might do that, anyway, I hope you guys enjoyed this video, if you did, hit the like button
+
+253
+00:23:28,800 --> 00:23:33,120
+这是一个很有趣的视频，我们实际上玩了一些东西，并添加了一些变换
+this was kind of more of a fun video where we actually played around with some stuff as well as adding in transforms
+
+254
+00:23:33,120 --> 00:23:36,325
+你们可以看到，只需添加模型矩阵和变换是多么容易
+you can see how easy it is to just add in the model matrix and transform
+
+255
+00:23:36,325 --> 00:23:39,250
+这样我们就可以在不同位置渲染对象
+so that we can actually render objects in different positions
+
+256
+00:23:40,120 --> 00:23:45,920
+你们可以通过访问patreon.com/thecherno来帮助支持这个系列，非常感谢所有的赞助人
+you can help support the series by going to patreon.com/thecherno, huge thank you as always to all the patrons
+
+257
+00:23:45,950 --> 00:23:53,000
+请记住，你们可以在那里支持，并获得下期视频，就像我所说的，下期有很多东西可以探索
+remember you can support the series there, and get the next video right now, next time, as I said, we've got so many things we can explore
+
+258
+00:23:53,000 --> 00:23:56,600
+这对我来说变得很难计划，我真的很想做2D纹理
+like this is becoming difficult for me to plan, I really want to do 2D textures
+
+259
+00:23:56,600 --> 00:24:01,920
+我真的想做一个非常基本的材质系统，这样我们就可以适当地设置纹理之类的
+I really want to do a very basic material system just so that we can set uniforms and textures and stuff like that properly
+
+260
+00:24:02,550 --> 00:24:10,400
+然后它将分成一个速度极快的2D渲染器，基本上就像正确地处理2D渲染器一样
+and then it's going to fork off into either a blazing fast 2d Renderer, and like doing a 2d renderer properly, basically
+
+261
+00:24:10,875 --> 00:24:18,440
+或者只是继续3D，在这种情况下，我们可能会这样做，哦，这是
+or kind of just continuing on with, with 3d, in which case we'll probably make like, oh, this where
+
+262
+00:24:18,440 --> 00:24:21,600
+我们从哪里开始呢，我们可能会从网格开始，对吧
+where do we even start, probably we'll probably start with meshes, right
+
+263
+00:24:21,600 --> 00:24:30,780
+所以我们想要网格，能够加载3D模型，并对其进行处理，以及对其应用材质，并进行渲染
+so we want meshes, we want to be able to load 3D models, and process them, you know, and actually apply materials to them, and render them
+
+264
+00:24:30,780 --> 00:24:36,900
+我们可能想要一个3D相机，那本身就是一种巨大的东西
+and we probably want like a 3D camera, and that's just a huge kind of thing of its own as well
+
+265
+00:24:38,475 --> 00:24:42,220
+在下面的评论区让我知道你们的想法，因为这个系列是由你们决定的，并为你们制作
+let me know your thoughts in the comment section below, because this series is up to you guys and making it for you
+
+266
+00:24:42,220 --> 00:24:45,100
+我想做你们想做的任何事，下次见，拜
+and I want to do whatever you guys want, I'll see you next time, goodbye
+

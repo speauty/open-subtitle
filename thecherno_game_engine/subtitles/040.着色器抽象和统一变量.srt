@@ -1,0 +1,1400 @@
+﻿1
+00:00:00,000 --> 00:00:03,600
+嘿，伙计们，我是TheCherno，欢迎回到我的游戏引擎系列
+hey, what's up guys, my name is TheCherno, welcome back to my game engine series
+
+2
+00:00:03,725 --> 00:00:10,575
+所以上期我们看了个基本的材质系统，更多的是讨论了以后会如何构建材质系统
+So last time we took a look at a basic material system, more of a discussion as to how we would build a material system in the future
+
+3
+00:00:10,775 --> 00:00:15,075
+这是个考虑这些的好时机，如果你们还没有看过那期视频的话，就去看看吧
+it's kind of good to start thinking about that kind of stuff, check out that video, if you haven't already
+
+4
+00:00:15,075 --> 00:00:19,415
+今天，我们将继续优化Shader类，让它变得更加正式一点
+and today we're going to continue on with the Shader class, make it a little bit more formal right now
+
+5
+00:00:19,600 --> 00:00:26,575
+它只是个与OpenGL一起用的基础类，还没有抽象出来，它只是实现了我们想要的
+it's just a basic class that only works with OpenGL, it's not abstracted in any way, and it just kind of does what we want it to
+
+6
+00:00:26,575 --> 00:00:32,625
+我的意思是，我们还不如把它写在Sandbox里，你们知道的，还没集成到我们的引擎中
+it's, I mean, we might as well have written it in Sandbox, it's that kind of, you know, non integrated into our engine
+
+7
+00:00:32,625 --> 00:00:40,900
+所以我们今天就把它清理下，也说说如何让它更具有那种OpenGL风格
+so we're just going to clean it up a little bit today, and also talk about how we are going to actually move it into more of an OpenGL kind of fashion
+
+8
+00:00:40,900 --> 00:00:49,125
+因为不幸的是，正如你们可能想象的那样，写Shader类这个点可是非常困难的
+because unfortunately the topic of writing a Shader class, as you can probably hopefully imagine, right, is something that's very difficult
+
+9
+00:00:50,050 --> 00:00:56,100
+因为在这个阶段，我们实际需要的着色器功能很少
+because at this stage, we have very little actual functionality to do with shaders
+
+10
+00:00:56,950 --> 00:01:04,160
+如果你们现在坐下来实际在Hazel中写Shader类，有可能要花一周的时间哦
+if you were to sit down and actually write a Shader class in your in Hazel right now, you would spend a week on it probably
+
+11
+00:01:04,160 --> 00:01:08,925
+因为你们需要写许多其他系统，也需要将其与材质系统关联起来
+because you need to write a lot of other systems, you need to tie it in with material systems
+
+12
+00:01:08,925 --> 00:01:13,375
+因为在庞大的系统中，如果你们打开虚幻引擎的源代码
+because in the big scope of things, if you open up like Unreal Engine source code
+
+13
+00:01:13,375 --> 00:01:18,320
+你们看看它们是如何处理着色器的，如何与材质集成的，以及所有这些都是如何运行的
+and you take a look at how they handle shaders, and how they integrate that with materials, and how all of that works
+
+14
+00:01:18,475 --> 00:01:24,225
+它非常复杂，不像是你们随意塞进去一千行代码，就可以跑起来的
+it's immensely complex, it's not just like a, it's not like a thousand lines of code that you can just jam in and everything works
+
+15
+00:01:24,575 --> 00:01:31,275
+这是个完整的架构，完整的系统，由于Hazel就是我向你们展示了这一切如何逐步进行的
+it's a whole architecture, it's a whole system, and since Hazel is all about me kind of showing you how everything works step by step
+
+16
+00:01:31,525 --> 00:01:39,250
+不仅展示我在屏幕上输入的所有代码，而且还确保我正在迭代Hazel
+and not only showing all the code that I'm typing on screen, but also making sure that I'm kind of iteratively working on Hazel
+
+17
+00:01:39,250 --> 00:01:44,300
+意思是，你们知道的，我们这里有什么，对吧，如果我们马上来看看
+meaning that, you know, what we have right here, right, if we just like take a look for one second
+
+18
+00:01:44,600 --> 00:01:48,600
+我们这里有个三角形，然后所有这些四边形都被渲染了
+what we have right here with like a triangle, and then all of these quads being rendered
+
+19
+00:01:49,250 --> 00:01:52,925
+比如每种列都是不同的颜色，红色或蓝色
+like with every kind of column being a different color, red or blue
+
+20
+00:01:53,925 --> 00:02:01,250
+我们可以花三年时间重写这个代码，重构它来实现这个
+that kind of stuff, we could spend three years rewriting this code, refactoring it to do this
+
+21
+00:02:01,500 --> 00:02:08,275
+因为你们可以在一个文件中用200行代码实现这个，也许只是OpenGL代码，对吧
+because you could do this in like 200 lines maybe of just OpenGL code in one file, and you'd be done, right
+
+22
+00:02:08,550 --> 00:02:16,650
+或者你们可以在虚幻引擎中实现这个，或者像Frostbite之类的，对吧，可以随心所欲地写它
+or you could do this in Unreal Engine or like Frostbite or something like that, right, you could write it however you like
+
+23
+00:02:16,650 --> 00:02:23,550
+它是如此的复杂，所以我直接让你们一开始就做这样的事情
+it's so complex, so I just want to get that into your heads that doing something like this from the get-go
+
+24
+00:02:23,550 --> 00:02:27,925
+立即写个神奇的材质和着色器系统来开发这个神奇的引擎
+and immediately writing this amazing, amazing engine with an amazing material system, an amazing shader system
+
+25
+00:02:28,125 --> 00:02:30,032
+那不是我们实际上可以做的事情
+that is not something that we can actually physically do
+
+26
+00:02:30,650 --> 00:02:35,825
+如果我们再做一次，那就需要一百期视频，每个人都可能对这个系列失去兴趣的
+if we were to do it again, it would take a hundred videos, and everyone will probably lose interest in this series
+
+27
+00:02:35,825 --> 00:02:43,175
+因为我们一直在用一百期视频创建正方形，所以我只是想用种你们都感兴趣的方式来构建
+because we've been making little squares for a hundred videos, so I'm just kind of trying to structure it in a way that is both interesting to you guys
+
+28
+00:02:43,175 --> 00:02:50,150
+但也展示了，一个基本的引擎，一直到某种行业标准，比如AAA
+but also shows, kind of almost like, you know, a basic engine all the way up to like something kind of industry standard, something like AAA
+
+29
+00:02:50,475 --> 00:02:51,800
+所以那就是这个系列的目标
+so that's the goal of this series
+
+30
+00:02:52,350 --> 00:02:55,875
+只要记住那个就好了，不论如何，访问patreon.com/thecherno就是支持这个系列最好的方式
+just to get that into your heads, anyway, patreon.com/thecherno best way to support this series
+
+31
+00:02:56,050 --> 00:03:00,125
+如果这些东西对你们来说有点无聊，想看到一些基于物理的渲染器，或者
+if this stuff is a little bit boring for you, and you want to see like some physically based rendering or some
+
+32
+00:03:00,300 --> 00:03:08,000
+比如模型查看器，它具有真实的3D渲染器，比如就集成了相机等
+like an actual kind of proper, like model viewer, which has a real 3d renderer, like a camera and everything integrated into it
+
+33
+00:03:08,275 --> 00:03:10,150
+那么就去访问patreon.com/thecherno看看吧
+then check out patreon.com/thecherno
+
+34
+00:03:10,150 --> 00:03:14,100
+如果你们确实赞助了这个系列，就可以访问我已经实现了所有这些功能的源码
+if you do help support the series, you'll get access to source code where I've already achieved all of that
+
+35
+00:03:14,325 --> 00:03:20,450
+那将有助于加快你们的学习速度，并且那也是我们在本系列中努力的方向
+and that'll kind of help accelerate your learning a little bit, and that is also what we're working towards with this series
+
+36
+00:03:20,675 --> 00:03:29,325
+所以今天我们要做什么，首先稍微重构Shader类，只是为了让它解耦OpenGL
+so today, what are we going to do, step one is going to be to refactor the Shader class very slightly, just to get it out of the idea of being OpenGL only
+
+37
+00:03:29,325 --> 00:03:35,075
+因为现在，如果你们去看Shader.h和Shader.cpp，其中包含了与OpenGL绑定的代码
+because right now if you look at Shader.h, Shader.cpp, it has OpenGL code in it, it's tied to OpenGL
+
+38
+00:03:35,075 --> 00:03:40,675
+我们想去除这种关联，其次，我们还想添加更多统一变量的函数
+we want to get rid of that association, second of all, we want to add more uniform functions
+
+39
+00:03:40,875 --> 00:03:44,775
+所以目前我们只能，我认为我们只有个可以上传统一变量的mat4和float4
+so at the moment we can only, I think we have a mat4 that we can upload and a float4
+
+40
+00:03:44,775 --> 00:03:50,975
+因为那就是我们用来创建这种颜色的，所以要创建它，这样就有了需要上传的所有统一变量
+because that's what we used for this color, we're going to make it, so that we have all of the uniforms that we actually need to upload
+
+41
+00:03:52,375 --> 00:03:57,025
+然后第三个就是，我实际上想在我们的ImGui UI中添加某种颜色选择器
+and then third of all, I actually want to add some kind of color picker to our ImGui UI
+
+42
+00:03:57,350 --> 00:04:01,875
+就像我上期说的，这样你们就可以选择所有这些正方形的颜色
+like I said last time, so that you can actually pick the color of all of these squares
+
+43
+00:04:01,875 --> 00:04:04,600
+不过为了简单起见，我们可能会让所有的正方形都是相同的颜色
+just for simplicity, we'll probably make all the squares the same color
+
+44
+00:04:04,600 --> 00:04:09,000
+但是你们实际上可以在引擎中使用颜色选择器来选择想要的正方形的颜色
+but you'll be able to actually use a color picker in the engine to pick what color you want the squares to be
+
+45
+00:04:09,300 --> 00:04:15,550
+所以那只是在展示你们在更新颜色时，动态更新统一变量，并且那应该是个很好的测试
+so that'll kind of just show dynamic uniforms being updated as you change the color, and that should be kind of a good test
+
+46
+00:04:17,375 --> 00:04:21,000
+关于统一变量的主题，我不想过多讨论了，就像我上期提到的那样
+on the topic of uniforms, I don't want to talk about uniforms too much, as I mentioned last time
+
+47
+00:04:21,000 --> 00:04:25,225
+统一变量是特定的统一变量系统是特定的材质系统需要的东西
+uniforms are something that a proper uniform system needs a proper material system
+
+48
+00:04:25,425 --> 00:04:32,250
+因为通常情况下，当你们绑定材质时，基本上就会使用材质接口
+because typically what you would be doing is basically, using the material api, when you bind a material
+
+49
+00:04:32,400 --> 00:04:34,575
+当渲染器实际绑定材质时
+when the renderer actually binds a material
+
+50
+00:04:34,925 --> 00:04:41,123
+你们通常只需从渲染器和你们正在使用的材质中获取所需的所有统一变量
+you would typically just take all of the uniform values that you need from both the renderer and from the actual material that you're using
+
+51
+00:04:41,350 --> 00:04:46,525
+然后将它们作为一个缓冲区，一个连续缓冲区上传到着色器中，对吧
+and then upload them as kind of one buffer, one contiguous buffer, right into the shader, right
+
+52
+00:04:46,525 --> 00:04:52,275
+因为你们想把所有数据在一个批处理中传到GPU，那不是我们现在正在做的
+cause you want to transmit all of that data to the GPU kind of in one batch, that is not what we're doing right now
+
+53
+00:04:52,950 --> 00:04:59,280
+那需要一些设置，我们需要属性渲染器和材质系统，所有那些东西在很快就会遇到的
+that requires a little bit of setup, we need a proper Renderer, we need a proper material system, all that kind of stuff, and that's coming in the future very soon
+
+54
+00:04:59,280 --> 00:05:04,775
+你们似乎已经投票支持3D，不过我们还会进行另一个投票，只是为了使其更正式
+you guys seem to have voted for 3d, and we'll have another poll as well, just to make it more formal
+
+55
+00:05:04,775 --> 00:05:08,975
+因为YouTube，老实说，YouTube视频上的投票真的很烦，比如他们没有给你们数据
+because the YouTube, honestly, the polls on the YouTube videos are really hate, like they just give you no data
+
+56
+00:05:09,350 --> 00:05:13,748
+因此我将进行准确的投票，我认为在YouTube页面上就像文本帖子一样，你们也可以那样
+so I'll make a proper poll, I think on my actual YouTube page as like a text post, cause you can also do that
+
+57
+00:05:13,950 --> 00:05:18,900
+那就像一个实际的投票，描述中会有一个链接，我也会在视频的末尾提到它
+and that'll have like, that'll be like an actual poll, there'll be a link in the description, I'll mention it at the end of the video as well
+
+58
+00:05:19,200 --> 00:05:24,600
+但那就是一个实际的投票，你们可以留下评论并讨论，就比如在投票的背景下
+but that will be like an actual poll where you can leave comments and discuss it, and it'll just be like kind of in the context of a poll
+
+59
+00:05:24,600 --> 00:05:29,150
+你们可以看到有多少人投票之类的，所以那将是正式的最后一次投票
+and you can see how many people voted and all that stuff, so that'll kind of be the formal last
+
+60
+00:05:29,400 --> 00:05:35,225
+就像最后的决定，我想那就是关于我们先做2D还是3D的决定
+like kind of last decision, I guess that gets made as to if we do 2d or 3d first
+
+61
+00:05:36,250 --> 00:05:44,025
+但无论如何，今天让我们先做这些统一变量的东西，添加OpenGL所需的统一变量函数
+but anyway, today let's do all this uniform stuff, let's add all the uniform functions that we need for OpenGL
+
+62
+00:05:44,025 --> 00:05:45,625
+让我们把它抽象成一个OpenGL类
+let's separate it into an OpenGL class
+
+63
+00:05:46,325 --> 00:05:54,300
+让我们看看是否可以动态改变这些正方形的颜色，好吧，所以我们首先就是看看着色器类
+and let's see if we can change the color of these squares dynamically, okay, so first thing we're going to do is take a look at that Shader class
+
+64
+00:05:54,300 --> 00:06:01,050
+正如我提到的，如果进入Shader类，也就是Shader.cpp，如果我们看看这个的位置
+so as I mentioned, if we go to our Shader class, this is Shader.cpp, if we look at where it's located, this Shader.cpp thing
+
+65
+00:06:01,400 --> 00:06:06,775
+如果来到Hazel，展示文件就是我想做的，我们很快就会看看它在哪里
+if I go to Hazel, and show files is what I wanted to do, and we just quickly take a look at where it is
+
+66
+00:06:06,775 --> 00:06:11,500
+你们可以看到它就在这里，它在Hazel/Renderer/Shader中，这是什么
+you can see that it's right here, it's in Hazel Renderer Shader, what is this
+
+67
+00:06:11,700 --> 00:06:22,240
+这就是一个独立接口，未知接口，一个渲染接口，未知的Hazel接口
+this is a api independent, an api agnostic, api, an api, agnostic api, a render api, agnostic Hazel api
+
+68
+00:06:22,325 --> 00:06:26,800
+对吧，很难说，真的没有意义，但关键是所有这些代码都应该是完全通用的
+right, hard to say, and it doesn't really make sense, but the point is all of this code should be completely generic
+
+69
+00:06:26,800 --> 00:06:34,375
+在VertexArray中，在IndexBuffers和VertexBuffers中，进行了切换来确定使用的接口
+and you can see that in the case of our VertexArray, in the case of both IndexBuffers and VertexBuffers, we do a switch to determine which API we use
+
+70
+00:06:34,625 --> 00:06:40,240
+Shader没有这个操作，而Shader只是直接包含OpenGL代码，没有切换，只是个完整的类
+whereas shader does none of that, Shader just has  OpenGL code in it, it has no switching, it's just a full class
+
+71
+00:06:40,375 --> 00:06:47,550
+这不是我们想要的，那根本就不是我们想要的，所以首先来到Platform/OpenGL目录下
+it's that's not what we want, that's not what we want at all, so the first step is going to be to go into platform and to go into OpenGL
+
+72
+00:06:48,250 --> 00:07:03,825
+然后我要创建两个新文件，也就是OpenGLShader.h和OpenGLShader.cpp
+and then I'm going to add a new file, two new files, one's going to be called OpenGLShader.h, okay, and then I'll also make a OpenGLShader.cpp file
+
+73
+00:07:04,075 --> 00:07:08,975
+然后我想做的是在cpp文件中，我们基本上只是去Shader文件
+and then what I want to do is the cpp file, we're basically just gonna, let's go to the Shader file
+
+74
+00:07:09,250 --> 00:07:19,900
+让我们打开Shader类，复制所有，因为它基本上是OpenGL特定的Shader类
+let's open up our Shader class, and I'm just going to copy everything, because it's basically what we've written here is an OpenGL specific Shader class
+
+75
+00:07:20,175 --> 00:07:24,525
+我将对cpp文件执行相同的操作，我将直接将其复制并粘贴到这里
+and I'll do the same for the cpp file, I'm just going to copy it straight up and paste it into here
+
+76
+00:07:24,950 --> 00:07:29,850
+好了，那要好得多，所以现在我们要做的就是创建它，也就是OpenGLShader类
+allright, that's much better, so now what we'll do is make it, specifically an OpenGLShader class
+
+77
+00:07:29,850 --> 00:07:35,375
+就像我们对VertexBuffer的VertexArray所做的这些一样，不需要包含这个
+like we did with VertexArray with VertexBuffer all of that stuff, we don't need to include this stuff
+
+78
+00:07:35,625 --> 00:07:41,750
+但是我们确实需要确保包含Hazel/Renderer/Shader.h，好了
+but we do need to make sure that we include Hazel/Renderer/Shader.h, okay
+
+79
+00:07:42,475 --> 00:07:47,575
+这显然就成了OpenGLShader，析构函数也将是虚拟的
+this obviously becomes OpenGLShader, the destructor will also be virtual
+
+80
+00:07:48,625 --> 00:07:57,504
+Bind和Unbind最终会像这样的virtual const override，然后我们把这些东西保留在这个类中
+Bind and Unbind will end up being kind of virtual const overrides like that, and then this stuff we're going to keep in this class
+
+81
+00:07:57,825 --> 00:08:02,200
+因为不想把这种接口暴露给着色器
+because we don't want to expose this kind of api to the Shader
+
+82
+00:08:02,550 --> 00:08:09,975
+现在这涉及到一些讨论，所以我们可能会在讨论的时候讨论它
+now this is, this involves a little bit of discussion, so we'll probably just talk about it as we go
+
+83
+00:08:10,675 --> 00:08:14,600
+但是从本质上讲，我们将为所有的比如独立接口类做同样的处理
+but essentially, and we'll do the same thing that we do for all of our like api independent classes
+
+84
+00:08:14,700 --> 00:08:17,800
+因此如果你们看一下Buffer.h之类的
+so if you take a look at like, you know, buffer or something .h
+
+85
+00:08:17,800 --> 00:08:23,575
+你们就会看到，你们知道的，我们也有个虚拟的析构函数
+you'll see that, that we also have, you know, we have like a virtual destructor
+
+86
+00:08:24,000 --> 00:08:27,475
+我们就有Bind和Unbind，实际上在这里做了等于default
+we've got Bind, Unbind, and we've actually done equals default here
+
+87
+00:08:27,475 --> 00:08:30,125
+我想我们也可以在这里做，而不是这个
+which I guess we can do for here as well instead of this
+
+88
+00:08:30,450 --> 00:08:40,100
+但你们可以看到，已经有了虚拟析构函数和一堆虚拟函数，没有属性数据
+but you can see that we've got, we've just got like, we've got our like virtual destructor and a bunch of virtual functions that appear virtual and no data members in here
+
+89
+00:08:40,100 --> 00:08:46,500
+然后比如静态Create函数一样，那正是我们将为Shader类遵循的模式
+and then like a static Create function, so that's exactly the pattern that we're going to be following for our Shader class
+
+90
+00:08:46,900 --> 00:08:55,575
+所以这会是个纯虚类，这个就删除了，因为我们不想暴露它
+so this will just be pure virtual, this disappears, because we don't want to expose it, what we will in
+
+91
+00:08:55,700 --> 00:08:59,250
+我们实际上会有的，并且这个已经在Hazel开发分支中完成了
+what we will in fact have, and this is already done in the Hazel development branch
+
+92
+00:08:59,575 --> 00:09:07,300
+我们实际上会有个virtual void UploadUniformBuffer()，对吧，但这就会稍微复杂一点
+what we will actually have is just like a virtual void, you know, UploadUniformBuffer, right, but this will be a little bit more complicated
+
+93
+00:09:07,300 --> 00:09:13,875
+因为和顶点着色器的情况会有所不同，所以就和材质渲染器统一变量也会有所不同
+because it will be different for like vertex shaders, it will be different for like material uniforms versus renderer uniforms
+
+94
+00:09:13,875 --> 00:09:21,280
+因为它们可能以不同的频率上传，因此它们可能就像GPU内部实际的不同缓冲区一样
+because they might get uploaded at different frequencies, therefore they might be like actual different buffers inside the GPU
+
+95
+00:09:21,525 --> 00:09:27,450
+要实现那个就需要写很多东西，但那只是对以后的一点了解
+there's a whole lot of actual stuff that needs to get written for that to happen, but that's just a little bit of a peek into the future
+
+96
+00:09:27,450 --> 00:09:34,050
+如果你们想知道这个系统到底是如何运行的，现在你们注意到没开放任何接口到着色器类
+if you're wondering how on earth this system works, now you'll note that we do not expose anything into this Shader class
+
+97
+00:09:34,050 --> 00:09:44,600
+我们根本没有暴露UploadUniformMat4或float4，所以目前如何用这个上传统一变量的
+we don't have, we don't have our UploadUniformMat4 or float4 exposed at all, so how do we currently with this system upload uniforms
+
+98
+00:09:44,600 --> 00:09:49,575
+你们可能会问自己，所以你们会看到，结果就是我们最终会
+you may be asking yourself, so the answer to that, as you'll see, is we're just going to end up
+
+99
+00:09:49,925 --> 00:09:52,775
+虽然我们会创建一个着色器，也就是个着色器指针
+whilst we will create a shader, and it'll be a Shader pointer
+
+100
+00:09:53,025 --> 00:09:59,975
+但实际上要做的就是把该着色器转换为OpenGLShader
+what we will actually do is basically cast that shader into an OpenGLShader
+
+101
+00:09:59,975 --> 00:10:05,200
+因为很明显，在这点上，它就是个OpenGLShader对象，因为那是我们唯一支持的渲染接口
+because clearly it's going to be an OpenGLShader object at this point, because that's the only render api we support
+
+102
+00:10:05,600 --> 00:10:11,050
+然后，当我们开始支持其他渲染器接口时，我们实际上就会有那个材质系统
+and then by the time we start supporting other Renderer apis, we'll actually have that material system in place
+
+103
+00:10:11,050 --> 00:10:15,075
+所以我们永远不必使用cast，那还是有一定道理的，那是我们跳过前面的一种方式
+so we'll never have to cast, so that makes sense, that's kind of a way for us to skip ahead
+
+104
+00:10:15,075 --> 00:10:19,800
+但也能够保留那个功能，而无需编写一大堆我们永远不需要的代码
+but also be able to retain that functionality without writing a whole bunch of code that we'll never ever need
+
+105
+00:10:20,500 --> 00:10:28,300
+就是那样，那就是我们整个Shader类，现在我们需要一个static Shader* Create()
+that's it, that is our whole Shader class, now we need a static Shader* Create function
+
+106
+00:10:28,575 --> 00:10:37,675
+现在我们的OpenGLShader里面有什么，我们有个构造函数，它接收vertexSrc和fragmentSrc
+now what do we have inside our OpenGL, Shader, we had a constructor which takes in a vertexSrc and a fragmentSrc
+
+107
+00:10:37,675 --> 00:10:45,050
+那正是我们将粘贴到Create中的内容，我会打开VertexArray.cpp并复制其中的所有代码
+so that's exactly what we'll paste into Create, I'm going to open up VertexArray.cpp and steal basically all the code in there
+
+108
+00:10:45,300 --> 00:10:56,000
+那将取代Shader.cpp内部的代码，显然我们会包含Shader.h和Renderder.h
+and that's going to replace the code inside Shader.cpp, obviously we'll include Shader.h and a Renderer, will also need to include for RenderAPI, and then we'll,
+
+109
+00:10:56,625 --> 00:11:02,300
+相反，我们也会包含Platform/OpenGL/OpenGLShader，好了，那看起来还不错
+instead of this, we'll include OpenGL shader inside the platform, all right, so that is looking pretty good
+
+110
+00:11:02,475 --> 00:11:09,900
+显然，我们用OpenGLShader代替了它，并填补了空白，因此这成为了Create函数
+ibviously we replaced this with OpenGLShader and we fill in the gaps, so this becomes a create function
+
+111
+00:11:10,150 --> 00:11:16,875
+它需要一个Shader，因为它在Shader的命名空间，那都是没问题的
+which takes a shader, which is, in the shader namespace, and then we have, that's all correct
+
+112
+00:11:17,550 --> 00:11:22,500
+然后就是vertexSrc和fragmentSrc
+vertexSrc and fragmentSrc ends up, fragmentSrc ends up here,
+
+113
+00:11:24,425 --> 00:11:29,400
+那对我来说，看起来不错，而它看起来有点儿问题，因为我最后有一个分号
+and that looks pretty good to me, so it doesn't seem very happy because I've got a semi-con at the end
+
+114
+00:11:30,125 --> 00:11:33,525
+如果你们尝试编译(Ctrl + f7)这个文件，看看是否有效
+if you try and just control F7 that to compile this file, see if that works
+
+115
+00:11:34,175 --> 00:11:38,975
+有效的，好了，所以那基本上就是我们所做的改变，那么现在
+it does, great, okay, so that's, that's basically the change that we've made, so right now
+
+116
+00:11:38,975 --> 00:11:44,350
+显然每次执行这个操作时，都会创建个公开的OpenGLShader指针，不过关于指针这个主题
+obviously we'll be creating an open, an OpenGL shader point every time we do this, on the topic of pointers
+
+117
+00:11:44,350 --> 00:11:49,275
+我非常难过地看到这些原始指针现在在代码中无处不在
+I'm getting really, quite sad at seeing these raw pointers absolutely everywhere in the code right now
+
+118
+00:11:49,975 --> 00:11:53,800
+它们基本上应该是某种形式的引用计数对象
+they should basically be some kind of form of reference counted objects
+
+119
+00:11:53,800 --> 00:11:57,325
+所以换句话说，如果不编写我们自己的，那就会是个共享指针
+so in other words, in our case, without writing our own, that would be a shared pointer
+
+120
+00:11:57,675 --> 00:12:01,800
+我真的很想开始那个系统，我们甚至可以就在下期做，因为
+I'm really keen to move over into that system, we might even do that next episode, because
+
+121
+00:12:02,400 --> 00:12:07,525
+正如我提到的，我对此有点烦，我们现在写的越多，以后需要替换的就越多
+as I mentioned, I am getting a little bit annoyed with this, and the more of this we write, the more we'll have to replace later
+
+122
+00:12:08,300 --> 00:12:16,025
+当我们讨论那个时，你们会看到我们是如何实现的，因为这个显然已经在Hazel dev中完成了
+you'll see how we do that, when we do cover that, because, and again, it's stuff that's done obviously in Hazel dev already, but maybe
+
+123
+00:12:16,025 --> 00:12:20,250
+下期值得做那个，所以那可能就是下期的内容，事实上，我想我会的
+that's worth doing next time, so potentially that will be the next episode, in fact, I think I will
+
+124
+00:12:20,250 --> 00:12:24,800
+因为它有点像这样，几乎可以归结为只需要编写的代码
+because it's just kind of like this, almost boil up like code that just needs to be written
+
+125
+00:12:24,800 --> 00:12:30,000
+然后我们就可以不用管它了，有点像需要编写的Hazel核心库内容，核心的内容
+and then we can just forget about it, it's kind of like the core Hazel library stuff that needs to be written, the core stuff
+
+126
+00:12:30,975 --> 00:12:35,450
+好了，太棒了，就是那样，那就是本期的主要内容
+okay, fantastic, so that that's it, that is a hundred percent the end of this class
+
+127
+00:12:36,175 --> 00:12:41,475
+这个RendererID显然要被删除的，因为这个Shader类应该没有数据，我们不需要
+this RendererID obviously gets removed, because this shader class should have no data and we don't need
+
+128
+00:12:42,700 --> 00:12:47,650
+我们在这里根本不需要glm，也不需要，通常还是需要string的
+we don't really need glm here at all, nor do we need, normally need string
+
+129
+00:12:47,650 --> 00:12:52,300
+好了，酷，所以老实说，我认为已经有了glShader
+okay, cool, so I think glShader already has that to be honest
+
+130
+00:12:52,950 --> 00:13:02,650
+搜索起来太烦了，好了，所以只有Shader，确实还是需要glm，因为我们这里只有这些
+which I can't search for annoyingly, okay, so we have, we just have shader, so we do need glm, just because we have this stuff over here
+
+131
+00:13:03,000 --> 00:13:08,750
+看起来很好，显然我们需要做些查找，在这里找到替换的代码，所以就是OpenGLShader
+so that is looking pretty good, obviously we need to do some find, find replace stuff here, so OpenGLShader
+
+132
+00:13:08,750 --> 00:13:18,775
+我会在本文档中快速把Shader::替换为OpenGLShader::，然后修复下这两个函数
+I'll quickly just replace Shader:: with OpenGLShader:: inside this document, and then patch up these two things
+
+133
+00:13:20,550 --> 00:13:29,901
+也就是构造函数和析构函数，好了，我认为那是我们这儿需要做的
+the constructor and the destructor, all right, that I think is about it for what we need to do here
+
+134
+00:13:30,975 --> 00:13:38,200
+所以我现在要做的是测试一下，如果我们去SandboxApp
+so what I'll do is probably test this out now, if we go to SandboxApp
+
+135
+00:13:38,875 --> 00:13:45,525
+我们目前，你们会看到，如果我编译Hazel，特别是如果我编译Hazel
+we currently you'll see hopefully that if I compile Hazel, especially if I compile Hazel
+
+136
+00:13:45,525 --> 00:13:50,200
+但是，如果我们看看着色器的编写位置，甚至不需要为这个编译Hazel
+but we shouldn't even need to compile Hazel for this to happen, if we take a look at where we've written our shaders
+
+137
+00:13:50,200 --> 00:13:55,675
+你们可以看到正在弹出错误，我们实际上不能以同样的方式创建Hazel
+and you can see the errors are popping up, you'll see that we can't actually create Hazel in the same way
+
+138
+00:13:56,150 --> 00:14:02,425
+我要做的最后一件事是，没关系，它在Renderer中，马上会处理，所以在SandboxApp.cpp
+and one last thing that I'll do actually is, that's fine, it's in the Renderer, we'll deal with that in a minute, so inside SandboxApp.cpp
+
+139
+00:14:02,425 --> 00:14:04,975
+你们可以看到我们实际上不能再创建Hazel::Shader了
+you can see that we can't actually create a Hazel::Shader anymore
+
+140
+00:14:04,975 --> 00:14:08,550
+因为我们不能使用new Shader，就像不能使用new VertexArray一样
+because we can't go new Shader, just like we can't go new VertexArray
+
+141
+00:14:08,550 --> 00:14:13,150
+因为它是个抽象类，所以我们必须用Hazel::Shader::Create
+because it's an abstract class, so we'll have to do Hazel::Shader::Create
+
+142
+00:14:13,425 --> 00:14:21,100
+就像我们必须处理所有其他类型的类似Renderer的资源一样
+just like we have to do with all of our other kind of Renderer like resources
+
+143
+00:14:21,400 --> 00:14:27,850
+好了，那么继续，所以用Create而不是用new，然后我们有一个必须处理的经典问题
+okay, there we go, so we create that instead of newing it, and then we have a fantastic problem that we have to deal with
+
+144
+00:14:27,975 --> 00:14:30,775
+所以，顺便说一下，就是在Renderer类里面
+so, and the same thing by the way, is inside the Renderer class
+
+145
+00:14:30,775 --> 00:14:38,550
+当尝试上传这些统一变量着色器时，当前是一个Shader类型的共享指针
+when we try to upload these uniforms shader is currently a shared pointer that is of shader of type shader
+
+146
+00:14:38,850 --> 00:14:42,600
+我们需要做的实际上是将其转换为OpenGLShader
+what we need to do is actually cast it into an OpenGLShader
+
+147
+00:14:42,900 --> 00:14:47,125
+现在我们知道这是一个OpenGLShader，因为这是唯一的可能性
+now we know it's an OpenGLShader, because that's the only thing it could possibly be
+
+148
+00:14:48,050 --> 00:14:53,050
+到那时，它可能像DirectXShader或VulcanShader一样，我们会有的
+and by the time, it could be like a DirectXShader or a VulcanShader, we will have far
+
+149
+00:14:54,100 --> 00:14:57,500
+就像重写了系统，已经去掉了它，让它变成抽象的
+far like rewritten the system, gotten rid of it, and made it actually abstract
+
+150
+00:14:58,375 --> 00:15:02,750
+但是既然我们现在还没有，我们基本上必须转换(cast)这个，所以要用
+but since we haven't right now, we basically have to cast this, so to do that using
+
+151
+00:15:03,600 --> 00:15:08,425
+你们知道的，标准cpp库，我想我们必须做static_cast或dynamic_cast
+you know, proper C++, I guess we'll have to do either a static_cast or dynamic_cast
+
+152
+00:15:08,525 --> 00:15:13,375
+从技术上讲，我们可以很容易执行static_cast，因为我们知道它是什么
+technically speaking, we could easily do a static_cast, because we know what it is
+
+153
+00:15:13,375 --> 00:15:16,000
+我们不需要做任何形式的验证来确保它是
+we don't need to do any kind of validation to make sure it's that
+
+154
+00:15:16,125 --> 00:15:19,375
+但是只是为了，你们知道的，漂亮，我想
+but just for the sake of being like, you know, nice, I guess
+
+155
+00:15:19,650 --> 00:15:26,475
+我们会像那样对OpenGLShader进行处理，所以就是std::dynamic_pointer_cast
+we'll do a dynamic_pointer_cast into OpenGLShader like that, so std::dynamic_pointer_cast
+
+156
+00:15:27,175 --> 00:15:32,215
+然后是我们要转换的类型，所以显然必须包含Platform
+and then the type we want to cast into, so we'll have to include obviously Platform
+
+157
+00:15:33,525 --> 00:15:40,700
+也就是Platform/OpenGL/OpenGLShader，我会复制并粘贴到这里
+Platform/OpenGL/OpenGLShader for that to work, and I'll just copy this and paste it into here
+
+158
+00:15:40,850 --> 00:15:44,425
+好了，现在我们在做什么，以后就可以轻松地搜索
+okay, so now what we're doing and, and in the future, we can easily just search for
+
+159
+00:15:45,350 --> 00:15:49,200
+就是std::dynamic_pointer_cast<OpenGLShader>，只要搜索一下，基本上就是这个字符串了
+you know, std::dynamic_pointer_cast<OpenGLShader>, just search for the, basically this string
+
+160
+00:15:49,375 --> 00:15:53,025
+然后用完全替换而不再是cast了，因为我们不再需要它了
+and then replace that all with just, you know, not casting it at all, because we won't need it anymore
+
+161
+00:15:53,425 --> 00:15:56,850
+即使这个没有意义，无论如何我们也必须删除这个函数
+even though that doesn't make sense, because we'll have to remove this function anyway
+
+162
+00:15:56,850 --> 00:15:59,675
+因为UploadUniformMat4不是抽象函数
+because UploadUniformMat4 is not an abstract function
+
+163
+00:15:59,675 --> 00:16:03,725
+这是个glShader的函数，太好了，所以那就是我们最终得到的
+it's a glShader only function, great, so that's what we end up with
+
+164
+00:16:03,725 --> 00:16:06,800
+在这种情况下，我们必须在SandboxApp中做同样的处理
+and we have to do the same thing in SandboxApp in this case
+
+165
+00:16:07,425 --> 00:16:10,050
+我们会改变系统的运行方式，所以就会有一点区别
+we're going to change the way the system works though, so it'll be a little bit different
+
+166
+00:16:10,950 --> 00:16:16,725
+基本上我们需要做的是，问题是这不会被绑定，永远不会
+basically what we need to do is, and the thing is this doesn't get bound, ever
+
+167
+00:16:16,880 --> 00:16:22,160
+所以我们调用了一个没有绑定的统一变量，这不是个好主意，原因可能是之前的也在运行
+so we do a uniform without binding, not a great idea, the reason that may have worked before
+
+168
+00:16:22,160 --> 00:16:29,450
+之前的运行方式只是因为我认为那是我们唯一的着色器，老实说，真的很惊讶
+and did work before is just because I think that's, is that the only shader we have, I'm actually quite surprised that worked to be honest
+
+169
+00:16:29,550 --> 00:16:33,900
+因为着色器从未绑定过，那就有点不可靠
+because the Shader was never bound, and that's a bit dodgy
+
+170
+00:16:33,900 --> 00:16:43,475
+但是让我们直接绑定着色器吧，所以就执行m_FlatColorShader->Bind()
+but let's bind the shader, so we'll do m_FlatColorShader->Bind()
+
+171
+00:16:43,475 --> 00:16:46,650
+再说一次，我们必须复制它，我想做一些事情
+and again, we'll have to just copy that, I want to do a few things
+
+172
+00:16:46,650 --> 00:16:52,775
+我们必须像这样把这个包含从Renderer复制到SandBox的顶部
+we'll have to copy this include from the Renderer into the top of sandbox like that
+
+173
+00:16:54,425 --> 00:16:59,575
+然后我们必须这样做，因为这实际上是Hazle的一部分，差不多放在最前面
+and then we'll have to, since that's actually part of Hazel, I might put it like first like that
+
+174
+00:17:00,100 --> 00:17:09,650
+然后必须做Hazel::OpenGLShader，转换类型，继续，然后Bind，然后要做的就是上传了
+and then, we'll have to do Hazel::OpenGLShader, custom thread type, there we go, Bind, and then what we'll do is we'll actually upload
+
+175
+00:17:10,098 --> 00:17:14,725
+那么我们有redColor和blueColor，太好了，我要做的是在这里创建个成员
+so redColor, blueColor, that's all great, what I'll do is I'll actually create a member here
+
+176
+00:17:14,725 --> 00:17:20,375
+正如我提到的，因为我们将把它与ImGui联系起来，所以就是个glm::vec3 m_SquareColor
+because we're going to tie this in with ImGui, as I mentioned, so this would be a glm::vec3 m_SquareColor
+
+177
+00:17:20,775 --> 00:17:26,070
+我们会把它设置为 (0.2，0.3，0.8)，就像之前做的那样，把它作为一个vec3
+we'll set this equal to (0.2, 0.3, 0.8), like we did before, we'll just have it as a vec3
+
+178
+00:17:26,225 --> 00:17:29,800
+我的意思是，alpha将为0，所以我们不妨就将其作为vec3
+I mean, the alpha is going to be 0, so we might as well just have it as a vec3
+
+179
+00:17:30,700 --> 00:17:36,224
+这意味着我们必须添加正确的函数，所以我们把这个作为一个，我们将在这里上传
+which means we'll have to add the right function, so we have this as a, we'll do the upload here
+
+180
+00:17:36,625 --> 00:17:40,461
+所以我们必须执行UploadUniformFloat3，我们还没有，但是马上就会有了
+so we'll have to do an UploadUniformFloat3, which we don't have yet, but will
+
+181
+00:17:40,925 --> 00:17:52,150
+名称将保留为u_Color，然后对应值也就是m_SquareColor，对吧
+the name will remain as u_Color, and then the value will be m_SquareColor, okay
+
+182
+00:17:53,050 --> 00:17:58,875
+我们已经写了其他所有东西，我们会移除这些，然后对这里的位置进行转换
+we've already written everything else, we'll get rid of this stuff, and just do the transform in the position inside here
+
+183
+00:17:59,175 --> 00:18:02,625
+所以这只是一种，如果我们有了材质，它就会在材质中
+so this will just kind of, again, if we had a material, it would be in the material
+
+184
+00:18:02,625 --> 00:18:05,950
+但是现在没有，所以它就在这里，但是当我们将来有材质的时候
+but we don't, so it's here, but when we have materials in the future
+
+185
+00:18:05,950 --> 00:18:10,175
+我们就会重写这个，我们会从这里去掉redColor和blueColor，因为我们不再需要它们了
+we'll rewrite this, we'll get rid of the redColor and the blueColor from here, because we don't need them anymore
+
+186
+00:18:10,550 --> 00:18:12,775
+最后一件事就是我们需要创建所有这些函数
+and then the final thing is we need to create all of these functions
+
+187
+00:18:12,880 --> 00:18:20,725
+所以让我们继续实现那个，所以在OpenGLShader中，我们将基本上重复这一过程
+so let's go ahead and make that happen, so inside OpenGLShader, we're going to basically duplicate this a bunch of times
+
+188
+00:18:20,925 --> 00:18:24,975
+我们将有UploadFloat、UploadFloat2、Float3和Float4
+we'll have UploadFloat, UploadFloat2, Float3 and Float4
+
+189
+00:18:26,050 --> 00:18:33,825
+可能也会有个int，所以当需要上传这些东西(采样器)时，肯定会需要UploadUniformInt
+we'll probably have an int as well so UploadUniformInt will definitely need that for things like samplers when we need to upload those
+
+190
+00:18:34,600 --> 00:18:43,025
+int2，int3，int4，可能还不会为这些创建函数，我们也可以，只是想到底该用于什么
+int2, int3, int4, we probably won't make functions for that just yet, we could definitely could, I'm just trying to think what on earth that'd be used for
+
+191
+00:18:43,825 --> 00:18:50,725
+int3可能对骨骼索引非常有用，但同样，我们不会很快处理动画
+and int3 would probably be quite useful for like bone indices, but again, we're not dealing with animation anytime soon
+
+192
+00:18:50,725 --> 00:18:57,520
+所以我认为现在那个太有用了，所以我会在以后需要它的时候处理
+so I think that's too useful right now, so I'll just, I'll deal with that in the future, as we need it
+
+193
+00:18:57,520 --> 00:19:06,125
+不过我会创建Mat3，因为那可能会有用，好了，所以我们现在已经处理了所有这些函数
+I'll do mat3 though, because that could potentially be useful, okay, so we've got all of this sorted out now
+
+194
+00:19:06,550 --> 00:19:18,025
+所以我们有了所有这些，我可以直接点击这里，使用VA来创建，好了，然后回到这里，看看
+so we've got all these, I can just right click here, and use visual assist to create all of these things, okay, and then back here, and see
+
+195
+00:19:18,025 --> 00:19:23,425
+如果我们可以将它们按顺序排，那就太好了，我要做的就是将这个代码复制到所有地方
+if we can put them in the right order, which is great, what I'll do is just copy this code absolutely everywhere
+
+196
+00:19:23,850 --> 00:19:31,325
+所以这个location应该，就像我上期提到的应该已经在这里了，因为已经传入了着色器
+so this, this location should, as I mentioned last episode should already be here, because we should have passed the shader
+
+197
+00:19:31,325 --> 00:19:37,424
+得到了所有的着色器值，我们会在后面更深入地处理它
+got all the shader values out, we'll have, we'll deal with that in more depth in the future for sure
+
+198
+00:19:37,700 --> 00:19:42,375
+但是现在，我们只会每次都获得位置，我们不应该真正注意到任何性能
+but for now, we'll just get the location every single time, which we shouldn't really notice any kind of performance
+
+199
+00:19:43,125 --> 00:19:45,775
+从中减少，即使这不是最有效的事情
+decrease from that, even though it isn't the most efficient thing to do
+
+200
+00:19:46,160 --> 00:19:49,050
+仅仅是因为我们目前不处理任何大规模渲染
+just because we're not dealing with any kind of large scale rendering at the moment
+
+201
+00:19:50,150 --> 00:19:57,750
+所以不要太担心，如果你们有点担心，好了，所以就是2f和3f，然后你们可以做的是
+so don't worry too much about that if you are slightly worried, okay, two F and three F what you could do is
+
+202
+00:19:57,750 --> 00:20:04,550
+实际上，缓存这些位置就像一个快捷处理，你们可以从OpenGL中检索活动统一变量的列表
+actually cache these locations as like a quick thing, you could either like retrieve a list of active uniforms from OpenGL
+
+203
+00:20:04,550 --> 00:20:07,840
+但是很多人倾向于做的一种技术实际上是
+but a technique that a lot of people tend to do is actually
+
+204
+00:20:07,840 --> 00:20:14,025
+比如在哈希表中缓存统一变量，这样你们就不会在哈希表中估计了
+cache the uniforms and like in like a map, like a hash map, so that you don't bet like under the hash map
+
+205
+00:20:14,250 --> 00:20:19,450
+哈希表是基于统一变量的名称，然后是键，实际值是位置
+the hash map is based on the name of the uniform, and then the key, the actual value is the location
+
+206
+00:20:19,750 --> 00:20:23,250
+因此，你们可以轻松地仅检索一次位置并缓存该值
+so you can just easily kind of retrieve the location only once and cache that value
+
+207
+00:20:23,500 --> 00:20:28,075
+然后重复使用它，因为位置不会改变，我实际上有期视频
+and then reuse it since the location is not going to change, I actually have a video
+
+208
+00:20:28,075 --> 00:20:32,700
+我想昨天我可能发布了一期关于那个的视频，也有可能还没有做
+I think yesterday I probably released a video on that, I haven't made the video yet
+
+209
+00:20:32,700 --> 00:20:37,875
+但是我要创作然后发布，实际上这期视频将在我发布另一期视频之后发布的，有点奇怪
+but I'm gonna make it and then release it, and actually this video will be released after I released the other video, which is weird
+
+210
+00:20:37,875 --> 00:20:44,550
+因为我还没有创作其他的，但长话短说，OpenGL缓存统一变量的视频，如果还没有看过的话
+because I haven't made the other video yet, but long story short, OpenGL caching uniforms video up there, check it out if you haven't already
+
+211
+00:20:45,440 --> 00:20:48,640
+如果你们想了解有关如何缓存这些统一变量的更多详细信息，因为我想我会创作
+if you want more details about how to cache these uniforms and stuff, cause I thought I'd make
+
+212
+00:20:48,850 --> 00:20:55,795
+关于这个的特定OpenGL系列视频，好了，所以value，这就成了value.x和value.y
+a specific OpenGL series video about that, okay, so value, this becomes value.x, value.y
+
+213
+00:20:58,350 --> 00:21:03,050
+万一我搞得太快了，而你们却没有跟上，我在这里所做的就是
+in case, in case I'm going a little bit too fast, and you're not following along, all I'm doing here is
+
+214
+00:21:03,050 --> 00:21:10,750
+只是创建非常基本的函数，这些函数几乎相同，只是它们实际处理的类型不同
+just creating very, very basic functions that are pretty much the same, but they actually deal with different types
+
+215
+00:21:11,450 --> 00:21:16,350
+换句话说，我们在这里处理一个三分量向量，两分量向量，一分量向量，也就是个浮点数
+so in other words, we're dealing with a three component vector here, two component vector, a one component vector, just a float
+
+216
+00:21:17,150 --> 00:21:25,025
+然后比如四个分量向量，就像vec4，就是四个浮点数，我们以统一变量的形式上传到GPU
+and then like a four component vector, like a vec4, which is just four floats that we're uploading to the GPU in the form of uniform
+
+217
+00:21:25,175 --> 00:21:30,425
+这样我们基本上可以上传我们想要的任何类型的数据，而不仅仅是float4和map4
+so that we basically can upload any type of data we want, and not just float4 and map4
+
+218
+00:21:30,425 --> 00:21:36,025
+这是我们之前可以做的另一件事，所以这变成了3fv
+which is what the other thing that we could do before, so this becomes 3fv and
+
+219
+00:21:36,850 --> 00:21:41,925
+那就是唯一可以改变的，令人惊讶，好了，非常简单，确保你们不会犯任何错误
+that is literally the only thing that changes, amazing, okay, really simple, make sure that you don't make any mistakes
+
+220
+00:21:41,925 --> 00:21:45,967
+四，三，二，一，听起来不错，1当然就是整数
+four, three, two, one, sounds good, and one, I of course, for the integer
+
+221
+00:21:46,900 --> 00:21:51,800
+好了，就那样，那就是我们要做的，现在我们有了所有这些函数
+okay, that's it, that's all we have to do, now we have all of these functions
+
+222
+00:21:51,800 --> 00:21:57,800
+而且我们显然可以像UploadUniformFloat3一样使用它们，应该完全可以
+and we can obviously use all of them like UploadUniformFloat3, for example, should be completely fine
+
+223
+00:21:57,800 --> 00:22:01,275
+这是函数，好了，那就是它的运行原理，让我们继续
+here's the function, okay, so that's how that works, let's go ahead
+
+224
+00:22:01,275 --> 00:22:09,300
+并将这个m_SquareColor添加到ImGui控件中，确实非常容易做到
+and add this m_SquareColor vector to our ImGui controls, really, really easy to do
+
+225
+00:22:09,300 --> 00:22:11,725
+我们认为以前没有在ImGui中做到过
+we don't think we've done that before in ImGui
+
+226
+00:22:11,725 --> 00:22:16,175
+但是我将向你们展示它是多么简单，我们基本上只是做ImGui::Begin创建个新窗口
+but I'll show you how simple it is, we basically just do ImGui::Begin to make a new window
+
+227
+00:22:16,175 --> 00:22:23,350
+我会叫它为Settings，然后每个ImGui::Begin也需要有一个ImGui::End
+I'll call this window settings, and then every ImGui::Begin needs to have an ImGui::End as well
+
+228
+00:22:23,650 --> 00:22:27,200
+然后在这之间，我们基本上列出了我们想要的UI控件列表
+and then in between that, we put basically a list of UI controls that we want
+
+229
+00:22:27,475 --> 00:22:34,325
+所以我们要做的是创建一个ImGui::ColorEdit3，这只是一种
+so what we'll do is we'll make a ImGui::ColorEdit3, which is just a little kind of
+
+230
+00:22:34,325 --> 00:22:40,400
+颜色编辑UI控件，我们可以单击它来调出一个颜色选择器，我们就叫它Square Color
+color edits UI control that we can click on to bring up a color picker, we'll call this our SquareColor
+
+231
+00:22:41,425 --> 00:22:48,725
+我们会给它一个glm::value_ptr，也就是m_SquareColor，就像那样
+and we'll give it a glm::value_ptr, which is going to be m_SquareColor, just like that
+
+232
+00:22:48,725 --> 00:22:57,075
+好吧，对于value_ptr，需要个包含，就是这个，我只是从OpenGLShader来做，就像那样
+okay, and for value_ptr, I think we need an include, which is this one, I'm just doing it from OpenGLShader, just like that
+
+233
+00:22:57,800 --> 00:23:01,800
+就是那样，就像这三行代码会为我们提供一个不错的小UI
+and that's it, like these three lines of code are going to give us a nice little UI
+
+234
+00:23:01,875 --> 00:23:05,250
+这样我们就可以在运行时改变正方形颜色，其他一切都应该可以运行的
+so that we can change the square color at runtime, and everything else should work
+
+235
+00:23:05,575 --> 00:23:09,325
+让我们运行一下，看看会发生什么，好吧，那没有像预期的那样运行了
+let's hit f5 and see what happens, okay, so that did not work as expected
+
+236
+00:23:09,325 --> 00:23:11,825
+所有正方形实际上都是黑色的，这太棒了
+all of our squares are actually black, which is fantastic
+
+237
+00:23:11,825 --> 00:23:17,950
+但是你们可以看到，至少它们处于适当的位置，这意味着很明显，变换矩阵这些都有效
+but you can see that at least they are in the proper positions, which means that obviously the transformation matrix and all that stuff works
+
+238
+00:23:18,075 --> 00:23:24,450
+因此，由于某种原因，m_FlatColorShader似乎无法与此一运行，所以让我们来看看这个
+so for some reason, m_FlatColorShader did not seem to work with this, so let's take a look at this
+
+239
+00:23:24,450 --> 00:23:28,448
+这是一个vec4，所以我们需要把它改成vec3，确保你们不会忘记这个改变
+Oh, it's a vec4, so we changed it to a vec3, make sure that you don't forget that change
+
+240
+00:23:28,775 --> 00:23:34,375
+然后在这里，我们会执行vec4 u_Color，然后1.0 alpha，让我们运行一下
+and then over here, we'll just do a vec4 u_Color and then 1.0 for the alpha, let's hit f5
+
+241
+00:23:34,950 --> 00:23:40,160
+现在，这应该可以正常运行，正如你们所看到的，我们的Hazel引擎正在运行
+and this should now work, all right, and as you can see, we have our Hazel engine running
+
+242
+00:23:40,160 --> 00:23:45,200
+有了这种带有正方形颜色的UI控件，所以我们现在可以做的就是点击这个
+with this kind of UI control here with the square color, so what we can do is now just click on this
+
+243
+00:23:45,300 --> 00:23:49,150
+调出一个颜色选择器，你们可以看到我们可以将其更改为所需的任何颜色
+brings up a color picker, and you can see that we can change it to really any color we want
+
+244
+00:23:49,475 --> 00:23:53,952
+所有的正方形都用这种颜色更新了，所以绝对很酷
+and there's all of the squares are updated with that color, so definitely very cool
+
+245
+00:23:54,125 --> 00:23:59,000
+并表明我们所有的统一变量实际上都在动态运行，好了
+and shows that all of our uniforms are in fact working dynamically, all right
+
+246
+00:23:59,000 --> 00:24:01,675
+所以我希望你们喜欢这期视频，如果喜欢的话，就为它点赞吧
+so I hope you guys enjoyed this video, if you did, you can hit that like button
+
+247
+00:24:01,675 --> 00:24:08,225
+你们还可以通过访问patreon.com/thecherno来帮助支持该系列，并获得许多非常酷的东西
+you can also help support the series by going over to patreon.com/thecherno and get access to a lot of really cool things
+
+248
+00:24:08,640 --> 00:24:14,000
+我已经开始在patreon上做这个新东西了，实际上我只是为赞助商制作独家视频
+I've started doing this new thing on patreon where I actually make exclusive videos just for patrons
+
+249
+00:24:14,075 --> 00:24:18,100
+所以这不像某种大规模的计划
+so this isn't like some kind of massive like conspiracy of
+
+250
+00:24:18,325 --> 00:24:23,425
+哦，我的天哪，Cherno突然发布了他所有的非常好的内容，只是为付了费的赞助商，不
+oh my gosh, Cherno suddenly releasing all of his like really good content just for Patrons behind a paywall, no, no, no
+
+251
+00:24:23,775 --> 00:24:28,875
+我实际上正在做的只是在创作视频时制作了一些小视频，只是带了一些注释
+what I'm actually doing is just making little videos as I work on the real videos, just with little notes
+
+252
+00:24:29,000 --> 00:24:34,525
+所以当我开发Hazel dev的时候，对吧，这就是我个人的Hazel开发分支
+so while I'm developing Hazel dev, right, which is kind of my personal Hazel development branch
+
+253
+00:24:34,525 --> 00:24:39,500
+你们也可以通过patreon访问，已经做好了PBR渲染器那些东西
+which you can also access through patreon, which is where I've got like the PBR renderer and all of that stuff
+
+254
+00:24:40,375 --> 00:24:46,500
+或者我只是在想我要创作的另一期视频，我会创建一个开发日志，就像
+or I'm just kind of just thinking about another video that I'll make, I'll make kind of like a development log, that's just like
+
+255
+00:24:46,500 --> 00:24:51,825
+大家好，这就是我正在考虑的事情，我将输入一些代码以确保其正常运行
+hey guys, so this is what I'm thinking of doing, I'll just type out some code to make sure it works
+
+256
+00:24:52,150 --> 00:24:56,250
+你们知道的，这就是我在Hazel-dev中所做的，这就是Hazel-dev中的代码
+you know, this is what I've been doing in a Hazel dev, this is what the code looks like in Hazel dev
+
+257
+00:24:56,250 --> 00:25:02,925
+这就是我正在考虑为游戏引擎系列下一期做的事情，特别是针对Hazel公开之类的东西
+this is what I'm thinking about doing for the next episode of game engine series for specifically the Hazel public, that kind of stuff
+
+258
+00:25:02,925 --> 00:25:07,408
+或者就像，我是说，上次我发布的时候，就像一段25分钟的视频，我只是在随意交流
+or it's like, I mean, last time I released, it was like a 25 minute video of me just having a casual conversation
+
+259
+00:25:07,408 --> 00:25:10,950
+这几乎就像一个会议或者我有点像和你们讨论的事情
+it's almost like a meeting or something that I'm just kind of like discussing with you guys
+
+260
+00:25:10,950 --> 00:25:16,100
+就像，嘿，这就是我正在做的，我说的大部分内容最终都会发布到YouTube
+like, hey, this is what I'm doing, most of the content that I say that does eventually make its way to YouTube videos
+
+261
+00:25:16,100 --> 00:25:23,825
+但这就像一种排他性的，就像幕后的样子，更像是讨论，你们也可以留下评论并提出建议
+but this is just like a kind of exclusive, like behind the scenes look, and more of like kind of a discussion where you guys can also leave comments and make suggestions
+
+262
+00:25:24,400 --> 00:25:27,920
+就像我做的事情一样，当我在办公室工作时
+and like it's just something that I do kind of, as I work on stuff back at my office do
+
+263
+00:25:28,950 --> 00:25:32,875
+如果你们对此感兴趣，绝对可以帮助支持以获取这些视频，顺便说一句，每月3美元
+so if you're interested in that, definitely help support to get those videos, by the way, it's like $3 a month
+
+264
+00:25:33,325 --> 00:25:36,475
+这是最低的赞助费，你们可以访问所有这些patreon视频
+it's the lowest patreon tier, and you get access to all those patreon videos
+
+265
+00:25:36,475 --> 00:25:38,925
+我试图每周做一两期，但每周至少一期
+I'm trying to do like one or two a week, but at least one a week
+
+266
+00:25:39,300 --> 00:25:45,825
+所以一定要去看看，并帮助支持这个系列，因为你们的慷慨让这种事情成为可能
+so definitely check that out and help support the series, because your generosity makes this kind of stuff possible
+
+267
+00:25:45,875 --> 00:25:49,825
+我非常喜欢做这种事情，所以下期，就像我提到的那样
+and I love doing this kind of stuff so much, so next time, as I mentioned
+
+268
+00:25:49,925 --> 00:25:57,650
+可能看看参考计数之类的东西，因为我们保留的越多，以后我们要做的工作就越多
+probably take a look at reference counting and that kind of stuff, because the more we leave it, the more work we'll have to do later
+
+269
+00:25:57,975 --> 00:26:03,900
+可能不是最激动人心的一期，但这只是真正需要完成的核心引擎内容
+might not be the most thrilling episode, but it's just core kind of engine stuff that really does need to get done
+
+270
+00:26:04,200 --> 00:26:11,300
+正如我之前提到的，将会有一个最后的投票，只是为了确定我们是否要做2D和3D
+and as I mentioned before, there's going to be one final poll just to determine whether or not we're going to do 2D and 3D
+
+271
+00:26:11,650 --> 00:26:15,600
+就像你们知道的，你们可以通过看上期视频来查看
+just so you guys know, and you can check that out by just looking at the last video
+
+272
+00:26:16,325 --> 00:26:24,825
+就像你们中的3分之2投票给3D，而你们中的3分之1投票给2D，所以很可能是3D
+it was like two thirds of you voted for 3D, and one third of you voted for 2D, so it is very likely going to be 3D
+
+273
+00:26:25,125 --> 00:26:29,550
+所以我已经开始计划3D了，这可能就是我们以后的方向
+so I've already started planning 3D actually, and that's probably the direction that we'll actually take
+
+274
+00:26:29,950 --> 00:26:35,400
+但是最后一次投票，会有描述，描述中会有个链接，如果你们去我的频道，它就像讨论页样
+but again, one final poll, there'll be a descriptionm and there'll be a link in the description, if you go to my channel, it's in like the discussion page
+
+275
+00:26:35,550 --> 00:26:38,500
+你们中的一些人可能已经看到它出现在你们的like流上，
+some of you may have already seen it pop up on your like feed, 
+
+276
+00:26:39,250 --> 00:26:42,950
+因为我只是将其发布为通过YouTube的投票
+because I'm just going to publish it as like a poll post through YouTube
+
+277
+00:26:43,975 --> 00:26:47,325
+所以一定要确保你们出去，去那里投票，并发表评论
+so definitely make sure that you go out, go there and vote and also leave a comment
+
+278
+00:26:47,850 --> 00:26:53,225
+比如建议为什么投票支持这个，为什么想要那个，这样就可以让更多的人投票支持你们想要的
+like suggesting maybe why you voted for this, and why you want that, so that you can get more people on board to vote for what you want
+
+279
+00:26:53,225 --> 00:26:58,800
+这将会是我们对Hazel系列的最终决定
+and this will kind of be the final decision as to which way we take this Hazel YouTube series
+
+280
+00:26:58,800 --> 00:27:01,488
+希望你们喜欢这期视频，下次见，拜
+hope you guys enjoy this video, I'll see you next time, goodbye
+

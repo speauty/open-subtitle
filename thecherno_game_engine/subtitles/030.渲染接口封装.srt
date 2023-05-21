@@ -1,0 +1,2085 @@
+﻿1
+00:00:00,166 --> 00:00:03,075
+嘿，你们好，我是TheCherno，欢迎回到我的游戏引擎系列
+hey, what's up guys, my name is TheCherno, welcome back to my game engine series
+
+2
+00:00:03,200 --> 00:00:08,225
+那么上期我们终于用着色器正确地绘制了一个三角形，那应该对每个人都有用
+so the last time we finally actually used shaders to draw a triangle properly, and that should work for everyone
+
+3
+00:00:08,825 --> 00:00:12,166
+今天我们要讲一些我们还没讲过的东西
+today we're going to talk about something that we haven't talked about
+
+4
+00:00:12,166 --> 00:00:16,425
+到目前为止，我们只是想尽快把所有内容显示在屏幕上
+thus far we kind of just wanted to get everything up onto the screen as quickly as possible
+
+5
+00:00:16,425 --> 00:00:21,300
+在我们的Application类中，对吧，只有一些原始的OpenGL代码
+just having kind of raw OpenGL code, right, inside our application class
+
+6
+00:00:22,333 --> 00:00:29,950
+并且今天我们终于要讨论些渲染接口的设计和抽象了
+and today we're finally getting to discussing kind of the design the abstraction of these kind of renderer api course
+
+7
+00:00:29,950 --> 00:00:34,975
+我们有的OpenGL那些接口，以及我们如何处理多个渲染接口
+that we have currently with OpenGL, and how we're actually going to handle multiple renderer apis
+
+8
+00:00:34,975 --> 00:00:40,366
+因为那是个非常重要的问题，当你们在考虑游戏引擎时，那确实需要处理
+because that's a pretty big issue, that really needs to be addressed, when you're thinking about game engine the line
+
+9
+00:00:40,366 --> 00:00:44,525
+特别是如果你们想有某种支持多种接口的渲染引擎
+especially if you want to actually have some kind of renderer engine that supports multiple apis
+
+10
+00:00:44,525 --> 00:00:51,766
+在游戏引擎中，这是种很重要的抽象，通常与多平台有关
+it's kind of too big kind of abstractions that go on in game engines, usually to do with kind of multiple platforms
+
+11
+00:00:51,766 --> 00:00:59,771
+那是多个实际的平台，像Windows Mac Linux Android iOS PS for Xbox switch等等
+and that is the multiple actual platforms, right,so stuff like Windows Mac Linux Android iOS, PS for Xbox switch whatever
+
+12
+00:01:00,100 --> 00:01:06,450
+那些就是你们实际处理不同平台的抽象，还有渲染器接口抽象
+those kind of abstractions where you're actually dealing with different platforms, and there's also the renderer api abstraction
+
+13
+00:01:06,733 --> 00:01:13,150
+你们在处理渲染器接口的潜力，它实际上就是支持多个渲染接口
+in which you're dealing with the potential for renderer apis, that it actually basically supporting multiple rendering apis
+
+14
+00:01:13,300 --> 00:01:22,625
+所以能够使用DirectX渲染，OpenGL，Vulcan之类的接口，所以这两个都是非常大的主题
+so being able to render using DirectX, using OpenGL, using Vulcan, any of that kind of stuff, so both are very big discussions
+
+15
+00:01:23,275 --> 00:01:30,250
+很明显，我们今天讨论了渲染器接口，我也想看看关于这个有很多学派的思想
+obviously we got talking about renderer apis today, and I also want to kind of see that there's lot of schools of thought on this
+
+16
+00:01:30,250 --> 00:01:36,733
+在我的职业生涯中，见过很多和我喜欢的方式不同的来实现这个的方法
+I've seen in my professional career, I've seen a lot of different ways of doing this the way that I like doing it
+
+17
+00:01:36,733 --> 00:01:41,975
+我们要为Hazel实现这个的方法只是众多方法中的一种，不像没有正确的方法
+and the way that we're going to do it for Hazel is just one of the many ways, don't like there's no correct way
+
+18
+00:01:41,975 --> 00:01:47,100
+这取决于哪种方法适合你们的需求，比如实际上喜欢什么，以及你们希望接口是什么样
+it depends on what kind of suits your needs, and what you actually like, and what you want the api to look like
+
+19
+00:01:47,100 --> 00:01:53,000
+并且你们想让代码看起来像编程，撸码是一件很主观的事情
+and what you want the code to look like programming, and just you know, writing code is such a subjective kind of thing
+
+20
+00:01:53,375 --> 00:01:59,375
+我的意思是，是的，有客观事实可以确定这样做，但从技术理论上来说，可能就比较糟糕
+I mean yes, there are objective truths as to sure you could do it this way, but it's like technically on paper worse in every way
+
+21
+00:01:59,375 --> 00:02:04,450
+当然，代码可能看起来很漂亮，但性能很差，抽象很差，接口很糟糕
+like sure the code might look pretty, but the performance is bad, the abstraction is bad, the api is terrible
+
+22
+00:02:05,000 --> 00:02:09,250
+我想如果代码很不错，接口不会太糟糕，但你们明白我的意思
+well I guess if the code is pretty, the api wouldn't be terrible, but you get my drift
+
+23
+00:02:10,100 --> 00:02:20,275
+我非常相信做正确的事情，是的，代码可能更难读，它可能不那么好
+I'm a big believer of doing things like properly in a sense of, yes, the code might be harder to read, and it might not be as nice
+
+24
+00:02:20,466 --> 00:02:27,125
+但它的运行速度会更快，显然我有EA游戏引擎工程的背景
+but it's gonna perform faster, obviously me coming from a background of like game engine engineering at EA
+
+25
+00:02:27,866 --> 00:02:34,200
+我们当然关心性能，因为我们试图突破极限，所以考虑那点很重要
+we definitely care about performance, because we're trying to push the limits, so it's important to kind of consider that
+
+26
+00:02:34,200 --> 00:02:40,533
+那就是我作为一个程序员的本能，我真的很在乎性能，我喜欢那样做
+and that's kind of just, that's kind of just who I am as a programmer, I really care about performance, and I like to kind of do it that way
+
+27
+00:02:40,533 --> 00:02:45,250
+不管怎样，永远不会满足于那个，我想对所有支持这个系列的朋友表示衷心的感谢
+anyway, I don't wanna blab her on forever, I wanna give a huge thank you to all the patrons that made the series possible
+
+28
+00:02:45,250 --> 00:02:49,100
+如果你们访问patreon.com/thecherno支持，就能提前看到视频
+patreon.com/thecherno, if you guys sign up there, you'll get videos early
+
+29
+00:02:49,100 --> 00:02:54,775
+你们就可以访问Hazel开发分支的源代码
+you'll get access to the source code to the Hazel kind of development repository
+
+30
+00:02:54,775 --> 00:03:00,350
+开发分支那边，我几乎每天都在提代码，不是每天，但几乎每天都在做
+the development branch which I'm working on pretty much every day, will not every day, but almost every day
+
+31
+00:03:01,225 --> 00:03:08,275
+上期视频中，我展示了Hazel引擎在开发分支中的具体进度
+last video I actually showed like a bit of a bit of a tour of what the Hazel engine actually is in the development branch
+
+32
+00:03:08,275 --> 00:03:13,266
+那就是我已经实现了的细节展示，感觉你们对那个更感兴趣
+and that was like a huge kind of little kind of show detail that I did, you guys are more interested in that
+
+33
+00:03:13,266 --> 00:03:17,800
+我注意到有些人想让我制作一期独立的视频来展示天使
+I noticed that some people wanted me to like make a video actually showing the angel like a standalone video
+
+34
+00:03:17,800 --> 00:03:24,799
+就像是我们在引擎运行时中所拥有的一切，它能做什么，所有的特性
+just kind of like a tour of what we actually have in the engine runtime and what everything, what it can actually do like all the features
+
+35
+00:03:24,800 --> 00:03:28,200
+如果你们感兴趣，一定要在下面留言，但如果现在就想看的话
+if you guys interested in that, definitely leave a comment below, but if you want access to that like right now
+
+36
+00:03:28,200 --> 00:03:34,675
+你们可以直接在patreon上注册，来帮助支持我们这个系列，这样就可以访问源码构建那个
+you can just sign up on patreon, conversations to channel helps about this series, and you'll get access to that source code and to that build
+
+37
+00:03:35,000 --> 00:03:40,825
+好了，不管怎样，回到这个，让我们说说渲染器接口吧，如何支持多个渲染接口
+okay, so anyway, back to this, let's talk about renderer apis, how do we support multiple renderer apis
+
+38
+00:03:41,166 --> 00:03:52,400
+所以我认为你们要做的最重要的选择就是在编译或运行时，是否有这种支持
+so I think the biggest choice that you have to make here is if you're going to kind of have this support during compilation or during runtime
+
+39
+00:03:52,866 --> 00:03:58,966
+那么我要说的是，比如我的意思，本质上你们可以通过多个渲染接口做的就是
+so I kind of talk about like what I mean by that, essentially what you could do right with multiple rendering apis is
+
+40
+00:03:58,966 --> 00:04:06,250
+可以看到，在编译时，当我物理编译代码时，你们需要选择渲染接口，例如需要DirectX
+you could see that at compile time when I physically compile my code, right, you need to select rendering api, for example I want DirectX
+
+41
+00:04:06,750 --> 00:04:09,900
+然后即将发生的就是，你们知道的，基本上
+and then what will happen is you know via like essentially
+
+42
+00:04:09,900 --> 00:04:15,675
+如果定义或某些文件编译或未编译基于你们在这里设置的配置
+if defs or certain files that either compiled or not compiled based on your kind of configuration set up here
+
+43
+00:04:16,500 --> 00:04:24,250
+你们可以选择我要用DirectX编译，这意味着Hazel将用DirectX构建，对吧
+you can basically choose that like I am going to compile with DirectX, meaning that Hazel is going to be built with DirectX, right
+
+44
+00:04:24,766 --> 00:04:28,282
+如果你们想用OpenGL，那么添加编译时，就选择OpenGL，对吧
+if you want to OpenGL, then add compile time, you choose OpenGL, right
+
+45
+00:04:28,282 --> 00:04:35,000
+然后所有被编译的文件都是特定于OpenGL的，对吧，然后你们在最终构建中使用OpenGL
+and then all the files that are compiled are kind of OpenGL specific, right, and then you get OpenGL into your final build that
+
+46
+00:04:36,300 --> 00:04:39,375
+给你们一个更实际的例子吧，我的意思是，你们知道，你们可以
+and to give you a more practical example, what I mean is like you know, you could have like
+
+47
+00:04:39,766 --> 00:04:44,525
+本质上就是你们把渲染接口分解成每个图元文件
+essentially a file for each kind of you break down the rendering API and into primitive
+
+48
+00:04:44,575 --> 00:04:49,275
+所以你们就会有顶点缓冲区，索引缓冲区，纹理类，你们知道的，着色器类
+so you have like a vertex buffer, an index buffer, texture class, you know shader class
+
+49
+00:04:49,575 --> 00:04:54,600
+然后你们要做的就是，创建个OpenGL着色器类，然后还有DirectX着色器类
+and then what you do is you have like an OpenGL shader class, and then you have a DirectX shader class
+
+50
+00:04:54,950 --> 00:04:58,750
+并且其中只有一个会被编译，对吧，被编译的那个
+and only one of those will be compiled, right, and the one that gets compiled
+
+51
+00:04:58,750 --> 00:05:03,400
+取决于你们的配置设置，取决于你们实际选择的渲染接口
+depends on your configuration setup at which depends on which rendering API you've actually selected
+
+52
+00:05:03,766 --> 00:05:08,825
+所以你们就可以那样做，或者甚至可以有着色器的文件，比如Shader.cpp
+so you can kind of do it like that, right, or you could even just have a shader of files, Shader.cpp
+
+53
+00:05:09,133 --> 00:05:14,725
+然后如果定义了，如果定义了DirectX，就编译这段代码
+and then just if defs the kind of just, says you know if DirectX is defined, then compiled this chunk of code
+
+54
+00:05:15,000 --> 00:05:21,000
+否则如果OpenGL被定义，编译了这段代码，对吧，那就是另一种方法同样的原理，对吧
+otherwise if OpenGL is defined, compiled this chunk of code, right, that's another way to do it same principle, right
+
+55
+00:05:21,100 --> 00:05:23,796
+只是没有将其分解成多个文件，而是将所有内容都放在一个文件中
+just instead of breaking it up into multiple files, you have everything in one file
+
+56
+00:05:24,125 --> 00:05:30,225
+当然，那么就让我们来说说它的优点和缺点吧，好了，那么最大的缺点是什么
+sure, so let's talk about the advantages and disadvantage of that, okay, so the biggest disadvantage, what's that with the disadvantages
+
+57
+00:05:30,225 --> 00:05:34,950
+因为我认为最明显的一点就是你们需要个独立构建的Hazel
+because I think that's kind of the glaring obvious one is you need a separate build of Hazel
+
+58
+00:05:35,166 --> 00:05:41,150
+一个独立的构建，一个独立的物理二进制构建，以便实际选择你们想使用的接口
+a separate build a separate physical binary build, in order to actually select which api you want to use
+
+59
+00:05:41,500 --> 00:05:45,454
+并且一旦你们用那个接口编译了代码，就那样了，你们就必须重新编译整个引擎
+and once you compile your code with that api, that's it, you have to recompile the whole engine
+
+60
+00:05:45,566 --> 00:05:52,275
+或者释放引擎关于整个渲染器的渲染组件，如果你们真的想切换渲染接口的话
+or release the rendering component of the engine about the whole renderer, if you actually want to switch rendering apis
+
+61
+00:05:53,422 --> 00:05:58,450
+想象一下，对吧，我的意思是正在运行，就像，啊，你们知道，我们写这个游戏就像
+so picture this, right, I mean we're working, and we're like ah you know, we've written this game in like
+
+62
+00:05:58,450 --> 00:06:01,625
+我不知道，我们只是在做这个Sandbox项目，用OpenGL写的
+I don't know, we're just working on this little Sandbox project, we've written it in OpenGL
+
+63
+00:06:01,625 --> 00:06:08,950
+我突然想看看它在DirectX中的样子，拿着啤酒，我用DirectX再次编译我的整个代码
+suddenly I want to see what it looks like in DirectX, hold my beer while I compile my entire code again with DirectX
+
+64
+00:06:09,500 --> 00:06:15,950
+好吧，那不是，我不是，我真的不太热衷于那个，所以除了开发时间有点慢
+right, that's not, I'm not, I'm really not a big fan of that, so apart from development times being kind of slow
+
+65
+00:06:15,950 --> 00:06:19,775
+特别是当真正在渲染器上运行时，那是人们没有意识到的比较重要的问题
+especially when you're actually working on the renderer, that's another big thing that people don't realize
+
+66
+00:06:20,100 --> 00:06:25,900
+你们必须让它变得友好些，所以我的意思是，当你们实际开发渲染器
+you have to make this develop a friendly, so what I mean by that is while you're actually developing the renderer
+
+67
+00:06:25,900 --> 00:06:30,150
+你们会如何处理这个，你们知道的，我已经完成了OpenGL实现
+how you're gonna deal with this, well, you know I've finished the OpenGL implementation
+
+68
+00:06:30,150 --> 00:06:35,775
+现在我在做DirectX的实现，需要在它们之间切换，对吧，我需要在它们之间切换
+now I'm working on the DirectX implementation, I need to switch between them, right, I need to switch between them
+
+69
+00:06:36,066 --> 00:06:42,050
+要知道视觉模仿是否相同，对吧，两个渲染器之间是否有差异
+to know whether or not the visual parody is kind of the same, right, are there like discrepancies between the 2 renderers
+
+70
+00:06:42,250 --> 00:06:48,450
+DirectX和OpenGL看起来不一样吗？应该完全一样，如果看起来不一样，我就犯了个错
+does DirectX look different to OpenGL, it shouldn't, right, it should be exactly the same, if it looks different, I've made a mistake
+
+71
+00:06:48,733 --> 00:06:53,000
+所以我需要来回反复比对，但是为了实现那个，就需要重新编译我的代码
+so I'm going to have to go back, and forth them quite a bit, but to do that, I need to recompile my code
+
+72
+00:06:53,960 --> 00:06:58,966
+我的意思是，你们可以做很多事，OpenGL已经完成了，就可以把渲染代码放到模块中
+and yeah I mean, there's a lot of things you could do, right, OpenGL is done, you could bring out all the rendering code into a module
+
+73
+00:06:58,966 --> 00:07:03,688
+所以那就像是在一个独立的组件中，在一个独立的module.dll文件中，对吧
+so it's like in a separate kind of component in separate kind of module dll file whatever, right
+
+74
+00:07:04,000 --> 00:07:09,750
+然后如果你们想用OpenGL启动，我的意思是可以用DirectX或任何你们正在使用的渲染接口
+and then if you want to kind of just launch with OpenGL, I mean you could just or DirectX or whatever one you're using
+
+75
+00:07:10,066 --> 00:07:16,075
+当然，你们就可以切换相应的dll文件，但那仍然意味着你们需要重新编译代码
+you could just switch which one which dll file it uses, sure, but that still means that you need to recompile your code
+
+76
+00:07:16,366 --> 00:07:23,650
+它仍然意味着你们需要在编译时实现那个，对吧，不是我们想要做的事情，对吧
+and it still means you need to do that kind of at compile time, right, not something we want to kind of do to do with that, right
+
+77
+00:07:23,812 --> 00:07:30,550
+所以那种决定是它属于那两个方面，你们想什么时候做那个决定
+so that kind of decision is it falls into kind of those 2 areas, when do you want to make that decision
+
+78
+00:07:30,866 --> 00:07:35,225
+你们需要在编译时或运行时选择使用渲染接口呢
+do you want to choose which renderer api use compile time or at runtime obviously
+
+79
+00:07:35,333 --> 00:07:38,825
+现在看来，在运行时显然是更好的，因为很多，你们知道的
+right, now it seems like runtime is definitely the superior one, because a lot you know
+
+80
+00:07:38,825 --> 00:07:44,025
+为什么要提前做这个艰难的决定，如果你们能在最后做出决定，而且还不错的话，对吧
+why have this hard decision that you have to make ahead of time, if you can just make it at the very end, and still be fine about that, right
+
+81
+00:07:44,025 --> 00:07:48,725
+并且我们马上就会讲到那个，但关于这个的另一个问题就是
+and we'll kind of go into that in a minute, but the other thing with this is that
+
+82
+00:07:51,966 --> 00:08:00,100
+这样做的好处，最主要的好处就是性能，对吧，你们知道正在使用哪个渲染接口
+the benefit the primary benefit of doing it, this way is essentially performance, right, you know which api you're using
+
+83
+00:08:00,333 --> 00:08:07,575
+你们基于那个渲染接口编译整个代码，对吧，那也就意味着没有任何运行时做的决定
+you compile the whole code base with that api, right, which means that there's no kind of runtime decisions that ever get made
+
+84
+00:08:07,575 --> 00:08:12,125
+甚至一次都没有哦，就比如要使用这个渲染接口，我们需要实现这个
+not even once, that say alright, well, if we're actually using this api, we need to do this
+
+85
+00:08:12,125 --> 00:08:17,425
+不可能，因为所有那些都是即时编译完成的，并且那就意味着在运行时
+no, because all that stuff is done on the fly, all that stuff is done during compile time, and it means that during runtime
+
+86
+00:08:17,650 --> 00:08:23,350
+你们的代码、程序和引擎不需要做出任何决定，也就不再需要浪费时间
+your code, your program, your engine doesn't have to make any decisions and waste time
+
+87
+00:08:23,350 --> 00:08:29,325
+因此不用浪费时间来做这些，比如当前使用的接口，或者你们想要使用的渲染接口，对吧
+thus wait no waste time making those decisions, as to which api is currently in you, so which one you want to use, right
+
+88
+00:08:29,575 --> 00:08:33,700
+那不是必须要做的事情，因为已经在编译时之前完成了
+that's not stuff, that actually has to be done, because it's already been done ahead of time at compile time
+
+89
+00:08:34,000 --> 00:08:39,625
+所以一旦它没那么多灵活性，就有可能给你们带来更好的性能，现在我们来说说后半部分
+so once it gives you less flexibility, it does potentially give you more performance, now let's talk about the second half of things
+
+90
+00:08:39,625 --> 00:08:47,225
+那就是在运行时做那些决定，所以那意味着什么，本质上意味着编译所有东西，对吧
+and that is making those decisions at runtime, so what does that mean, what that essentially means is that you compile everything, right
+
+91
+00:08:47,500 --> 00:08:55,375
+所以你们如果有OpenGL和DirectX实现，那么这两个实现就都会被编译
+so you have an, you have an OpenGL implementation, you have a DirectX implementation, both of those implementations get compiled
+
+92
+00:08:55,600 --> 00:09:00,825
+通常你们实现这个的方式，直接就是，你们知道的，而不是ifdef之类，真不能只用ifdef
+usually the way you do this again you could just, you know instead of ifdefs or whatever, you can't really do ifdefs
+
+93
+00:09:00,825 --> 00:09:06,175
+因为如果你们真的疯了，像个大疯子样，毕竟两个接口不可能共用一个着色器类
+because you can't have like a shader class that suddenly does both, I mean, if you were really crazy and like a big psychopath
+
+94
+00:09:06,266 --> 00:09:13,450
+你们可能只是在每种函数中，对吧，在你们为着色器创建的每个函数中
+you could probably just have like inside every kind of function that you have, right, inside every kind of function that you have for shaders
+
+95
+00:09:13,450 --> 00:09:19,400
+比如绑定着色器，或者你们知道的，上传统一变量之类的，那么可能就会检测，嘿
+like bind shader, or you know upload uniforms or whatever, you could have an, if check that says, hey
+
+96
+00:09:19,400 --> 00:09:25,400
+如果这段代码用DirectX，这段用OpenGL，太疯狂了，我也不知道为什么会有人做那个
+if it's DirectX on this code, if it's OpenGL on this code, that's just like a pathic, to be honest, I don't know why anyone will do that
+
+97
+00:09:25,400 --> 00:09:30,100
+但我已经看到过了，那就是为什么要提它，不要那样做，那么你们就可以这样做
+but I have seen that, that's why I'm mentioning it, don't do that, you could do something like that
+
+98
+00:09:30,650 --> 00:09:35,325
+通常你们会把它分成多个文件，并且可能有很多方法可以实现这个
+usually you break it up into multiple files, and potentially again many ways to do this
+
+99
+00:09:35,325 --> 00:09:41,825
+但如果你们在运行时做这个，可能会需要个基本的抽象类，就是纯虚类那种的
+but potentially if you're doing it at a runtime, you'd probably have a base kind of abstract, you know, pure virtual kind of class
+
+100
+00:09:42,500 --> 00:09:51,375
+没有实现，可能也没存储任何数据，就像一个间接和抽象，如果你们愿意的话
+that has no implementations, probably stores no data at all, just acts as like essentially a an indirection and abstraction, if you will
+
+101
+00:09:51,650 --> 00:09:56,300
+并且然后你们可能就会有两个类，或者一种渲染接口对应一个类
+and then you have two classes or basically one class that breaks off per renderer api
+
+102
+00:09:56,300 --> 00:10:00,825
+那么可能会有，你们知道的，比如着色器，可能就会有OpenGLShader和DirectXShader
+so you might have you know shader, and you might have OpenGLShader, and you might have DirectXShader
+
+103
+00:10:01,100 --> 00:10:07,200
+那些都是原始基类的，也就是那个Shader类的子类
+those are both child classes, subclasses from that original base class, which is that just Shader class
+
+104
+00:10:07,275 --> 00:10:16,300
+对吧，由于它们都是纯虚类，那么在运行时，当实际创建着色器时，你们决定创建，对吧
+right, and then since their pure virtual there, at runtime, when you actually create a shader, you decide upon creation, right
+
+105
+00:10:16,300 --> 00:10:21,575
+所以那样也不是真正的废，如果你们需要，这儿有很多方法可以让它变得更快
+so it's not really like taxing, and there are ways to make it even faster, if you want
+
+106
+00:10:21,575 --> 00:10:25,925
+通过(epoll?)费尽心思想实现你们想要的，但基本上当你们创建着色器时
+by pulling your hairs together or doing whatever you want, but essentially when you create a shader
+
+107
+00:10:26,266 --> 00:10:31,525
+它检查你们当前使用渲染接口，你们知道的，比如它是OpenGL
+it checks to see what the current rendering api you're using actually is, and if it is you know OpenGL
+
+108
+00:10:31,900 --> 00:10:39,244
+然后它就会创建OpenGLShader并返回，如果是DirectX，就会创建DirectXShader，对吧
+then it creates a new OpenGLShader, and returns that, if it's DirectX it creates a new DirectXShader, and returns that, right
+
+109
+00:10:39,366 --> 00:10:43,175
+但是基类类型返回的就是基类的类型，也就是Shader
+but the base type is returning is the base class type, which is just Shader
+
+110
+00:10:43,533 --> 00:10:50,500
+所以当前阶段，你们在Sandbox中的所有客户端代码，或游戏中，对吧，都只能看到Shader
+so you're all of your client code that's in Sandbox at this stage, right, or inside your game, that just sees Shader
+
+111
+00:10:51,066 --> 00:10:55,100
+就是那样，它只是个引用了Shader对象的指针
+that's all, it is it's a pointer is some kind of reference to a Shader object
+
+112
+00:10:55,566 --> 00:11:00,250
+但不管它是OpenGLShader还是DirectXShader的实现细节，都被隐藏起来了
+but the implementation detail of whether it's an OpenGLShader or DirectXShader is kind of hidden
+
+113
+00:11:00,566 --> 00:11:06,156
+我的意思是通常你们会提供方法来提取它，以防，因为你们知道，没有引擎接口是那样的
+I mean usually you would provide ways to extract that just in case, because you know no engines api is that
+
+114
+00:11:06,850 --> 00:11:13,750
+你们就可以在里面做任何想做的事情，有点奇怪，我之前还没见过那种情况
+that's kind of complete really that you can just do everything you want within that, it's a bit weird, I haven't really seen that before
+
+115
+00:11:13,966 --> 00:11:16,750
+我的意思是，如果这个取决于你们在做什么，如果是那种非常简单的
+I mean if it depends what you're doing, if you're doing really simple stuff
+
+116
+00:11:16,750 --> 00:11:22,425
+你们不需要深入挖掘实现细节，但也有可能，因此可能会进行这种筛选
+you shouldn't need to dig in deep into the implementation details, but you might, so you might have that kind of filtering through
+
+117
+00:11:22,425 --> 00:11:26,450
+但本质上客户端代码只看得到Shader，并不关心Shader是什么，因为如果你们想一想
+but essentially the client code, just sees Shader, doesn't care what Shader is, because if you think about it
+
+118
+00:11:26,766 --> 00:11:30,725
+它会做什么，它会打开某种，创建个基于文件之类的新着色器
+what does it do, it opens some kind of, creates a new shader based on like a file or something
+
+119
+00:11:30,933 --> 00:11:35,709
+它只要绑定着色器，上传统一变量数据，不需要知道你们使用的是DirectX还是OpenGL
+it binds the shader, it uploads uniform data, it doesn't need to know if you're using DirectX OpenGL
+
+120
+00:11:35,900 --> 00:11:42,775
+因为那是你们在渲染接口中定义的接口，就在我几周前做的视频
+because that's kind of the api you've defined in that rendering api, kind of video thing that I made a few weeks ago
+
+121
+00:11:42,775 --> 00:11:50,650
+可能是几个月前，我说过那个界线，对吧，在你们实际的渲染接口和渲染器之间的界线
+a few months ago maybe,I talked about that line, right, between your actual renderer api, and then your actual renderer
+
+122
+00:11:50,933 --> 00:11:56,125
+渲染器只调用渲染接口，它不应该关心你们实际使用的是哪个实现
+so the renderer just uses the rendering api, it doesn't, it shouldn't care which implementation you're actually using
+
+123
+00:11:56,375 --> 00:12:02,250
+它只是指定你们正在使用的渲染器，它应该是个简单的，比如只是查找着色器
+which specific renderer you're using, it should just be a simple, it's just kind of just looking up shader
+
+124
+00:12:02,250 --> 00:12:07,400
+就比如创建着色器，上传这些统一变量，绑定着色器来渲染，对吧，就那么简单
+and being like I want to create a shader, I want to upload these uniforms,  I want to bind the shader for rendering, right, simple as that
+
+125
+00:12:10,400 --> 00:12:16,850
+那么显然这里有个明显的事实，不是所有的渲染应用都能在所有平台上得到支持
+so obviously there's the obvious fact here that if like not all rendering apps are supported on all platforms
+
+126
+00:12:17,425 --> 00:12:22,950
+我们一直在讨论DirectX和OpenGL作为两个主要渲染接口，只是为了这个例子，对吧
+so DirectX, we've been talking about DirectX and OpenGL as our 2 main ones, just for the sake of this example, right
+
+127
+00:12:22,950 --> 00:12:27,550
+为了进行这种转换，OpenGL在几乎所有平台上都是可用的
+for the sake of this kind of conversation, OpenGL is available on pretty much everything
+
+128
+00:12:27,625 --> 00:12:34,966
+而DirectX只适用于Windows和Xbox之类的微软产品，所以如果你们在Mac或Linux上编译
+DirectX is only available on Windows and like Xbox and just Microsoft kind of products, so if you're compiling on Mac or Linux
+
+129
+00:12:36,175 --> 00:12:44,000
+DirectX代码就不会被编译，对吧，不会被编译，所以你们仍然需要ifdef，但也不只有ifdef
+your DirectX code is not gonna compile, is it, no, it's not, so you still have to have like ifdef or, but or not even ifdef
+
+130
+00:12:44,000 --> 00:12:50,600
+我通常没有用ifdef，就只有独立的文件，所以我有Shader.h和Shader.cpp
+the way I do what I don't usually have ifdefs, I just have separate files, so I have Shader.h and maybe Shader.cpp
+
+131
+00:12:50,800 --> 00:12:59,250
+就像基本抽象，然后在Platform特定的文件夹结构中，就有OpenGLShader.cpp和头文件
+which is like my base abstraction, and then in my platform specific kind of folder hierarchy, I have OpenGLShader.cpp and h
+
+132
+00:12:59,533 --> 00:13:09,024
+然后还有DirectXShader.cpp和.h，对吧，不需要担心DirectX.h，而DirectXShader.cpp
+and then DirectXShader.cpp and h, right, and DirectX, you don't really need to worry about the header file, but DirectXShader.cpp
+
+133
+00:13:09,366 --> 00:13:16,350
+那在Mac和Linux构建时是关闭的，并且可能除了Windows之外的所有构建都是关闭的
+that is turned off for like Mac and Linux build, and probably all builds except for except for Windows at this, right right
+
+134
+00:13:16,533 --> 00:13:21,050
+所以它甚至不会编译，它只会在你们用VS为Windows生成项目时编译，对吧
+so that's not even gonna compile, it's only gonna compile, when you generate the project for visual Studio, for Windows, right
+
+135
+00:13:21,050 --> 00:13:25,625
+如果你们的目标是Windows，那就会被编译，否则它就不会被编译的，好了
+if you're targeting Windows, that gets compiled, otherwise it does not get compiled, okay
+
+136
+00:13:26,000 --> 00:13:33,825
+你们不用担心头文件，那样的话，很明显，然后你们实际上在通用的Shader.cpp中
+and header file, you don't need to worry about, that way obviously oh, and then also usually in your actual kind of generic Shader.cpp
+
+137
+00:13:34,166 --> 00:13:42,175
+你们就有些Create函数，不会在运行时检查，只知道，当前使用的是哪个渲染接口
+you have like some kind of create function, which doesn't, which does a runtime check, and it says, which rendering api are currently using
+
+138
+00:13:42,175 --> 00:13:49,112
+基本就像switch，如果是OpenGL，就执行那个，如果是DirectX，就会执行ifdefs中的那块
+it's basically like a switch statement, if it's OpenGL, do that, otherwise if it's DirectX, and you have that block inside ifdefs
+
+139
+00:13:49,775 --> 00:13:54,825
+然后就返回新的DirectXShader，这样它就受到了保护，它只会为Windows编译
+then you can return a new DirectXShader, so that way it's kind of protected, it's only going to compile for Windows
+
+140
+00:13:55,175 --> 00:13:59,175
+那就是DirectX的特定代码，我的意思，你们知道的，对于其他渲染接口，都是差不多的
+that's specific code, and I mean, you know for other apis, it's kind of the same thing
+
+141
+00:13:59,475 --> 00:14:08,425
+所以你们不会在除了MacOS或iOS的其他平台编译Metal，所以就会通过配置把那些过掉
+so you wouldn't really compile Metal on anything except for MacOS or iOS, right, so you have that stuff either filtered out by the configuration
+
+142
+00:14:08,425 --> 00:14:12,900
+如果它们是独立的CPP文件或ifdef，如果在一些通用文件中
+if they're separate kind of cpp files or ifdeft, if they're in kind of common files
+
+143
+00:14:12,900 --> 00:14:17,750
+因为你们确实需要某种到公共文件的链接，不管怎样，我讲了很多
+because you do need some kind of link to a common file at some rate in this, anyway, I've talked a lot
+
+144
+00:14:18,250 --> 00:14:24,475
+希望这个设计是有意义的，坐下来思考这个真的很酷，我也可以绘制关于这些的图表
+hopefully this design is making sense, it's really cool to just sit down and think about this, I could draw a diagram of all this
+
+145
+00:14:24,475 --> 00:14:34,675
+我意识到我通常不会，因为我觉得这不是，我觉得这只是我在纸上写我的话
+I realized that I usually don't, because I I feel like it's not, I feel like it's just me running down my words on paper
+
+146
+00:14:34,800 --> 00:14:41,066
+我想对一些人来说，直观地看东西还是挺不错的，所以让我知道你们对图表的看法
+I think for some people, it's good to see things visually, so let me know what you think about diagrams in general
+
+147
+00:14:41,066 --> 00:14:45,466
+我来举个小杆看看，你们是否想要更多的图表，我的意思是我很少做这些
+I'll run a little pole maybe to see if you guys want more diagrams, I mean I do them very rarely
+
+148
+00:14:45,466 --> 00:14:49,025
+不过如果视频是关于计划之类的，我通常就会那么做
+usually I do them if the video is dedicated about planning or something like that
+
+149
+00:14:49,900 --> 00:14:53,750
+但我不这么做的主要原因只是因为这些东西在我的脑海里
+but the main reason I don't is just because this stuff is, well it's in my mind
+
+150
+00:14:54,133 --> 00:15:00,850
+这有点简单，我所绘制的一切都只是我所说的话，所以如果你们想一想
+it'skind of simple to the point where everything I would draw is just the words I'm saying, so if you just think about them
+
+151
+00:15:00,850 --> 00:15:04,866
+如果你们看不懂的话，可以重新看一遍，想象一下
+and maybe rewatch that area, if you don't, if it doesn't make sense to you, and just visualize it
+
+152
+00:15:05,000 --> 00:15:11,575
+更不用说我们将看到背后的代码，所以那就是视觉辅助，那就是为什么我通常不费心
+not to mention we're about to see the code behind this, so that will act as a visual aid, that's why I don't usually bother
+
+153
+00:15:11,575 --> 00:15:17,675
+但无论如何，我总是很乐意接受反馈，所以请让我知道你们的想法，这儿有几个类
+but anyway, I'm always open to feedback obviously, so please let me know what you think, we have several classes here
+
+154
+00:15:18,450 --> 00:15:22,100
+我们今天不会对所有进行抽象，但是我想我们可以把顶点缓冲区抽象出来
+we're not gonna abstract all of them today, I think we'll probably do the vertex buffer
+
+155
+00:15:22,200 --> 00:15:25,375
+因为我认为那个很容易，主要还是为了给你们些想法
+because I think that's pretty easy, just to give you guys an idea
+
+156
+00:15:25,375 --> 00:15:28,950
+并且然后我想让你们做的作业也就是继续抽象着色器类
+and then what I want you to do for homework is actually go ahead, and do the same thing with the shader class
+
+157
+00:15:29,066 --> 00:15:32,500
+抽象顶点数组类和索引缓冲区类
+do the same thing with the vertex array class, do the same thing with the index buffer
+
+158
+00:15:33,200 --> 00:15:38,825
+事实上，我想我今天会抽象索引和顶点缓冲区，那就让我们来看看能做些什么
+case in fact, I think I will do both the index buffer and the vertex buffer today, let's jump in and see what we can do
+
+159
+00:15:39,066 --> 00:15:45,775
+好了，那么这就是上期讲到的位置，如果直接运行这个，然后我们就会看到，有些什么
+okay, so this is where we left off last time, if we just run this, then we'll see what we get
+
+160
+00:15:45,900 --> 00:15:51,900
+所以我们有这样一个在顶点位置和颜色之间插值的三角形
+so we had this kind of triangle that was kind of interpolating between the vertex position colors that we had here
+
+161
+00:15:53,800 --> 00:16:00,540
+我们所做的只是在Application.cpp中，我们有这些OpenGL代码，显然不是我们想要保留的
+what we did is just inside Application, we had all this OpenGL code, which obviously is not something that we ever want to keep
+
+162
+00:16:00,900 --> 00:16:06,750
+对吧，这只是一个如何尽快把这些东西显示在屏幕上的例子
+right, this is just kind of an example of how to kind of get this stuff on screen as soon as possible
+
+163
+00:16:07,220 --> 00:16:15,550
+但我们现在想做的是让它通用，对吧，让它通用，你们知道，我想要能够像
+but what we want to do now is make this generic, right, make this generic in the sense that you know, I want to just be able to like
+
+164
+00:16:15,600 --> 00:16:21,225
+其他这些代码都不知道渲染接口是什么，对吧，它真不知道，你们知道的，它只有层
+none of this other code has any idea of what a rendering api is, right, it doesn't really, you know, it's got layers
+
+165
+00:16:21,225 --> 00:16:26,966
+它知道EventDispatcher，或者有些不是渲染接口特定的代码，而不是就像这样创建
+it's got EventDispatcher or it's got stuff that is not render api specific, instead of creating stuff like this
+
+166
+00:16:26,966 --> 00:16:30,075
+比如这里就有定义我们顶点缓冲区的gl代码
+and having gl code here that for example defines our vertex buffer
+
+167
+00:16:30,366 --> 00:16:34,925
+而我想做的，本质上就是创建VertexBuffer，对吧
+what I essentially want to be able to do is create a VertexBuffer, right
+
+168
+00:16:35,900 --> 00:16:42,525
+本质上，你们知道的，你们实现这个的方式可能是不同的取决于选择如何实现
+which essentially you know and the way you do this might be different depending on how you choose implemented
+
+169
+00:16:42,525 --> 00:16:51,200
+但是你们知道的，我们可能会做比如VertexBuffer::Create()，可能会接收vertices，就像这样
+but you know we'll probably want to do something like VertexBuffer::Create(), we'll probably want to take in you know the vertices like this
+
+170
+00:16:52,200 --> 00:16:58,050
+也许绘制模式也像内存存储类型一样，因为它是STATIC，DYNAMIC和STREAM之类的
+maybe the draw mode as well like the memory storage type, because is whether it's static or dynamic or streaming or anything like that
+
+171
+00:17:00,250 --> 00:17:07,700
+但本质上，我们想要把这里的所有vertices定义都作为VertexBuffer，就是那样
+but essentially we want to probably take in the whole kind of vertices definition that we have here as a VertexBuffer, and that's kind of it
+
+172
+00:17:07,700 --> 00:17:13,800
+然后在绘制时，我们可能会做些操作，比如buffer.Bind()，搞定，我们希望它是这样的
+and then when it's time to draw, we just probably do something like that x like buffer.Bind(), and that's done, we want it to be like this
+
+173
+00:17:13,925 --> 00:17:18,750
+因为我们实际上不想包含glad之类的库，就我们所知，这可以使用DirectX
+because we don't actually want to include glad or anything like that, this could be using DirectX for all we know
+
+174
+00:17:19,700 --> 00:17:25,750
+并且至于实现这些的这种方式，显然我们不仅仅在VertexBuffer中有OpenGL代码
+and this kind of way of doing things, and obviously we don't just have the OpenGL code inside VertexBuffer
+
+175
+00:17:26,566 --> 00:17:31,850
+它也会返回我们实际上选择的渲染接口的实现，并且我们实际上也会创建这些
+it returns an implementation of which api we've actually chosen, and we'll actually create all of them
+
+176
+00:17:32,175 --> 00:17:35,286
+对吧，现在就来看看那是什么样子的，好了，酷，所以那就是我们的目标
+right, now and see what that looks like, okay, cool, so that's kind of the goal
+
+177
+00:17:35,950 --> 00:17:39,425
+你们通常会做的就是让这个返回些指针
+usually you do kind of usually this would return some sort of pointer
+
+178
+00:17:40,100 --> 00:17:46,450
+我通常直接会在这里返回一个完全原始的指针，对吧，然后它会是
+I usually just like returning a completely raw pointer in here, right, and then it's gonna be up to like
+
+179
+00:17:46,450 --> 00:17:50,500
+如果你们确实有个带有引用计数之类的引擎，那么我可能就会返回引用
+if you do have an engine with a reference counting or something like that, I would probably return a ref
+
+180
+00:17:50,900 --> 00:17:54,500
+因为我们现在还没有那个，我就直接让Create返回一个原始指针
+since we don't have that at the moment, I'm just going to have create return a raw pointer
+
+181
+00:17:54,800 --> 00:18:01,875
+然后这将是客户端的工作来实际管理它，不管他们喜欢通过将原始指针推入共享指针
+and then it's gonna be the client's job to actually manage that, however they like either by shoving that raw pointer into like a shared pointer
+
+182
+00:18:01,875 --> 00:18:07,950
+或者通常我们在这里要做的就是把它放到一个唯一指针中，好了，那么就让我们来看看
+or usually like what we're gonna do here is just kind of putting it into a unique pointer, okay, so let's take a look at
+
+183
+00:18:07,950 --> 00:18:13,900
+我们如何做这样的事情，这就是这个接口的目标，那么在Renderer中，创建一个新项
+how we can do something like this, this is kind of the goal for the api, so over here in renderer, I'm gonna make a new item
+
+184
+00:18:14,400 --> 00:18:20,800
+并且实际上，我就直接叫它Buffer.h，现在你们可能会想，好吧，这是不是VertexBuffer
+and I'm actually just gonna call this Buffer.h, now you might be like well, okay, is this gonna be the VertexBuffer
+
+185
+00:18:20,800 --> 00:18:27,150
+为什么要叫Buffer，我叫它Buffer就是因为我不喜欢创建大量文件
+why you calling a Buffer, the reason I'm calling a Buffer is because I I'm not a huge fan of creating 1,000,000 files
+
+186
+00:18:27,150 --> 00:18:35,925
+我认为这不是必要的，我认为它减慢了你们的构建时间，并且它让代码更难阅读
+I think that it's not that necessary, I think that it like it slows down your build times, it makes code harder to read through
+
+187
+00:18:36,700 --> 00:18:41,075
+如果想和别人分享你们的代码，那么你就必须给他们大量文件，那确实有点烦
+if you want to like share your code with someone, you have to give them 1,000,000 files, it's just a bit annoying
+
+188
+00:18:41,400 --> 00:18:46,525
+所以我肯定会比如创建多个文件，你们可以看到实际上我这里已经有不少文件了
+so I definitely like creating more than one file, you can see I've actually got quite a few here
+
+189
+00:18:47,050 --> 00:18:50,650
+那将来会少些吧，但也可能不会，不过对于Buffer这样的东西
+that might get collapsed in the future, but probably not, but for things like Buffer
+
+190
+00:18:50,650 --> 00:18:57,300
+我不喜欢用VertexBuffer和IndexBuffer这样的类，它们都是缓冲区，只是不同类型的缓冲区
+I don't really like having a VertexBuffer and IndexBuffer kind of class, they're both buffers, they're just different types of buffers
+
+191
+00:18:57,733 --> 00:19:04,989
+所以应该把它们放在一个文件，显然这只是我的观点，不赞同随你们，但那就是我要做的
+so you should just have them in one file, this is clearly just my opinion, feel pretty disagree with it, but that's kind of what I do
+
+192
+00:19:05,066 --> 00:19:10,950
+好了，我比如做些事情，基本上喜欢创建这样的代码，然后直接在一个文件中创建多个类
+okay, I like to do something, I basically like to create code like this, and then just have multiple classes in one file
+
+193
+00:19:11,800 --> 00:19:15,950
+这只是让它更简单，然后你们知道的，我将对纹理进行同样的处理
+it just makes it easier, okay, and then you know, I'll do the same for texture for example
+
+194
+00:19:15,950 --> 00:19:21,799
+所以这儿每个渲染接口都会有一个文件叫做Texture，然后在那里，就会有2DTexture
+so there'll just be one file per rendering api called like texture essentially, and then in there, we'll have 2D textures
+
+195
+00:19:21,800 --> 00:19:26,299
+你们知道的，3D纹理，立方体贴图之类的东西，所有用纹理做的东西都在一个文件里
+you know 3 textures cube maps that kind of stuff, everything you do with texture have all in one file
+
+196
+00:19:26,300 --> 00:19:30,700
+而不是必须有一个单独的文件，每个类型的纹理
+instead of having to have a separate, a separate file for each kind of type of texture
+
+197
+00:19:30,700 --> 00:19:39,900
+因为在我看来，那太烦了，不管怎样，那么我们就有两个，包含pch和Buffer
+because that's just annoying, in my opinion, anyway, so we have both of these will include our pch, we'll include our Buffer class
+
+198
+00:19:41,800 --> 00:19:51,575
+然后是我创建的头文件，并且然后是namespace Hazel，让我们来说说这儿我们需要什么
+and then I'll header file I made, and then we'll have a namespace Hazel, and then let's talk about what we need here
+
+199
+00:19:51,900 --> 00:19:56,400
+那么这个就是我们的纯虚接口，对吧，我的意思是这里没有实现
+so this is our pure virtual interface, right, what I mean by that is there is no implementation here
+
+200
+00:19:56,666 --> 00:20:01,125
+并且这儿绝对没有成员，完全没有数据成员，这个应该不占存储空间
+and there is absolutely no members, no data members at all, this this should take up 0 storage
+
+201
+00:20:01,325 --> 00:20:07,566
+显然它会占用一个字节，当初始化时，必须有它的类，但没有成员，就不占用任何存储空间
+obviously it'll take up one bytes, when we initialize it, it has to its class, but it's got no members it takes up no storage
+
+202
+00:20:07,566 --> 00:20:14,014
+它就像是这些被调度的虚函数的尾巴
+it's literally just like a retail of just functions of those virtual functions that get dispatched to
+
+203
+00:20:14,375 --> 00:20:20,625
+不管是哪种子类，实际上都实现了这个接口，对吧
+whatever kind of subclasses actually realizes this implementation, right
+
+204
+00:20:20,625 --> 00:20:26,150
+这种抽象，所以我们就不需要构造函数之类的
+this kind of abstraction, so we don't really need a constructor or anything like that
+
+205
+00:20:26,150 --> 00:20:33,766
+不过确实需要个虚析构函数，通常是空的，对吧，我们会直接实现这个，我想对于这两个
+you do need to have a virtual destructor, usually this is just empty, right, we'll do this straight away, I think for both of these
+
+206
+00:20:33,766 --> 00:20:39,000
+所以你们会知道它是如何实现的，希望通过实现两次
+so you're gonna get the idea of how it's implemented, and hopefully by implementing it twice
+
+207
+00:20:39,000 --> 00:20:46,475
+就像我在这里，你们就会明白，需要做什么去实现Shader，然后就只需要定义接口
+as I am here you'll kind of see, what you need to do to implement the stuff of shader, and then we just define the interface
+
+208
+00:20:46,666 --> 00:20:55,750
+那么VertexBuffer，VertexBuffer的功能是什么，我们肯定需要一些绑定函数
+so VertexBuffer, what are the functions of a VertexBuffer, well we definitely want to have some sort of like binding functions
+
+209
+00:20:55,750 --> 00:21:02,326
+那么就是virtual void Bind()，我们需要能够为渲染绑定顶点缓冲，或者直接放到顶点数组
+so virtual void bind, right, we want to be able to bind the vertex buffer for rendering, or if we want to put into a VertexArray
+
+210
+00:21:02,600 --> 00:21:08,450
+关于这个在顶点数组上的原理，顺便说下，我们以后会讲到，因为那有点不同
+the way that this will actually work with the vertex array, by the way, we will talk about that later, because that's a bit different
+
+211
+00:21:08,450 --> 00:21:15,825
+那实际上是更具体的接口，不像你们知道的，比如？？？，处理这些就是不同的
+and that is actually a bit more api specific, unlike you know, drug devs for example, which deals with the stuff differently
+
+212
+00:21:15,825 --> 00:21:23,800
+那么就是Bind()和Unbind()，我肯定会比如创建SetData()和UploadData()这些虚函数
+so Bind Unbind, I definitely like to have some kind of like SetData UploadData things are virtual
+
+213
+00:21:24,533 --> 00:21:32,325
+如果要实现的话，可能就是virtual void SetData()，然后在这儿就有些，最后关于构造函数
+if you would write it, you do like virtual void SetData, and then you'd have your stuff here, and now finally for the construction
+
+214
+00:21:32,466 --> 00:21:37,200
+我们实际上想做的就是，你们会注意到，如果我能找到，这个在哪儿
+what we actually want to do is you'll notice is, if I can find where this stuff is
+
+215
+00:21:38,133 --> 00:21:46,599
+我们实际上需要，你们会看到想要的是实际的顶点数据，对吧，还有VertexAttribPointer
+we want to actually, you'll see that what we kind of want is the actual vertex data, right, VertexAttribPointer as well
+
+216
+00:21:46,600 --> 00:21:52,025
+和顶点数组有关，不是我们现在需要做的，但这儿这部分代码
+something to do with vertex arrays, not really something we want to do right now, but just this kind of chunk of code here
+
+217
+00:21:52,025 --> 00:22:01,025
+我们需要把vertices赋给这个，那对这个来说是完全错误的，对吧，但是不想创建构造函数
+we need to actually give the vertices to this, that was completely the wrong thing to this, right, however I don't want to create a constructor
+
+218
+00:22:01,025 --> 00:22:06,675
+因为如果我创建了构造函数的话，那就意味着我需要选择我需要的类型
+because if I create a constructor, that means that I need to actually choose which type I want
+
+219
+00:22:07,000 --> 00:22:14,800
+所以我要做的就是创建个静态VertexBuffer，那就是我之前说的，我们返回的是一个实指针
+so what I'm actually going to do is create a static VertexBuffer, and again that's what I said, we're returning a real pointer
+
+220
+00:22:15,366 --> 00:22:20,650
+这就像是在你的引擎里有一个引用计数系统，我们现在还没有
+it would be like maybe some kind of referview had a reference counting system inside your engine which we don't at the moment
+
+221
+00:22:21,600 --> 00:22:25,600
+那么就是static VertexBuffer* Create()，这儿这个就是我的构造函数
+a static VertexBuffer* Create(), and here this is like my constructor
+
+222
+00:22:25,900 --> 00:22:33,000
+所以可以接收各种参数，并且它是静态，所以就不属于这个类，至于VertexBuffer* Create()
+so I take in everything I want here right, and it's static, so it doesn't actually belong to this class, VertexBuffer* Create()
+
+223
+00:22:33,366 --> 00:22:41,275
+然后可能就会传入vertices，然后是uint32_t，也就是size，顺便说下，可以直接用size_t
+and then I'll probably just take in my vertices, and then a uint32_t, which is my kind of size, could just use a size_t, by the way
+
+224
+00:22:41,275 --> 00:22:48,825
+但是我们就用uint32_t，好了，我们继续，搞定，这两个类很像的
+but we'll use uint32_t, okay, there we go, done, this is very similar in both of these
+
+225
+00:22:48,966 --> 00:22:58,625
+只不过这会返回IndexBuffer*，我们可能会传入uint32_t，也就是我们的indices
+except this returns a IndexBuffer instead, and we'll probably have a uint32_t, which is our indices
+
+226
+00:22:58,625 --> 00:23:06,700
+对吧，所以我们有无符号的32位整型，我们可能会直接用32位整型，也就是int32 indices
+right, so we have an unsigned 32bit integer, we'll probably go just gonna stick with 32bit integer 32bit indices
+
+227
+00:23:07,075 --> 00:23:11,566
+16位整型绝对是你们以后可以做的优化之一，但更多时候不止在
+for now16 bit is definitely an optimization you could make in the future, but more often than not
+
+228
+00:23:11,566 --> 00:23:17,100
+如果你们想渲染东西，想要一个简单的实现，你们知道的，32位整型也是可以的
+if you're trying to render things, and you're trying to just have a simple implementation, just you know 32 bit is just the way to go
+
+229
+00:23:17,966 --> 00:23:24,650
+否则你们就会用完索引，好了，酷，这看起来很好，现在我们只需要创建这两个Create函数
+otherwise you'll just run out of indices, okay, cool, this looks pretty good to me, now we just need to create these two Create functions
+
+230
+00:23:24,650 --> 00:23:30,600
+所以它们很简单，我们把它复制到这，这个就是VertexBuffer* Create()
+so they're pretty easy, we just drag this over here, this is gonna be VertexBuffer* Create()
+
+231
+00:23:33,225 --> 00:23:43,900
+对吧，然后同样的，我直接用VA帮助创建这个实现，已经有了，漂亮
+right, and then we do the same thing, I'll just use visual assist here to make this implementation for me, we've got this here, wonderful
+
+232
+00:23:44,300 --> 00:23:51,475
+现在我们需要做的是决定，在这个Create函数中，我们决定当前使用的是哪个接口
+now what we need to do is actually decide, in this function, in this create function, we decide which api we're currently using
+
+233
+00:23:51,766 --> 00:24:01,575
+那么我们渲染器使用的什么接口呢，以及类类型是，以及我们实例化并返回的类类型，对吧
+so what api our renderer is using, and thus which which class type, which actual kind of class we instantiate and return, okay
+
+234
+00:24:02,125 --> 00:24:09,450
+它会很明显地将它转换为基类型，所以我们不会返回实际的派生类型，但那就是目的
+it's going to kind of obviously cast it to the base type here, so we're not returning the actual derived type, but that's the intention
+
+235
+00:24:10,600 --> 00:24:16,225
+酷，好了，那么为了有类返回，我们实际上需要创建它们，因为我们现在暂时处理OpenGL
+cool, okay, so in order to have classes to return, we actually need to make them, so since we're kind of dealing with OpenGL for now
+
+236
+00:24:16,525 --> 00:24:23,225
+那么在Platform/OpenGL中，我要添加一个新项，就是OpenGLBuffer.h
+inside Platform/OpenGL, I'm going to add a new item, and this is going to be called OpenGLBuffer.h
+
+237
+00:24:23,366 --> 00:24:28,100
+那么你们可以看到，所有与OpenGL相关的东西，我这儿都是用的OpenGL前缀
+so you can see that everything that is kind of OpenGL related, I'm starting with the OpenGL kind of prefix here
+
+238
+00:24:28,466 --> 00:24:36,450
+然后Buffer是类的类型或者说类上面的文件名，在实际的泛型渲染器中
+and then buffer is kind of the type of class or rather the file name over the class, inside the actual kind of generic renderer
+
+239
+00:24:37,125 --> 00:24:48,050
+所以就添加这个，也就是渲染接口，我们还有命名空间，也要包含来着通用渲染接口的文件
+so we add this, which is the rendering api, we have our namespace, we include the file from the generic kind of rendering api
+
+240
+00:24:48,050 --> 00:24:57,150
+也就是这个(Buffer.h)，对吧，然后就创建OpenGLVertexBuffer类，继承自VertexBuffer
+which is this one, right, and then we make our OpenGLVertexBuffer class, which is a VertexBuffer
+
+241
+00:24:57,666 --> 00:25:07,175
+好了，然后我们要做的是实现那个文件，我们创建的那个类，我们在这里已经实现了
+okay, and then what we do here is we actually implement that file, right, so that class that we've created this, we implemented here 
+
+242
+00:25:07,300 --> 00:25:13,275
+显然我们不需要Create，就可以把它放在这里，把它作为虚析构函数
+so we don't need the Create obviously, so we can take this, we can put it in here, we can keep this as a virtual distractor
+
+243
+00:25:13,275 --> 00:25:20,525
+因为它已经是虚函数了，这样的话，我们就知道它是虚函数，然后Bind和Unbind
+just because it's already virtual, and this way, we know that it is virtual and smart correctly, and then Bind and Unbind
+
+244
+00:25:21,900 --> 00:25:37,200
+顺便说一下，我应该写const，我们在这里的实现中实现了这些东西
+which by the way, I should have made const, and this stuff we just kind of implement over here inside our implementation
+
+245
+00:25:37,200 --> 00:25:41,775
+在这种情况下，也就是这个OpenGLVertexBuffer，你们可以在这里放任何想要的数据
+which is the OpenGLVertexBuffer, in this case, you can put anything else you want here
+
+246
+00:25:41,775 --> 00:25:50,800
+对吧，那么显然需要m_RendererID，创建了么，不记得了，对哦，没有，就是uint32_t
+right, so obviously we're going to put a RendererId, did I make int, I don't remember, yeah no, I didn't, it's just a uint32
+
+247
+00:25:50,800 --> 00:25:56,075
+通常会创建个RendererId类型，会在另一期Shader类中提到，刚刚创建了m_RendererID
+usually I'd make a RendererId type, we'll talk about that in another time, in the Shader class, we just had a RendererID
+
+248
+00:25:56,400 --> 00:26:02,650
+所以我们保存了这个，在实际的实现中保存这个，没有在这(VertexBuffer)保存任何数据
+so we store this, you'll note, we store this in the actual implementation, we don't store anything in here at all
+
+249
+00:26:02,650 --> 00:26:08,288
+我们不应该在这里保存任何数据，对吧，这只是一个接口，不应该保存任何数据
+you shouldn't, we shouldn't store anything here, right, this is just an interface, just should not store any data
+
+250
+00:26:08,600 --> 00:26:15,250
+这才是数据实际保存的地方，所以有个uint32_t数据，也就是我们的RendererID
+this is where the data is actually stored, so we have a uint32_t, which is our RendererID
+
+251
+00:26:16,133 --> 00:26:38,575
+我们还会创建个OpenGLBuffer.cpp文件，包含hzpch.h，在这儿能做的就是，哦，差点忘了
+we'll make an OpenGLBuffer.cpp file, OpenGLBuffer.cpp, which will include our pch, and what we can do here is just oh and one thing
+
+252
+00:26:38,575 --> 00:26:43,775
+我肯定需要创建个构造函数，它接收的参数和Create()函数是一样的
+that I definitely want to make is a constructor, which takes in exactly what our Create function takes in
+
+253
+00:26:44,075 --> 00:26:47,450
+所以在Buffer.cpp中，我们有这个Create函数，只接收vertices和size参数
+so inside Buffer, we have this Create function, which takes in vertices and size
+
+254
+00:26:47,600 --> 00:26:51,725
+那就是我需要构造函数接收的参数，对吧，就是vertices和size
+that's what I want the constructor to take in, okay, vertices and size
+
+255
+00:26:51,725 --> 00:27:02,425
+现在让我们用VA来创建这些实现，顺便说一下，我不是由它赞助的，只是习惯使用它
+now let's create these implementations using visual assist, who by the way I'm not sponsored by, just I just like using it
+
+256
+00:27:03,500 --> 00:27:10,500
+然后在这里，我们要做一些事情，好了，那么首先，我的意思是，这就是VertexBuffer类
+and then over here, we're gonna do some things, okay, so first of all, yeah I mean look this is the VertexBuffer class
+
+257
+00:27:10,700 --> 00:27:16,450
+这就是我们即将绘制的三角形，在游戏引擎中，VertexBuffer类非常详细，非常大，对吧
+this is we're currently drawing a triangle, in a game engine, the VertexBuffer class is quite exhaustive, it's quite big, right
+
+258
+00:27:17,700 --> 00:27:22,658
+你们就需要做很多决定，比如是否在CPU端保留这个顶点信息
+there's a lot of decisions you want to make, such as whether or not you retain this vertex information on the CPU side
+
+259
+00:27:22,966 --> 00:27:25,750
+如果你们在做RayPicking(光线拾取)之类的，可能会需要这么做
+which you might want to do, if you're doing things like RayPicking
+
+260
+00:27:26,566 --> 00:27:31,599
+或者在重置鼠标拾取之类的操作，也有狠有比如碰撞之类的不同操作
+or in a recasting 2 mouse pick stuff like that, there's tons of different like collision whatever
+
+261
+00:27:31,600 --> 00:27:36,075
+在VertexBuffer中，你们可能想做很多不同的事情
+there's tons of different things that you actually might want to do from a VertexBuffer
+
+262
+00:27:36,866 --> 00:27:41,632
+我们现在要做的是我们可能不会保留它，至少不会复制并保存在这里
+what we'll do for now is we'll probably won't retain this, at least we won't copy it and keep it here
+
+263
+00:27:42,400 --> 00:27:48,882
+但我认为我们在这里真正需要的是，我不知道，我的意思是我们真的不需要任何东西
+but what we do need over here really I think is, well I don't know, I mean we don't really need anything to be honest
+
+264
+00:27:49,566 --> 00:27:56,275
+并且size这些参数会在构造函数中处理，那么这儿是我们的实际代码
+the size and all that stuff will handle in the constructor, so this is the actual code we have here
+
+265
+00:27:56,275 --> 00:28:00,866
+我们仍然会使用GenBuffers，而不是CreateBuffers，但也没关系，说实话，可能只是切换
+and we're still using GenBuffers not CreateBuffers, but that's okay, we could probably just switch, to be honest
+
+266
+00:28:00,866 --> 00:28:06,275
+我可能就会调用glCreateVertexBuffers，或者glCreateBuffers
+if I can do something called glCreateVertexBuffers or glCreateBuffers
+
+267
+00:28:06,666 --> 00:28:13,000
+对吧，基本上也就是这两个合在一起，那么，害，似乎忘了函数签名
+right, which is basically these 2 steps in one, so and I don't remember the function signature
+
+268
+00:28:13,000 --> 00:28:18,825
+我想只是在某些情况下可能会需要ArrayBuffer，不知道，我就去查下这个
+I think it's just that we'll need ArrayBuffer at some case, I don't know I'm just gonna look this up
+
+269
+00:28:19,366 --> 00:28:31,150
+那么CreateBuffers，glad，CreateBuffers，这里有签名，好了，实际上只有buffers和size
+so CreateBuffers, glad, CreateBuffers, there's a function signature, okay, cool, so it actually does just have the buffers and a size
+
+270
+00:28:31,533 --> 00:28:45,200
+好了，那么回到这儿，我们有了size和m_RendererID，对吧，酷，还需要包含glad.h，继续
+okay, so back here, we have our size and we have our RendererID, all right, cool, we also need to include glad.h, and there we go
+
+271
+00:28:45,200 --> 00:28:51,750
+我们创建了缓冲区，在这个阶段不管它是什么类型的，不管怎样，当设置缓冲区数据时
+so we create our buffer, doesn't matter what kind of buffer it is at this stage, anyway, when we actually set our buffer data though
+
+272
+00:28:51,750 --> 00:28:56,675
+那时就会为VertexBuffer用ARRAY_BUFFER，为IndexBuffer用ELEMENT_ARRAY_BUFFER了
+that's when we will use a GL_ARRAY_BUFFER for VertexBuffer, and GL_ELEMENT_ARRAY_BUFFER for IndexBuffer
+
+273
+00:28:57,125 --> 00:28:59,000
+那么就不会再使用sizeof(vertices)了
+so we have, we can't use size of vertices anymore
+
+274
+00:28:59,000 --> 00:29:04,775
+很明显，它只是个指针，我们使用size和vertices，这里又会用到GL_STATIC_DRAW了
+obviously it's just a pointer, we use size, we use vertices, and we for now again hard-code GL_STATIC_DRAW
+
+275
+00:29:05,166 --> 00:29:11,975
+好了，那么我们继续，然后我们还会在析构函数中，我们还没有，让我们看看
+okay, so there we go, then we'll also have in the destructor, which we haven't, let's see
+
+276
+00:29:12,100 --> 00:29:24,675
+那么这个就不需要在这里实现了，而是需要在这实现，并且然后直接就是glDeleteBuffers了
+so this needs to not be implemented here anymore, we need to take this and implement it here, and then this will just glDeleteBuffers
+
+277
+00:29:27,966 --> 00:29:39,025
+因为不想保留那个，这里glBindBuffer()，那么就是GL_ARRAY_BUFFER和m_RendererID
+because we don't want to retain that glBindBuffer, let's see, so GL_ARRAY_BUFFER and m_RendererID
+
+278
+00:29:39,466 --> 00:29:47,375
+然后Unbind，可能不会经常用，但会解除绑定，好了，酷，那么继续，非常简单的类
+and then Unbind, which we probably will not use that often, but we will unbind it then, okay, cool, so there we go, very simple class
+
+279
+00:29:47,800 --> 00:29:53,650
+只是简单地创建缓冲区，上传它们，然后我们可以为渲染绑定它们，并且我会实现这些
+just simply creates buffers, uploads them, and then we can bind them for rendering, and I'll do all of that kind of stuff
+
+280
+00:29:53,750 --> 00:29:59,050
+好了，回到Application类中，让我们试一下，看看会发生什么，那么我们仍然有vertices
+okay, so back inside our application class, let's try that out and see what happens, so we still have our vertices
+
+281
+00:29:59,050 --> 00:30:05,375
+我们不需要再生成这个了，如果回到这儿，我们就可以代替m_VertexBuffer
+we don't need to generate this anymore, if I go back to here, we can instead of having unsigned VertexBuffer
+
+282
+00:30:05,700 --> 00:30:11,725
+我们可以直接去掉那个，实际上会有个指向VertexBuffer的唯一指针
+we can get rid of that and actually have a unique pointer to a VertexBuffer
+
+283
+00:30:13,000 --> 00:30:19,675
+并且那就是我们的m_VertexBuffer，酷，那么然后在这里，我还必须包含这个
+and that will be our m_VertexBuffer, cool, so then over here, and I'll have to include this
+
+284
+00:30:20,000 --> 00:30:33,275
+所以基本上一样的，除了VertexBuffer，那么在这，有个m_VertexBufffer，我喜欢用reset
+so basically the same as that except VertexBuffer, so now over here, we have a VertexBuffer, I like to just use reset
+
+285
+00:30:35,366 --> 00:30:44,075
+所以我上次用过，对吧，然后我们把这个放在这，显然先有数据(vertices)，然后是size
+so I used last time, yeah I did, and then we put this in here, obviously we have the data first and the size second here
+
+286
+00:30:45,825 --> 00:30:53,733
+那应该没什么问题吧，好了，很明显没用，不好意思，问题不大，这里直接就是Buffer
+that should be okay, okay, that clearly didn't work, sorry, it's not bad, it's Buffer, it's just Buffer
+
+287
+00:30:56,177 --> 00:31:01,475
+好了，我们继续，然后差不多就那样了，我的意思是我们可能应该绑定它
+okay, and there we go, and then that's kind of it, I mean we probably should bind it
+
+288
+00:31:02,100 --> 00:31:10,017
+我不确定Create是否绑定它，那就是问题所在，我想我们可以运行这个，看看会发生什么
+I'm actually not sure if create create binds it or not, that's kind of the problem, I guess we can run this and see what happens
+
+289
+00:31:11,000 --> 00:31:15,475
+但那应该很有趣，我不认为我们漏了什么，我们还需要实现BufferData吗
+but yeah that'll be interesting, I don't think we're doing anything else, are we still doing buffer data
+
+290
+00:31:16,375 --> 00:31:21,375
+所以我不应该那样做，让我们直接取消那个编译吧，反正都失败了
+so I shouldn't actually do that, let's just cancel that build, I've failed anyway
+
+291
+00:31:21,650 --> 00:31:25,850
+好了，为什么我失败了，好吧，Create什么都没做，我们还没把这个讲清楚
+okay, why I fail, okay, so create of course create does nothing yet, we haven't sort of this out yet
+
+292
+00:31:26,333 --> 00:31:31,750
+所以你们实际上应该做的是，我们没有渲染器类，有点烦人，我们下次一定要设置那个
+so what you actually should do is, we don't have a renderer class, which is kind of annoying, we should definitely set that up next time
+
+293
+00:31:31,750 --> 00:31:39,000
+因为我们真的需要，因为有些通用渲染器命令，比如你们知道的Clear和ClearColor之类的
+because we really need to, because we also have kind of generic renderer commands like Clear and ClearColor that you know
+
+294
+00:31:39,700 --> 00:31:42,399
+在大多数情况下，你们可能会关联到一个帧缓冲区
+in most cases, you could probably associate to a frame buffer
+
+295
+00:31:42,400 --> 00:31:46,200
+但是在你们的渲染器中，也有些有用的函数作为渲染器命令
+but also useful functions to have inside your actual renderer as renderer commands
+
+296
+00:31:46,500 --> 00:31:54,975
+在那个Renderer类中，我们可能有个接口的切换，所以如果你们使用的是OpenGL或DirectX
+and inside that Renderer class, we probably have a switch for the api, right, so if you're using like OpenGL or DirectX it would kind of
+
+297
+00:31:55,133 --> 00:32:01,375
+渲染器应该为你们提供这些，对吧，所以我们现在要做的就是创建Renderer类
+the renderer is what should kind of have that for you, right, so what we'll do right now is we'll create a Renderer class
+
+298
+00:32:02,575 --> 00:32:11,050
+直接就是Renderer，对吧，这对今天来说只是一丢丢，但基本上
+which is just called a Renderer, right, this is going to be so brush for today, but basically
+
+299
+00:32:11,050 --> 00:32:17,000
+它要做的就是创建个枚举类RendererAPI，然后这个就是None
+what it's going to do is have an enum class RendererAPI, right, and then this is going to be None
+
+300
+00:32:17,166 --> 00:32:23,450
+就像你在无头文件运行，或者只是不想，如果你们可能在做不需要Rendererr的单元测试
+which is like if you're running headless, or if you just don't want to have, if you may be doing unit tests that don't require Rendererr
+
+301
+00:32:23,450 --> 00:32:26,975
+你们比如在构建机器上运行它们之类的
+and you're running them on like a build a build machine or something like that
+
+302
+00:32:26,975 --> 00:32:30,550
+它甚至可能没有你们想要测试的显卡
+which might not even have a graphics card in it that you want to test with
+
+303
+00:32:31,666 --> 00:32:39,250
+那么就有了None，然后是OpenGL，在以后，你们知道的，可能有Direct3D或Vulcan之类的
+so you have None and then you have OpenGL, and then in the future you know we'll probably have like Direct3D or Vulcan whatever
+
+304
+00:32:39,566 --> 00:32:41,675
+但这两个显然是我们现在有的
+but these are kind of the 2 that we obviously have right now
+
+305
+00:32:42,733 --> 00:32:50,800
+好了，这个可能需要以某种静态状态保存，因为我说过，它非常简短
+okay, this needs to be stored in some kind of static state probably, again since I said it's gonna be really brief
+
+306
+00:32:51,225 --> 00:32:57,350
+我们基本上要做的就是在Renderer类中有个静态的RendererAPI，对吧
+essentially what we're gonna do is just have a static RendererAPI inside the Renderer class, right
+
+307
+00:32:58,800 --> 00:33:09,750
+也就是s_RendererAPI，我们马上就会看到，好了，然后在马上创建的cpp文件中
+which is the s_RendererAPI, we'll just see, okay, and then inside the cpp file, which I'll now have to create
+
+308
+00:33:10,966 --> 00:33:22,950
+既然已经这样做了，没问题，Renderer.cpp，包含hzpch和Renderer.h，namespace Hazel
+since I just did it this way, which is fine, renderer.cpp, include our pch, will include our Renderer.h, namespace Hazel
+
+309
+00:33:24,183 --> 00:33:38,310
+这显然是我们可以在运行时设置的东西，但现在只会设置成RendererAPI::OpenGL，对吧
+and then this for now clearly something that we can set at runtime, but for now this just gets set to RendererAPI::OpenGL, okay
+
+310
+00:33:38,800 --> 00:33:42,600
+所以我们在这里很难创建它，显然你们可以在运行时设置它
+so we are hard creating it here, obviously it's something that you could definitely set at runtime
+
+311
+00:33:42,875 --> 00:33:54,870
+事实上，我们会为它添加个获取方法，我们会有公共内联方法 RendererAPI
+in fact we're going to add a get up for it, so we'll have inline, public private, inline RendererAPI
+
+312
+00:33:57,966 --> 00:34:04,725
+我不知道，比如GetRendererAPI()，可能直接就是GetAPI()，老实说，在Renderer中
+I don't know, GetRendererAPI(), probably just GetAPI(), to be honest, inclue inside the Renderer
+
+313
+00:34:04,725 --> 00:34:15,125
+你们可以直接调用当前接口之类的，然后这个是静态函数，直接返回s_RendererAPI
+you could call a current api or whatever, and then this will just be static, and it will just return s_RendererAPI
+
+314
+00:34:15,300 --> 00:34:19,600
+好了，酷，如果你们想设置这个，然后还可以用SetApi()做同样的事情，很明显
+okay, cool, and then you could also do SetApi that does the same thing, if you want to set this
+
+315
+00:34:19,600 --> 00:34:25,025
+你们需要在Application中创建Renderer和上下文前设置，本质上是在创建窗口之前
+and obviously if you set it before you create the Renderer and the context in Application, essentially before you create the window and everything
+
+316
+00:34:25,575 --> 00:34:34,175
+它应该使用那个接口，好了，酷，现在我们已经在我们的Buffer类中了
+it should use that chosen api, okay, cool, so now that we've got that inside our open side just our Buffer class
+
+317
+00:34:34,175 --> 00:34:43,071
+就这儿，所以我们直接包含Renderer
+which is over here, we will include, we're already in here, so we can just include the Renderer
+
+318
+00:34:43,466 --> 00:34:54,000
+然后执行switch，检查Renderer::GetAPI，如果它是None，那么可能不会返回任何东西
+and then we do a switch segment, and we check Renderer::GetAPI, okay, so if it is None, you know then we'll probably won't return anything
+
+319
+00:34:54,000 --> 00:35:00,275
+所以暂时就返回nullptr，我们可能会有一个什么都不做的实现
+so return null point up for now, we probably will have an implementation that does nothing though
+
+320
+00:35:00,966 --> 00:35:06,650
+否则这个崩溃，所以我们可以在这种情况下直接断言
+otherwise this purple crash, so we could just assert in this case
+
+321
+00:35:06,800 --> 00:35:22,250
+说实话，我们可能那样做，HZ_CORE_ASSERT(false, "RendererAPI::None is not supported")
+to be honest, we might do that, HZ_CORE_ASSERT(false, ""), and we'll say RendererAPI::None is not supported
+
+322
+00:35:24,466 --> 00:35:41,025
+它目前不受支持，然后我们会返回nullptr，当然对于OpenGL，我们会把这个移到这里
+it's currently not supported, and then we will return non pointer, and then for OpenGL of course, so we'll kind of move this over here
+
+323
+00:35:42,700 --> 00:35:52,066
+我们可以，把这个向前回点，会返回OpenGLVertexBuffer，里面有vertices和size
+we will, we can move this back a bit, we will return a new OpenGL vertex buffer with the vertices and the size
+
+324
+00:35:52,066 --> 00:35:54,275
+所以我只是想弄明白这个的所有原理，对吧
+so I really just kind of making sense how this all works, right
+
+325
+00:35:55,225 --> 00:36:05,275
+然后很明显，在这里，返回nullptr，我们也可以在这里有个断言表示它失败了
+and then obviously over here the return null pointer, and we could just, you know also have an assert here essentially that says it failed
+
+326
+00:36:05,275 --> 00:36:17,766
+也就是说，如果你说，它的值不在这里，我们可以让一个烤箱断言这有假的未知品牌的reapi
+that's if somehow you said, it to a value that's not here, so just we can just have a oven assert this has false Unknown RendererAPI
+
+327
+00:36:18,800 --> 00:36:23,398
+好了，然后OpenGLBuffer.h当前是我们需要包含的文件
+okay, and then OpenGLBuffer is of course something that we need to include
+
+328
+00:36:23,525 --> 00:36:31,325
+那么就是Hazel，它实际上在哪儿，就是Platform，它没有在Hazel中，显然没有
+so Hazel, where is it actually, Platform, this Platform is not in Hazel, apparently not
+
+329
+00:36:33,425 --> 00:36:38,400
+那么就是OpenGLBuffer.h，对吧，然后很明显，如果比如，对吧，这儿复制几行
+OpenGLBuffer, right, and then obviously if for example, right, this will share some line here
+
+330
+00:36:38,650 --> 00:36:44,645
+那么比如，我们已经有了Direct3D/Direct3DBuffer.h或DirectXBuffer.h之类的，对吧
+if for example we you know had Direct3D and Direct3DBuffer or DirectXBuffer or whatever you called it, right
+
+331
+00:36:45,666 --> 00:36:52,750
+由于那个只支持Windows，你们知道的，会做些比如#if HZ_PLATFORM_WINDOWS之类
+that since that's Windows only, you would do something like you know, if HZ_PLATFORM_WINDOWS or something
+
+332
+00:36:53,066 --> 00:36:59,400
+你们会做这个，否则就不会包含，这样的话，你们仍然可以在MacOS上编译这个类
+you would do this, otherwise you wouldn't, right,and that way you'd still be able to compile this class on like MacOS
+
+333
+00:36:59,400 --> 00:37:05,250
+同样的，如果你们知道，这是DirectX而不是OpenGL，也可以用它来处理这个
+and then same with this, if this was you know DirectX instead of OpenGL, you could surround this case specifically by that
+
+334
+00:37:05,400 --> 00:37:11,848
+对吧，这样的话，DirectX代码就会被忽略，在不支持它的平台上根本不会编译
+right, and in that way obviously the DirectX code is ignored and not compiled at all on platforms that do not support it
+
+335
+00:37:12,333 --> 00:37:17,225
+好了，那么我们继续，就是那样，差不多就是那样了
+okay, so there we go, that is that, and then that's pretty much it
+
+336
+00:37:18,100 --> 00:37:24,966
+显然对于IndexBuffer，我们需要做一样的处理，那么就这儿，OpenGLBufffer仍然在这儿
+obviously for IndexBuffer, we need to do the exact same thing, so I'll come over here, OpenGLBuffer is still the file here
+
+337
+00:37:24,966 --> 00:37:34,500
+这就是OpenGLIndexBuffer，它有我们的indices和size，我想我们还没有创建类
+this will be OpenGLIndexBuffer, which has our indices and our size, still not a class that we've created yet I guess
+
+338
+00:37:35,766 --> 00:37:39,825
+但是，耶，我们继续，完全一样的代码，对吧，我只是想把它敲过去
+but yeah there we go, exact same code, right, I just like to tap this across
+
+339
+00:37:41,400 --> 00:37:48,700
+酷，那么我们现在要去创建那个IndexBuffer了，所以我们就直接复制并粘贴这个
+cool, so now I will have to create that IndexBuffer I guess, so if we copy and paste this
+
+340
+00:37:50,533 --> 00:38:01,600
+我们就叫它IndexBuffer，很明显继承IndexBuffer，如果看看Buffer.h，可以找出些原因
+we'll call this our IndexBuffer, and obviously it will be an IndexBuffer, if we go to, Buffer, and not trying out for some reason
+
+341
+00:38:01,600 --> 00:38:10,950
+但如果我们到这里，就可以直接复制这个，把它粘贴到这儿，又会是一期很长的视频
+but if we go here, we can steal this, copy it, paste it here, there's gonna be another long episode
+
+342
+00:38:12,000 --> 00:38:22,125
+幸运，伙计们，好了，这就是IndexBuffer，看起来不错，然后这儿，我们可以复制粘贴这个
+lucky, you guys, okay, IndexBuffer, looks good to me, and then if we go over here, we can basically copy and paste this
+
+343
+00:38:23,300 --> 00:38:34,075
+我要代码中的Vertex替换成Index，然后显然我们需要在这里得到适当的代码
+I'm just going to replace code here from Vertex to Index, alright, and then obviously we need to get the appropriate code here
+
+344
+00:38:36,600 --> 00:38:44,525
+也就是glBufferData，变成了ELEMENT，但我们可能还需要绑定它，我们一会儿再看
+which is that glBufferData, this becomes ELEMENT, all right, but we might still need to bind it, we'll check that out in a minute
+
+345
+00:38:44,525 --> 00:38:55,398
+我想会一起学习那个，indices，OpenGLIndexBuffer，把这改成ELEMENT_ARRAY_BUFFER
+we'll both learn that together I guess indices, and then um OpenGLIndexBuffer, we change this to the ELEMENT_ARRAY_BUFFER
+
+346
+00:38:56,800 --> 00:39:03,100
+其他的都是一样的，好了，酷，通常我喜欢做的是把这些分开，因为它们都在一个文件中
+everything else says the same, okay, cool, and then usually what I like to do is just kind of separate this, because it's all in one file
+
+347
+00:39:03,100 --> 00:39:12,678
+你们可能需要看到，我想用这样的分隔，所以你们知道的，有时我基本上这样做
+and you kind of want to see kind of the, I guess separation of these 2 things, so you know sometimes I do something like this essentially
+
+348
+00:39:13,366 --> 00:39:21,400
+我不知道，它的格式是不同的，我只是根据我的心情改变它
+and I don't know it, the formatting for this varies, I just kind of change it up depending on my mood
+
+349
+00:39:22,175 --> 00:39:29,450
+但现在我想我可能会这样做，这是我们的IndexBuffer，然后这是我们的VertexBuffer
+but right now I guess I'll do something like this, which is just our index buffer, and then this will be our vertex buffer
+
+350
+00:39:29,450 --> 00:39:36,800
+有时我也会在头文件中这样做，这样很明显，我们有这两种实现
+and sometimes I do this in the header file as well, just so that it's super obvious, where we have those 2 kind of implementations
+
+351
+00:39:36,800 --> 00:39:41,350
+顺便说一下，你可能不需要写三四行，但你可以随意写
+you probably don't need to have like 3 4 lines to take this up by the way, but do as you wish
+
+352
+00:39:41,666 --> 00:39:51,550
+好了，酷，那么继续，我们在这里多了一个，因为顶点的线太多了或者说多了个字符
+okay, cool, so there we go, we've got an extra one here, because I guess the vertex was too many lines or rather one more character
+
+353
+00:39:51,550 --> 00:39:55,825
+不管怎样，好了，我们漏了一些东西，因为我把它放进了Vertex的区域，可爱
+anyway, so there we go, we're missing something, because I put this into the vertex spot lovely
+
+354
+00:39:58,350 --> 00:40:05,500
+看起来很好，如果我们回到Buffer.cpp，你们就可以检查确保这都编译了，它确实编译了
+yeah that looks pretty good to me, if we go back to the Buffer.cpp file, you can check to make sure this all compiles, and it does
+
+355
+00:40:05,866 --> 00:40:20,000
+然后回到Application，这里的IndexBuffer不是unsigned int，这里会有个IndexBuffer实例
+and then back inside Application, instead of having that IndexBuffer as just to unsigned int here, we'll have an IndexBuffer instance here
+
+356
+00:40:20,600 --> 00:40:25,175
+好了，酷，为了实现这个，我需要包含Buffer，不过已经包含了，因为它们都在一个文件中
+okay, cool, and then for that to happen I need to include Buffer, which I already am, because they're both in one file
+
+357
+00:40:25,175 --> 00:40:31,125
+就很简单奈斯了，为了做这个，不管怎样，都是代替glGenBuffers这些，还有glBufferData
+which is lovely, nice and easy, we're in to do this, anymore, instead of glGenBuffers and all that stuff, and glBufferData
+
+358
+00:40:31,466 --> 00:40:40,300
+我们直接创建indices，然后可以看到m_IndexBuffer.reset(IndexBuffer::Create(indices, size))
+we can just create the indices, and then see m_IndexBuffer.reset(IndexBuffer::Create(indices, size))
+
+359
+00:40:41,600 --> 00:40:48,150
+并且那就是我们需要的，size就是sizeof(indices)，实际上这就是不错的关键点了
+and that's all we need, and size is just sizeof indices, now actually this is a good point
+
+360
+00:40:48,150 --> 00:40:54,500
+对吧，那么关键是我们到底需要大小，还是应该需要数量
+right, so the point is do we actually need size here, or should we rather have a count
+
+361
+00:40:55,300 --> 00:41:03,275
+原因是你们指定了uint32_t，就知道它们的大小，所以为什么不直接计数呢
+the reason is that you're specifying uint32_t indices they, you know the size of them, anyway, so why not just have a count
+
+362
+00:41:03,575 --> 00:41:12,766
+我们在IndexBuffer中还有个，就是count，对吧，那么就是virtual uint32_t GetCount()
+and the other thing that we actually do need in IndexBuffer, which I have neglected is the count, right, so virtual uint32_t GetCount()
+
+363
+00:41:13,625 --> 00:41:17,502
+对吧，然后这个就会告诉我们，在IndexBuffer中，实际上有多少个索引
+and right, and then this will just tell us how many indices are actually in IndexBuffer
+
+364
+00:41:17,700 --> 00:41:21,450
+对渲染也很重要，因为我们想要普遍渲染所有的
+which is important for rendering, since we want to commonly render all of them
+
+365
+00:41:22,566 --> 00:41:31,900
+那么这儿就会有virtual GetCount，返回m_Count，然后就是属性，uint32_t m_Count
+so we'll have virtual GetCount here, which will return a count, m_Count, and then uint32_t m_Count
+
+366
+00:41:32,533 --> 00:41:44,999
+然后在这儿，当接收count时，设置count，就能做这个，然后这就是count*sizeof(uint32_t)
+right, and then over here, when we take in the count, we'll set count, so that we can do this, and then this becomes count*sizeof(uint32_t)
+
+367
+00:41:45,975 --> 00:41:50,850
+好了，那么那就是我区分接收字节和非字节的方法
+okay, so that's how I like to differentiate between what is in bytes and what is not in bytes
+
+368
+00:41:50,950 --> 00:41:56,725
+对吧，如果是count，那么就不是通过字节，它就是元素，这就意味着你们需要乘以大小
+right, if it's count, then it's not in bytes, it's in elements, which means that you need to multiply by the size
+
+369
+00:41:56,725 --> 00:42:03,200
+如果它是size，就是通过字节传入，我们继续，很棒，那么现在返回Application
+if it's size, it's in bytes, okay, there we go, wonderful, so now back inside our Application
+
+370
+00:42:03,966 --> 00:42:10,650
+我们创建了这个，在这个例子中我们没有indices，我们只有sizeof(indices)
+we create this, we create these, and we instead of having indices in this case, we just have the sizeof(indices)
+
+371
+00:42:10,950 --> 00:42:17,500
+我们只有3个，因为这里有3个索引，看，我的意思是，如果你们想让它自动计算
+we just have 3, because there's 3 indices in here, yeah look, I mean if you wanted this to be automated
+
+372
+00:42:17,500 --> 00:42:24,725
+你们就可以用sizeof，因为我知道有些人他们总是想用uint32_t，就像那样
+you could just do sizeof, because I know some people gonna comply they always do uint32_t right like that
+
+373
+00:42:25,766 --> 00:42:30,500
+我在这里应该用什么，好了，然后那会给你们实际的数量
+just what I should use here, alright, and then that will give you the actual a count
+
+374
+00:42:31,333 --> 00:42:39,725
+如果你们真的想那样做，这个会保持不变，然后我的意思是我们可能需要在某个点绑定它
+if you really want to do it that way, this will keep the same, and then I mean we probably need to bind it at some point
+
+375
+00:42:39,725 --> 00:42:43,525
+如果我现在运行这个，可能不会得到一个三角形，因为这有点可疑
+if I run this right now, probably won't give us a triangle, because this is a bit suspicious
+
+376
+00:42:43,525 --> 00:42:49,600
+不幸的是，我用完OpenGL已经有一段时间了，但我们会看到我们会得到什么
+and unfortunately has been a while since I've used up in OpenGL, but we will see what we get here if anything
+
+377
+00:42:50,500 --> 00:42:56,625
+好吧，我们什么都没得到，我们得到了驱动内部的甭哭哦，是的，可能什么都没有绑定
+okay, so we get nothing, and we get a crash in fact inside the driver, yeah probably nothing's bound
+
+378
+00:42:56,625 --> 00:43:02,901
+我的意思是试图在这绘制元素，我打赌没有什么可以绘制的，所以需要做的就使用
+I mean we're trying to draw elements here, I bet we've got nothing to draw, so the other thing we need to do is actually use out
+
+379
+00:43:02,901 --> 00:43:07,350
+这里不是只有3个硬编码，我们应该得到IndexBuffer，并实际得到数量
+instead of just having 3 hard-code here, we should get our IndexBuffer, and actually get the count
+
+380
+00:43:07,733 --> 00:43:14,000
+那就是我把它放在这里的原因，那么就来修改一下缓冲区，因为很明显我没有想象的那么好
+that's why I wanted it here, okay, so let's fix up our buffers, because clearly I am not as good as I thought
+
+381
+00:43:14,400 --> 00:43:21,899
+我们需要绑定缓冲区，这意味着为什么要用create，为什么要用gen，在缓冲纹理是一样的
+we need to bind our buffer, which I guess means that why to use create, why to use gen, they're the same in terms of buffers fleck textures
+
+382
+00:43:21,899 --> 00:43:26,199
+实际上你们马上就会指定目标，我可能觉得这里也会是一样的
+you actually specify the target immediately, I kind of maybe thought that it would be like the same here
+
+383
+00:43:27,775 --> 00:43:35,975
+但我认为不是，对吧，那么这就是个IndexBuffer，OpenGL是不一致的，尽管代价是一致的
+but I guess not, right, so this is the one IndexBuffer, so you know OpenGL have been inconsistent, even though price to be consistent
+
+384
+00:43:37,133 --> 00:43:44,250
+创建的原因只是为了匹配着色器，它有glCreateShaders，CreateShader和glCreateProgram
+and the reason they have created now is just to match the shader api, which has glCreateShaders, you know CreateShader and glCreateProgram
+
+385
+00:43:45,800 --> 00:43:50,800
+但不管如何，我想我们会看到，所以那就是为什么你们应该使用create而不是gen
+but anyway, I guess we'll see, so that's why you should still use creat instead of just gen
+
+386
+00:43:50,900 --> 00:43:59,550
+因为那样的话，接口是一致或者说OpenGL接口是一致的，让我们运行它，看看会发生什么
+because that way your api is kind of consistent or rather your OpenGL api is consistent, let's run that and see what happens
+
+387
+00:44:01,350 --> 00:44:05,500
+既然我们已经有了边界，也让它有了边界，它现在应该在顶点上，一切都很好
+and since we've bounded and left it bound, it should be in the vertex right now, and everything should be great
+
+388
+00:44:05,800 --> 00:44:12,000
+正如你们所看到的，希望这个能让你们对我在视频开始时所讲的内容有所了解
+and as you can see it is, so hopefully that shed some light as to all the blabbing I did in the beginning of the video
+
+389
+00:44:12,000 --> 00:44:14,300
+比如你们知道的，你们必须这么做，必须创建这些类
+where I was like you know, you have to do this, you have to create all these classes
+
+390
+00:44:15,025 --> 00:44:20,400
+现在我们已经完成了，你们可以看到我们在这里有基类，它们只是没有数据的接口
+now we've done that, you can see we have the base classes here, which are just interfaces with no data at all
+
+391
+00:44:21,266 --> 00:44:29,566
+然后在运行时，我们选择返回一个特定渲染接口的特定实例，希望你们喜欢这期视频
+and then at runtime, we make the choice to actually return a specific instance of a specific rendering api, hope you guys enjoyed this video
+
+392
+00:44:29,566 --> 00:44:34,100
+如果你们喜欢的话，就为它点赞吧，你们也可以访问patreon.com/thecherno来支持本系列
+if you did, you can hit that like button, you can also help support the series by going to patreon.com/thecherno
+
+393
+00:44:34,100 --> 00:44:37,275
+非常感谢你们的支持，那也是本系列得以维持的动力
+your support is greatly appreciated, and it is what keeps this series going 
+
+394
+00:44:37,275 --> 00:44:43,500
+所以非常感谢所有帮助支持这个系列的朋友，让我知道你们对这种设计的看法吧
+so huge thank you to everyone who helps support the series, let me know what you think of this kind of design
+
+395
+00:44:43,500 --> 00:44:48,650
+如果看到了其他你们认为更好的设计，请告诉我，这是我已经用了很多年的一个设计
+let me know if you've seen other designs that you think are better, this is the one that I've kind of been using for years
+
+396
+00:44:48,650 --> 00:44:54,075
+说实话，这是我最喜欢的，因为所有的决定都是在运行时做出的，而且是在性能方面
+and to be honest, it's my favorite, because all the decisions are made at runtime, and in terms of performance
+
+397
+00:44:54,075 --> 00:44:56,700
+我不知道，有些人可能会说
+like I don't know, some people out there might be nipicking being like
+
+398
+00:44:57,066 --> 00:45:02,075
+但每次都是虚拟调度，没关系，老实说，真的没有太大关系
+but it's a virtual dispatch every time, it doesn't matter, like it it honestly, doesn't matter
+
+399
+00:45:02,400 --> 00:45:08,800
+我曾经围绕着这种东西进行过基准测试，但我从未在编写游戏或引擎时遇到过这种情况
+I've done benchmarks around this kind of stuff, I have never been in this situation, where I've written a game or an engine
+
+400
+00:45:09,600 --> 00:45:16,250
+并且我也一直在想，我希望我有非虚函数调用会有的额外性能
+and I've been like man, you know, I wish I had the extra performance that having non virtual function calls would have had
+
+401
+00:45:17,575 --> 00:45:21,625
+我不是说这种情况不存在，我是说根据我的经验
+I mean not saying that that scenario doesn't exist, I'm saying in my experience
+
+402
+00:45:21,659 --> 00:45:27,019
+对于我正在做的，对于我以后会用Hazel做的，这将是个非常高的性能，要求很高
+and for what I'm doing, and for what I'm trying to do with Hazel which is going to be a very high performance, like quite demanding
+
+403
+00:45:27,333 --> 00:45:34,475
+视觉上，你们知道视觉上要求很高的引擎，对吧，这类东西肯定不会有什么影响
+and visually you know visually demanding kind of engine, right, this kind of stuff definitely is not going to matter
+
+404
+00:45:34,475 --> 00:45:41,300
+如果你们正在构建一个非常小的引擎，比如嵌入式系统上的像素图像，也许这些会很重要
+if you're making some really small engine for like pixel graphics on like an embedded system, yeah maybe this stuff would matter
+
+405
+00:45:41,300 --> 00:45:49,150
+但它不是这样的，在作业中，看看你们能不能创建Shader接口，因为现在我只有Shader
+but it doesn't for something like this, for homework, see if you can create the shader api like this, because right now I've just got shader
+
+406
+00:45:49,600 --> 00:45:56,975
+我已经有了这个OpenGL函数的着色器类，而这个Buffer.cpp与OpenGL完全没有关系
+I've got the shader class for this actually just OpenGL functions, whereas this Buffer.cpp file has no relation to OpenGL at all
+
+407
+00:45:56,975 --> 00:46:01,525
+对吧，我们包含了OpenGLBuffer，但那是，只有当我们在支持它的平台上
+right, we include OpenGLBuffer, but that's again, only if we're on the platform that supports it
+
+408
+00:46:03,533 --> 00:46:09,125
+还有，你们知道的，我们没有包含glad之类的库，顺便说一下，OpenGLBuffer也没有
+and also you know, we're not including glad or anything like that, and neither is OpenGLBuffer by the way
+
+409
+00:46:09,200 --> 00:46:16,100
+如果看看OpenGL，如果快速看下Buffer类，没有包含glad，对吧，但是cpp文件包含了
+if you look at OpenGL, if we just quickly look at the Buffer class, this doesn't include glad, right, the cpp file does
+
+410
+00:46:16,500 --> 00:46:22,125
+所以实际上我们从没有把glad包含到通用Buffer类，不应该那样做，对吧，DirectX也一样
+so we're never actually including glad into our generic buffer class and we shouldn't, right, same with kind of DirectX
+
+411
+00:46:22,125 --> 00:46:27,200
+你们通常不希望DirectX那样做，因为你们只会在Windows上构建它
+you usually don't want to do that with DirectX is probably okay, because you'll be only building that on Windows
+
+412
+00:46:27,200 --> 00:46:32,766
+但对于这样的东西，我们甚至不需要，如果你们能避免它，肯定就避免了，然后是另一个
+but for something like this, we don't even need to, and if you can avoid it, you definitely should, and then the other one
+
+413
+00:46:32,766 --> 00:46:38,400
+你们可以尝试封装VertexArray，看看能否让Application类完全通用
+you can have a go with is VertexArray, and just see if you can make that application class completely kind of generic
+
+414
+00:46:39,133 --> 00:46:43,100
+不管怎样，我希望你们喜欢这期很长的视频，我已经在这里坐了差不多一个小时了
+anyway, I hope you guys enjoyed this very long episode, been sitting here for like an hour almost
+
+415
+00:46:43,900 --> 00:46:48,325
+下次我想我们会更多地控制Renderer类或者
+next time I think we're gonna either take more control with the renderer class or
+
+416
+00:46:48,325 --> 00:46:54,325
+我还想说说VertexArray以及如何适配，以及如何抽象，也许还有BufferLayout
+I really want to also talk about VertexArray and how they fit in, and how we can abstract that and maybe the BufferLayout as well
+
+417
+00:46:55,093 --> 00:46:59,150
+但是请告诉我你们想看什么，我们下次见，再见
+but yeah let me know what you want to see, and I'll see you guys next time, goodbye
+

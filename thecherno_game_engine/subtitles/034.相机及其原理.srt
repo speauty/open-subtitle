@@ -1,0 +1,2035 @@
+﻿1
+00:00:00,166 --> 00:00:03,387
+嗨，大家好，我叫TheCherno，欢迎回到我的游戏引擎系列
+hey, what's up guys, my name is TheCherno, welcome back to my game engine series
+
+2
+00:00:03,700 --> 00:00:08,050
+上一次我们来看一下Renender、RenderCommand、RendererAPI之类的东西
+so last time we cook a look at the Renderer, RenderCommand, RendererAPI stuff like that
+
+3
+00:00:08,050 --> 00:00:14,625
+我们实际上是如何开始和结束渲染的，并提交几何体和网格之类的
+how we can actually kind of like begin and begin and end our rendering, and submit geometry and meshes, and stuff like that in between
+
+4
+00:00:14,625 --> 00:00:17,375
+如果你们还没有看过这段视频，那你们一定要去看看
+definitely check out that video, if you haven't already
+
+5
+00:00:17,375 --> 00:00:23,075
+今天我们要讨论的是相机，相机是一个很大的话题
+and today we're gonna be talking about cameras, cameras are a pretty big topic
+
+6
+00:00:23,075 --> 00:00:27,200
+我认为这两种东西都非常重要，如果你们不知道的话
+and there I think something that is both like extremely vital, if you don't know
+
+7
+00:00:27,500 --> 00:00:34,000
+但同样重要的是，你们要考虑到相机的架构，以及它们如何正常运行的
+but also extremely like important that you consider the architecture of cameras, and how they work properly
+
+8
+00:00:34,766 --> 00:00:41,925
+为了真正考虑在你们的实际游戏引擎中，如何构建一种合适的相机系统
+and in order to actually consider how to architect a proper kind of  I guess camera system in your actual game engine
+
+9
+00:00:43,000 --> 00:00:47,200
+你们需要了解渲染的实际运行原理，而不仅仅是渲染方面的内容
+you need to actually know how rendering works, but not only the rendering side of things
+
+10
+00:00:47,200 --> 00:00:51,425
+但也有游戏性方面的东西，因为相机很有趣，所以它们对渲染至关重要
+but also kind of the gameplay side of things, because cameras is interesting, they're vital for rendering
+
+11
+00:00:51,425 --> 00:00:55,750
+如果要在屏幕上渲染任何内容，你们绝对需要有一个好的相机系统
+you absolutely need to have a good camera system, if you want to render anything on your screen
+
+12
+00:00:55,975 --> 00:01:01,075
+当然，与渲染一样，你们也知道，你们想让它尽可能地优化
+and also of course you know that with as with rendering, you know, you want to make that as optimal as possible
+
+13
+00:01:01,325 --> 00:01:04,425
+因为如果你们能优化你们的渲染，这意味着你们可以在屏幕上看到更多的东西
+because if you can optimize your rendering, it means you can have more things on the screen
+
+14
+00:01:04,625 --> 00:01:08,475
+只是更多的时间，更实际的那种，我想
+and just more time, more kind of actual kind of I guess
+
+15
+00:01:09,666 --> 00:01:13,019
+你们可以拥有更多，虽然基本上会看到更高的价格，对吧
+you can have more, while it's going to see like a higher price essentially, right
+
+16
+00:01:13,333 --> 00:01:18,775
+因为我们指的是价格昂贵或便宜的东西，至于需要多长时间
+because we kind of refer to like something being expensive or cheap, as to how much time it takes
+
+17
+00:01:18,775 --> 00:01:20,925
+并且我们所付出的是我们自己的时间，对吧
+and what we're kind of paying with is our time, right
+
+18
+00:01:21,150 --> 00:01:27,475
+因为我们渲染一个帧的时间是有限的，所以如果你们能让你们的渲染尽可能的高效
+because we have a finite kind of amount of time in which to render a frame, so if you can kind of make your rendering as efficient as possible
+
+19
+00:01:27,650 --> 00:01:31,750
+你们可以在屏幕上渲染更多的东西，这显然是非常非常有用的，通过屏幕上更多的东西
+you can render more things on the screen, and that's obviously very very useful, and by more things on the screen
+
+20
+00:01:31,750 --> 00:01:34,625
+我的意思不一定是像场景更多的物体，我的意思是你们可以把更多的时间花在渲染上，对吧
+I don't necessarily mean like more objects on the scene, I just mean kind of you can spend more of your time doing rendering, right
+
+21
+00:01:39,225 --> 00:01:43,875
+更像是帧时间，这对实际制作高保真图形非常重要
+and more kind of in frame time, and that's really really important to actually producing high fidelity graphics
+
+22
+00:01:44,225 --> 00:01:49,400
+现在还有一些游戏之外的考虑，对吧，因为一旦你们在很多时候都需要相机来渲染
+now there's also a gameplay out of things though, right, because once you need cameras for rendering a lot of the time
+
+23
+00:01:49,400 --> 00:01:53,375
+相机对你们与游戏的实际互动做出反应，对吧
+cameras respond to your actual interaction with the game, right
+
+24
+00:01:53,375 --> 00:01:58,350
+所以使用它们的导入和类似的东西，如果我移动我的角色的机会是，它很可能会移动相机
+so use their import and stuff like that, if I kind of move my character around chances are, it's probably gonna move the camera
+
+25
+00:01:59,366 --> 00:02:03,800
+因此，因为我们有一种错误的关系，它既受游戏的影响
+and so because we kind of have that too fault relationship, where it's influenced by both the gameplay
+
+26
+00:02:03,800 --> 00:02:09,850
+但提交进行渲染也很重要，它的架构实际上比你们想象的要重要得多
+but then also important to be submitted for rendering, the architecture of it is actually a lot more important than you might think
+
+27
+00:02:11,333 --> 00:02:18,250
+正因为如此，我们今天实际上要做的是，我们只会专注于计划，当决定制作这段视频时
+and so because of that, what we're actually gonna do today is we're just gonna focus on planning, and when deciding to do this video
+
+28
+00:02:18,250 --> 00:02:24,100
+就像我很想进入代码一样，只需写一点解释相机是如何运行的
+like I was very tempted to just kind of just go into the code, and just write a little kind of explain how camera's going to work
+
+29
+00:02:24,100 --> 00:02:28,250
+实际上比如正交相机，或者是我们目前的2D场景
+and actually come up with like an autographic camera, or something for our kind of 2D scene at the moment
+
+30
+00:02:28,525 --> 00:02:35,725
+然后把它推送进去，实际上已经准备好了代码， 但我觉得我今天花在这里会更好
+and then just kind of push that in, and actually have that code ready, but I thought it would be much better idea for me to spend today
+
+31
+00:02:35,725 --> 00:02:39,975
+只为了给你们绘制图表，谈论相机的运行原理以及所有这些
+just actually drawing like diagrams for you guys, talking about how cameras work and all of that
+
+32
+00:02:40,250 --> 00:02:44,250
+以及我们如何将它们引入Hazel，以及什么样的大计划
+and how we're gonna set them up in Hazel, and what the kind of big scale plan is
+
+33
+00:02:44,250 --> 00:02:49,275
+不仅仅是我们现在要做的事情，在它的第一次迭代中，让它启动和运行
+not just what we're gonna do like immediately now to get this thing up and running in its kind of first iteration
+
+34
+00:02:50,066 --> 00:02:57,475
+这样做的另一个好处是，除了你们对相机系统有更全面的了解外，还有
+the other benefit of this though apart from just you guys having more of a holistic kind of understanding of camera systems is
+
+35
+00:02:57,575 --> 00:03:01,800
+我想让你们做的是在这段视频之后，对吧，继续试着自己做
+what I want you to do is after this video, right, go ahead and try and do it yourself
+
+36
+00:03:02,266 --> 00:03:05,767
+你们在公共GitHub存储库上有Hazel的源代码，对吧
+you have the source code to Hazel on the public github repository, right
+
+37
+00:03:06,279 --> 00:03:14,350
+继续试着把我们今天提到的旧信息拿来，根据我的指导，自己编写这个相机系统，对吧
+go ahead and just try and take old old information that we've talked about today, and write this camera system based on my guidance yourself, right
+
+38
+00:03:14,600 --> 00:03:20,575
+你们甚至可能会有一些其他的想法，让这个相机系统比我在这里要做的计划更好
+you might even get some other ideas along the way in which to make this camera system even better than what I'm gonna just kind of plan out here
+
+39
+00:03:20,575 --> 00:03:25,733
+对吧，所以我真的鼓励你们这样做，因为如果你们只是跟着这个视频做，那么就去GitHub
+right, so I really encourage you guys to do that, because if you're just falling along with this video, so just going to github
+
+40
+00:03:25,800 --> 00:03:31,175
+然后得到源代码，然后就像把你们知道的Hazel改为你们的引擎名称一样，仅此而已
+and getting the source code, and then just like changing you know Hazel to your engine name, and that's it
+
+41
+00:03:31,333 --> 00:03:36,350
+你们不会真的从中得到什么，所以我真的鼓励你们这么做，我也认为
+you're not really getting anything out of this, so I would really encourage you guys to do that, and what I also think
+
+42
+00:03:36,350 --> 00:03:41,400
+所有使这个系列成为可能的赞助人，patreon.com/thecherno是你们可以支持这个系列的地方
+all the patrons that made the series possible, patreon.com/thecherno is where you can go to help support this series
+
+43
+00:03:42,066 --> 00:03:47,733
+你们就可以访问我已经为我的Hazel版本编写的源代码
+you'll get access to source code that I've written already for kind of my version of Hazel
+
+44
+00:03:47,733 --> 00:03:52,266
+这就像你们知道一个完整的3D场景和一个PBR渲染器，以及所有有趣的东西
+which is like you know a full kind of 3D scene and with a PBRRenderer, and all that kind of fun stuff
+
+45
+00:03:52,266 --> 00:03:56,625
+显然，这里面有一个完整的3D相机系统和所有东西，所以你们可以看到它是如何运行的
+and obviously that's got like a full 3D camera system in it and everything, so you can kind of see how that works
+
+46
+00:03:56,945 --> 00:04:02,150
+然后，你们也会提前一周收到视频，不管怎么说，回到相机这里
+and then you'll also get videos like a week early as well, anyway, jumping back to cameras
+
+47
+00:04:02,150 --> 00:04:13,050
+所以让我们继续从头开始，实际上我猜是理论上的，或者谈论基本的相机系统是如何运行的
+so let's just go ahead and go to the drawing board, and actually kind of I guess theorize or talk about how a basic camera system's gonna work
+
+48
+00:04:13,050 --> 00:04:16,378
+事实上，也许在我们开始之前，我会先解释一下
+in fact maybe before we go to the drawing board, I'll just have a go kind of explaining it
+
+49
+00:04:17,066 --> 00:04:22,899
+然后我会给你们绘制更多的架构，所以相机基本上是我们想要做的
+and then I'll kind of draw you guys more of the architecture, so cameras essentially what we want to do is
+
+50
+00:04:22,900 --> 00:04:29,525
+想想相机是用来做什么的，对吧，所以我喜欢做什么，当我想到任何一种概念时，对吧
+think about what cameras are used for, right, so what I like to do, when I think about any kind of concept, right
+
+51
+00:04:29,525 --> 00:04:33,457
+因为相机只是一个概念，所以在OpenGL中没有相机这样的东西，对吧，
+because cameras are just a concept, there's no such thing as a camera in OpenGL, right
+
+52
+00:04:33,457 --> 00:04:35,700
+所以你们必须思考相机到底是什么
+so you have to think about what a camera actually is
+
+53
+00:04:35,966 --> 00:04:41,725
+对吧，所以相机是用来，首先，定义，我想我们是如何看一个场景的
+right, so camera is used for, first of all, defining, I guess how we look onto a scene
+
+54
+00:04:41,850 --> 00:04:46,800
+我要在这里谈一谈3D相机，这显然也适用于2D
+and I'm going to kind of talk about 3D cameras in this, the same obviously applies to 2D
+
+55
+00:04:46,800 --> 00:04:52,576
+但我只是认为，这更像是真实世界，更像真实世界中的真实相机，这可能会更容易理解
+but it's just I think, it's just a bit more like real world, and like real cameras in the real world, and it's just might be easier
+
+56
+00:04:52,800 --> 00:04:58,175
+与3D环境相比，与Wood和2D环境相比，相机的功能也更强大
+and also more powerful to think about cameras, than kind of a 3D context, than a wood and kind of just a 2D context
+
+57
+00:04:58,333 --> 00:05:03,150
+因为2D相机通常很容易操作，显然Hazel会是3D视角
+because 2D cameras are usually quite easy to kind of do, and obviously Hazel's gonna be a 3D angle
+
+58
+00:05:03,150 --> 00:05:11,306
+所以需要在这样的背景下考虑它，但本质上来说，相机提供了一种观察世界的手段，对吧
+so we need to think about it in that kind of context, but essentially cameras provide a means for us to view into the world, right
+
+59
+00:05:11,700 --> 00:05:18,750
+所以我们在3D场景中有一堆物体，我们想要做的是，从一个特定的角度来看它们，对吧
+so we have a bunch of objects in our 3D scene, and what we want to do is, look at them from a particular viewpoint, right
+
+60
+00:05:19,000 --> 00:05:24,750
+不只是从特定的角度来看，我猜也是以某种形式，所以我的意思是
+and not just from a particular viewpoint, but I guess in a certain format as well, so what I mean by that is like
+
+61
+00:05:24,750 --> 00:05:28,850
+就像在现实世界中一样，你们可以拿着相机，你们可以在上面放任何场景，对吧
+just like in the real world, you can take a camera, and you can put any kind of scene on it, right
+
+62
+00:05:28,850 --> 00:05:35,250
+就像你们可以有一个非常宽的像10mm镜头之类，或者比如200像素的深度，对吧
+like you could have like a really wide, like 10mm lens or something like that, or you could have like a really zoomed in like 200 mill, right
+
+63
+00:05:35,475 --> 00:05:40,175
+嗯，如果你们不是摄影师或录像师，你们可能会明白这些术语的原理
+um wanna see if you're not a photographer or a videographer, you might not understand how these terms work
+
+64
+00:05:40,933 --> 00:05:45,100
+但希望你们中的第一个人，那会有点意义，对吧，你们可以，你们有不同的关注广度
+but hopefully first of you though, that's gonna kind of make sense, right, you can, you have different vocal lengths
+
+65
+00:05:45,466 --> 00:05:49,850
+同样地，这也是我们所拥有的，你们知道，你们也知道一种游戏引擎，对吧
+and in the same way that's what we kind of have, you know, you know kind of game engine as well, right
+
+66
+00:05:49,850 --> 00:05:53,375
+现在我们把它们称为视野，而不是实际的焦距
+now we kind of refer to them as field of view, rather than actual focal lengths or
+
+67
+00:05:53,375 --> 00:05:57,850
+虽然如果你们真的创建了一个物理相机系统，当然你们可以做到这一点
+although if you do actually create a physical camera system, which you can do of course
+
+68
+00:05:57,850 --> 00:06:00,525
+我们未来可能会在Hazel中探索这一点
+and we might explore that in the future in Hazel
+
+69
+00:06:01,500 --> 00:06:07,584
+因为我非常，你们知道的，我很乐意走上为Hazel渲染照片真实感的道路
+because I'm quite, you know, I would love to kind of go down the photorealistic path in terms of rendering for Hazel
+
+70
+00:06:07,750 --> 00:06:12,800
+不管怎么说，如果我们那样做，除此之外，通常是在视野内，对吧，所以视野有点像
+but anyway, if we do that,aside from that, is usually in field of view, right, so field of view is kind of like
+
+71
+00:06:12,800 --> 00:06:18,550
+我们的视野有多宽或多窄，对吧，那么我们实际能看到多少，比如你们在这里放一个相机头
+how wide or narrow our field of view is, right, so how much we can actually see, you put a camera here
+
+72
+00:06:18,775 --> 00:06:27,174
+但是相机有多宽，对吧，我们实际能看到多少场景，因为我们只有一个相机的位置
+but how wide is the camera, right, how much can we actually see of the scene, because just having a position of the camera
+
+73
+00:06:28,850 --> 00:06:33,525
+而且像相机的方位是很不错，但我们仍然需要知道，我们能看到多少
+and like an orientation of the camera is all great, but we need to still know, how much we can see
+
+74
+00:06:33,525 --> 00:06:39,700
+如果我给你们绘制个简单图表，如果你们想象一下，这里的这个盒子就像相机
+and like you know, if I was to just draw a quick diagram for you, you know, if you imagine that, this box over here is like the camera
+
+75
+00:06:40,000 --> 00:06:44,600
+对吧，我们有一个视野，那可能是相当宽的，这意味着如果我们有一个立方体
+right, we have a field of view, that could be quite wide, which means that if we have you know a cube
+
+76
+00:06:44,600 --> 00:06:48,500
+这有点像俯视图，或球体之类的，我们可以同时看到它们
+and this is kind of like a top down view or a sphere or something like that, we can see both of them
+
+77
+00:06:48,766 --> 00:06:53,850
+或者视野可以很窄，就像这样，这意味着你们可以看到被裁剪的立方体
+or the field of view could be quite narrow like this, and that would mean that you can see that we kind of clip through the cube
+
+78
+00:06:54,133 --> 00:07:01,750
+我们裁剪了球体，所以我们可以有类似的，对吧，但这种视野被称为断层，对吧
+and we clip through the sphere, so we could have something like that, right, but this kind of field of view is known as fault, right
+
+79
+00:07:02,066 --> 00:07:08,700
+它基本上是以角度或半径为单位的，因为我们是人，我们更喜欢与角度打交道
+and it's basically usually given in like either degrees or radius, because we're humans, we like dealing with degrees more
+
+80
+00:07:08,700 --> 00:07:16,625
+所以通常我们会说像是45度、65度或90度的视野之类的，对吧
+so usually we'd say like a field of view of like 45 degrees or 65 degrees or 90 degrees or something insane like that, right
+
+81
+00:07:17,137 --> 00:07:23,800
+所以通常可能把它呈现在45左右，也许45到65可能是个可接受的，任何比这个更高的范围
+so usually you probably want to render it about 45, maybe like 45 2 65 is probably an acceptable range anything higher than that
+
+82
+00:07:23,800 --> 00:07:30,366
+你们会开始在边缘周围看到相当多的扭曲，就像你们会看到鱼眼视野样，或者甚至就像
+and you'll start to see a quite a lot of distortion around the edges, same as what you would with like a fish eye land, or even just like a
+
+83
+00:07:30,650 --> 00:07:34,500
+我的意思是，即使你们在现实世界中打开了一个相当宽的12 mm镜头
+I mean even if you get like a fairly wide like 12mm lens on
+
+84
+00:07:34,500 --> 00:07:38,800
+就像个全帧传感器，看着帧的边缘
+like a full frame sensor in the real world, and you look at the edges of your frame
+
+85
+00:07:38,800 --> 00:07:43,850
+你们试着给某人的脸拍照，但他们就像是在你们的相框里一样
+and you try and take a photo of someone's face, but like they are like over here in your frame
+
+86
+00:07:44,166 --> 00:07:47,925
+你们会看到，它们实际上是非常扭曲的，看起来很滑稽
+you will see that, they actually end up being quite distorted and can look quite funny
+
+87
+00:07:48,566 --> 00:07:55,900
+那就是为什么我们通常想要在这个范围内渲染，但想法是，那就是相机的组成，对吧
+so that's why we generally want to render kind of in this range, but the idea is, that's kind of what a camera is made up of, right
+
+88
+00:07:55,900 --> 00:08:03,975
+它不只是由一个位置组成，就像你们知道的，如果这是我见过的，这有xyz坐标，对吧
+it's not just made up of a position, like you know, if this is like I've seen, you know this has like an x y z coordinate, right
+
+89
+00:08:04,050 --> 00:08:12,125
+然后可能也像旋转一样，可以用xyz，如果它像？？旋转一样，或者可以用四元数
+and then probably like a rotation as well, which you could give in xyz as well, if it was like oiler rotations or you can use quaternions
+
+90
+00:08:12,125 --> 00:08:19,975
+你们知道我们要用什么，可能应该用什么，不仅仅是那样，所以不仅仅是一种变换，对吧
+which is you know what we're gonna use, and what you should probably use, it's not just that, right, so it's not just a transform, right
+
+91
+00:08:19,975 --> 00:08:28,225
+它也是其他一种物理的相机属性，像视野，对吧，还有一个通常给出的宽高比，对吧
+it's also other physical kind of camera properties, like the field of view, right, there's also an aspect ratio that's usually given, right
+
+92
+00:08:28,225 --> 00:08:33,725
+纵横比基本上将决定相机是否应该像这样渲染
+and an aspect ratio is just going to basically determine kind of, you know, if the camera should render like this
+
+93
+00:08:33,725 --> 00:08:38,075
+如果是那样的话，它会有多宽，因为那也会非常重要
+if it's around like that, how wide is it going to be, because that's going to be really important as well
+
+94
+00:08:38,200 --> 00:08:44,766
+这样我们就可以将其正确地放入帧缓冲区中，并且当对屏幕进行渲染或对纹理进行渲染时
+so that we can actually fit this properly into our frame buffer, and when we kind of render to our screen or rendering to a texture
+
+95
+00:08:44,766 --> 00:08:50,766
+ 所以所有这些属性都定义了相机是什么，那对理解相机非常重要
+so all of these kind of properties define what a camera is, and that's kind of really important to understand
+
+96
+00:08:50,766 --> 00:08:55,950
+ 所以当我不理解一个概念，或者当我在谈论一种新的概念时，对吧
+so when I don't understand a concept, or when I'm kind of talking about a new kind of concept, right
+
+97
+00:08:55,950 --> 00:08:57,300
+那么比如说相机吧，什么是相机
+so cameras like what a cameras
+
+98
+00:08:57,300 --> 00:09:02,025
+我不知道它们是什么，我不知道在我的游戏引擎中，它们将如何运行，最好做的就是这样
+I don't know what they are, I don't know how they're gonna work in my game engine, the best thing to do is this, right
+
+99
+00:09:02,600 --> 00:09:13,650
+把它分解成数据，这是什么样的实际数据或美国数据，相机是什么样数据
+kind of break it down into data, what actual data is this or data American, what kind of data is a camera
+
+100
+00:09:13,725 --> 00:09:18,850
+就像我实际在做什么，你们知道，当我渲染时，当我将这些分解为实际的OpenGL代码时
+like what am I actually doing, you know, when I render, when I break these down to actual OpenGL codes
+
+101
+00:09:19,350 --> 00:09:24,884
+我需要从我的相机中获取什么数据，并将其传递到类似图形渲染的区域
+what data do I need to take from my camera, and pass into like graphic rendering territory
+
+102
+00:09:25,400 --> 00:09:30,918
+对吧，在这种情况下，正如我所说，我需要世界上某个地方的相机的实际位置
+right, and in this case, as I said, I'm going to need the actual position of the camera somewhere in the world
+
+103
+00:09:31,533 --> 00:09:37,050
+和相机的方向，然后实际上像相机的属性，而不仅仅是一种变换
+and the orientation of the camera, and then actually like the properties of the camera, not just kind of the transform
+
+104
+00:09:37,050 --> 00:09:46,350
+还有纵横比中的视野，现在让我们进一步细分一下，OpenGL中的相机意味着什么，对吧
+but also the field of view in the aspect ratio, now let's break that down even further, what does it mean to have a camera in OpenGL, right
+
+105
+00:09:46,350 --> 00:09:50,425
+就像实际上的意思一样，因为OpenGL中没有相机的概念，所以相机实际上是如何运行的
+like what does actually mean, like because there's no concept of cameras in OpenGL, how do cameras actually work
+
+106
+00:09:50,900 --> 00:09:57,348
+发生的情况是，相机真的是，你们知道的，我们不会讨论滤镜视图，我们不会谈论纵横比
+well what happens is a camera is really, you know, let's, we won't talk about a filter view, we won't talk about aspect ratio
+
+107
+00:09:57,525 --> 00:10:01,725
+让我们来谈谈相机的变换，这就是相机在我们的3D世界中的位置，以及它所朝向的方向
+let's talk about the transform of camera, so it's where the camera is in our 3D world, and where it's looking towards
+
+108
+00:10:01,725 --> 00:10:06,400
+它指向的是什么，对吧，那实际上是什么，那意味着什么
+where it's kind of pointing towards, right, what does that actually do, and what does that mean
+
+109
+00:10:06,900 --> 00:10:14,500
+所以如果我的场景中有一个立方体，它在原点，在这里，我把相机向上移动，它会看着它
+so if I have a cube in my scene, and it is at the origin, and is here, and I move the camera kind of up, and it's going to look at it, right
+
+110
+00:10:15,333 --> 00:10:20,725
+实际上正在移动的东西，我们实际上想做的事情是在屏幕的不同位置渲染立方体
+the thing that's actually moving, and the thing that we actually want to do is render the cube at a different position in our screen
+
+111
+00:10:21,733 --> 00:10:26,350
+对吧，当我向上拖动相机时，如果我从这里开始，然后向上拖动相机，对吧
+right, as I drag the camera up, if I start here, and I drag the camera up, right
+
+112
+00:10:26,600 --> 00:10:33,500
+实际发生的是立方体从这里移动到这里，对吧，我突然看到立方体有点自上而下
+what's actually happening is the cube is moving from here to here, right, I'm suddenly looking at the cube kind of top down
+
+113
+00:10:33,500 --> 00:10:38,125
+再说一次，如果我绘制一张图表，你们知道，我们可能会从立方体在屏幕的中间开始
+and again if I draw you a diagram, you know, we might start with the cube being in the middle of the screen
+
+114
+00:10:38,466 --> 00:10:43,375
+对吧，但当相机作为实际的类似相机时，我将用c标记它，向上移动
+right, but then as the camera as the actual like camera, which I'll mark with the c, moves upwards
+
+115
+00:10:43,375 --> 00:10:50,082
+实际上，在我们看来，立方体会突然变得更像这样
+what's actually going to happen is that, cube is suddenly going to be more like this in our kind of view
+
+116
+00:10:50,766 --> 00:10:56,994
+取决于你们如何呈现它，我想，对吧，但基本上会发生的是，原谅我糟糕的绘制
+right, depending on how you render it I guess, right, but basically what's gonna happen is, and forgive my awful drawing
+
+117
+00:10:57,266 --> 00:11:05,375
+但我们会更多地像这样看立方体，更多地看到它的顶面，对吧，因为相机向上移动了
+but we're just gonna look at the cube more like this, yeah we're gonna see the top face of it more, right, because that camera's moved up
+
+118
+00:11:05,375 --> 00:11:12,175
+所以如果你们想想我们屏幕上实际发生了什么变化，它是立方体的一种变换，对吧
+so if you think about what's actually changed on our screen, it's the it's kind of the transform of the cube, right
+
+119
+00:11:12,600 --> 00:11:18,525
+立方体已经从我们看前面变成了我们看前面和顶面的那种
+the cube has gone from us looking at the front face to us, kind of looking at the kind of both the front and the top face
+
+120
+00:11:18,575 --> 00:11:23,625
+所以这个立方体，看起来像是有点旋转，如果我们决定要把相机往回移
+so the cube, it looks like, the cube is kind of rotated a bit, and again, if we decide that we want to move our camera back
+
+121
+00:11:23,733 --> 00:11:30,400
+如果我像这样撤销这一切，如果我们决定我们真的想把相机移回，实际发生了什么
+if I just undo like all of this, if we decide that we actually want to move our camera back, right, what actually happens, right
+
+122
+00:11:30,733 --> 00:11:35,800
+好吧，我不知道我是怎么做的，但不管怎么说，当我们把相机向后移时，实际发生了什么
+well that was, I don't know how I did all that one move, but anyway, what actually happens, when we move our camera back
+
+123
+00:11:36,300 --> 00:11:42,100
+这个立方体可能有，这么大，因为我们正从平面上往外看，然后如果我们把相机向后推
+well the cube might be, you know, this big, because we're looking out of flat on, and then if we kind of just wheel that camera back
+
+124
+00:11:42,566 --> 00:11:48,825
+对吧，它会突然变小，对吧，所以屏幕上实际发生的变化，这个立方体是
+right, it's gonna suddenly be smaller, right, so what's actually changing on the screen, well the cube is
+
+125
+00:11:48,966 --> 00:11:51,702
+立方体的大小似乎在变化，它似乎在变小
+the scale of the cube seems to be changing, it seems to be getting smaller
+
+126
+00:11:52,200 --> 00:11:57,050
+所以我要试着让你们记住，相机是不存在的，对吧
+so what I'm going to try to get into your heads is that, the cameras don't exist, right
+
+127
+00:11:57,050 --> 00:12:05,975
+实际发生的是基于我们相机的那种合成变换，我们想要改变我们整个场景的变换
+what actually happens is based on the kind of made up transform of our camera, we want to change the transform of our entire scene
+
+128
+00:12:06,400 --> 00:12:12,000
+重要的是，你们不要以每个物体为基础来考虑它，但实际上它是整个场景，对吧
+and it's important that you think about it as not kind of a per object basis, but really it's the whole scene, right
+
+129
+00:12:12,000 --> 00:12:15,100
+如果我的场景中有三个立方体，我将相机向后移动
+if I have three cubes in my scene, and I move the camera back
+
+130
+00:12:15,100 --> 00:12:18,350
+其中一个立方体会变小吗，不，所有的立方体都会变小
+does one of the cubes get smaller, no, all of the cubes get smaller
+
+131
+00:12:18,600 --> 00:12:24,016
+因为我的相机是倒退的，所以相机会影响整个场景
+because I'm going backwards with my camera, right, so cameras affect the whole scene
+
+132
+00:12:24,500 --> 00:12:28,975
+在上期视频中，我们了解了BeginScene和EndScene，对吧
+when you kind of last episode, we learn about BeginScene Endscene, right, 
+
+133
+00:12:28,975 --> 00:12:31,599
+所以当我们开始一个场景时，那就是为什么我们会传入相机
+so when we begin a scene, that's why we push a camera
+
+134
+00:12:31,600 --> 00:12:37,256
+那就是为什么我在前面视频中提到了这点，因为当开始场景时，传入相应的相机，为什么
+and that's why I mentioned that in the previous video, because when we begin a scene, we push a camera for that scene, why
+
+135
+00:12:37,525 --> 00:12:43,225
+因为当我开始渲染一个场景时，它都是从那个角度来渲染的，你们知道的
+because when I start rendering a scene, it's all gonna be rendered from that one perspective, you know
+
+136
+00:12:43,225 --> 00:12:48,800
+你们带着相机走进现实生活中的房间，把一切都拍下来，把所有都写在拍下的那个场景中
+you walk into a room in real life with your camera, you take a photo of everything, write everything in that scene that you take a photo off
+
+137
+00:12:48,800 --> 00:12:53,266
+如果你们要从该一个视区中获取数据，现在很明显，如果你们要讨论更高级的渲染
+if you're gonna be taken from that one viewport, now obviously if you talk about more advanced rendering
+
+138
+00:12:53,266 --> 00:12:58,950
+以及我们可能想要进行额外的过程，甚至是具有不同相机方向的额外过程
+and where we might want to do additional passes, or even additional passes with different camera orientations for example
+
+139
+00:12:59,175 --> 00:13:01,800
+我们可能需要为着色器贴图渲染深度缓冲或类似的效果
+we might need to render a depth puff or like for a shader map
+
+140
+00:13:01,800 --> 00:13:06,300
+或者我们可能需要像动态立方体贴图反射那样进行渲染，那并不重要，对吧
+or we might need to render like a dynamic cube map reflection or something like that, that doesn't matter, right
+
+141
+00:13:06,300 --> 00:13:12,087
+我们不是在谈论那种相机，我们在谈论我们的主景相机，我们有一种，对吧
+we're not talking about those kind of cameras, we're talking about our main scene camera, we have exactly one of those, right
+
+142
+00:13:12,666 --> 00:13:16,250
+就像每个场景一样，它将在一个特定的方向上
+for like every scenario, and it's gonna be at a particular orientation
+
+143
+00:13:16,250 --> 00:13:22,250
+我们在场景中渲染的每个对象都将来自3D空间中的实际相同位置
+every single object that we render in our scene is gonna be from that actual like position in 3D space
+
+144
+00:13:22,250 --> 00:13:32,300
+对吧，所以基本上我要说的是，相机的变换，我们想要通过那个变换来移动我们的对象
+right, so basically what I'm saying is that, that transform of the camera, right, we want to move our objects by that transform
+
+145
+00:13:33,000 --> 00:13:37,850
+现在这是另一个很酷的问题，对吧，我们可以看到，如果我们把相机向后移
+now here's another cool question like for this, right, we can see that, if we move our camera back
+
+146
+00:13:37,850 --> 00:13:45,000
+我们希望对象变小，对吧，我的意思是不是，我想要实际更改对象的比例，那就是发生的
+we want the object to get small, right, I mean it's not, where I want to actually change the scale of the object, effectively that is what happens
+
+147
+00:13:45,333 --> 00:13:50,200
+如果你们处理的是透视投影，对吧，越远的物体结束时就越小
+if you're dealing with like a perspective projection, right, objects to the further away are ended smaller
+
+148
+00:13:50,700 --> 00:13:56,456
+但实际发生的是，我们只是将物体移得更远，所以当我们将相机移回物体时
+but what's actually happening is, we're just moving the object further away, so when we moved the camera back the object
+
+149
+00:13:56,975 --> 00:14:02,075
+我们基本上是在将物体移动得更远，当我们向前移动相机时，我们就是在将物体移动得更近
+we're basically moving the object further away, when we move the camera forward, we're moving the object closer
+
+150
+00:14:02,075 --> 00:14:07,600
+所以它看起来有点倒置，如果我们有相机，把相机向左移动，会发生什么，让我们来看看
+so it looks like it's kind of inverted, right, what happens if we have our camera, and we move the camera left, well let's take a look
+
+151
+00:14:07,900 --> 00:14:15,325
+如果我们有相机，让我们来看看，这是我们在这里的相机视野，如果把这个相机向左移动
+if we have our camera, let's justs see, this is our camera view over here, right, if we move this camera left, right
+
+152
+00:14:15,325 --> 00:14:21,275
+所以我将向左移动这个实际的外部矩形，相机将结束在这里，对吧
+so I'm moving this whole this actual outer kind of rectangle left, the camera is going to end up here, right
+
+153
+00:14:21,966 --> 00:14:30,100
+这个立方体的实际情况是，这个立方体实际上是向右移动的，因为现在的视野是这样的
+so what's actually happened this cube, this cube is effectively moved right, because now the view is like this, right
+
+154
+00:14:30,100 --> 00:14:42,075
+所以向左移动相机，那个会向右移动，旋转会怎么样，对吧，如果我将相机向前倾斜呢
+so moving the camera left, moves that right, yeah what about rotation right, so what if I tilt the camera forward
+
+155
+00:14:42,400 --> 00:14:49,100
+这个物体会朝那个方向移动，它会改变，但问题是，这个物体不会绕着自己旋转
+well this object is going to move that way, and it's going to change, but the thing is, the object isn't going to rotate around itself right
+
+156
+00:14:49,150 --> 00:14:54,150
+物体将旋转，有效地像世界的原点一样，但并不是真的，对吧
+the object is going to rotate around, effectively like the origin of the world, but not really right
+
+157
+00:14:54,150 --> 00:15:00,125
+这有点难以想象，那也是为什么，如果这个物体是在世界的原点
+this is a bit difficult to think about, and that's why, also you know, if the object was in the origin of the world
+
+158
+00:15:00,125 --> 00:15:06,400
+实际上是的，就像物体会旋转一样，但如果它被偏移了某种位置，比如
+and effectively yeah, like the object would just rotate, but if it's offset by some kind of position like
+
+159
+00:15:06,400 --> 00:15:12,475
+所以它在世界上有自己的位置，而不是有效地以原点为中心
+so it's got its own own kind of position in the world, and it's not centered around the origin effectively
+
+160
+00:15:12,475 --> 00:15:17,100
+接下来会发生的是，它可能会旋转，就像它会以完全不同的方式旋转
+what's gonna happen is, it's gonna like it might rotate, like it's gonna rotate completely differently
+
+161
+00:15:17,100 --> 00:15:22,150
+它不仅会围绕自己旋转，它实际上会像旋转一样移动，但那是一个更高级的主题
+it's not just gonna rotate about itself, it's gonna actually move as well as kind of rotate, but that's a more advanced topic
+
+162
+00:15:22,150 --> 00:15:27,050
+我真的不需要讨论它是如何运行的，因为如果你们正确地做好你们的？？？，它就会起作用
+where I really don't need to discuss how that actually works, because it will just work, if you do your mats properly
+
+163
+00:15:27,766 --> 00:15:34,625
+我们将在未来的行动中看到这一点，所以实际上我要说的是，一切都是颠倒的，对吧
+and we'll kind of see that in action in the future, so effectively what I'm saying is that everything is kind of inverted, right
+
+164
+00:15:34,725 --> 00:15:38,300
+因此，每当我们向左移动相机时，现在看到的所有对象都会向右移动
+so whenever we move our camera leftns, all of the objects now seen move right
+
+165
+00:15:38,300 --> 00:15:45,100
+我们对现在看到的所有物体进行变换，然后对它们进行变换，使它们以相反的方向移动
+we take the transform of all of the objects now seen, and we transform them, so that they move the opposite way, right
+
+166
+00:15:45,466 --> 00:15:53,196
+所以这种定义相机变换位置的数据是一个矩阵，对吧，它是一个变换矩阵
+so this kind of data that defines where the camera's transform is, is a matrix, right, it's a transformation matrix
+
+167
+00:15:53,425 --> 00:15:58,100
+特别是奇怪的照片，它作为视图矩阵，为什么，因为它有点像我们进入场景的视图
+and specifically weird photo, it as the view matrix, why, because it's kind of like our view into the scene
+
+168
+00:15:58,100 --> 00:16:04,600
+有些人称它为焦点矩阵，因为它就像我们的眼睛注视着场景一样，但我喜欢称它为视图矩阵
+some people call like the eye matrix, because it's like our eye looking into the scene, but I like calling it the view matrix
+
+169
+00:16:04,600 --> 00:16:08,200
+那也是一个非常流行的术语，所以这些视图矩阵是我们所做的
+which is also very popular term for it, so these view matrix what we do
+
+170
+00:16:08,200 --> 00:16:13,525
+那是实际相机本身的变换，对吧，如果我们只取视图矩阵
+and that's the transform of the actual camera, just by itself, right, if we just take the view matrix
+
+171
+00:16:13,525 --> 00:16:17,450
+这也是相机在3D空间中的位置的变换，那就是它的本质
+which again is a transform of where the camera is in 3D space, that's what it is
+
+172
+00:16:17,450 --> 00:16:24,475
+这只是相机在3D空间中的变换，那么它的变换在哪里，对吧，那么它到底在哪里
+it's just the kind of the transform of the camera in 3D space, so where is it the translation, right, so where actually is it
+
+173
+00:16:24,475 --> 00:16:30,125
+在我们的场景中，相机是什么样的xyz坐标，然后旋转，比如旋转矩阵
+what kind of xyz coordinate in our scene is the camera out, and then the rotation like the rotation matrix
+
+174
+00:16:30,500 --> 00:16:37,100
+那基本上就是相机实际进入的位置，也就是相机的位置，但我们想要做的是
+that's essentially where the cameras actually are entered, that's the location of the camera, however what we want to do
+
+175
+00:16:37,266 --> 00:16:41,700
+当我们实际上从相机的角度进行渲染时，我们需要变换对象
+when we actually render from the camera's point of view, and we need to transform our objects
+
+176
+00:16:41,950 --> 00:16:47,625
+我们不能仅仅通过相机的矩阵来变换它们，对吧，通过相机的视角矩阵，那没有任何意义
+is we can't just transform them by the camera's matrix, right, by the camera's view matrix, that doesn't make any sense
+
+177
+00:16:47,625 --> 00:16:52,125
+因为我们应该做的是以不同的方式移动物体，对吧
+because what we're supposed to do is move the objects not in the same kind of way, right
+
+178
+00:16:52,400 --> 00:16:58,225
+但反过来，我们实际上需要做的是求逆矩阵，我们需要获取相机的视角矩阵
+but in the opposite way, so what we actually need to do is invert the matrix, we need to take that camera's view matrix
+
+179
+00:16:58,225 --> 00:17:03,699
+把它倒过来，有几种你们可以做到的方法，实际上可以通过取反一些来手动实现那个
+and just invert it, right, few ways you could do that, you could actually do that manually just by kind of negating things
+
+180
+00:17:03,733 --> 00:17:11,275
+在其他方面，如果我想把我的相机移动到，假设xyz等于5，所以5 5 5，对吧
+and in other ways, if I want to move my camera to, let's just say xyz that is equal to 5, so 5 5 5, right
+
+181
+00:17:11,366 --> 00:17:18,000
+这是我相机的xyz，我可以做-5 5 5，对吧，-5-5-5，我可以手动反转它
+it's my xyz for my camera, I can just do -5 5 5, right, -5 -5 -5, I can kind of manually invert it
+
+182
+00:17:18,000 --> 00:17:23,350
+但通常你们会做的是，你们会计算Trs变换的旋转比例相机，你们没有比例
+but usually what you would do is, you would calculate the trs transform rotation scale cameras, you don't have scales
+
+183
+00:17:23,350 --> 00:17:27,775
+你们不必担心那个，变换乘旋转，然后你们取那个矩阵，你们把它倒过来
+you don't have to worry about that, translation times rotation, and then you take that matrix, and you invert it
+
+184
+00:17:28,766 --> 00:17:35,125
+那实际上是一种变换，你们将应用于场景中的所有对象
+and that is actually kind of the transformation, you will be applying to all of the objects in your scene
+
+185
+00:17:35,175 --> 00:17:43,475
+那真的很简单，所以到目前为止我所说的只是数据，对吧，那就是我们获得数据的方式
+and that's really as simple as it is, so what I've talked about so far has just been the data, right, that is how we get the data
+
+186
+00:17:43,733 --> 00:17:49,725
+我们要做的是把相机放在3D空间的某个位置，给它一个方向，对吧，我们得到那个矩阵
+what we do is we take the camera, we position at somewhere in 3D space, we give it an orientation, right, we get that matrix
+
+187
+00:17:50,100 --> 00:17:55,575
+我们用这两样东西构造一个变换矩阵，位置和旋转，对吧，方向
+we construct like a transformation matrix out of those 2 things, the position and the rotation, right, the orientation
+
+188
+00:17:56,066 --> 00:18:01,255
+然后我们反转它，这个矩阵就是我们得到的，那就是变换所有对象的方式
+and then we invert it, and that matrix is what we take, and we transform all of our objects by
+
+189
+00:18:01,866 --> 00:18:08,498
+那么关于纵横比中的视野，如何存储的
+now what about the field of view in the aspect ratio, that's like how does that how is that even stored
+
+190
+00:18:08,933 --> 00:18:13,300
+存储方式是在称为投影矩阵的东西中存储，特别是针对3D场景
+the way that stored is in something called a projection matrix, specifically for a 3D scene
+
+191
+00:18:13,300 --> 00:18:20,150
+对于一个视野，一个长宽比，它被称为透视矩阵，它基本上定义了某个投影
+and for a field of view, an aspect ratio, it's something called a perspective matrix, which basically defines a certain projection
+
+192
+00:18:21,333 --> 00:18:27,725
+大致来说，这是一种投影，距离较远的物体具有透视效果，对吧
+loosely like really it's a projection, which objects that are further away, have like the perspective effect, right
+
+193
+00:18:28,000 --> 00:18:34,725
+所以它们更小，对吧，我们有那种消失点，那种你们知道的，就像我刚移动到这里
+so they're smaller, right, we have that kind of vanishing point that kind of idea of just you know having, like if I just moved down here
+
+194
+00:18:35,566 --> 00:18:40,675
+我只是有一种，你们知道，如果你们看起来像一条直线，你们看起来像这样的东西，对吧
+I've just kind of having this kind of, you know, if you look like like a street, and you look at something like this, right
+
+195
+00:18:40,675 --> 00:18:46,450
+你们可能有一堆，你们可能有一堆建筑，他有一扇门，就像那里有一扇门
+where you have like a bunch of, you might have like a bunch of buildings here or whatever, he has a door, like there's a door
+
+196
+00:18:46,450 --> 00:18:52,175
+你们有一个消失点，最终一切都进入了这种，我不能再这样做了
+you kind of have that vanishing point, where eventually everything kind of just goes into this kind of, and I gotta stop doing that
+
+197
+00:18:52,625 --> 00:18:58,250
+一切最终都会变成这样的消失点，对吧，那就是你们最终会得到的
+everything kind of just goes into this kind of vanishing point in the end, right, and that's kind of what you end up with
+
+198
+00:18:58,250 --> 00:19:02,714
+这是一种透视投影，还有一种叫做正交投影的东西
+so this is kind of a perspective projection, there's also something called an orthographic projection
+
+199
+00:19:03,300 --> 00:19:08,875
+通常用于2D渲染，在这种情况下，距离较远的对象实际上不会变小
+usually that's used for 2D rendering, and in that kind of scenario, objects that are further away, don't actually get smaller
+
+200
+00:19:09,000 --> 00:19:13,375
+换句话说，如果我渲染一个立方体，对吧，它看起来像这样，我渲染一个立方体
+so in other words, if I'm rendering a cube, right, and it looks like this, and I render a cube
+
+201
+00:19:13,375 --> 00:19:20,200
+那就像是在这个立方体后面很远的地方，稍微靠右一点，在透视投影下，它看起来像这样
+that's like far away kind of behind this cube, and a bit off to the right, and at perspective projection, it would look like this
+
+202
+00:19:20,700 --> 00:19:23,975
+而在正交投影中，它们应该是相同大小的，它们看起来像这样
+whereas in an autographic projection, they would be like the same size, they look like this
+
+203
+00:19:24,166 --> 00:19:29,625
+虽然这个距离更远，但我们有不同类型的投影矩阵，并以矩阵的形式存储
+even though this one's a lot further away, okay, so we have different kind of projection matrices, and that's stored as a matrix
+
+204
+00:19:30,133 --> 00:19:33,800
+所以这个视野是宽高比之类的东西，对吧
+so this field of view an aspect ratio kind of all this kind of stuff, right
+
+205
+00:19:34,200 --> 00:19:40,650
+那些内容存储在投影矩阵中，特别是透视矩阵中，因为我们使用的是GLM
+that stuff is stored inside a projection matrix, specifically a perspective matrix, and since we're using glm
+
+206
+00:19:40,650 --> 00:19:48,900
+我们可以通过简单地说GLM来构建其中的一个，比如透视，那会为我们创建一个透视矩阵
+we can just construct one of those by just saying glm, you know perspective, right, and that will create a perspective matrix for us
+
+207
+00:19:49,700 --> 00:19:55,300
+然后我们实际上可以，我认为有一个叫做透视率的函数，然后我们可以提供视野和纵横比
+and then we can actually, I think there's a function called perspective volve, and then we can provide the field of view and aspect ratio
+
+208
+00:19:55,300 --> 00:19:59,166
+我认为，我们甚至可以提供实际帧缓冲区的宽度和高度
+and everything will kind of, I think, we can even provide a width and height of our actual frame buffer
+
+209
+00:19:59,166 --> 00:20:05,525
+它基本上会自己进行除法运算，以得出它需要的纵横比之类的
+and it will kind of do the division itself essentially to come up with the aspect ratio that it needs and all of that
+
+210
+00:20:05,866 --> 00:20:13,999
+那只是返回一个4x4的矩阵，所以就是Mat4，现在相机像我提到的XYZ和XYZ一样变换
+and that just returns to us a 4 by 4 matrix, so Mat4, okay, now the cameras transform as I mentioned xyz and xyz
+
+211
+00:20:14,700 --> 00:20:20,058
+变换，你们知道在旋转中的位置，它也存储在视图矩阵中，这也是Mat4
+transform, you know being the position in the rotation, that's also stored in the view matrix, which is also a Mat4
+
+212
+00:20:20,650 --> 00:20:24,450
+然后再明显地变换我们的客观自由，场景也是一个矩阵
+and then obviously the transform of our objective free, scene is also a matrix
+
+213
+00:20:24,566 --> 00:20:30,750
+所以那就是变换旋转比例，所有这些都存储在一个矩阵中，这就是变换矩阵
+so that's trs translation rotation scale, all of that is stored in a matrix as well, which is the transformation matrix
+
+214
+00:20:31,266 --> 00:20:36,306
+然后我们终于得到了3D模型的实际顶点，现在我有点超前了
+and then finally we have the actual vertices of the 3D model, now I am getting a bit ahead of myself
+
+215
+00:20:36,800 --> 00:20:41,000
+因为我们还没有真正谈到这些，但我们将在未来讨论，所以这提供了一些背景知识
+because we haven't covered any of this really, but we will in the future, so this is providing some context
+
+216
+00:20:41,600 --> 00:20:43,825
+所以基本上我们最终得到的是一堆矩阵
+so basically what we end up with is a bunch of matrices
+
+217
+00:20:44,000 --> 00:20:50,125
+为了真正弄清楚我们的对象应该在屏幕上的哪个位置，对吧
+and in order to actually figure out where our object should be on our like inside our screen, right
+
+218
+00:20:50,366 --> 00:20:57,099
+我们基本上需要将所有这些矩阵相乘，所以我们要做的是，我们取透视矩阵，对吧
+we need to essentially multiply all of those matrices together, so what we do is, we take the perspective matrix, right
+
+219
+00:20:57,100 --> 00:21:05,550
+所以我们有了投影矩阵，将它与视图矩阵相乘，然后我们将其与我们的模型矩阵相乘
+so we have our projection matrix, we multiply that with our view matrix, right, and then we multiplied that with our model matrix
+
+220
+00:21:06,066 --> 00:21:12,500
+它也被称为世界矩阵，它本质上是我们模型的矩阵，所以它有点像这样，我们有这个立方体
+which is also known as the world matrix, which is essentially the matrix of our model, so it's kind of like this, we have this cube
+
+221
+00:21:12,600 --> 00:21:15,100
+那就是立方体的变换矩阵，对吧
+that's the transformation matrix of the cube, right
+
+222
+00:21:15,166 --> 00:21:21,699
+然后最终也会乘以我们的实际顶点位置，好了
+and then that will also eventually be multiplied by our actual vertex positions, okay
+
+223
+00:21:21,866 --> 00:21:28,175
+那就是我们需要在屏幕上渲染实际模型的位置的完整画面
+and that is what gives us the full picture of where our actual model needs to be rendered in our screen
+
+224
+00:21:28,175 --> 00:21:35,275
+显然，如果它位于屏幕之外，它将被裁剪，它会被剪贴，好了，那就是我们最终得到的
+and obviously if it lies outside of the screen, it will just be clipped, it'll be cutted, okay, so that's what we end up with
+
+225
+00:21:35,275 --> 00:21:43,175
+现在这个顺序是GLM的顺序，也是我们在gls着色器中看到的乘法顺序
+now this order is glm's order, and also the order of multiplication that we see in gls heller shaders
+
+226
+00:21:43,533 --> 00:21:48,957
+因为在DirectX中，它们是主列的，所以这是反过来的，所以基本上你们有了顶点位置
+because their column major in DirectX, this is the other way round, so you basically you have your vertics position
+
+227
+00:21:49,400 --> 00:21:54,400
+对吧，将其与模型矩阵相乘，对吧，与视图矩阵相乘
+right, you multiply that with the model matrix, right, you multiply that with the view matrix
+
+228
+00:21:54,550 --> 00:21:59,500
+然后用投影矩阵乘以，这是反过来的，因为它是主行的
+and you multiply that with the projection matrix, okay, so it's the other way around, because it's a row major
+
+229
+00:22:00,300 --> 00:22:08,780
+显然，顺便说一句，就像4乘4矩阵乘法一样，实际上矩阵乘法顺序也很重要，好了
+and obviously by the way, like 4 by 4 matrix multiplication matters, in fact matrix multiplication order matters, okay
+
+230
+00:22:09,133 --> 00:22:15,050
+所以要确保你们用正确的方式，这就是为什么我一直说TRS，因为我们想要累乘变换
+so make sure you do it in the right way, and that's why I keep saying TRS, because we want to multiply translation
+
+231
+00:22:15,200 --> 00:22:20,350
+我们想要进行变换乘旋转乘缩放，以将所有矩阵组合在一起，以相反的顺序进行
+we want to do translation times rotation times scale to combine all of our matrices together, doing them in reverse order
+
+232
+00:22:20,675 --> 00:22:26,475
+给你们一个不同的矩阵，好吧，差不多就是那样，那就是你们真正需要的所有数据
+gives you a different matrix, okay, so that's pretty much it, that is that's all the data that you actually need
+
+233
+00:22:26,475 --> 00:22:33,699
+对吧，这期我们花了很多时间讨论数据，我认为这很好，因为这就是它归结为正确的
+right, we've spent a lot of this episode actually talking about data, which I think is good, because that's what it boils down to right
+
+234
+00:22:33,700 --> 00:22:38,533
+我想让你们意识到，我们正在构建一个游戏引擎，这是相当复杂的，但最终
+I want you guys to realize that we're building a game engine, and it's fairly complicated, but at the end of the day
+
+235
+00:22:38,533 --> 00:22:41,461
+我们只是在处理数字，这些只是矩阵，对吧
+we're just dealing with numbers, these are just matrices, right
+
+236
+00:22:41,766 --> 00:22:46,650
+它们最终将进入适当的图形渲染流水线区域
+they will eventually make their way into the appropriate graphics rendering pipeline areas
+
+237
+00:22:47,100 --> 00:22:52,800
+在这个场景中，那实际上允许我们在屏幕上的特定位置呈现图形
+and that's what actually allows us to render graphics at particular place on the screen in this scenario
+
+238
+00:22:53,300 --> 00:22:56,825
+好了，关于数据，我认为那是有意义的，希望那足以让你们继续下去
+okay, so enough about data, I think that makes sense, hopefully that's enough for you guys to go on
+
+239
+00:22:56,825 --> 00:23:01,950
+并实际制作自己的相机系统，可能处理这些类型的矩阵和所有这些
+and actually make your own camera system, that maybe deals with these kind of matrices and all of that
+
+240
+00:23:03,025 --> 00:23:10,650
+现在让我们讨论下API是如何运行的，因此有了这些数据，非常棒，立方体有个模型矩阵
+now let's talk about how the api works, so we have this data, fantastic, you know, my cube has a model matrix
+
+241
+00:23:10,650 --> 00:23:16,575
+这是一个变换矩阵，它定义了它在世界上的位置，你们知道，它显然有一堆顶点
+which is a transformation matrix that defines where it's going to be in the world, you know, it's obviously got a bunch of vertices
+
+242
+00:23:16,575 --> 00:23:21,800
+所以我有我的顶点位置，我有一个相机，它有一个视图矩阵，对吧，很好
+so that I've got my vertex positions, I've got a camera, which has a view matrix, right, great
+
+243
+00:23:22,150 --> 00:23:27,880
+相机也有一个投影矩阵，投影矩阵定义了视野，以及它看起来是如何进入世界的
+and the camera also has a production matrix, production matrix defines like the field of view, and kind of how it looks into the world
+
+244
+00:23:28,166 --> 00:23:33,250
+视图矩阵定义了它在世界上的位置，以及它看起来的位置，对吧，我知道了，所以换句话说
+view matrix defines where it is in the world, and where it's looking, right, I've got that, so in other words
+
+245
+00:23:33,600 --> 00:23:40,100
+实际上属于相机的部分，只是重申一下，是视图上的投影，好了，模型实际上是在对象上
+the part that actually belongs to the camera, just to reiterate is the projection on the view, okay, model is actually on the object
+
+246
+00:23:40,566 --> 00:23:50,675
+顶点位置实际上是像网格样打开的，所以相机的投影视图，已经有了，我该如何处理那些
+and vertex position is actually on like the mesh, right, so projection view on the camera, right, I've got that, what do I do with that data
+
+247
+00:23:51,700 --> 00:23:58,150
+所以基本上我们需要做的是，做我刚才提到的整个乘法
+so essentially what we need to do at some point is, do this whole multiplication that I've just mentioned
+
+248
+00:23:58,150 --> 00:24:03,050
+对吧，我们有这个投影乘视图乘模型乘顶点位置投影
+right, we have this projection times view times model times vertex position projection in view
+
+249
+00:24:03,200 --> 00:24:08,500
+我们可以在相机中进行乘法运算，在很多情况下，你们需要
+we can just do that multiplication in the camera, there are a lot of cases in which you will need
+
+250
+00:24:08,500 --> 00:24:13,875
+例如，只知道相机的位置，甚至不只是旋转，但我只需要知道位置在哪里
+for example just the camera position, not even the rotation, but I just need to know where the position is
+
+251
+00:24:13,875 --> 00:24:20,835
+当你们试图计算像某个特定像素和相机的视角位置之间的因子时，那很重要
+that's important for when you're trying to calculate infectors between like a particular pixel and the camera's view kind of position
+
+252
+00:24:21,150 --> 00:24:26,450
+你们知道，像光照计算这样的东西，但只是在屏幕上渲染立方体，这就是我们现在正在做的
+you know, for things like lighting calculations, but just for rendering a cube on the screen, which is what we're doing right now
+
+253
+00:24:26,700 --> 00:24:32,175
+你们实际上不需要把它们分开，只需要把它们相乘，就那样，那就是你们的相机矩阵
+you don't actually need these to be separated, you can just multiply it, and that's it, that's kind of your camera matrix straw
+
+254
+00:24:32,466 --> 00:24:41,450
+你们可能会叫它VP，或者你们知道的PV，通常叫VP，只是因为这是一种要做的事情
+and you probably call that something like VP or you know PV, usually call it VP, just because that's kind of the whoops meant to do this
+
+255
+00:24:41,800 --> 00:24:49,162
+那在某种程度上是DirectX光纤的作用，但在OpenGL中，视图投影矩阵只是投影乘以视图
+that's kind of the DirectX fiber doing things, but the view projection matrix is just projection times view in OpenGL
+
+256
+00:24:49,500 --> 00:24:55,550
+所以你们有了它，你们可以直接使用它，但模型矩阵显然来自对象
+so you have that, and you can kind of just use that, but the model matrix obviously comes from the object
+
+257
+00:24:55,550 --> 00:25:00,270
+因此，如果我在我的场景中渲染三个对象，那将是三个不同的模型矩阵，对吧
+so if I render three objects in my scene, that's going to be 3 different model matrices, right
+
+258
+00:25:00,270 --> 00:25:05,150
+所以我不能简单地烘焙这个，对吧，我可以在每个场景中做一次，当我移动我的相机时
+so I can't just kind of bake this in, right, I can do this like once per scene, when I move my camera
+
+259
+00:25:05,150 --> 00:25:11,278
+我已经决定，它将在这个特定的地方，每帧一次是我想看到的，我可以烘焙这种
+and I've decided that, it's gonna be in this particular place, once per frame is what I meant to see, I can just bake this kind of
+
+260
+00:25:11,425 --> 00:25:17,250
+我可以只做这个修改，对吧，我渲染的每一个东西都将与这个矩阵一起
+I can just do this modification done, right, every single thing that I render is gonna be with this matrix
+
+261
+00:25:17,475 --> 00:25:21,315
+为什么，因为我又发泄了我的场景，我开始了一个新的场景，对吧
+why because again I vented my scene, I've started a new scene, right
+
+262
+00:25:21,925 --> 00:25:25,450
+相机在渲染场景的过程中不会移动，对吧
+the camera's not going to move throughout rendering a scene, right
+
+263
+00:25:25,450 --> 00:25:30,350
+当你们拍照时，没有物体移动，对吧，你们有它的位置，就像在相机里一样
+when you take a photo, no object moves, right, you've kind of have the position of it like as in the camera
+
+264
+00:25:30,350 --> 00:25:36,020
+没有移动，当你们拍照的时候，对吧，你们拍了一张照片，从那个角度看，那是现场的快照
+doesn't move, while you take a photo, right, you've taken a photo that's here as a snapshot over the scene from that point of view
+
+265
+00:25:36,275 --> 00:25:44,900
+所以这个东西是静态的，它不变，但是模型矩阵将是每个物体的变换，它确实改变了，对吧
+so this stuff is static right it doesn't change, but then the model matrix is going to be the transform of each object, that does change, right
+
+266
+00:25:44,900 --> 00:25:50,525
+因为那会改变，因为你们知道，你们有三个立方体，你们在不同的位置渲染它们，对吧
+and because that changes, and because you know, you have three cubes, you render them at different positions, right
+
+267
+00:25:50,933 --> 00:25:56,463
+你们不能随时随地做这个乘法，对吧，它需要对每个对象都做
+you can't kind of do this multiplication just then and there, right, it kind of needs to be done for each object
+
+268
+00:25:57,375 --> 00:26:02,599
+最后，这个顶点位置显然也是针对每个对象完成的
+and then finally this vertex position obviously is also kind of done, you know, for each object as well
+
+269
+00:26:02,600 --> 00:26:07,825
+因为很明显，物体有唯一的顶点，它们只属于一种网格
+because obviously objects have unique vertices, and they only belong to kind of one mesh
+
+270
+00:26:08,166 --> 00:26:14,900
+所以不管怎样，我想看到的是我们有一个VP矩阵，那很棒，但是我们必须做这个模型矩阵
+so anyway, what I'm trying to see is that we have this VP matrix, that's fantastic, but then we have to do this model matrix
+
+271
+00:26:14,900 --> 00:26:19,699
+这就是为什么相机是场景的一部分，对吧
+which comes from the actual object itself, that's why the camera is part of the scene, right
+
+272
+00:26:19,700 --> 00:26:21,325
+那就是为什么我们提交它，当我们开始一个场景时
+and that's why we submit it, when we begin a scene
+
+273
+00:26:21,325 --> 00:26:23,725
+因为我们正在看到，正在从这个焦点开始一个场景
+because we're seeing, we're beginning a scene with this pointview
+
+274
+00:26:25,266 --> 00:26:30,450
+现在，当我们渲染对象时，有几种方法可以进行这种转换，我们实际上可以
+now when we render the object,  there's a few ways to do this kind of transformation, we could actually
+
+275
+00:26:30,933 --> 00:26:37,850
+从技术上讲，只用c++来做，所以我们可以看到我们有VP矩阵
+technically speaking do it just in c++, right, so we could see that we've got the VP matrix
+
+276
+00:26:37,975 --> 00:26:43,750
+好了，让我们往下走，也许在这里，我们有更多的空间，所以我们有VP矩阵
+right, let's just go down here, and maybe over here, where we've got some more space, so we have the VP matrix
+
+277
+00:26:43,900 --> 00:26:51,550
+我们将它与模型矩阵相乘，我们在哪里做，所以我们可以在C++那边实现这个
+we're going to multiply it with the model matrix, right, where do we do this, so we could do this in C++ land
+
+278
+00:26:52,200 --> 00:27:02,025
+但我们需要做的是将它相乘，对每一个模型进行这种相乘，对吧，那很好
+but then what we would need to do is actually multiply it, do this kind of multiplication for every single model, right, that's good
+
+279
+00:27:02,025 --> 00:27:05,525
+那可能是你们必须要做的事情，除非你们知道使用批处理
+and that's probably something you'll have to do, unless you you know use batching
+
+280
+00:27:05,525 --> 00:27:10,200
+或者你们知道的某种其他类型的实例，其中你们可能有一组这些矩阵
+or some kind of other you know, instancing in which you probably have like an array of these matrices
+
+281
+00:27:10,800 --> 00:27:14,450
+有几种不同的方法可以做到这一点，但基本上你们有机会在C++中做到这一点
+there's a few different ways to do it, but essentially you have the opportunity to do this in c++
+
+282
+00:27:14,825 --> 00:27:23,700
+这意味着你们可以做这个乘法，然后进入着色器，这就是你们做矩阵乘以顶点的那种乘法
+which means that you kind of do this multiplication, and then into your shader, which is where you do the matrix times vertex kind of multiplication
+
+283
+00:27:23,700 --> 00:27:31,450
+对吧，所以这种最后一步是传统的，这种最后一步总是在顶点着色器中真正完成
+right, so this kind of last step is traditionally done, this kind of last step is always done really in the vertex shader
+
+284
+00:27:32,575 --> 00:27:34,825
+那就是我们一直在做的，但只是以不同的方式
+and that's what we've kind of been doing, but just in a different way
+
+285
+00:27:35,400 --> 00:27:40,575
+因为那基本上就是我们输出到gl_Position的结果
+because that's essentially the result of this is what we output into gl_Position
+
+286
+00:27:40,800 --> 00:27:44,927
+对吧，它在我们的顶点着色器中，好了，整个乘法的结果
+right, which is inside our vertex shader, okay, the result of this whole multiplication
+
+287
+00:27:45,366 --> 00:27:52,275
+所以所有的东西，对吧，我们可以做的就像这个MVP矩阵，我们最终得到了
+so all of that stuff, right, we can do in like this MVP matrix that we end up with
+
+288
+00:27:52,666 --> 00:27:59,000
+我们基本上，我们可以得到，我们可以乘以我们在实际顶点着色器中的顶点位置
+we basically take, we can take that, and we can multiply that by our vertex positions inside the actual vertex shader
+
+289
+00:27:59,000 --> 00:28:04,700
+那就是我们的gl_Position，所以你们可以这样做，或者你们甚至可以在着色器中做这个乘法
+and that's our gl_Position, so you can do that, or you can do even this multiplication in the shader
+
+290
+00:28:04,866 --> 00:28:13,625
+然后你们就会得到这样的结果，你们知道，你们只是做VP乘以模型乘以顶点，对吧
+and then you kind of just end up with instead of this, you know, you just do VP times model times vertex, right
+
+291
+00:28:14,066 --> 00:28:19,550
+我真的忍不住告诉你们最好的事情是，在C++中的明显优势是
+and I can't really tell you what the best thing to do is, the obvious advantage of doing in C++
+
+292
+00:28:19,766 --> 00:28:24,150
+这意味着你们不必为每个顶点执行那个操作，因此顶点着色器将为每个顶点运行
+means that you don't have to do it for every vertex, so a vertex shader runs for every vertex
+
+293
+00:28:24,425 --> 00:28:25,890
+如果你们在顶点着色器中执行那个操作
+so if you do it in your vertex shader
+
+294
+00:28:26,133 --> 00:28:32,325
+它将对每个顶点进行乘法，这可能会更糟，也可能不会更糟，但是，如果你们使用C++
+it's going to do this multiplication per vertex, which may or may not be worse, right, however if you're doing c++
+
+295
+00:28:32,325 --> 00:28:37,450
+它是按对象完成的，那就是为什么我们也不想像投影乘以视图乘以模型那样做
+it's kind of done per object, that's why we also don't want to do like projection times view times model
+
+296
+00:28:37,450 --> 00:28:43,158
+因为我们可以在整个场景的C++中只做一次视图
+because the production of view stuff we can just rather do once in cpp for our entire scene
+
+297
+00:28:43,366 --> 00:28:48,875
+然后继续使用这些数据，而不是每个顶点都这样做
+and then keep using that data, rather than having to actually kind of do that per vertex
+
+298
+00:28:49,866 --> 00:28:54,047
+如果我们在顶点着色器中，就是我们必须做的，那么不管怎样，在这两者之间
+which is what we would have to do, if we in the vertex shader up, so anyway, so between these two
+
+299
+00:28:54,900 --> 00:28:57,609
+这在很大程度上取决于你们的设置，你们需要这个模型矩阵
+it depends on your setup a lot of the time you need this model matrix
+
+300
+00:28:57,609 --> 00:29:01,399
+无论如何，如果你们想要变换，你们知道
+anyway, for example if you want to translate, you know
+
+301
+00:29:01,400 --> 00:29:06,783
+法线进入世界空间或类似的东西，你们知道，你们需要模型的旋转
+normals into like world space or something like that, you know, you'll need the rotation of the model
+
+302
+00:29:07,050 --> 00:29:12,282
+对吧，不是真正的变换，而是模型的旋转，所以这个矩阵很方便
+right, not the translation really, but the rotation of the model, so this matrix does come in handy
+
+303
+00:29:12,550 --> 00:29:18,175
+正如潜在的相反情况一样，有很多不同的事情是重要的，对吧
+as does this as does potentially the inverse of this, there's a lot of different things that are important, right
+
+304
+00:29:18,900 --> 00:29:24,150
+所以通常我会在我的着色器中做一些类似的事情，对吧，我有视图投影，这是我的相机
+so typically I end up doing something like this in my shader, right, where I have the view projection, which is my camera
+
+305
+00:29:24,500 --> 00:29:29,150
+我有模型，这是我的模型的变换，对吧，我的对象，然后我显然有顶点数据
+I have the model, which is the transform of my model, right, of my object, and then I have obviously the vertex data
+
+306
+00:29:29,366 --> 00:29:37,198
+这是在属性中出现的，所以那就是我们最终得到的，所以总结一下，我们需要做的是
+which comes in in the attributes, okay, so that's kind of what we end up with, so to summarize, what we need to do is
+
+307
+00:29:38,400 --> 00:29:44,425
+当我们开始我们的场景时，对吧，现在我们进入实际的代码，当我们开始我们的场景
+when we begin our scene, right, and now we're getting into actual code, when we begin our scene
+
+308
+00:29:44,800 --> 00:29:51,900
+我们希望提交此视图投影矩阵，那就是为什么我们以相机作为参数开始场景的原因
+we want to submit this view projection matrix, and that's why we begin our scene with a camera as a parameter
+
+309
+00:29:51,900 --> 00:29:58,399
+因为我们需要用相机开始一个场景，同样如果我们有一个环境，就像一个灯光设置之类的
+because we need to begin a scene with a camera, again if we had an environment, and like a light kind of set up or something like that
+
+310
+00:29:58,400 --> 00:30:03,550
+就像一堆灯光，我们也提交那些，但现在不提交，但会有个相机，这就是我们现在讨论的
+like a bunch of lights, we also submit those, but we don't right now, but we're gonna have a camera, that's what we're talking about now
+
+311
+00:30:03,900 --> 00:30:11,675
+所以我们可以提交一个相机，它基本上给我们提供了视图投影矩阵，但是当需要渲染时
+so we can submit a camera, which basically gives us that view projection matrix, however when it comes time to render
+
+312
+00:30:12,600 --> 00:30:16,825
+我们可能会在场景中使用完全不同的着色器渲染不同的对象
+we might render different objects in our scene with completely different shaders
+
+313
+00:30:17,400 --> 00:30:19,499
+对吧，所以这不仅仅是说好的问题
+right, so it's not just a matter of saying okay
+
+314
+00:30:19,500 --> 00:30:24,075
+当我们开始我们的场景时，让我们取到着色器，然后提交
+when we begin our scene, let's take our shader, and then just submit that
+
+315
+00:30:24,075 --> 00:30:29,550
+将这个视图投影矩阵作为统一的着色器上传到我们的着色器中，对吧，那就是我们要做的
+you know, upload this view projection matrix into our shader as a uniform, right, that's what we're going to do
+
+316
+00:30:30,100 --> 00:30:33,166
+但顺便说一句，如果你们不明白什么是统一变量
+but and by the way, if you don't understand what uniforms are anything like that
+
+317
+00:30:33,166 --> 00:30:37,975
+你们可能应该看看OpenGL中的着色器视频，我实际上不记得是否做了关于统一变量的视频
+you should probably look into the shaders video in OpenGL, I actually don't remember if I've done a proper video on uniforms
+
+318
+00:30:37,975 --> 00:30:42,900
+但如果我没有，它肯定会很快进入OpenGL系列，但不管怎样
+but if I haven't, it's going to definitely come into the OpenGL series, very soon, but anyway
+
+319
+00:30:44,000 --> 00:30:50,650
+因此，我们需要将其上传到着色器中，但是我们实际上并不知道现在看到的所有对象
+so we need to upload this into our shader, however we don't actually know like all of the objects now seen
+
+320
+00:30:50,650 --> 00:30:56,899
+它们将被呈现出来，对吧，就像我所说的，如果我们有一个球体
+and what they're going to be rendered with, right, like as in what I mean by that is, what if we have a sphere
+
+321
+00:30:56,900 --> 00:31:01,866
+使用一种材质进行渲染，因此使用一种着色器，即第一号着色器
+that's rendered with one material, and therefore uses one kind of shader, shader number one
+
+322
+00:31:01,900 --> 00:31:06,225
+然后我们有一个立方体或类似的背景之类的，用完全不同的着色器渲染
+and then we have a cube or like a background or something like that, that's rendered with a completely different shader
+
+323
+00:31:07,133 --> 00:31:10,193
+你们知道我们要做什么，实际上需要做的是
+you know what do we do, well what actually needs to happen is
+
+324
+00:31:10,466 --> 00:31:13,525
+该视图投影矩阵需要上载到这两个着色器中
+that view projection matrix needs to be uploaded into both of those shaders
+
+325
+00:31:14,000 --> 00:31:17,675
+对吧，但是我们还没有，我们还不知道我们会不会提交这个
+right, but we haven't, we don't know that we're gonna submit this yet
+
+326
+00:31:17,933 --> 00:31:23,775
+所以我们实际上不能这样做，所以BeginScene和相机实际上应该做的是
+so we can't actually do that, so what BeginScene with the camera should actually do right is it
+
+327
+00:31:23,775 --> 00:31:25,183
+它不会上传任何统一变量
+it's not gonna upload any uniforms
+
+328
+00:31:25,466 --> 00:31:31,039
+它基本上会做两件事中的一件，它可以只保存对右侧相机的引用，供以后使用
+it's basically going to do one of two things, it could just save a reference to the camera at right for later
+
+329
+00:31:31,333 --> 00:31:36,847
+或者就像你们知道的，如果用种不同的方式设计它，你们需要某种统一的缓冲区来填充
+or like you know, if you were designing this in a different way, and you had like some kind of uniform buffer to fill
+
+330
+00:31:37,133 --> 00:31:41,225
+你们实际上可以将这个视图投影矩阵复制到一个统一变量的缓冲区中
+you could actually copy this view projection matrix into like a uniform buffer
+
+331
+00:31:41,466 --> 00:31:45,025
+本质上就像是将内存副本或其他东西复制到统一变量缓冲区中
+essentially just do like a memcopy or something into a uniform buffer
+
+332
+00:31:45,350 --> 00:31:48,966
+然后当你们实际开始使用特定着色器进行渲染时
+and then when you actually start rendering with a particular shader
+
+333
+00:31:48,966 --> 00:31:53,166
+从理论上讲，你们的渲染器会将具有相同材质的对象批处理在一起
+and theoretically your renderer would batch together objects with the same material by the way
+
+334
+00:31:53,166 --> 00:31:59,425
+使用相同的着色器，这样你们就不必重新绑定着色器1、着色器2、着色器1和着色器2
+so with the same shader, so that you don't have to kind of keep rebinding shader 1 shader 2, shader 1 shader 2
+
+335
+00:31:59,425 --> 00:32:02,650
+其中一些只需绑定着色器即可完成所有对象
+some of that you just bind shader one do all the objects with that
+
+336
+00:32:03,300 --> 00:32:08,166
+然后绑定着色器以使用该着色器渲染所有对象，因此当你们第一次绑定着色器时
+then bind shader to render all the objects with that shader, so when you bind the shader for the first time
+
+337
+00:32:08,166 --> 00:32:12,850
+你们在你们的渲染器里有数据，那就是相机，那是属于当前场景的相机
+you have that data inside your Renderer, that's the camera, that's the camera that belongs to the current scene
+
+338
+00:32:13,200 --> 00:32:19,400
+因此，你们要做的就是从中获取视图投影矩阵，并将其作为统一变量上传到着色器中
+so what you do is you take the view projection matrix from that, and you actually upload it into the shader right as a uniform
+
+339
+00:32:21,125 --> 00:32:25,750
+完成后，你们渲染所有对象，然后将其绑定到不同的着色器中
+and that's done, and then you render all of the objects, and then you bind it in a different shader
+
+340
+00:32:25,933 --> 00:32:31,400
+你们上传视图投影矩阵，然后渲染所有对象，对吧
+you do the upload of the view projection matrix, and then you render all of the objects, right
+
+341
+00:32:31,400 --> 00:32:37,366
+就像我提到的，BeginScene应该以统一变量的形式上传
+and that kind of gets uploaded as a uniform, as I mentioned, okay, and that's kind of what BeginScene is supposed to do
+
+342
+00:32:37,366 --> 00:32:41,150
+我们的责任是复制这台相机，我们要么保存它的视图投影数据
+the responsibility is let's grab this camera, let's either save the view projection data from it
+
+343
+00:32:41,150 --> 00:32:46,702
+或者实际上可以保存对实际相机的引用，通常情况下更好，如果你们真的希望只复制数据
+or we can actually save a reference to the actual camera, usually it's better, if you're really being optimal to just copy the data
+
+344
+00:32:46,975 --> 00:32:51,200
+因为通常这会被提交到一个，就像你们有一个多线程引擎
+because usually this will be submitted into a, like if you've got a multi threaded engine
+
+345
+00:32:51,200 --> 00:32:55,766
+它会被提交到渲染提交队列中，引用相机是非常危险的
+it will be submitted into a render submission queue, taking a reference to the camera is very dangerous
+
+346
+00:32:55,766 --> 00:33:01,260
+因为在评估渲染提交队列之前，你们可能已经更改了相机的位置
+because before the render submission queue might get evaluated, you might have already changed the position of the camera
+
+347
+00:33:01,933 --> 00:33:05,175
+所以这是可能的，因为你们知道典型的多路渲染是他落后的一个
+so it could because you know typically multithroad rendering is one for him behind
+
+348
+00:33:05,175 --> 00:33:11,725
+所以不管怎样，你们知道，这一切都有一些类似的细节，就像一个星号
+so anyway, there's kind of like specifics to all of this that you know, it's like an asterisk
+
+349
+00:33:11,725 --> 00:33:17,900
+如果采用引用，它可能不起作用，因此通常更好的做法是添加该时间点，复制所需数据
+it might not work, if you take a reference, so it's usually generally better to add that point in time, copy the data that you want
+
+350
+00:33:18,900 --> 00:33:22,400
+然后将其放入渲染命令立方体缓冲区
+and then kind of put that into basically your render command cube buffer
+
+351
+00:33:23,100 --> 00:33:29,450
+但不管怎样，那就是BeganScene所做的，对吧，然后当我们实际进行按对象渲染时
+but anyway, so that's what BeganScene does, right, and then when we actually do per object rendering
+
+352
+00:33:29,866 --> 00:33:35,725
+那就是我们将对象的变换矩阵，也就是模型矩阵，上传到着色器中的时候
+that's when we take the transformation, matrix of that object, which is the model matrix, and upload that into the shader
+
+353
+00:33:36,250 --> 00:33:41,450
+好了，所以我想重申的是，当我们开始一个场景时
+right, so what I'm trying to kind of reiterate, here is that when we begin a scene
+
+354
+00:33:41,700 --> 00:33:46,650
+我们有一大堆实际的着色器统一变量，需要将其设置为渲染器的一部分
+we have a whole bunch of actual shader uniforms that we need to set that a part of our renderer
+
+355
+00:33:46,900 --> 00:33:51,225
+所以像相机这样的东西，像环境这样的东西，对吧，像灯光这样的东西
+so things like camera things like the environment, right, things like the lights
+
+356
+00:33:51,366 --> 00:33:59,364
+他们不会在每个物体的基础上改变，但是我们有一堆统一变量，同样是这里的其他统一变量
+they're not going to change on a per object basis, but then we have a bunch of uniforms, again another set of uniforms over here
+
+357
+00:33:59,766 --> 00:34:03,446
+那些都是我们材料的一部分，那么这个物体是什么
+that are kind of part of our material, so what is this object where redering
+
+358
+00:34:03,800 --> 00:34:10,470
+对吧，它是金属的，还是塑料的，它有多亮，它的反射效果如何，它是木头的，什么颜色的
+right, is it metal, is it plastic, how shiny is it, how much it reflect is it wood, you know, what color is it
+
+359
+00:34:11,600 --> 00:34:19,350
+所有这类信息都是材质的一部分，所以我们有材质统一变量，按对象或按材质
+all of that kind of information, that is part of the material, so we have material uniforms, which are per object or per material
+
+360
+00:34:19,350 --> 00:34:25,344
+因为我们可能会用相同的材质渲染几个对象，然后就有了某种渲染器统一变量，对吧
+because again we might render several objects with the same material, and then we have kind of our renderer uniforms, right
+
+361
+00:34:25,466 --> 00:34:30,775
+基本上，你们可以看到，你们看到的是统一变量，或一堆不同的称呼，对吧
+wisher basically, you could see, you're seeing uniforms or a bunch of different ways to call them, right
+
+362
+00:34:31,000 --> 00:34:34,966
+但它们在某种程度上由渲染器处理，而这是由材质处理的
+but they're kind of handled by the Renderer, whereas this is handled by the material
+
+363
+00:34:34,966 --> 00:34:39,400
+因此，这是一种跳跃到创造一个完整的材料系统，并做我们将做的所有有趣的事情
+so this is kind of jumping ahead into creating a whole material system, and doing all the fun stuff that we'll be doing
+
+364
+00:34:39,400 --> 00:34:44,066
+但希望你们能看到比我更大的画面，只是说相机能做这做那
+but hopefully, you guys can kind of see the bigger picture than me just saying that cameras do this and that
+
+365
+00:34:44,066 --> 00:34:49,050
+就是那样，好了，总结一下，我们需要一个名为BeginScene的函数
+and that's it, ok, so to summarize, what we need is a function called BeginScene
+
+366
+00:34:49,050 --> 00:34:54,725
+那是以相机为参数的，对吧，它需要从相机获得视图投影
+that takes in a camera as a parameter, right, it needs to get the view projection from the camera
+
+367
+00:34:54,725 --> 00:34:59,000
+这就是投影，你们知道，这是远宽高比的东西
+which is going to be the projection again, which is you know, this farven aspect ratio stuff
+
+368
+00:35:00,266 --> 00:35:06,725
+顺便说一句，它比Favon长宽比大，它也是最小类型的CUL距离和最大的CUL距离
+and by the way, it's it's more than favon aspect ratio, it's also the the minimum kind of cul distance and the maximum cul distance
+
+369
+00:35:06,725 --> 00:35:10,575
+所以我们基本上定义了剪裁平面，就像近剪裁平面和远剪裁平面一样
+so we define basically clipping planes that are, like near and far clipping planes
+
+370
+00:35:10,933 --> 00:35:14,250
+所以基本上，物体在固定之前可以离相机多近
+so basically how close can an object be to the camera before it gets cold
+
+371
+00:35:14,566 --> 00:35:18,425
+一个物体必须离相机多远才能不被渲染
+and how far away does an object have to be from the camera for it not to get rendered
+
+372
+00:35:18,725 --> 00:35:23,593
+因为就像我说的，你们知道，这会产生一种锥体，就像是一种视锥体
+because as I said, you know, this kind of creates a frostum, like a view frostum
+
+373
+00:35:24,366 --> 00:35:28,325
+这就是我们的相机，然后我们需要定义这个远平面，也就是这个
+which is kind of our camera, and then we need to define this far plane, which is this
+
+374
+00:35:28,975 --> 00:35:37,500
+对吧，然后我们还需要定义这种近平面，所以那也是我们需要做的，对于实际的投影矩阵
+right, and then we also need to define this kind of near plane, so that's also what we need to do for an actual projection matrix
+
+375
+00:35:37,800 --> 00:35:45,100
+但我们得到的视图矩阵基本上是相机变换的逆，我们需要获取那些数据
+but we have that view matrix is basically the inverse of the camera's transform, we need to take that data
+
+376
+00:35:45,100 --> 00:35:47,750
+我们需要把它放到我们的渲染中，当我们开始一个新的场景时
+we need to put it into our render, when we start a new scene
+
+377
+00:35:48,175 --> 00:35:51,933
+对吧，然后当一些东西被提交时，现在在Hazel中
+right, and then when something gets submitted, which right now in Hazel
+
+378
+00:35:51,933 --> 00:36:00,157
+一旦它被提交，就会被渲染，我们实际上需要查看提交网格或顶点数组时使用的着色器
+as soon as it gets submitted it gets rendered, we actually need to see what shader wear submitting that mesh or that vertex array with, right
+
+379
+00:36:00,800 --> 00:36:08,333
+当我们绑定着色器时，在本例中，我们还需要上传视图投影和实际模型
+when we bind the shader for that, we also need to upload in this case both the view projection and the actual model
+
+380
+00:36:08,700 --> 00:36:15,250
+所以那就是整个相机的架构，EndScene什么都不做，仍然是什么都不做
+so that's kind of the architecture this whole thing, and EndScene really does nothing, right, still kind of does nothing
+
+381
+00:36:15,900 --> 00:36:20,125
+你们可以清楚地知道，如果在复制数据，可以让它清除数据，我不知道，可能不会那么做
+you could have it clear, if you were copping data, you could have it clear the data, I don't know, I wouldn't probably do that
+
+382
+00:36:22,400 --> 00:36:27,325
+在任何情况下，你们可以就像，你们可以只跟踪它是否，无论你们是否在场景中
+in any case, you could just have like, you could just keep track of whether it, whether you're inside a scene or not
+
+383
+00:36:27,700 --> 00:36:33,175
+所以你们可以看到这样的场景，或任何等于false或null，以这种方式
+so you could see like am you know scene or whatever equals false or null or whatever, and in that way
+
+384
+00:36:33,700 --> 00:36:37,533
+如果尝试呈现尚未呈现的内容，则尚未调用BeginScene或调用BeginScene
+if you try and render something that hasn't, you haven't called BeginScene, or you called BeginScene
+
+385
+00:36:37,533 --> 00:36:40,875
+如果你们在没有EndScene的情况下再次调用BeginScene，它可能会像一个集合，并确保你们
+and you called BeginScene again without EndScene, it could like a set and make sure that you
+
+386
+00:36:41,225 --> 00:36:44,275
+你们所做的就像是一件小小的保护运行，但EndScene在以后显然会有一些东西
+it's like a little protection thing that you do, but EndScene will have stuff in the future obviously
+
+387
+00:36:44,566 --> 00:36:49,925
+但现在不是，好吧，那就是整个相机系统的想法，希望那对你们有意义
+but not right now, okay, so that's kind of the idea of this whole camera system, hopefully that makes sense to you
+
+388
+00:36:50,500 --> 00:36:56,100
+希望在我在下一个视频中实现它之前，这些信息足以让你们尝试自己弄清楚这一点
+hopefully this is enough information for you guys to try and figure this out on your own before I implement it in the next video
+
+389
+00:36:57,333 --> 00:37:03,800
+但是，是的，这就像是一种，这是场景和渲染器之类的整个基础
+but yeah this is like a whole kind of, this is the whole basis for scenes and renderers and stuff like that
+
+390
+00:37:03,933 --> 00:37:06,975
+所以这是非常非常令人兴奋的，你们可以看到它导致了
+so it's very, it's all very exciting, and you can see that it leads to
+
+391
+00:37:08,025 --> 00:37:12,875
+真的很酷的系统，无论如何，我希望你们喜欢这个视频，如果你们喜欢，就为它点赞吧
+really really cool system in the future, anyway, I hope you guys enjoy this video, if you did, and hit that like button
+
+392
+00:37:12,966 --> 00:37:16,150
+你们还可以通过访问patreon.com/thecherno来帮助支持该系列
+you can also help support the series by going to patreon.com/thecherno
+
+393
+00:37:16,150 --> 00:37:18,733
+你们将提前一周获得源代码和视频
+you'll get access to source code earlier and videos a week earlier
+
+394
+00:37:18,733 --> 00:37:23,866
+就像我说的，在未来，如果你们现在在YouTube上公开观看这场直播，而你们不是Patreon
+as I said, in the future, if you're watching this live on YouTube right now publicly, and you're not a patreon
+
+395
+00:37:23,866 --> 00:37:28,000
+你们现在就可以马上看到下一期，如果你们继续下去并帮助支持这一系列的话
+you can just see the next episode immediately right now, if you just go ahead and helps support the series
+
+396
+00:37:28,366 --> 00:37:33,450
+好了，就像我说的，下一次我们将真正深入到C++代码和着色器代码之类
+okay, so as I said, next time we're gonna actually dive into the c++ code and the shader code and everything like that
+
+397
+00:37:33,733 --> 00:37:37,333
+要做到这一点，我们将设计一个正交相机
+and actually make this happen, we're gonna design an autographic camera
+
+398
+00:37:37,333 --> 00:37:43,425
+不是透视相机，因为目前我们只处理2D渲染，我们可以做透视相机
+not a perspective camera, because currently we're kind of dealing with just 2D rendering, and we could do a perspective camera
+
+399
+00:37:43,966 --> 00:37:51,266
+不确定，但无论如何，当有了3D场景，显然最终会实现那个，从那里，我可能想要也许
+not sure, but we will obviously eventually do that, anyway, when we have a 3D scene, and from there, I'll probably want to maybe
+
+400
+00:37:51,500 --> 00:37:55,350
+我不知道，当我们真正到达那里时，我们会分成几个部分，我们可能只会谈论它们
+I don't know, we'll branch off into several things, we might just talk about them, when we actually get there
+
+401
+00:37:55,350 --> 00:38:01,850
+我会尝试做一些你们想看到的事情，但实际上我们可以继续使用2D渲染
+and I'll try and kind of do something that you guys want to see, but effectively we could continue on with 2D rendering
+
+402
+00:38:01,850 --> 00:38:08,466
+实际上可能会让相机变得可控，这样我们就可以在屏幕上渲染多个物体
+and actually maybe make the camera controllable, and also make it, so that we could render multiple objects on the screen
+
+403
+00:38:08,466 --> 00:38:14,700
+然后我们甚至可以制作一个2D游戏之类的，或者我们可以只做一些基本的运行
+and then we could even make a 2D game or something like that, or we can just kind of do the base level work for that
+
+404
+00:38:14,700 --> 00:38:19,775
+然后直接转到3D，取决于你们想要什么，我的意思是，我可能更热衷于做3D
+and then just move on straight to 3D, depending on what you guys want, I mean, I'm probably more keen to do 3D
+
+405
+00:38:19,775 --> 00:38:25,925
+老实说，因为我喜欢这些东西，但我们可能会更快地让Hazel更适用于实际的2D游戏
+to be honest, because I love that stuff, but we'll probably make Hazel more usable for actual 2D games more quickly
+
+406
+00:38:25,925 --> 00:38:31,475
+如果我们先做这个，那么这就是你们的决定，不管怎样，在下期，我们会深入了解这些东西
+if we did this first, so it's kind of up to you guys suicide, anyway, in the next episode, we'll intimate this stuff
+
+407
+00:38:31,800 --> 00:38:36,750
+在你们真正看下期之前，一定要先去试试，再见，拜
+make sure you have a go on your own before you actually look at the next episode, I'll see you guys later, goodbye
+

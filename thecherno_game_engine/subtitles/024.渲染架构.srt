@@ -1,0 +1,1480 @@
+﻿1
+00:00:00,100 --> 00:00:03,300
+嘿，你们好，我是TheCherno，欢迎回到我的游戏引擎系列
+hey guys, my name is TheCherno, welcome back to my game engine series
+
+2
+00:00:03,466 --> 00:00:09,875
+那么上期我们介绍了渲染，如果你们还没看过那期，一定要去看看
+so the last time we took a look at an introduction to rendering, definitely check that video out, if you haven't already
+
+3
+00:00:10,133 --> 00:00:13,533
+因为今天我们会继续讨论上期剩下的东西
+because today we're gonna continue off, kind of where we left off in that video
+
+4
+00:00:13,533 --> 00:00:20,325
+实际上就是讨论这整个渲染的架构，以及我们渲染图形的所有问题
+and actually talk about the architecture of this whole renderer, and just the whole problem of we need to render graphics of the screen
+
+5
+00:00:20,325 --> 00:00:27,050
+比如我们如何在引擎中实现那个，正如我承诺的那样，确实准备了一些PPT
+how do we do that in an engine, as promised I did prepare a little bit of a powerpoint presentation
+
+6
+00:00:27,425 --> 00:00:32,150
+那应该很酷，那我们就直接去看看那个吧
+which should be pretty cool, so we're gonna jump in that, into that in just a second
+
+7
+00:00:32,150 --> 00:00:38,650
+但我只是想先说，首先，非常感谢所有让这一系列成为可能的赞助人
+but I just want to kind of start off by just saying, first of all, huge thank you to all of the patreons that make this series possible
+
+8
+00:00:38,650 --> 00:00:43,700
+就是patreon.com/thecherno，谢谢你们的支持对我来说意义重大，尤其是现在，因为太忙了
+patreon.com/thecherno, thank your support just means the world to me, especially right now, because I'm so busy
+
+9
+00:00:43,700 --> 00:00:47,300
+我仍然希望能够为你们播放这些视频，你们已经看到人们
+and I still want to be able to pump out these videos for you guys, and you've seen that people are 
+
+10
+00:00:47,300 --> 00:00:50,300
+所以对支持这一系列的兴趣对我来说绝对是惊喜
+so interested in supportive of this series is absolutely amazing to me
+
+11
+00:00:51,175 --> 00:00:53,725
+如果你们有兴趣成为赞助人，一定要看看那个链接
+if you're interested in becoming a patreon, definitely check out that link
+
+12
+00:00:54,366 --> 00:00:59,700
+你们会收到些奖励，比如提前收到视频，尽管那在目前还没实现，因为我的生活太疯狂了
+you'll receive a bunch of rewards such as videos early, although that's kind of unhold at the moment since my life is so crazy
+
+13
+00:01:00,533 --> 00:01:09,075
+但你们可以访问诸如Hazel引擎的源代码之类的，这些源代码基本上已经像提前编写的那样了
+but you'll get access to things like source code for Hazel engine that has already been like way way way written in in advance essentially
+
+14
+00:01:09,075 --> 00:01:14,439
+所以我们现在讨论的这类东西已经实现了，并且在分支中是可用的
+so this kind of stuff that we're covering now has somewhat been implemented already, and is a little usable in a branch
+
+15
+00:01:14,925 --> 00:01:25,475
+就像是一种方法，让它变得更像一个，我想更多的控制，让Hazel能够朝着正确的方向前进
+and just kind of as like as a way to kind of get more of like a, I guess more control into where Hazel actually going being able to steer it into the right direction
+
+16
+00:01:25,750 --> 00:01:31,000
+我通常也会在discord和与Hazel的开发相关的赞助频道上发布内容
+I commonly post things on discord as well and the patrons channel relating to Hazel's development
+
+17
+00:01:31,000 --> 00:01:35,125
+当我写代码时，就像写开发博客一样，我有时会尝试做那些
+as I write the code and like it's almost like a development blog, at times I try and do that
+
+18
+00:01:35,125 --> 00:01:37,500
+只是为了让你们了解我正在做的事情
+just to keep you guys updated with what I'm actually working on
+
+19
+00:01:37,500 --> 00:01:44,425
+因为很明显，我是独立地在Hazel上工作的，然后我最终会在以后的时间里实现
+because obviously I work on Hazel kind of independently, and then eventually what I kind of implement eventually way away later in the future
+
+20
+00:01:44,425 --> 00:01:50,050
+很明显，在这些视频中，我详细地解释了我正在做的
+makes its way to videos such as this one, and obviously in these videos, I explain what I'm doing a lot more
+
+21
+00:01:50,400 --> 00:01:56,950
+然后讨论我们将如何构建某些东西，无论如何，关于渲染架构，让我们直接深入吧
+and talk about like how we're gonna structure certain things, anyway, rendering architecture, let's dive in
+
+22
+00:01:57,000 --> 00:02:03,600
+好了，在Hazel引擎中渲染架构，首先，漂亮的背景不是在Hazel中渲染的
+okay, so rendering architecture in the Hazel engine, first of all, that beautiful background is not rendered in Hazel
+
+23
+00:02:03,600 --> 00:02:07,933
+那是我在澳大利亚维多利亚州南部拍摄的照片
+that's actually a photo I took in pretty much the south of victoria here in Australia
+
+24
+00:02:07,933 --> 00:02:11,425
+如果你们想看更多我的照片，就去访问instagram.com/thechernol吧，描述里面有
+if you wanted to see more of my photos, instagram.com/thechernol, it will be a link in the description
+
+25
+00:02:11,975 --> 00:02:17,125
+因为我也喜欢摄影，但也许有一天，我们可以在Hazel上渲染出这样的东西
+because I do love photography as well, but maybe one day, we can render something like this in Hazel
+
+26
+00:02:17,125 --> 00:02:22,805
+那将是一个非常好的目标，一个非常好的目标，不管怎样，整个事情都有两面性
+that would be quite nice, quite a good goal to aim for, anyway, there were two sides to this whole thing
+
+27
+00:02:23,375 --> 00:02:28,075
+我想我应该谈谈的一件事，我的意思是在渲染视频的介绍中，我涵盖了很多内容
+and I guess one of the things that I should probably talk about, I mean in the introduction to rendering video, I did cover a lot
+
+28
+00:02:28,075 --> 00:02:33,475
+我真的不想有太多重复，所以我们现在要采取更实际的方法
+and I don't want to really overlap too much, so we're gonna do taking more of a practical approach at this now
+
+29
+00:02:34,666 --> 00:02:40,125
+但实际上，我认为游戏引擎中的渲染系统有两个方面
+but effectively the way that I kind of see this is there are two sides to a rendering system in a game engine
+
+30
+00:02:40,466 --> 00:02:47,293
+有一种叫做渲染接口的东西，这个术语也是我最终编出来的
+there's something called the render api, which again this terminology is something that I eventually made up
+
+31
+00:02:47,775 --> 00:02:51,825
+我的意思是，这显然是有道理的，其他人过去也用过，而且确实用过
+I mean it does make sense obviously, and other people have used it in the past, and do use it
+
+32
+00:02:52,166 --> 00:02:58,950
+但这与一些教科书或类似的东西不同，所以不要期望，但本质上我们拥有的是一个渲染接口
+but this isn't like from some textbook or anything like that, so don't expect that, but essentially what we have is a render api
+
+33
+00:02:59,166 --> 00:03:07,125
+这是平台和api渲染api图形api，我们正在构建的整个系统的特定部分，那意味着
+which is the platform and api render api graphics api, specific part of this whole system that we're building, what that means is that
+
+34
+00:03:07,125 --> 00:03:13,200
+这实际上是特定于OpenGL，特定于Vulcan，特定于DirectX，这是一种
+this is actually specific to OpenGL, specific to Vulcan, specific to DirectX, this is this kind of
+
+35
+00:03:13,200 --> 00:03:22,975
+这边的这部分实际上是我们与那些平台或接口结合在一起的东西，而这部分我们将接触
+this side of this line is stuff that we actually tie into those platforms or those apis, whereas this side which we'll get into
+
+36
+00:03:23,666 --> 00:03:27,675
+一旦我们通过所有这些要点，我们将在未来接触
+which we'll get into kind of in the future, once we get through all of these points
+
+37
+00:03:28,166 --> 00:03:34,575
+这将类似于渲染，有点像接口，平台无关的那种，有点像这两者的这一面
+this is going to be like the render, kind of the api platform independent, kind of side of this side of these two
+
+38
+00:03:36,133 --> 00:03:41,825
+这两个方面，系统的两个方面，让我们看看我们得到了什么，所以渲染上下文，对吧
+two sides side of these, two sides of the system, so let's take a look at what we've got, so render context, right
+
+39
+00:03:42,166 --> 00:03:47,850
+这方面也是，这是一个实现，就像在OpenGL或Vulcan中一样
+so again this side, what this is is, it's an implementation that is implemented like in OpenGL or in Vulcan
+
+40
+00:03:48,100 --> 00:03:55,125
+那些实际的接口，这是我们必须基本上按照接口实现的特定内容，这也是没有办法的，对吧
+those actual apis, this is the stuff that is specific that we have to basically implement per api, there's no way around that, right
+
+41
+00:03:55,700 --> 00:04:05,333
+所以我们基本上要构建什么，对吧，所以我们构建渲染上下文，交换链和帧缓冲区之类的
+so we have essentially what do we build, right, so we build a render context, we build things like a swap chain a frame buffer
+
+42
+00:04:05,333 --> 00:04:09,199
+顶点缓冲区可能更容易一次列出所有这些，一个索引缓冲区
+a vertex buffer might just be easier to just list all these I think, at once an index buffer
+
+43
+00:04:09,200 --> 00:04:16,100
+你们知道的，纹理，着色器，状态，管道和渲染过程，然后我们会转到下一个方面
+you know, texture kind of api, shader api, states, pipelines, render passes, and then we'll kind of move on to the next side
+
+44
+00:04:16,400 --> 00:04:22,875
+让我们来讨论一下，我的意思是，这些基本上是
+so let's talk about this for a bit, what I mean by this is that the these are essentially in a way
+
+45
+00:04:22,875 --> 00:04:27,200
+我想你们可以把它们称为渲染接口原语，我可能错过了很多东西
+I guess you could call them render api primitives, and I've probably missed like a bunch of things
+
+46
+00:04:27,200 --> 00:04:36,475
+这就像是我脑海中一个松散的列表，但本质上我们需要
+this is just like a loose kind of off the top of my head kind of list, but essentially we need to if we're like
+
+47
+00:04:36,475 --> 00:04:41,025
+正如你们在下一张幻灯片中所看到的那样，我们将从实现OpenGL开始
+and the way that we're gonna start this out as you'll see in the next slide is by implementing OpenGL
+
+48
+00:04:41,025 --> 00:04:43,125
+因此，如果我们以它为例，对吧
+so if we use that as an example, right
+
+49
+00:04:43,450 --> 00:04:48,850
+我们需要做的基本上是创建，你们可以看到这些东西中的每一个都有一个类
+what we need to do is essentially make, you could see a class for each of these things
+
+50
+00:04:49,300 --> 00:04:57,650
+但本质上是OpenGL的一个实现，就像这个渲染上下文，交换链，帧和顶点缓冲，下个缓冲
+but essentially an implementation for OpenGL, for like this render context, this swap chain, this frame buffer, the vertex buffer the next buffer
+
+51
+00:04:57,900 --> 00:05:02,850
+因为这是一种渲染原语，从中我们可以告诉显卡我们要做什么
+because these are kind of render primitives out of which we tell our graphics card what it is we want to do
+
+52
+00:05:03,314 --> 00:05:08,375
+对吧，比如顶点缓冲区，对，我们有一个数据缓冲区，我们想要它，把它发送到GPU
+right, so things like a vertex buffer, right, we have a buffer of data, we want it, send it into the GPU
+
+53
+00:05:09,300 --> 00:05:15,075
+然后实际上能够使用它，可能是静态的，可能是动态的，然而我们想用它，对吧
+and then actually be able to use it, maybe like kind of statically, maybe dynamically, however we want to use that, right
+
+54
+00:05:15,075 --> 00:05:21,350
+我们需要个接口来实现那个，最酷的是我们在每个接口中都实现了这一点
+we need an api to be able to do that, and the cool thing about this is that we implement this in every api
+
+55
+00:05:21,350 --> 00:05:26,650
+所以在其他方面，我们会有一个OpenGL的实现，我们会有一个Vulcan的实现，对吧
+so in other ways, we'd have an implementation for OpenGL, we would have an implementation for Vulcan, right
+
+56
+00:05:26,933 --> 00:05:32,425
+一旦我们有了它，我们实际上可以从渲染器的角度不可知地使用它，对吧
+and then once we have that, we can actually use it from the renderer side of things agnostically, right
+
+57
+00:05:32,733 --> 00:05:37,785
+这意味着我们有一个渲染实现，它只是说
+which means that it doesn't matter we have one implementation of the render, which just says
+
+58
+00:05:38,000 --> 00:05:43,550
+好了，首先在交换链中创建渲染上下文，然后创建实际渲染可能需要的任何帧缓冲区
+okay, first up create a render contacts in a swap chain, then you know, create any frame buffers, you might need for actual rendering
+
+59
+00:05:43,550 --> 00:05:48,300
+然后我想渲染一个三角形，让我们上传一些顶点缓冲区数据和一些索引缓冲区数据
+then I want to render a triangle, so let's upload some vertex buffer data and some index buffer data
+
+60
+00:05:48,300 --> 00:05:50,150
+当然我们要创建一个着色器
+and we're going to create a shader of course
+
+61
+00:05:50,775 --> 00:05:55,725
+然后我们将创建一个渲染过程或管道或任何我们需要的东西，然后开始渲染该三角形
+and then we'll create a render pass or a pipeline or anything else we need, and then we'll kick off rendering that triangle
+
+62
+00:05:56,100 --> 00:06:04,600
+对吧，就是那样，好了，但问题是要渲染一个三角形，我们使用渲染器中的这个渲染接口
+right, that's it, okay, but the thing is to render a triangle, we use this render api from the renderer
+
+63
+00:06:05,125 --> 00:06:11,450
+很酷的是，如果突然决定，我们实际上会减少使用Vulcan或DirectX12或其他工具的渲染
+and the cool thing about this is that suddenly if we decide, we'll actually less render using Vulcan or DirectX12 or whatever
+
+64
+00:06:11,625 --> 00:06:18,900
+这一部分显然是包含这些接口的实际实现的部分，但这一部分没有改变
+this part obviously is the part that contains the actual implementation of those apis, but this part does not change
+
+65
+00:06:18,975 --> 00:06:24,825
+我们只需要监听一个开关，好了，现在在DirectX12中执行，但是我们绘制三角形的逻辑
+we just have to hear a switch that says okay, now do it in DirectX12, but our logic for drawing a triangle
+
+66
+00:06:24,825 --> 00:06:28,775
+我们传入的实际渲染命令本质上是相同的
+our actual render commands that we pass in are essentially going to be the same
+
+67
+00:06:29,200 --> 00:06:34,100
+现在在上期视频中，在渲染视频的介绍中，我谈到了如何很难划清界限
+now in the last video, in the introduction to rendering video, I talked about how it was really hard to kind of draw the line
+
+68
+00:06:34,100 --> 00:06:38,950
+这是条线，这是我刚才说的线，我画了那条界限，我说过这是在这边
+and this is the line, this is the line I was talking about, I've drawn that line, and I've said this is on this side
+
+69
+00:06:38,950 --> 00:06:44,350
+这是在这一边，对吧，但现在你们实际上可以看到什么实际上属于每一边
+this is on this side, right, but now you actually kind of see what actually belongs to each kind of side
+
+70
+00:06:45,750 --> 00:06:48,975
+如果我想突然给三角形添加纹理，对吧，我该怎么办
+again if I want to suddenly add a texture to a triangle, right, what do I do
+
+71
+00:06:48,975 --> 00:06:53,525
+我只是说，好吧，让我们加载一个纹理并绑定它，然后我们将使用该纹理进行绘制，对吧
+I just say okay, let's load a texture and bind it, and we'll draw using that texture, right
+
+72
+00:06:53,525 --> 00:06:58,300
+我们将很明显地更新着色器代码，以实际从该纹理采样，然后绘制这些像素
+and we'll update the shader code obviously to actually sample from that texture and then draw those pixels
+
+73
+00:06:58,650 --> 00:07:01,275
+但是我们如何使用这个纹理，我们只是说，哦，我们想创建一个纹理
+but how do we use that texture, we just say, oh we wanna make a texture
+
+74
+00:07:01,400 --> 00:07:05,200
+对吧，至于实现细节，好吧，它到底意味着什么
+right, the implementation details of, okay, what does it even mean
+
+75
+00:07:05,200 --> 00:07:10,200
+我想创建一个纹理，你们知道，我要从文件中读取它，然后我该怎么处理这些数据，对吧
+I wanna make a texture, you know, I'm going to read that from a file, and then what am I gonna do with that data, right
+
+76
+00:07:10,200 --> 00:07:16,648
+这是由DirectX12或Vulcan OpenGL或其他什么工具实现的吗？那就在线这边，对吧
+is that going to be implemented by DirectX12 or Vulcan OpenGL or whatever, that is on this side of the line, right
+
+77
+00:07:16,900 --> 00:07:22,475
+因此，这只是一个接口，它为我们提供了对这种低级代码的访问
+so this is just an api that provides us access to that kind of lower level code
+
+78
+00:07:22,825 --> 00:07:29,400
+但是我们在渲染器中使用这个接口来实际渲染我们想要的，好吧，那样做的好处显然是
+but then we use this api in our renderer to actually render what we want, okay, and the benefit of that obviously is that
+
+79
+00:07:30,466 --> 00:07:37,025
+我们在幕后使用什么接口并不重要，就像我们在所有其他接口之上创建另一个接口一样
+it doesn't matter what api we use under the hood, it's kind of like we're creating another api on top of all those other apis
+
+80
+00:07:37,300 --> 00:07:41,750
+这正是我们想要的，你们知道，通常要简单得多
+it's going to do exactly what we want, you know, much much much simpler way usually
+
+81
+00:07:42,066 --> 00:07:45,475
+然后所有的努力都是在幕后完成的，对吧，那就是整个想法
+and then all the hard work is kind of done behind the scenes, right, that's kind of the whole idea
+
+82
+00:07:45,766 --> 00:07:51,050
+让我们看一下渲染器将负责的事情，因此实际的2D和3D渲染器
+so let's take a look at things that the renderer would be responsible for, so the actual 2D & 3D renderer
+
+83
+00:07:51,050 --> 00:07:57,518
+之前的做法是否会推迟，那将在很大程度上得到实现，使用的是来自此的实际原始类型
+whether that before would deferred whatever, that is going to be implemented largely, using actual kind of primities from this
+
+84
+00:07:58,326 --> 00:08:06,600
+现在我必须提到的是，接口之间存在着分歧，就像我刚才说的上期那样，哦，这太难了
+now I have to mention that, there are differences in the api, like I didn't just say last episode that, oh this is gonna be so hard
+
+85
+00:08:06,600 --> 00:08:11,625
+做这件事总是很难，然后我觉得那很容易，我们要举起来，我要列出所有这些的关键点
+it's always so hard to do this, and then here I'm like that's easy, we're just gonna lift up, I'm gonna list all these dog points
+
+86
+00:08:11,933 --> 00:08:19,575
+我们会这样那样做，一切都会很美好，不，因为你们知道在OpenGL中实现延迟渲染
+we're gonna do this and that, everything's gonna be sweet, no, because you know implementing a deferred render in OpenGL
+
+87
+00:08:20,750 --> 00:08:29,775
+与像Vulcan这样的东西不同，因为在Vulcan中，这些原语的数量比在OpenGL中要多
+versus something like Vulcan it's different, because in Vulcan, you just have kind of more of these primitives than you do in OpenGL
+
+88
+00:08:30,159 --> 00:08:33,875
+在OpenGL中，你们只需要创建一组帧缓冲区，就是那样，而在Vulcan中
+in OpenGL, you just kind of create like a bunch of frame buffers, and that's kind of it, whereas in Vulcan
+
+89
+00:08:33,875 --> 00:08:41,700
+你们知道你们可以有管道和描述符集之类的东西，还有更多的实际内容
+and you know you can have things like pipelines and like descriptor sets, and just more kind of just more actual content for this
+
+90
+00:08:41,700 --> 00:08:49,275
+这就是为什么我不能，OpenGL与Vulcan DirectX12完全不同
+which is why something like I can't, OpenGL is something completely different to like Vulcan DirectX12
+
+91
+00:08:49,275 --> 00:08:56,250
+因为这是正确的，就像某些高级渲染技术的方法实际上是完全不同的
+because it is right like the approach to some of these advanced rendering techniques is actually quite different
+
+92
+00:08:56,575 --> 00:09:01,925
+所以当我们进入延迟渲染，甚至是基于平铺的渲染或诸如此类的事情时，这将是很有趣的
+so it's going to be interesting, when we get into things like deferred rendering or even like tile based rendering or anything like that
+
+93
+00:09:01,925 --> 00:09:08,950
+对吧，因为我们设置它的方式实际上可能不同，我们可能需要扩展这个渲染接口
+right, because the way that we kind of set this up might actually differ, and we might have to extend this render api
+
+94
+00:09:09,666 --> 00:09:16,925
+基本上，只要我们需要编写更多的Vulcan代码，就可以使用这些原语
+and basically whenever we need to just write more Vulcan code than otherwise possible with these primitives
+
+95
+00:09:16,925 --> 00:09:22,675
+因为我们需要一种更有效的延迟渲染方法，例如，因为你们可以使用这些原语实现延迟渲染
+because we want a more efficient way of deferred rendering, for example, because you can achieve deferred rendering with these primitives
+
+96
+00:09:22,675 --> 00:09:27,850
+那很好，但是Vulcan可能有更好的方法，通过使用更多的控制
+that's fine, but Vulcan might have a better way of doing it by using more control essentially
+
+97
+00:09:27,850 --> 00:09:29,100
+很明显，Vulcan有一些东西
+and obviously Vulcan has things
+
+98
+00:09:29,100 --> 00:09:35,050
+比如你们知道的看到同步原语，比如栅栏和信号量之类的东西，对吧
+like you know seeing the synchronization primitives like fences and semaphores and that kind of stuff, right
+
+99
+00:09:35,733 --> 00:09:41,400
+不是OpenGL真正拥有的东西，所以会有一些不同，不会像这看起来那么简单
+not something OpenGL really has, so there's gonna be some difference, there's not gonna be a straightforward as this might look
+
+100
+00:09:42,366 --> 00:09:46,425
+因为我不想让你们认为我在上一期里表现得太难了
+because I don't want you guys to think that I've made it out to be so hard in the last episode and inside the lamb, just like that
+
+101
+00:09:46,425 --> 00:09:51,625
+这很容易，不容易，我只是为你们简化一下，这样我们就可以开始实现这个了
+it's gonna be easy, it's not gonna be easy, I'm just simplifying it for you guys, so that we can actually start doing this
+
+102
+00:09:51,625 --> 00:09:54,850
+这样你们就不会觉得不知所措，但可能会觉得有点不知所措
+and so that you don't feel two overwhelmed, but maybe feel a little bit overwhelmed
+
+103
+00:09:55,566 --> 00:10:02,325
+只是因为我不想让事情变得更简单，所以正因为如此
+just because I don't want to like make this out to be actually more simple than it is, so because of that yeah
+
+104
+00:10:02,325 --> 00:10:07,425
+就像我们可能不得不说的那样，你们知道仅仅用这些实现延迟渲染器没有什么意义
+like we might have to say, well you know what it doesn't make sense to have a deferred renderer implemented with just these
+
+105
+00:10:07,625 --> 00:10:12,975
+就像平台和接口不可知原语一样，那可能没有任何意义，那完全没问题
+like platform and api agnostic primitives, that might not make any sense, and that's totally fine
+
+106
+00:10:12,975 --> 00:10:20,875
+因为接下来我们要做的是将代码的这一部分移动到渲染接口区域，现在的缺点是
+because then what we'll do is we'll move that part of the code into the render api zone, now the downside the drop that
+
+107
+00:10:20,875 --> 00:10:26,683
+通常情况下，当你们做出决策时，事情会变得更有效率，但你们突然有了更多的代码
+usually what happens when you make that decision is things get more efficient, but you suddenly have more code
+
+108
+00:10:27,133 --> 00:10:32,571
+因为突然之间，任何明显移动到渲染接口区域的内容都需要按照接口实现
+because suddenly anything you move obviously into the render api zone needs to be implemented per api
+
+109
+00:10:32,866 --> 00:10:38,725
+因此，我们突然需要为Vulcan的OpenGL提供延迟渲染或任何实现
+so we need to suddenly have a deferred rendering or whatever implementation for OpenGL for Vulcan
+
+110
+00:10:38,725 --> 00:10:47,225
+从我们实际选择支持的任何接口（我们有点想避免），显然我们真正想做的是
+from whatever apis we actually choose to support, which we kind of want to avoid, obviously what we actually want to do is
+
+111
+00:10:47,225 --> 00:10:54,550
+尝试在平台和接口的代码部分中使用尽可能多的代码
+try and have as much code as possible in that platform and api agnostic kind of section of our code
+
+112
+00:10:54,550 --> 00:10:59,200
+因为那意味着我们不必每次都有单独的实现
+because that means that we don't have to have a separate implementation every time we want to do that
+
+113
+00:10:59,675 --> 00:11:02,800
+一般来说，我们之所以有这个，这似乎是一个愚蠢的问题
+the reason we have this line in general, this might seem like a silly question
+
+114
+00:11:02,800 --> 00:11:07,150
+但我知道有些人可能有点困惑我们之所以有这个界线是因为
+but I know some people might be a little bit confused the reason why we have this line is because
+
+115
+00:11:07,150 --> 00:11:14,375
+再次回想一下渲染三角形，我们是否希望每个接口编写四次或五次代码
+again think back to rendering a triangle, do we want to write code four or five times per api
+
+116
+00:11:14,375 --> 00:11:18,900
+如果我们有DirectX12，如果我们有Vulcan，如果我们有OpenGL，如果我们有Metal
+if we have like DirectX12, if we have Vulcan, if we have OpenGL, if we have Metal
+
+117
+00:11:18,900 --> 00:11:28,825
+不管我们想写什么代码来为每个接口呈现一个三角形，不，我们想做的是创建所有这些图元
+whatever do we want to write code to render a triangle for each api, no, what we want to do is create all these primitives
+
+118
+00:11:29,133 --> 00:11:34,199
+然后，正如我所描述的，我们将在文本显示中创建顶点缓冲区和索引缓冲区
+and then as I kind of described, you know, we'll create a vertex buffer and an index buffer in a text show
+
+119
+00:11:34,533 --> 00:11:38,125
+你们知道的，关于着色器，无论需要什么，我们都会创建它
+you know shader whatever we need, we create that
+
+120
+00:11:38,125 --> 00:11:44,359
+然后就像绘制三角形的代码一样，Hazel很容易处理，对吧
+and then like the the code to draw a triangle is just easily handled by Hazel, right
+
+121
+00:11:44,600 --> 00:11:48,850
+然后通过那种方式进入所有这些接口，因此我们只需要编写一次代码
+and then that kind of branches off into all those api, so that we really only need to write that code once
+
+122
+00:11:48,850 --> 00:11:52,075
+我们想渲染一个三角形，这是渲染三角形的代码，我们只写一次
+we want to render a triangle, this is the code to render a triangle, we've write at once
+
+123
+00:11:52,400 --> 00:11:58,175
+然后它就像你们知道的，越来越底层时，就会访问到指定接口
+and then it kind of you know will eventually lower lower and low level as it kind of goes down into the api
+
+124
+00:11:58,500 --> 00:12:04,416
+你们知道的，它最终会使用OpenGL或DirectX12等任何渲染接口方式
+it will eventually hit, you know, whatever render api way using such as OpenGL or DirectX12
+
+125
+00:12:04,733 --> 00:12:11,125
+不管怎样，让我们回到渲染器这件事上来，就像场景，对吧，就像个场景管理器
+anyway let's get back into this renderer thing, so things like a scene graph, right, like a scene manager
+
+126
+00:12:11,125 --> 00:12:18,650
+那不是你们通常会用到的，不想在那种情况下写原始OpenGL代码，比如在那种系统中
+that's not something you usually have in, you don't want to write raw OpenGL code kind of in that, like for that kind of system
+
+127
+00:12:18,750 --> 00:12:26,200
+这是你们知道的，它与实际的渲染接口没有任何关系，你们知道，比如排序
+it's something that is you know, it doesn't have anything to do with actual rendering apis, you know, you have like sorting
+
+128
+00:12:26,200 --> 00:12:33,250
+是吧，决定渲染什么，在设置其他内容后可能需要渲染某些内容，因为混合之类的事情
+right, deciding what to render, when some things might need to be rendered after setting other things, because of things like blending
+
+129
+00:12:33,775 --> 00:12:40,575
+但我们通常也希望能够将使用相同材质、相同着色器或相同纹理的对象排序在一起
+but also we typically want to be able to sort things that use the same material or the same shader or the same texture, kind of together
+
+130
+00:12:40,766 --> 00:12:47,400
+所以我们不需要像剔除那样频繁地切换状态，对吧，那么什么适合我们的投影矩阵呢
+so that we don't need to switch states as often things like culling, right, so what fits into our frustum
+
+131
+00:12:47,400 --> 00:12:53,650
+也许还有某种遮挡剔除，这些系统同样与特定的渲染接口无关
+maybe some kind of occlusion culling as well, those systems, again, have nothing to do with specific render apis
+
+132
+00:12:53,650 --> 00:13:01,075
+我们必须为每一个渲染接口执行这些操作，所以为什么不让渲染器处理那些呢
+we have to do them for every single render api, so why not just have, like why does, why not just have the renderer handle that, right
+
+133
+00:13:01,500 --> 00:13:07,199
+材质，因此材质与着色器紧密相关，材质本质上是什么
+materials, so materials are very closely tied with shaders, essentially what a material is
+
+134
+00:13:07,200 --> 00:13:11,050
+只是一个着色器加上一些统一的数据，从那里
+is just a shader plus some uniform data, and from there
+
+135
+00:13:11,050 --> 00:13:14,650
+我们可能会有一些类似于材质实例的东西，它们是基于材质的
+we'll probably have things like material instances, which are based on materials
+
+136
+00:13:14,650 --> 00:13:21,366
+那通常是大多数渲染器和引擎的运行方式，但那也是在这里实现的
+that's typically how most renderers and most engines kind of work, but again that's something that is implemented here
+
+137
+00:13:21,366 --> 00:13:25,875
+所以有客户端统一存储，然后有一个着色器链接，以及所有那些东西
+so having like client side uniform storage, and then a shader linked, and all of that stuff
+
+138
+00:13:25,875 --> 00:13:33,400
+那适用于每个渲染接口，没有什么不同，而纹理或顶点缓冲区之类的东西
+that's that applies to every single render api, that's not different, whereas something like a texture or a vertex buffer
+
+139
+00:13:33,700 --> 00:13:38,050
+你们知道每个渲染接口可能会有所不同，这就是为什么我们需要在这里而不是在这里
+you know might be different per render api, which is why we needed to be here and not here
+
+140
+00:13:38,150 --> 00:13:46,625
+对吧，希望这有意义，至于LOD，对吧，层次细节，所以我们的测量质量较低，测量量较小
+right, hopefully this is making some sence, lod, right, level of detail, so measures that we have lower quality and kind of smaller measures
+
+141
+00:13:46,625 --> 00:13:51,975
+本质上，在多边形计数和三角形计数方面，我们决定渲染一些东西
+essentially in terms of polygon count and triangle count the further away, we decide to render something
+
+142
+00:13:51,975 --> 00:13:55,075
+因此，我们不会像那样渲染那么多三角形系统
+so that we don't render as many triangles systems like that
+
+143
+00:13:55,075 --> 00:13:58,975
+也不会渲染实际渲染接口动画中的三角形系统
+not something that belongs in the actual render api animation as well
+
+144
+00:13:59,333 --> 00:14:08,325
+它有点像客户端渲染器，它的实现不需要任何实际的渲染接口支持相机，对吧
+it's purely kind of like a client side renderer, implementation of that doesn't need any actual render api support cameras, right
+
+145
+00:14:08,325 --> 00:14:12,375
+再说一次，你们知道的，我们需要比如相机可能被绑定到帧缓冲上
+again something that is just you know we need to like maybe a camera might be tied to a frame buff
+
+146
+00:14:12,375 --> 00:14:15,600
+或者相机可能正在渲染到渲染目标，对吧
+or maybe a camera might be rendering to a render target, right
+
+147
+00:14:15,600 --> 00:14:20,150
+在渲染器端实现的这种东西不需要是其中的一部分
+ that kind of stuff implemented on the renderer side doesn't need to be part of that
+
+148
+00:14:20,500 --> 00:14:23,350
+我的意思是，实际上渲染通道几乎也属于这里
+I mean in fact render passes almost belong here as well
+
+149
+00:14:23,350 --> 00:14:26,075
+之所以把它们放在这，是因为它们可以被视为图元
+the reason I put them here is because they can be seen as a primitive
+
+150
+00:14:26,675 --> 00:14:32,300
+它们在不同的渲染接口中实现的方式不同，但一般来说，你们知道我们是否想要控制
+and they are implemented differently in different render apis, but in general, you know if we want to control
+
+151
+00:14:32,300 --> 00:14:38,866
+就像我们想再次开始或结束渲染通道一样，在实际的渲染器中也会有一个接口，即视觉效果
+like if we want to begin or end a render pass again, there will be an api for that in the actual renderer as well, visual effects
+
+152
+00:14:39,225 --> 00:14:46,500
+所以像粒子系统这样的东西也是，现在这些东西产生了这些东西，不要误会我
+so things like particle systems, that stuff as well is, now that stuff made this stuff don't get me wrong
+
+153
+00:14:46,500 --> 00:14:53,175
+将需要渲染接口的支持我在这里没有列出的东西，例如批处理或实例，对吧
+will require support from render api things I didn't list here, things like batching for example or Instancing, right
+
+154
+00:14:53,325 --> 00:14:59,925
+批处理通常可以由渲染端控制，而实例化需要渲染接口支持
+batching is something that you usually can be controlled by the render side, whereas instancing requires render api support
+
+155
+00:15:00,229 --> 00:15:03,975
+所以，诸如此类的事情突然间决定要批量处理一些东西，但你们想使用实例
+so things like that suddenly you decide you want to batch something, but you want to use instancing
+
+156
+00:15:03,975 --> 00:15:10,133
+在这种情况下，那需要在这里的接口中设置实例，但可以从渲染器中使用
+in this case, that requires instancing to be kind of set up in the api here, but then can be used from the renderer
+
+157
+00:15:10,581 --> 00:15:17,199
+所以那也是需要考虑的，至于PostFX，我指的是一个后期效果系统，对吧
+so that's something to think about as well, PostFX, and by that I mean specifically a post effects system, right
+
+158
+00:15:17,200 --> 00:15:22,400
+所以实际上，如果你们分解了后期效果是什么，我们将场景渲染到帧缓冲区
+so actually if you break down what post effects is, we render our scene to a frame buffer
+
+159
+00:15:22,675 --> 00:15:31,600
+然后我们使用个不同的着色器在屏幕上渲染四边形，使用顶点缓冲区，这里应用了PostFX
+and then we use a different shader to just render a quad on the screen, using a vertex buffer with kind of our PostFX applied here
+
+160
+00:15:31,933 --> 00:15:37,550
+但你们也知道，对于PostFX，通常我们可能需要额外的数据，而这些数据不是立即需要的
+but also you know, for PostFX, it's common that we might need additional data that we wouldn't need immediately
+
+161
+00:15:37,566 --> 00:15:42,775
+例如，一个非常简单的PostFX可能类似于颜色校正，那很容易，因为我们该怎么做
+so for example, a very simple PostFX might be something like a color correction, that's easy, because well what do we do
+
+162
+00:15:42,775 --> 00:15:49,415
+将场景渲染到帧缓冲区，然后再次渲染该帧缓冲区，在另一个四边形上使用不同的着色器
+we render our scene to a frame buffer, and then we render that frame buffer again, using a different shader onto another quad
+
+163
+00:15:49,600 --> 00:15:53,425
+然后在屏幕上显示，然后着色器可能会进行颜色校正
+and then display that on our screen, and then that shader might do the color correction
+
+164
+00:15:54,150 --> 00:15:56,975
+然而，如果我们想做一些像屏幕空间环境光遮蔽之类的效果
+whereas if we want to do something like screen space ambient occlusion
+
+165
+00:15:57,329 --> 00:16:00,800
+对吧，效果不是很好，但我们还是继续吧
+right, not a great effect, but let's just go with it
+
+166
+00:16:01,733 --> 00:16:08,100
+我们需要原始渲染通道中的一些其他数据，例如位置法线数据，对吧
+we need some other data from our original render pass, such as like positional normal data, right
+
+167
+00:16:08,100 --> 00:16:12,400
+我们希望这些法线像一个单独的缓冲区一样进入，这样就可以在PostFX着色器中读取它们
+we want those normals into like a separate buffer, so we can then read them in our PostFX shader
+
+168
+00:16:12,400 --> 00:16:20,075
+因为我们需要在运行PostFX之前不需要的额外信息，所以诸如此类的事情，对吧
+because we need that extra information that we didn't need before we ran that PostFX, so things like that, right
+
+169
+00:16:20,075 --> 00:16:25,500
+所以它是一种结合在一起的方式，具体来说，我指的是PostFX系统
+so it's kind of it does tie in together, as specifically I do mean as PostFX system
+
+170
+00:16:25,800 --> 00:16:28,066
+它可能处理那些渲染通道的方式
+the way that it might handle those render passes
+
+171
+00:16:28,066 --> 00:16:32,850
+我们需要的这些额外数据通常是由渲染器实现的
+and those additional data that we need is something that typically would be implemented by the renderer
+
+172
+00:16:33,300 --> 00:16:42,099
+因为这个渲染使用我们创建的接口，所以它不需要专门使用OpenGL
+because this render uses this api that we've created, just so that it doesn't need to use OpenGL specifically
+
+173
+00:16:42,099 --> 00:16:48,100
+或者任何实际的渲染接口，我希望你们知道我说的是哪种渲染接口
+or any actual render api specifically, I hope you guys know which render api I'm talking about
+
+174
+00:16:48,100 --> 00:16:53,775
+当我说渲染接口时，有时我在谈论这个列表，有时我在谈论OpenGL Vulcan之类的东西
+when I just say render api, sometimes I'm talking about this list, sometimes I'm talking about OpenGL Vulcan that kind of thing
+
+175
+00:16:54,533 --> 00:16:59,300
+但希望它能让其他事情变得有意义，所以我想，你们知道，就像
+but hopefully it is to make sense other things, so I think, you know like
+
+176
+00:16:59,300 --> 00:17:04,248
+我猜随机技术，比如反射，环境光遮蔽，你们知道，用类似反射探测器的方式设置反射
+I guess random techniques like reflections, ambient occlusion, you know setting up reflections in terms of like reflection probes
+
+177
+00:17:04,866 --> 00:17:11,933
+你们知道渲染是为了比如立方体贴图，比如环境光遮蔽，无论是PostFX还是更高级的效果
+you know rendering to like cube maps doing things like ambient occlusion, whether that being a PostFX or like kind of more advanced
+
+178
+00:17:11,933 --> 00:17:16,225
+你们知道HBAO(水平环境光遮蔽)或其他我们可用的渲染技术
+you know HBAO or whatever other other kind of render techniques we have available to us
+
+179
+00:17:17,500 --> 00:17:21,150
+那些东西通常在渲染器中实现，那是我们在那里做的事情
+those things are typically implemented in the renderer, that's something that we do there 
+
+180
+00:17:21,150 --> 00:17:25,775
+因为我们不会，比如有时我们可能需要额外的接口支持，但是如果你们考虑一下
+because we don't like sometimes we might need extra api support, but if you think about it
+
+181
+00:17:25,775 --> 00:17:31,900
+通常，我们应该能够使这个接口非常强大，不需要突然实现
+usually we should be able to get this api pretty strong to the point, where we don't need to suddenly implement
+
+182
+00:17:32,050 --> 00:17:41,200
+就像每次我们想做的时候实际渲染接口中更细粒度的东西一样，就像一种不同的技术，对吧
+like finer grain things inside the actual render api every time we want to do, like a different technique, right
+
+183
+00:17:42,000 --> 00:17:49,575
+现在我想说的是，这次测试之所以变得困难，是因为这看起来
+now I do want to say though that the reason this test become difficult is because as nice as this might seem
+
+184
+00:17:49,575 --> 00:17:52,825
+就像我们可以有一个渲染接口，对吧，那看起来很棒
+like we can just have a render api, right, that seems great
+
+185
+00:17:52,825 --> 00:17:56,666
+就像我们有一个渲染接口，我们让它非常强大，它可以处理所有事情
+like we have a render api, we make it really strong, it handles everything
+
+186
+00:17:56,866 --> 00:18:00,475
+突然，每当我想在渲染器中执行任何操作时，我都必须编写一次
+suddenly every time I wanna do anything in my renderer, I have to write it once
+
+187
+00:18:00,475 --> 00:18:06,150
+它只会在我们支持的每个渲染器接口上运行，这是一个伟大的梦想，但在实践中
+and it'll just work on every renderer ip how we support, that's a great dream to have, but in practice
+
+188
+00:18:06,400 --> 00:18:13,925
+那通常不是一种非常优化的方式，原因是如果你们尝试开发一个通用渲染接口
+that's usually not a very optimized way of doing things, the reason is that if you try and make a generalist render api
+
+189
+00:18:13,925 --> 00:18:18,422
+你们有同样的问题，就像你们尝试做一个通用游戏引擎一样，对吧
+you have the same problems as if you try and make a generalist game engine, right
+
+190
+00:18:18,475 --> 00:18:23,800
+这是一个可以用于任何游戏的游戏引擎，你们可以想到，你们可以使用这个游戏引擎
+it's a game engine that can be used for any game, you can think of, you can make with this game engine
+
+191
+00:18:24,333 --> 00:18:32,038
+但是如果我为我的特定游戏编写特定引擎，那会更好吗？不，不会更好
+but is that gonna be better than if I have a, if I write my own specific engine for my specific game, no, it's not gonna be better
+
+192
+00:18:32,225 --> 00:18:40,900
+这就是开始变得危险的地方，因为理想情况下，如果你们学习了高级的技术
+which is where this starts to become dangerous, because ideally speaking, like if you get into advanced techniques
+
+193
+00:18:40,900 --> 00:18:45,975
+那确实需要更高的性能，你们是否能够编写一个通用接口并使用它
+that actually do require more performance, are you going to be able to write a generalist api, and use that
+
+194
+00:18:45,975 --> 00:18:52,799
+如果你们直接使用原始DirectX12，则可以获得与你们相同的性能级别和优化效果
+and receive the same level of performance, and just optimization as you are, if you just use raw DirectX12 directly
+
+195
+00:18:53,300 --> 00:19:01,766
+当然不是，对吧，所以你们必须非常小心，我们会遇到这样的事情
+of course not, right, so you have to really be careful with this, and we'll kind of as we go along, we'll kind of run into stuff like this
+
+196
+00:19:01,766 --> 00:19:05,933
+并且可能会进行一些认真的讨论，甚至可能喜欢以一种方式实施一些事情，然后很好地
+and have probably some serious discussions, and may even like implement things one way and then be like well
+
+197
+00:19:05,933 --> 00:19:11,400
+事实上，这并没有我周末做的其他测试那么好，结果更好，我们可能会重新开始
+actually this isn't as good as other tests I did over the weekend, and it turned out to be better, and we might go back on that
+
+198
+00:19:11,400 --> 00:19:16,325
+我不知道，总的来说应该很有趣，但我只是想提醒你们，不要有一些潜在的问题
+and I don't know, generally should be pretty fun, but I'm just kind of warning you guys off some potential problems
+
+199
+00:19:16,325 --> 00:19:22,950
+那将不可避免地从这样的事情中产生，好吧，记住这一点，我没有提到的一件事
+that will inevitably arise from stuff like this, okay, so with that in mind, one of the things that I didn't mention
+
+200
+00:19:23,600 --> 00:19:28,775
+我们还必须设计一个渲染指令队列，对吧
+which we will also have to pretty much design is essentially a render command queue, right
+
+201
+00:19:28,775 --> 00:19:35,733
+这种联系类似于告诉渲染接口正确操作的渲染器和指令之间的联系，对吧，渲染指令队列
+and this kind of ties in like between the renderer telling the render api what to do right and a render command queue
+
+202
+00:19:35,733 --> 00:19:40,650
+基本上是一种将每个渲染指令编码为一个大缓冲区的方法
+is just basically a way for us to encode every single render command into like a big buffer
+
+203
+00:19:41,100 --> 00:19:46,950
+所以每帧一次，当我们决定从本质上渲染所有内容时，我们会通过那个指令队列
+so that once per frame when we actually decide to like render everything essentially, we go through that command queue
+
+204
+00:19:46,950 --> 00:19:53,600
+我们执行所有这些命令，通常数据都是在线的，如果需要，我们可以在不同的线程上运行它
+and we execute all those commands, and typically the data is all in line, we can run it on a different thread if we want to
+
+205
+00:19:53,600 --> 00:19:59,400
+与专用的渲染线程不同，因此当它在某种程度上通过渲染队列时，我们可以做其他事情
+unlike a dedicated render thread, so that while it's kind of going through that render queue, we could be doing other stuff
+
+206
+00:19:59,400 --> 00:20:05,450
+比如为下一帧提交更多渲染指令，或者在主线程上执行游戏逻辑或接口，或者其他任何操作
+like submitting more render commands for the next frame, or doing game logic or doing ai, or anything else on our kind of main thread
+
+207
+00:20:06,266 --> 00:20:08,500
+所以那就是渲染指令队列，你们知道的
+so that's a render command queue, you know
+
+208
+00:20:08,500 --> 00:20:12,750
+像Vulcan这样的接口有指令队列，对吧，那就是你们在Vulcan中所做的
+an api like Vulcan has command queue, right, that's what you do in Vulcan
+
+209
+00:20:12,750 --> 00:20:19,650
+你们有很多指令，比如，你们知道绑定这个，然后绘制这个三角形，然后你们知道
+you kind of you have a bunch of commands like for example, you know bind this and then draw this triangle, and then you know
+
+210
+00:20:19,866 --> 00:20:27,266
+这是我的场景状态，这是视口状态，你们要做的是把所有这些都放到一个队列中
+this is my scenes state, this is my viewport state, and what you do is you put all of that into a like into a queue essentially
+
+211
+00:20:27,266 --> 00:20:32,266
+最后你们告诉Vulcan，我要你们实际给出那个队列，对吧，我要你实际通过那个队列
+and then eventually you tell Vulcan, I want you to actually present that queue, right, I want you to actually go through that queue
+
+212
+00:20:32,266 --> 00:20:37,562
+然后进行渲染，那么Vulcan就有那个，但OpenGL没有，所以我们需要为OpenGL创建
+and then do that rendering thing,  so Vulcan has that, but OpenGL doesn't, so we need to create that for OpenGL
+
+213
+00:20:38,733 --> 00:20:44,900
+一般来说，如果你们可以选择比如，好了，我想实现三个接口，我应该如何制作它们
+and just in general if you have like a choice of like okay, I want to implement three apis, what do I make them
+
+214
+00:20:44,900 --> 00:20:47,600
+就像通常的选择一样，我会让它们像DirectX一样
+like usually the choices I'll make them like DirectX
+
+215
+00:20:47,775 --> 00:20:52,275
+对吧，因为DirectX对我来说至少是最明智的实际接口，对吧
+right, because DirectX like for me at least seems to be the most sensible actual api, right
+
+216
+00:20:52,275 --> 00:20:57,933
+所以我们可能会遵循这种设计，但因为我喜欢做新东西，因为Hazel对我来说是一个新项目
+so we might follow that kind of design, but because I like making new things, and because Hazel is a new project for me
+
+217
+00:20:57,933 --> 00:21:00,429
+我可以试着做我自己的东西，然后我们看看会发生什么
+I might just try and make my own thing, and we'll see what happens
+
+218
+00:21:00,975 --> 00:21:03,525
+并且那就是我们作为一个社区一起工作的地方
+and that's where we as a community we work together
+
+219
+00:21:03,866 --> 00:21:10,450
+我们试着做一些新的东西，很酷的东西，所以只需要给你们一些内在的东西
+and we try and build something, new as something cool, so just giving you guys a little bit of inside there
+
+220
+00:21:11,000 --> 00:21:15,675
+那么我们从哪里开始谈很好，但我们需要真正开始这件事，那么要怎么做呢
+so where do we start talking is great, but we need to actually start this thing, so how are we going to do that
+
+221
+00:21:16,566 --> 00:21:20,700
+首先我们要从OpenGL开始，现在我要从OpenGL开始
+well first of all we're gonna start with OpenGL, now would I start with OpenGL
+
+222
+00:21:20,700 --> 00:21:25,100
+如果我只是为了好玩而制作自己的引擎，而没有用它制作视频系列，可能不会
+if I was just making my own engine like for fun without making a video series out of it, probably not
+
+223
+00:21:25,200 --> 00:21:28,750
+老实说，可能根本不支持OpenGL，直接从Vulcan开始
+probably wouldn't support OpenGL at all, to be honest, just start with like Vulcan maybe
+
+224
+00:21:29,600 --> 00:21:36,942
+但问题是OpenGL是最简单的接口，需要从外部进行更强大的设计才能使其真正发挥作用
+but the problem is OpenGL is the simplest and the easiest api, requires a bit of a stronger design from outside to make it actually good
+
+225
+00:21:37,300 --> 00:21:45,000
+但这是最简单的接口，对吧，我们需要那个，因为这是一个游戏引擎系列，图形系列
+but it's the simplest and easiest thing, right, we want that because this is a game engine series, an unnaturally graphics series
+
+226
+00:21:45,000 --> 00:21:49,475
+很明显，我对图形感兴趣，我喜欢图形，因为老实说，这是我最喜欢的部分
+I am obviously having interested in graphics and I love graphics, since my favorite part of this whole thing to be honest
+
+227
+00:21:49,825 --> 00:21:57,525
+但我承认这是一个游戏引擎，我们有两个目标，首先，我们想尽快在屏幕上看到东西
+but I do recognize this is a game engine, we have kind of two goals, first of all, we want to see stuff on the screen as soon as possible
+
+228
+00:21:57,525 --> 00:22:02,450
+并尽快在屏幕上看到美丽的东西，因为这样才能真正看到结果
+and see beautiful things on the screen as soon as possible, because that's going to be great to actually see results
+
+229
+00:22:02,700 --> 00:22:08,450
+很明显，你们中的很多人都想要结果，因为这是一个YouTube系列，在这种情况下必须很好
+and obviously a lot of you guys actually want results, because this is a YouTube series, and it has to be fine in that case
+
+230
+00:22:08,450 --> 00:22:13,375
+而且它必须有市场，从我的角度来看，我也必须能够用
+and it has to be marketable, from my point of view as well, I have to be able to make pretty thumbnails with like
+
+231
+00:22:13,375 --> 00:22:19,800
+嘿，看看Hazel引擎，看起来很棒，即使我选择了像Vulcan这样的东西，架构可能会很神奇
+hey, look Hazel engine, looks great, even though if I chose something like Vulcan, the architecture might be amazing
+
+232
+00:22:19,901 --> 00:22:25,900
+我们可能已经做了大量的代码工作，但有什么好看的东西要展示吗？没有，所以有这一面
+we might have done a lot of code work, but do we have anything pretty to show not really, so there's that side
+
+233
+00:22:26,200 --> 00:22:31,766
+另一方面，我们不想花两年的时间来实现渲染接口，我们想在运行中有所收获
+and the other side is we don't want to spend two years implementing rendering apis, we want to get something up on running
+
+234
+00:22:31,766 --> 00:22:38,350
+然后转到其他场景，如场景系统或级别编辑，如工具集或序列化
+and then move on to something else like a scene like a scene system or like a level edited like tool set or like sterilization and
+
+235
+00:22:38,500 --> 00:22:42,600
+像那样的数据，或者实际的逻辑和脚本，或者像一个空的组件系统
+like data like that, or actual logic and scripting, or like an empty component system
+
+236
+00:22:42,600 --> 00:22:44,375
+我们需要处理这么多其他系统
+we have so many other systems we need to deal with
+
+237
+00:22:44,733 --> 00:22:49,300
+因此，使用我们的OpenGL并不理想，但它可以完成工作
+so using our OpenGL is not ideal, but it will get the job done
+
+238
+00:22:49,300 --> 00:22:52,625
+对吧，不是以最好的方式，也不是最快的方式
+right, not in the best way possible, not in the fastest way possible
+
+239
+00:22:52,625 --> 00:22:58,100
+但它会完成工作，因此我们的第一步是构建渲染接口部分
+but it will get the job done, so our step one with that is to build that render api part
+
+240
+00:22:58,100 --> 00:23:00,550
+所以当我谈到这一点以及所有这些事情时
+so when I talked about this and all of these things
+
+241
+00:23:00,550 --> 00:23:06,525
+那就是我们开始的地方，构建那些东西，一旦完成了，就开始构建另一个，那就是渲染器
+that's what we begin with, we build that stuff, once we've done that, we build the other side which is the renderer
+
+242
+00:23:06,733 --> 00:23:10,800
+当然，这些是有重叠的，它们不是相互依赖的，对吧
+of course these do have overlap, they're not dependent on each other, right
+
+243
+00:23:10,800 --> 00:23:14,825
+例如，我们不需要在开始渲染器之前完成渲染接口
+so for example, we don't need the render api to be complete before we can begin the renderer
+
+244
+00:23:15,166 --> 00:23:18,575
+一旦我们在渲染接口中有足够的内容来绘制三角形，猜猜我们将要做什么
+once we have enough in the render api to like draw a triangle, guess what we're going to do
+
+245
+00:23:18,800 --> 00:23:21,300
+我们将编写一个渲染器，可以绘制三角形
+we're going to write a renderer that can draw a triangle
+
+246
+00:23:22,075 --> 00:23:25,850
+好了，这样我们就可以开始运行这些东西，然后就对其进行迭代
+okay, so that we get that stuff up and running, and then we'll iterate over it
+
+247
+00:23:25,850 --> 00:23:27,925
+我们会根据需要添加更多的东西，你们知道
+and we'll add more things as we need them, you know
+
+248
+00:23:27,925 --> 00:23:30,800
+突然之间，我们希望能够渲染到纹理或类似的东西
+suddenly, we want to be able to render to a texture or something like that
+
+249
+00:23:30,966 --> 00:23:35,875
+我们将在纹理目标、纹理渲染目标接口中添加帧缓冲区，好吧
+we'll add the frame buffer in the texture target, texture render target api at that point, okay
+
+250
+00:23:36,627 --> 00:23:39,675
+在那之后，我们有了一个基础来渲染我们想要的任何东西
+after that we have a base to render anything we want
+
+251
+00:23:39,775 --> 00:23:43,150
+对吧，当然，通过构建渲染器，我说的是
+right, and of course by build renderer I am talking about things like
+
+252
+00:23:43,150 --> 00:23:49,825
+我们需要建立一个材质系统，也许像着色器的阴影一样，那将基本上包括在第二步中
+we need to build a material system, maybe like a shader of paza stuff like that, that will be kind of included in step two essentially
+
+253
+00:23:50,900 --> 00:23:53,450
+但在那之后，我们可以渲染我们想要的任何东西，你们知道我们想要像
+but after that we can render anything we want, you know we want to render like
+
+254
+00:23:53,766 --> 00:23:59,322
+一些很酷的东西，比如pbr材料，3d模型等等，我们可以，我们应该能够处理
+some cool like pbr materials and like 3d models and all that kind of stuff, we can, we should be able to
+
+255
+00:24:00,266 --> 00:24:02,475
+所以，一旦我们在OpenGL中完成了这项工作
+so once we can do that once in OpenGL
+
+256
+00:24:02,475 --> 00:24:05,530
+我就可以像一个完整的3D场景一样渲染，看起来很美
+I can render like a full 3D scene, that looks beautiful
+
+257
+00:24:05,775 --> 00:24:13,025
+好吧，可能还有PostFX和所有这些东西，那就是我们现在要实现其他接口的时候了
+right, with probably PostFX and all of that stuff, that's when we're going to implement other apis now this is
+
+258
+00:24:13,425 --> 00:24:17,566
+我写这些是为了做决定，因为正如我所说的，我们可能想做一些像场景这样的事情
+and I did write to be decided, because as I said, we probably want to do things like a scene
+
+259
+00:24:17,566 --> 00:24:21,250
+你们知道场景序列化，我在组件系统中提到的所有其他东西
+you know scene level letter to sterilization, all that other stuff I mentioned in component system
+
+260
+00:24:22,500 --> 00:24:29,333
+在我们开始深入其他接口之前，编写所有我们可能想做的事情，但这是为你们准备的系列
+scripting all that stuff we probably want to do before we start diving into other apis, but this is a series for you guys
+
+261
+00:24:29,333 --> 00:24:33,900
+如果你们决定了，你们知道我们有足够的东西，让我们实现Vulcan，我真的很想了解这一点
+if you guys decide that, you know we've got enough stuff, let's just implement Vulcan, and I really want to learn about that
+
+262
+00:24:34,025 --> 00:24:38,250
+如果大多数人决定，我就会去实现那个，对吧，老实说，我很乐意做那个
+if the majority of people decide that, that I'm gonna do that, right, I would love to do that to be honest
+
+263
+00:24:39,175 --> 00:24:44,475
+但我只是在想大多数人想要什么，很明显，我想让这个系列成为你们喜欢的东西
+but I'm just thinking about what the majority of people want, and obviously trying to make this series something that you guys enjoy
+
+264
+00:24:44,750 --> 00:24:49,850
+还有一些东西比如，特别是比如赞助人真正想看到的东西，但不仅仅是赞助人
+and something that like, especially like the patrons actually want to see, but not just patrons
+
+265
+00:24:49,850 --> 00:24:56,150
+别那么想，我只关心那些在经济上支持我的人，显然我是关心我所有的观众的
+don't think that, I'm just only care about people who support me financially, obviously I care about all of my viewers
+
+266
+00:24:56,150 --> 00:25:03,000
+但我想，支持我的好处之一当然是，你可以把这部系列更多地引导到你们真正想要的地方
+but of course one of the perks of supporting me, I guess, is that you get to steer this series a little bit more into where you actually want
+
+267
+00:25:03,933 --> 00:25:10,075
+但是，所以DirectX11和12，Metal之类的东西，我最终会得到的
+but yeah so DirectX 11 and 12, Metal that kind of stuff that I will get to that eventually
+
+268
+00:25:10,350 --> 00:25:12,400
+但这是我首先想要的东西，对吧
+but this is kind of the stuff I want first, right
+
+269
+00:25:12,700 --> 00:25:17,075
+我们要从最简单的接口开始，我们要做，我们要做一些看起来很漂亮的东西
+we're gonna start with the simplest api possible, and we're gonna make, we're gonna make something that looks pretty
+
+270
+00:25:17,400 --> 00:25:22,600
+如果我们有时间和资源做类似的事情，我们可以继续做其他事情
+and then after we have that, we can move on to other stuff, if we kind of have the time and resources to do something like that
+
+271
+00:25:22,600 --> 00:25:25,144
+好了，就这么多了，谢谢你们观看，希望你们喜欢这个视频
+okay, so that's pretty much it, thanks for watching guys, hope you enjoy this video
+
+272
+00:25:25,144 --> 00:25:26,775
+如果你们喜欢的话，就为它点赞吧
+if you did, and hit that like button
+
+273
+00:25:26,775 --> 00:25:30,200
+你们还可以帮助支持patreon上的系列，正如我在整个视频中提到的那样
+you can also help support the series on patreon as I've mentioned throughout this video
+
+274
+00:25:31,333 --> 00:25:35,375
+我想说的是，就像这是一个巨大的旅程，这将需要我们一段时间
+I do want to say that like this is a big journey, this is something that's gonna take us a while
+
+275
+00:25:36,725 --> 00:25:45,125
+OpenGL非常简单，在很多情况下，它也是，因为它非常简单，在很多情况下它也会很烦人
+OpenGL very vs, it's very simple, in a lot of cases, it's also, because it's so simple, it can also be annoying in a lot of cases
+
+276
+00:25:46,300 --> 00:25:52,875
+但我想我们会过得很轻松，所以我不太担心那类事情的实际细节
+but I think we're gonna have a generally easy time with that, so I'm not too worried about the actual details about like about that kind of stuff
+
+277
+00:25:52,875 --> 00:25:57,875
+我们应该尽快启动并运行，我认为这是一个很好的机会
+we should get something up and running pretty quickly, I would think this is a good opportunity
+
+278
+00:25:57,875 --> 00:26:02,700
+要查看我的OpenGL系列，如果你们还没有，这里有一个大约20个播放列表，我想还有视频
+to check out my OpenGL series, if you haven't already, there's a playlist of like 20, I think also videos
+
+279
+00:26:03,200 --> 00:26:08,575
+那将涵盖很多这些图元，我想我不知道，是的，我没有进入像帧缓冲区这样的高级领域
+that will kind of cover a lot of these primitives, I don't think I got it, yeah I didn't get into like advanced things like frame buffers
+
+280
+00:26:08,975 --> 00:26:13,975
+不，那是特别高级的，但我没有做到那个，我不认为或者你们知道渲染一个目标
+not, that's particularly advanced, but I didn't get to things like that, I didn't think or you know render a target
+
+281
+00:26:13,975 --> 00:26:18,300
+所以我喜欢很多这样的东西，我可能最终会在那个系列中
+so I just like a lot of that kind of stuff, I probably will eventually in that series
+
+282
+00:26:18,300 --> 00:26:23,975
+我想我要做的是展示一个实现，比如，嘿，你们知道我们需要在Hazel中设置帧缓冲区类
+I think what I'll do is I'll show an implementation of like, hey, you know we need to riot frame buffer class in Hazel
+
+283
+00:26:24,150 --> 00:26:27,200
+让我们那样做吧，然后我将链接到OpenGL系列
+let's just do that, but then I'll link to an OpenGL series
+
+284
+00:26:27,200 --> 00:26:31,225
+我将制作一段关于帧缓冲区的视频，它实际上讨论了帧缓冲区在OpenGL中的运行方式
+video that I'll make about frame buffers where it actually talks about, how frame buffers work in OpenGL
+
+285
+00:26:31,800 --> 00:26:36,400
+所以我可能会，我可能会继续OpenGL系列的很多内容，因为我们在整个过程中都有所进展
+so I'll probably be, I'll probably resume the OpenGL series a lot, as we kind of move throughout this
+
+286
+00:26:37,400 --> 00:26:42,899
+下个周末，通常是我拍视频的时候，是我的单身派对，因为正如我在之前的视频中提到的
+now next weekend, which is usually when I make videos is my bachelor party, because as I mentioned in the previous video
+
+287
+00:26:42,899 --> 00:26:49,299
+我现在还不到一个月就要结婚了，所以我下周末不能拍视频了
+I'm getting married in less than a month now, so because of that, I'm not gonna be able to make a video next weekend
+
+288
+00:26:49,300 --> 00:26:51,000
+我希望你们能理解，我的意思是
+I hope you guys understand, I mean
+
+289
+00:26:51,000 --> 00:26:55,525
+如果你们知道我在这份全职工作和其他事情上试图平衡我的生活
+if you know trying to balance my life in this full time job and other stuff's going on
+
+290
+00:26:55,900 --> 00:27:01,566
+这只是我的脑袋在爆炸，所以正如我所提到的，这又是一个回去观看OpenGL系列的好时机
+it's just my head's exploding, so this is again as I mentioned, a good time to go back and watch that OpenGL series
+
+291
+00:27:01,566 --> 00:27:06,875
+甚至可以自己尝试实现一个渲染器，对吧，尝试找到我在设计中概述的那些东西
+and maybe even try and implement a renderer yourself, right, try and find those things that I've outlined in the design
+
+292
+00:27:06,966 --> 00:27:12,475
+然后使用你们创建的接口，这种特定于OpenGL的，或者更确切地说是与平台无关的
+and then with that api that you've created, this OpenGL specific or rather platform agnostic kind of
+
+293
+00:27:12,475 --> 00:27:18,225
+尝试然后使用该接口实际绘制三角形，那是一个非常好的起点，当然可以
+try and then use that api to actually draw a triangle, that's a really good place to start, of course you can
+
+294
+00:27:18,366 --> 00:27:24,225
+如果你们看OpenGL系列，就可以绘制一个三角形，所以那是我的家庭作业
+you will be able to draw a triangle, if you watch that OpenGL series, so that's kind of my homework
+
+295
+00:27:24,225 --> 00:27:31,000
+比如我想让你们做的，而我下周有点自吹自擂的习惯，然后我们会重新开始
+and my like what I want you guys to do, while I kind of have this habits brag next week, and then we'll just get back into it
+
+296
+00:27:31,400 --> 00:27:35,720
+老实说，我真的很期待，所以我希望你们喜欢这期视频，下期见
+and to be honest, I'm really looking forward to it, so I hope you guys enjoyed this video, and I'll see you next time, goodbye
+

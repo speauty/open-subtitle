@@ -1,0 +1,1420 @@
+1
+00:00:00,000 --> 00:00:03,400
+嘿，你们好吗，我是TheCherno，欢迎回到我的游戏引擎系列
+hey, what's up guys My name is TheCherno. Welcome back to my game engine series
+
+2
+00:00:03,400 --> 00:00:05,680
+那么上期我们看了一下重构所有东西的过程
+So last time we took a look at refactoring everything
+
+3
+00:00:05,680 --> 00:00:09,720
+将它从我们的Application类移到Sandbox中，这样我们就可以在我们的游戏应用中使用它了
+moving it from our application class into Sandbox. so that we could actually have it in our kind of game application
+
+4
+00:00:09,720 --> 00:00:17,960
+而不是所有人都在Hazel应用中将这些呈现代码和这些交互代码作为API的一部分
+rather than all have all of this rendering code and all this interaction code in our actual just Hazel application as part of the API
+
+5
+00:00:17,960 --> 00:00:23,240
+因为很奇怪，所以如果还没有看的话，一定要看看，那就是对上期视频的有趣的小描述
+because that's weird. So definitely check out that video, if you haven't already. That's a fun little description of the last video
+
+6
+00:00:23,240 --> 00:00:26,840
+不管怎样，今天我们要讨论上期遇到的一个问题
+Anyway, today we're going to be talking about a problem that we had in the last episode
+
+7
+00:00:28,120 --> 00:00:32,240
+我们并没有真正看到问题，所以我只会通过再次向你们展示问题所在来强调问题
+We didn't really see the problem, so I'll just highlight the problem by showing you guys again what's wrong
+
+8
+00:00:32,240 --> 00:00:37,720
+但基本上我们正在做的是移动，我们实际上是在使用箭头键与我们的游戏互动
+But basically what we're doing is we're moving, we're actually interacting with our game using the arrow keys
+
+9
+00:00:37,720 --> 00:00:45,840
+我们正在移动相机，但是，每次渲染新帧时，基本上都会应用该移动
+We're moving the camera. However, that movement basically gets applied every time we render a new frame
+
+10
+00:00:45,840 --> 00:00:53,640
+每次我们更新我们的应用程序时，我们都会像这样移动摄像头，我认为是0.1，对单位
+Every time we update our app, we move our camera by like, what was it I think 0.1, right Units
+
+11
+00:00:53,640 --> 00:01:02,100
+每次我们实际上，比如如果按下箭头键，遇到了应用程序更新，作为更新循环的一部分
+Every time we actually, like, if the arrow key is pressed and we run into an application update as part of our update loop
+
+12
+00:01:02,100 --> 00:01:03,720
+我们就会移动相机0.1个单位
+we move the camera 0.1 units
+
+13
+00:01:03,720 --> 00:01:09,400
+现在的问题是，谁能说得出我们的应用程序更新得有多快，对吗
+Now the problem with that is, who's to say how fast our application is being updated, right
+
+14
+00:01:09,400 --> 00:01:15,560
+它每秒可以更新60次，它可以每秒更新20次，如果我们的帧速率低，并且我们落后的话
+It could be updated 60 times a second. It could be updated 20 times a second, if like our frame rate is low and we're lagging
+
+15
+00:01:15,560 --> 00:01:22,200
+如果我们用144Hz的监视器进行v-sync，它每秒可以更新144次
+It could be updated 144 times a second if we're v-sync to a 144 Hz monitor
+
+16
+00:01:22,875 --> 00:01:27,800
+或者可能是完全，比如v-sync可以被关闭，可以是无上限的，可以以4000fps的速度运行
+Or it could be completely, like v-sync could be turned off, it could be uncapped, we could be running at 4000fps
+
+17
+00:01:28,200 --> 00:01:35,480
+显然，在这种情况下，我们的相机会移动，如果速度是4000fps，那么每帧移动0.1个单位
+Obviously in that case, our camera is going to move, if we're running 4000fps, then we're moving 0.1 units per frame
+
+18
+00:01:35,480 --> 00:01:40,440
+相机每帧移动0.1个单位，它将在一秒钟内移动400个单位
+The camera is moving 0.1 units per frame. It's going to move 400 units in one second
+
+19
+00:01:40,440 --> 00:01:47,160
+然而如果每秒运行60次，每次移动相机0.1个单位，那么它将会比这个要少得多，对吧
+Whereas if we're running 60 times per second, and we move the camera 0.1 units every time, then it's going to be a lot less than that, right
+
+20
+00:01:47,160 --> 00:01:53,000
+它只能以每秒6个单位的速度移动，这是一个巨大的差异，6个单位，400个单位，疯狂
+It's only going to move like 6 units per second. It's a huge difference. 6 units, 400 units, crazy, right
+
+21
+00:01:53,000 --> 00:01:57,800
+我们想要做的是让我们的相机无论如何都能以相同的速度移动，对吧
+What we want to do is make our camera move the same speed no matter what, right
+
+22
+00:01:57,800 --> 00:02:09,400
+这实际上是一种不同的方式，只是说我们希望移动是基于时间的，而不是像CPU频率那样
+We want to base, this is actually a different way of just saying that we want our movement to be time-based rather than like CPU frequency-based, right
+
+23
+00:02:09,400 --> 00:02:14,440
+所以我们不希望它移动得像我们的计算机所能做的那样快，这是我们很多时候想要的
+So we don't want it to move as fast as our computer is capable of doing, which is a lot of times that's what we want
+
+24
+00:02:14,440 --> 00:02:18,680
+如果我们在做一些数学计算，我们不希望它花一秒钟的时间来计算
+If we're doing some mathematical calculation, we don't want it to take one second to calculate
+
+25
+00:02:18,900 --> 00:02:24,800
+我们希望它尽快完成这项工作，但有了这个，实际上希望这个东西只需要一秒钟，对吧
+We want it to do it as fast as possible. But with this, we actually want this thing to just take a second, right
+
+26
+00:02:24,800 --> 00:02:30,280
+或者花半秒，你们知道的，一秒半，不管应该花多长时间
+Or to take like half a second, you know, one and a half seconds, however long that's supposed to go for
+
+27
+00:02:30,280 --> 00:02:35,925
+这非常重要，我们要做的就是基本上将我们的运动与现实世界的时间捆绑在一起
+That's super important and the way that we're going to do that is by basically tying our movement into real-world time
+
+28
+00:02:36,450 --> 00:02:42,757
+我们通过在我们的引擎中实现称为TimeStep或DeltaTime的东西来实现这一点
+And we accomplish that by implementing something called a Timestep or DeltaTime, essentially, in our engine
+
+29
+00:02:43,150 --> 00:02:48,760
+如果还没支持这个系列，patreon.com/thechurno是一个很好的方式来帮助支持这些
+If you guys aren't supporting the series, patreon.com/thechurno is a great way to help support all this stuff
+
+30
+00:02:48,760 --> 00:02:52,120
+一如既往地非常感谢所有使这个系列成为可能的赞助人
+Huge thank you as always to all the patrons that made this series possible
+
+31
+00:02:52,350 --> 00:02:57,480
+如果你们去那里支持这个系列，会得到很多奖励，比如访问关于Discord的小规划频道
+If you go there and support the series, you'll get plenty of rewards such as access to like a little planning channel on Discord
+
+32
+00:02:57,480 --> 00:03:00,840
+在那里你们可以问我问题和其他人的问题之类的问题
+and where you can ask me questions and other patrons questions and stuff like that
+
+33
+00:03:00,840 --> 00:03:03,200
+这真的是一段美好的时光，你们还可以提前获得视频
+It really is a good time. You'll also get videos early
+
+34
+00:03:03,200 --> 00:03:07,525
+还可以访问一个Hazel开发分支，在那里我已经做了我今天要说的所有事情
+ and access to a Hazel development branch in which I've done all this stuff that I'm talking about today
+
+35
+00:03:07,900 --> 00:03:15,080
+不管怎样，看看DeltaTime是什么，事实上，我可能会先解释一下，那可能会有些帮助
+anyway, let's jump in and take a look at what this DeltaTime thing is. And in fact, I might just explain it first. That might help
+
+36
+00:03:15,080 --> 00:03:19,960
+所以，它之所以叫DeltaTime，你们可能听说过，或者它可能被称为时间步长
+So, DeltaTime, the reason it's called DeltaTime, you might have heard of that or it might be called a Timestep
+
+37
+00:03:19,960 --> 00:03:29,880
+基本上，这是一种工作方式，我们将相机移动一定的量的方式将会相当简单
+Basically, the way this is going to work, the way that we're going to move the camera by a certain amount is going to be fairly simple
+
+38
+00:03:29,880 --> 00:03:34,280
+我们要做的就是看看最后一帧花了多长时间，对吧
+All we're going to do is we're going to see how long the last frame took, right
+
+39
+00:03:34,280 --> 00:03:39,400
+换句话说，如果我们以60fps的速度运行，那么这一帧将需要16毫秒，对吧
+So, in other words, if we're running at 60fps, then the frame is going to take 16 milliseconds, right
+
+40
+00:03:39,400 --> 00:03:47,320
+所以16毫秒的真实世界时间流逝了，如果我们以30fps的速度运行，那么33毫秒就过去了
+So 16 milliseconds of real-world time passes. If we're running at 30fps, then 33 milliseconds passes, right
+
+41
+00:03:47,320 --> 00:03:54,728
+不同的时间单位实际上会流逝，所以，我们要测量一下，我们将测量一帧需要多长时间
+Different units of time actually pass. So, we're going to measure that. We're going to measure how long a frame takes
+
+42
+00:03:55,000 --> 00:04:00,984
+然后我们实际上要将这个数字和持续时间传到我们所有的更新函数中
+And then we're actually going to propagate that number, that duration into all of our update functions
+
+43
+00:04:01,375 --> 00:04:08,200
+所以我们基本上会在我们的更新函数上有一个参数，它会让我们知道这个帧花了多长时间
+So we're going to basically have a parameter on our update function that is going to let us know how long that frame took
+
+44
+00:04:08,200 --> 00:04:18,040
+然后所能做的就是移动角色，或者在这种情况下，相机移动特定的量，与实际时间相对应
+And then from that, all we can do is actually move our character by, or our camera in this case, a certain amount that is respective to that actual time
+
+45
+00:04:19,375 --> 00:04:22,425
+现在，起作用的原因和重要的原因如下
+Now the reason that works and the reason that's important is as follows
+
+46
+00:04:22,425 --> 00:04:30,600
+因为你们知道只是要画张图，因为我已经厌倦了挥手，所以DeltaTime或TimeStep之类的
+because You know what I'm just going to draw a diagram, because I'm getting sick of moving my hands. Okay, so DeltaTime or Timestep or whatever
+
+47
+00:04:30,600 --> 00:04:39,480
+让我们来说说这些东西是如何运行的，所以，本质上，我们想要这个数字的原因，对吧
+Let's talk about how all of this stuff works. So, essentially, the reason that we want that number, right
+
+48
+00:04:39,480 --> 00:04:47,560
+从这个DeltaTime，从这个测量一帧花费的时间，我们可以得到一个数字，比如16毫秒，对吧
+From this DeltaTime, from this measurement of how long a frame took, we could get a number such as, let's just see, 16 milliseconds, right
+
+49
+00:04:47,560 --> 00:04:55,160
+但我们实际上是以秒为单位来做的，所以0.016，如果以60fps的速度运行，那么这就是时间
+But we'll actually do this in terms of seconds. So 0.016, right That's our time for if we're running at 60fps
+
+50
+00:04:55,160 --> 00:05:02,120
+所以，我会在这里写两个可能的值，对于30fps，我把它搞砸了
+So, I'll kind of write two possible values here. And for 30fps, I screwed that up
+
+51
+00:05:04,040 --> 00:05:10,350
+30fps，我们会发现我们的时间，我们的增量时间大约是0.033，对吧
+30fps, we'll see that our time, our DeltaTime was 0.033 or something like that, right
+
+52
+00:05:10,350 --> 00:05:13,325
+那就是我们的时间值，对吧，秒为单位
+So, that's our kind of time values, right. In seconds
+
+53
+00:05:13,640 --> 00:05:20,840
+所以，这就是我们要添加到onUpdate函数中的内容，为什么要这样做，它将如何被使用
+So, that's what we'll be kind of pushing into our onUpdate function. Now, why are we doing that and how is it going to be used
+
+54
+00:05:21,475 --> 00:05:32,440
+我们实际上要做的是取这个时间值，即我们的帧之间经过了多少时间，然后乘以移动速度
+Well, what we're actually going to do is take this time value of how much time has passed between our frames and multiply it with our movement velocity, our movement speed, right
+
+55
+00:05:32,440 --> 00:05:37,080
+所以，这样做的原因是，让我们来看看，展示这一点的最好方式只是一个例子
+So, the reason that's done is because, let's just see, the best way to show this is just an example
+
+56
+00:05:37,200 --> 00:05:43,000
+我们有这个立方体，对吧，我们有这个正方形，它正以一定的速度朝这个方向移动，对吧
+We have this cube, right We have this square. It's moving this way at a certain speed, right
+
+57
+00:05:43,550 --> 00:05:54,100
+如果我们想要在一秒内从屏幕的左侧移动到屏幕的右侧，对吧
+If we wanted to move from the left side of the screen to the right side of the screen in exactly one second, right
+
+58
+00:05:54,360 --> 00:06:04,280
+它需要多少次移动，如果以60fps的速度运行，那么显然需要60次移动，对吧
+How many times does it need to move Well, if we're running at 60fps, then clearly we need to perform 60 little movements, right
+
+59
+00:06:04,280 --> 00:06:09,400
+才能来到这里，现在，如果我们以30fps的速度运行，我们需要做一半
+To get to here. Now, if we're running at 30fps, we need to do half of that
+
+60
+00:06:09,400 --> 00:06:15,800
+我们从这里到这里只有30帧，这就是我们在现实世界中一秒内能够渲染的帧的数量
+We only have 30 frames to get from here to here and that is how many frames we're able to render in one second of real-world time
+
+61
+00:06:15,800 --> 00:06:25,800
+所以我们需要做的显然是每一帧移动两倍，因为不是渲染这里的一帧
+So what we need to do is obviously move twice as far every frame because instead of rendering like one frame here, one frame here, one frame here
+
+62
+00:06:25,800 --> 00:06:30,440
+我们最终渲染，你们知道，这里的第一帧，然后这里的下一帧，对吧
+we end up rendering, you know, the first frame here and then the next frame here, right
+
+63
+00:06:30,440 --> 00:06:38,700
+所以我们可能只渲染这么多的帧，而如果以两倍的帧速运行，也必须渲染介于两者之间的帧
+So we might only render this many frames, whereas if we're running at twice the frame rate, we have to render the frames in between as well
+
+64
+00:06:39,250 --> 00:06:43,975
+这显然会产生更平滑的运动，这就是为什么像144Hz的显示器
+This obviously creates a smoother motion, and that's why monitors that are like 144Hz
+
+65
+00:06:44,575 --> 00:06:49,050
+即使只移动鼠标按钮，你们也能真正看出区别，因为它实际上只是渲染更多的帧
+you can really tell the difference even if you just move the mouse button, because it's actually just rendering more frames
+
+66
+00:06:49,480 --> 00:06:53,125
+如果你们看这个动画，它在动画中渲染更多的帧
+And if you look at an animation, it's rendering more frames in the animation
+
+67
+00:06:53,125 --> 00:06:57,000
+这意味着一切实际上都在更频繁地移动，对吧
+which means that everything's actually moving more often, right
+
+68
+00:06:57,000 --> 00:07:03,075
+这个立方体不是在一秒内移动四次，它可能在一秒内移动八次，这就是在这里看到的
+Instead of this cube moving four times in a second, it might move eight times in a second, right And that's kind of what we see here
+
+69
+00:07:03,400 --> 00:07:07,080
+事实上，这就是为什么你们也能分辨出30fps和60fps之间的区别
+In fact, that's why you can also tell the difference between like 30fps and 60fps
+
+70
+00:07:07,080 --> 00:07:10,840
+这是一个巨大的平滑差异，对吧，因为你们渲染了更多的帧
+It's a huge difference of smoothness, right Because you're rendering way more frames
+
+71
+00:07:10,840 --> 00:07:15,000
+没那么起伏了，它更平滑了，这就是我们想要做的
+It's less choppy. It's more smooth. That's what we kind of want to do
+
+72
+00:07:15,175 --> 00:07:21,880
+所以所做的是，我们看到移动是，我不知道，比方说一个单位，我们移动一个单位
+So what we do is we see that our movement is, well, I don't know, let's just say one unit, right We move one unit, right
+
+73
+00:07:21,880 --> 00:07:30,920
+我们把它乘以增量时间，在这种情况下，因为它只是一，如果把一乘以这个，得到0.016
+We take that, and we multiply it by our DeltaTime, right, In this case, because it's just one, if we multiply one by this, we get 0.016
+
+74
+00:07:30,920 --> 00:07:38,520
+这意味着我们的立方体或我们的对象在该帧中向右移动0.016个单位
+which means that our cube or our object moves 0.016 units to the right in that frame
+
+75
+00:07:38,520 --> 00:07:47,550
+然而，如果我们以30fps的速度运行，它会在一帧中移动0.00，哦，对不起，0.033个单位
+Whereas if we're running at 30fps, it moves 0.00, oh sorry, 0.033 units in one frame
+
+76
+00:07:47,550 --> 00:07:50,920
+这就像是双倍，所以它移动了两倍的距离
+That's like double, right, So it moves twice as far
+
+77
+00:07:50,920 --> 00:07:53,000
+为什么，因为它移动的频率较低
+Why, Because it moves less often
+
+78
+00:07:53,000 --> 00:07:58,675
+很明显，我们希望在相同的时间内从A点到达B点，也就是一秒
+And we obviously want to get from point A to point B in the same amount of real world time, which is one second
+
+79
+00:07:59,125 --> 00:08:03,470
+这就是整件事的运行方式，从数学上讲，这是一个非常简单的概念
+So that's how this whole thing works. Mathematically, it's a really simple concept
+
+80
+00:08:03,775 --> 00:08:06,760
+很多人避免这样做，并做一些奇怪的操作来绕过它
+A lot of people avoid this and do some weird hacks to get around it
+
+81
+00:08:06,760 --> 00:08:11,600
+我想我以前其实也做过这样的事情，但不管怎样，没关系
+I think I used to actually also do something like that in the past, but anyway, it doesn't matter
+
+82
+00:08:11,825 --> 00:08:15,100
+关键是，你们永远不应该尝试用你们的方式来绕过这个问题
+The point is you should never kind of try and hack your way around this
+
+83
+00:08:15,100 --> 00:08:17,960
+让这个计时逻辑工作起来非常简单
+It's super simple to get this timing logic to work
+
+84
+00:08:17,960 --> 00:08:24,550
+有些人还喜欢只以特定的受限帧速率运行onUpdate功能
+Some people also like to only run their onUpdate function at a certain restrictive frame rate
+
+85
+00:08:24,650 --> 00:08:29,240
+例如，独立于屏幕刷新率或独立于v-sync
+So for example independent of your screen refresh rate or independent of v-sync or
+
+86
+00:08:29,240 --> 00:08:33,560
+与你们的无上限帧速率无关，onUpdate每秒运行60次
+independent of your uncapped frame rate, onUpdate runs 60 times per second
+
+87
+00:08:33,560 --> 00:08:40,600
+这可能会给你们，因此，你们会移动，就像，你们不需要用DeltaTime乘以任何东西
+And that might give you, and because of that, you'll move, like, you don't need to multiply anything by DeltaTime
+
+88
+00:08:40,600 --> 00:08:43,480
+你们可以在onUpdate函数中移动一定的量
+You can move a certain amount inside your onUpdate function
+
+89
+00:08:43,480 --> 00:08:49,320
+例如你们可以将其硬编码为一个单位，或0.01或0.1或其他任何单位
+You can hard code it to be that one unit, for example, or 0.01 or 0.1 or whatever
+
+90
+00:08:49,320 --> 00:08:53,250
+你们不需要一直乘以DeltaTime，因为你们可以预测这会有多快
+You don't need to keep multiplying by DeltaTime, because you can predict how fast this will go
+
+91
+00:08:53,950 --> 00:08:58,920
+这不是一种好的做事方式，这不是一种好的做事方式的原因是因为这很棒
+That's not a good way of doing things. The reason that's not a good way of doing things is because that's great 
+
+92
+00:08:58,920 --> 00:09:02,962
+如果你们的应用程序能够达到60，但如果帧速率大幅下降怎么办
+if your application is able to hit 60, but what if your frame rate drops massively
+
+93
+00:09:03,225 --> 00:09:07,960
+如果你们的速度只有10fps，因为一切都落后了，你们猜会怎样
+What if you're on 10fps for a little bit because everything's lagging Well, guess what
+
+94
+00:09:07,960 --> 00:09:14,825
+这个游戏实际上会运行得更慢，对吧，这可能是你们想要的，但可能不是，对吧
+The game's actually physically going to run slower, right Which, again, might be what you want, but probably isn't, right
+
+95
+00:09:15,100 --> 00:09:21,700
+尤其是当在谈论渲染图形的时候，不会想让一切都变慢的，相反，需要的是渲染更少的帧
+Especially if you're talking about rendering graphics. You don't want everything to run slower. What you want instead is to render less frames
+
+96
+00:09:22,300 --> 00:09:29,325
+现在如果突然达到10fps，因为在没有DeltaTime的情况下每秒只做0.1个移动
+Now, if you're suddenly at 10fps, right, because you're just doing 0.1 movement every second without DeltaTime
+
+97
+00:09:29,675 --> 00:09:33,250
+然后在10秒内，它将总共移动一个单位
+then in 10, in one second, it's going to move a total of one unit
+
+98
+00:09:33,700 --> 00:09:37,160
+而如果你们乘以增量时间，它将以10fps的速度移动
+Whereas if you're multiplying by DeltaTime, the amount that it'll move at 10fps
+
+99
+00:09:37,160 --> 00:09:43,375
+在现实世界中，一秒钟的时间将与60fps相同，因为它只会以更大的跳跃移动
+in one second of real-world time will be the same as in 60fps, because it's just going to move in bigger jumps
+
+100
+00:09:43,550 --> 00:09:48,775
+如果这是有意义的，对吧，例如，你们可能会得到三帧这样的帧，而不是这种流畅度
+if that makes sense, right, So for example, instead of this smoothness, you might just get three frames like that
+
+101
+00:09:48,900 --> 00:09:54,539
+但重点是，在现实世界中，物体移动的时间仍然是相同的，这就是你们想要的，对吧
+But the point is the object still takes the same amount of time in real-world time to move, and that's what you want, right
+
+102
+00:09:54,875 --> 00:10:00,200
+如果发生这种情况，并且你们的速度是10fps，那么这个时间值应该是0.1，对吧
+So if that happens and you're at 10fps, then this time value would be 0.1, right
+
+103
+00:10:00,425 --> 00:10:05,525
+换句话说，你们把它乘以0.1，突然之间，它比乘以一个更小的数字有更大的跳跃，
+And in other words, you multiply this by 0.1, and suddenly it's a much bigger jump than if you multiply by a smaller number
+
+104
+00:10:05,850 --> 00:10:12,200
+如果帧速率低于v-sync，你们的游戏最终会运行相同的速度，对吧
+and your game ends up running the same speed, if the frame rate is below v-sync, right
+
+105
+00:10:13,050 --> 00:10:17,275
+这里唯一的区别是，本质上渲染的帧更少
+And the only difference here is that you just render less frames, essentially
+
+106
+00:10:17,275 --> 00:10:22,840
+你们实际上不会花更长的时间去做任何事情，这通常是你们想要的，希望这是有用的
+You don't actually take longer to do anything, which is usually what you want. Okay, so hopefully that makes sense
+
+107
+00:10:22,925 --> 00:10:27,275
+现在我们实际上可以深入到代码中，创建整个DeltaTime和TimeStep之类的，好了
+Now we can actually dive into the code and create this whole kind of DeltaTime, Timestep thing. All right
+
+108
+00:10:27,375 --> 00:10:31,225
+因此要做到这一点，正如我所说的，我们基本上需要传递到OnUpdate
+So to do this, as I said, we basically need to pass in, into OnUpdate
+
+109
+00:10:31,225 --> 00:10:32,650
+我们需要传递那个DeltaTime
+we need to pass in that DeltaTime
+
+110
+00:10:32,650 --> 00:10:35,800
+所以让我们先来讨论一下那是如何运行的
+so let's talk a little bit about how that's even going to work in the first place
+
+111
+00:10:36,700 --> 00:10:43,475
+所以这个Run循环，While循环，我们需要在其中测量这个帧实际花费了多长时间，对吧
+So this Run loop, this is the while loop in which we need to measure how long this frame actually takes, right
+
+112
+00:10:43,475 --> 00:10:46,675
+所以这里将是一个很好的地方来进行这种计算
+So over here would be a good place to actually do that kind of calculation
+
+113
+00:10:47,500 --> 00:10:53,225
+现在我要做的实际上是在Hazel里面，在里面，我要创建一个新的文件夹Core
+Now what I'm going to do is actually inside Hazel, inside, I'm going to make a new folder called Core
+
+114
+00:10:53,975 --> 00:10:58,375
+而这些东西实际上会像Hazel一样拥有很多核心的东西
+and this stuff's actually going to have like a lot of the core stuff that Hazel has
+
+115
+00:10:58,375 --> 00:11:02,280
+因为我不知道，这变得有点泛滥，Application和LayerStack在这里，我不知道
+because I don't know, this is getting a little bit flooded, Application is in here, LayerStack, I don't know
+
+116
+00:11:02,280 --> 00:11:06,225
+我想我很快就会进行一次巨大的重构，因为我不喜欢这变得如此混乱
+I'm going to do a huge refactor, I think soon, because I don't like how messy this is becoming
+
+117
+00:11:06,525 --> 00:11:12,950
+但在Core内部，我只需要创建一个名为TimeStep的头文件，我将其命名为TimeStep
+but inside core, I'm going to just basically make a little header file called Timestep, and I called it Timestep
+
+118
+00:11:13,400 --> 00:11:19,625
+这真是太棒了，Timestep，好吧，对于我们来说，这将是一个小小的辅助类
+So that's fantastic. Timestep. Okay. And this is going to be a little bit of a helper class for us
+
+119
+00:11:19,950 --> 00:11:22,025
+基本上，我们将创建一个名为TimeStep的类
+Basically we're going to make a class called Timestep
+
+120
+00:11:22,950 --> 00:11:27,975
+如果你们想的话，甚至可以把它变成一个结构体，并不重要，但我还是会把它建成类
+It's going to be, you can even make this a struct if you wanted to, honestly, it doesn't really matter, but I'll still make it a class
+
+121
+00:11:29,025 --> 00:11:35,350
+我们要做TimeStep(float time)，然后基本上会持有time
+We're going to do Timestep(float time), right, and then we'll basically hold time 
+
+122
+00:11:36,125 --> 00:11:37,560
+默认情况下我们会将它设置为零
+and we'll set it to zero by default
+
+123
+00:11:38,650 --> 00:11:44,575
+实际上，我们不需要默认将其设置为零，只需让构造函数设置它，就可以有个默认参数
+And actually we don't need to set it to zero by default. We can just have the constructor set it and we can have a default parameter
+
+124
+00:11:45,075 --> 00:11:51,512
+所以我们就在这里设置时间，然后我们要做的就是有一些基本的函数来检索时间，对吧
+So we'll set time here. And then all we'll do is we'll have some basic functions for retrieving the time, right
+
+125
+00:11:52,025 --> 00:11:54,675
+你们可以在这里做很多事情，对吧
+You could do a whole bunch of stuff here, right
+
+126
+00:11:54,675 --> 00:12:02,950
+例如，你们可以有，你们知道，你们可以重写运算符+或+=之类的
+You could, for example, have like, you know, you could override operator plus or plus equals or anything
+
+127
+00:12:02,950 --> 00:12:07,575
+这样你们就可以以这种方式递增Timestep，这样就可以真正地只对float进行包装
+so that you can increment Timestep that way, so that you can really just have a wrapper around a float
+
+128
+00:12:07,575 --> 00:12:08,350
+我们可能会那么做
+And we might do that
+
+129
+00:12:08,725 --> 00:12:16,450
+但现在，我们只有GetSeconds()，它将返回m_Time，因为我们的时间默认以秒为单位
+But for now, we'll just have GetSeconds, which is going to return m_Time, because our time's in seconds by default
+
+130
+00:12:16,450 --> 00:12:25,080
+也会有GetMilliseconds()，因为那也是有用的，这只是返回m_Time*1000
+And we'll have GetMilliseconds(), because that can be useful as well. And that's just going to return m_Time times 1000
+
+131
+00:12:25,350 --> 00:12:30,300
+好了，你们可以用毫秒而不是秒来存储时间，然后你们就可以
+OK, you could store the time in milliseconds instead of seconds, and then you can just
+
+132
+00:12:30,776 --> 00:12:34,700
+你们知道，乘以0.001可以得到秒的结果
+you know, multiply by 0.001 to get it into seconds
+
+133
+00:12:35,450 --> 00:12:38,392
+但现在我将用秒开始，这就是它看起来会是什么样子
+But I'm going to start in seconds for now. So that's how it's going to look
+
+134
+00:12:39,075 --> 00:12:41,320
+如果需要，我们可能会添加一些其他函数
+And we might add some other functions if we need to
+
+135
+00:12:41,475 --> 00:12:46,750
+我只是在想，减法可能有用，其他数学运算也可能有用
+I'm just thinking about it like we subtracting might be useful, and other mathematical operations might be useful
+
+136
+00:12:46,750 --> 00:12:49,750
+但这基本上就是我们目前所拥有的，一个非常非常基本的Timestep类
+But this is basically what we have for now, a very, very basic Timestep class
+
+137
+00:12:50,400 --> 00:12:52,566
+所以现在要做的是进入Application
+So now what we're going to do is inside Application
+
+138
+00:12:54,425 --> 00:13:07,625
+首先我将进入Hazel并确保可以将它放在这里，包含Hazel/Core/TimeStep，在Application中
+First of all, I'm going to go into Hazel and make sure that this we can put it here, include Hazel/core/Timestep is here inside our Application class
+
+139
+00:13:07,625 --> 00:13:13,232
+我也会把这个包含在内，所以就是#include "Hazel/Core/TimStep"
+I'm going to include that as well. So include Hazel/Core/Timestep
+
+140
+00:13:14,400 --> 00:13:17,100
+然后我们将在这里有一个TimeStep，对吧
+Then we're going to actually have a Timestep here. right
+
+141
+00:13:17,525 --> 00:13:24,400
+所以我们要做的是在这里，我不知道为什么这一切都是错误的，可能只是智能检测
+So what we'll do is inside here, I don't know why all of this is an error. Probably just IntelliSense
+
+142
+00:13:25,325 --> 00:13:35,912
+我要做的是，我应该在这里有个分隔，Private，我要做的就是，只需要Timestep m_Timestep
+What I'll do is, and I should have had a divider here. Private. What I'll do is I'll actually just have Timestep m_Timestep
+
+143
+00:13:37,175 --> 00:13:43,125
+这个Timestep，再说一次，取决于你们是想这样做还是不想这样做，取决于你们自己
+OK, and this Timestep. And again, it depends if you want to do it this way or if you don't want to do it this way, it's up to you
+
+144
+00:13:43,450 --> 00:13:50,750
+我也要来个float，事实上，我可能不需要在这里有个Timestep，真的，不，我没有
+I'm also going to have a little float. Actually, I probably don't have to have a Timestep here, really. No, I don't
+
+145
+00:13:51,025 --> 00:13:53,225
+我所需要的就是一个叫LastTime的属性，对吧
+All I need is something called lastTime. right
+
+146
+00:13:53,600 --> 00:13:57,625
+而LastTime，我将初始化为零，它将是渲染最后一帧所用的时间
+And lastTime, which I'll initialize to zero is going to be the time that it took to render last frame
+
+147
+00:13:57,950 --> 00:13:59,275
+我可能会叫它LastFrameTime
+I might say lastFrameTime
+
+148
+00:13:59,450 --> 00:14:06,625
+好了，这里的每一帧都会更新，所以我们会在这里看到time
+OK, so this over here is going to be updated every single frame. So we'll see time here
+
+149
+00:14:07,025 --> 00:14:13,600
+然后我们在这里要做的实际上是从平台检索时间，所以有很多方法可以实现这个
+And then what we'll do here is actually retrieve the time from our platform. So lots of ways to do this
+
+150
+00:14:14,305 --> 00:14:21,375
+基本上可以在Windows上使用QueryPerformanceCounter之类的来获取时间，就比较复杂
+You could just use Windows basically to get the right time by using something like query performance counter. That's a huge thing
+
+151
+00:14:21,375 --> 00:14:26,600
+我们可能真的会在以后那样做，但目前而言，它只会是glfwGetTime
+We might actually do that in the future. But for now, it's just going to be glfwGetTime
+
+152
+00:14:26,800 --> 00:14:30,625
+对吧，现在那确实意味着我们将这个Application类绑定到glfw
+OK, now that does mean that we tie this Application class to glfw
+
+153
+00:14:31,025 --> 00:14:35,750
+这只是临时的，因为我不会一直做这个视频，但这应该确实是根据平台来搞
+This is kind of temporary, because I don't want to make this video forever. But this should be in platform
+
+154
+00:14:35,750 --> 00:14:41,375
+我们应该有个平台类，比如你们知道的，WindowsPlatform，MacPlatform
+We should have a Platform class that is kind of, you know, WindowsPlatform, MacPlatform
+
+155
+00:14:41,375 --> 00:14:45,125
+IOSPlatform，ApplePlatform，你们想要的任何平台，对吧
+whatever iOSPlatform, ApplePlatform, whatever you want. right
+
+156
+00:14:45,125 --> 00:14:48,500
+所有不同的平台都将有自己的实现，对吧
+All different platforms that are going to have their own implementations. right
+
+157
+00:14:49,425 --> 00:14:53,550
+但平台获取时间应该是一种独立于平台的实际获取时间的方式
+But platform get time should be a platform independent way of actually getting the time
+
+158
+00:14:53,550 --> 00:14:56,675
+如果是Windows，就用glfwGetTime
+And if a Windows, it would use glfwGetTime
+
+159
+00:14:56,675 --> 00:15:00,250
+但我真的还不想设置这个平台，因为现在那样做还有点太早了
+But I don't really want to set up the platform just yet because it's a bit early to do that
+
+160
+00:15:01,475 --> 00:15:07,320
+我们可以这么做，但是你们知道，今天不会这么做，不过你们可以把它当成课后作业来做
+We could do it, but, you know, we're not going to today. You can do that yourself, if you want for homework
+
+161
+00:15:07,375 --> 00:15:11,000
+当我们有更多的东西要添加到平台中而不仅仅是时间时，就会抽空来做这个了
+And we'll actually get around to doing it when we have more things to add into platform than just timing
+
+162
+00:15:12,250 --> 00:15:18,375
+因此time就是glfwGetTime()，以秒为单位返回时间，所以我要把它转成浮点数，对吧
+So time is going to be glfwGetTime, which returns time in seconds. So I'm just going to cast that to a float. right
+
+163
+00:15:19,425 --> 00:15:30,600
+然后要计算DeltaTime，那么就是Timestep timestep=time-m_LastFrameTime，对吧
+And then we're going to calculate DeltaTime. So we'll see Timestep timestep = time-m_LastFrameTime. right
+
+164
+00:15:30,700 --> 00:15:35,675
+当然我们可以把它赋给一个浮点数，因为我们有个接收浮点数的构造函数
+And of course, we don't we can just assign it to a float like that, because we have a constructor, that takes in a float.
+
+165
+00:15:35,800 --> 00:15:41,050
+因此它会是一隐式强制转换，那就是DeltaTime，那就是Timestep，对吧
+So it will be an implicit cast. That is our DeltaTime. That's our Timestep. right.
+
+166
+00:15:41,400 --> 00:15:48,100
+就是这帧的长度，比如当前时间与最后一帧时间之比，所以我们记录了最后一帧的时间
+That's going to be how long this frame, like what the current time is versus the last frame time. So we record the last frame time.
+
+167
+00:15:48,425 --> 00:15:53,325
+我们执行完了整个帧，然后当转了一圈回到这里时，我们又得到了当前时间
+We do our whole frame. Then when we wrap around and get back up to here, we get the current time again.
+
+168
+00:15:53,325 --> 00:15:59,900
+然后计算差值或增量，那就是我们获得增量时间的方法，然后进入Layer::OnUpdate
+and we calculate the difference or the Delta. And that is how we get our Delta time. And then we go into Layer::OnUpdate.
+
+169
+00:16:00,575 --> 00:16:06,900
+我们接收一个Timestep ts，现在你们可以看到，我不是通过常量引用之类的传递这个
+We take in a Timestep. I'll call it ts. Now you can see that I'm not passing this by const reference or anything like that.
+
+170
+00:16:06,900 --> 00:16:11,850
+它不需要是这样，只是要被复制，因为如果你们看Timestep，它是单个浮点数，对吧
+It doesn't need to be. It's just going to be copied, because if you look at Timestep, it is a single float, right.
+
+171
+00:16:12,200 --> 00:16:16,275
+它只是个浮点数，就像传递一个浮点数一样，对吧
+It is just a float. It's going to it's the same as passing a float. right.
+
+172
+00:16:16,700 --> 00:16:22,100
+在这里，当实际创建每个帧时，我们在栈上创建那个对象
+And over here, when we actually created every frame, we're creating that object on the stack.
+
+173
+00:16:22,100 --> 00:16:27,600
+只是字面上等同于创建一个浮点数，所以我不知道，有些人可能会说，你们为这个创建类
+It's just it's literally the same as creating a float. So I don't know. Some people might be like, oh, you're creating a class for this.
+
+174
+00:16:27,700 --> 00:16:30,800
+你们为什么要那么做，为什么不直接用浮点数，它是一样的，对吧
+Why are you doing that Why not just have a float, It's the same, right
+
+175
+00:16:30,800 --> 00:16:33,975
+它基本上是一个浮点数，只有一些辅助函数使其更具可读性
+It's basically a float with just some helper functions to make it more readable.
+
+176
+00:16:34,400 --> 00:16:41,250
+现在如果正在使用Java，我就不会这样做，因为在Java中创建新对象，会在堆上创建它
+Now if you were using Java, I wouldn't do it this way, because if you create a new object in Java, you're creating it on the heap.
+
+177
+00:16:41,250 --> 00:16:47,725
+那是个完全不同的游戏或者在C#中，对吧，尽管在C#中，你们可以使用结构体，那会在栈上
+And that is a whole different board game or in C#, right, Although in C#, you can use a struct and that will be something on the stack.
+
+178
+00:16:48,250 --> 00:16:54,600
+但不管怎样，我们的想法是，这就像是完全没有问题，但有些人可能会有点犹豫
+But anyway, the idea is that this is like totally fine, but some people might be a bit hesitant.
+
+179
+00:16:54,600 --> 00:16:58,280
+但事实就是那样，对吧，所以我们有自己的Timestep，我们将其传递到我们的层栈中
+but that's what it is, right. So we have our Timestep. We pass that into our layer stack.
+
+180
+00:16:59,480 --> 00:17:05,350
+如果打开Sandbox，你们会看到这个，因为我们已强制各层设置TimeStep
+And then if we go to sandbox, you'll see that because we've enforced layers to have Timesteps
+
+181
+00:17:05,450 --> 00:17:16,650
+现在必须进入OnUpdate，实际确保我们有Hazel::Timestep ts，好了，现在来看看是否有用
+now, we have to go into onUpdate and actually make sure that we have our Hazel::Timestep, ts. OK, now let's take a look at if this even worked.
+
+182
+00:17:17,050 --> 00:17:24,550
+所以我们会看到HZ，它是什么，HZ_INFO之类的，我们只会看到HZ_TRACE
+So we'll see HZ, what is it, HZ_INFO or something like that. We'll just see HZ_TRACE.
+
+183
+00:17:25,675 --> 00:17:37,075
+所以我们将看到DeltaTime 0，然后是ts.GetSeconds()，对吧，所以这个应该显示耗时(s)
+So we'll see DeltaTime 0 and then ts.GetSeconds(), right. So this should give us how many seconds it took.
+
+184
+00:17:38,850 --> 00:17:46,275
+然后我们可能会看到，实际上可能会看到秒，然后在括号中，它是多少毫秒
+And then we might actually see, whoops. We might actually see seconds and then in brackets, I might put how many milliseconds it is,
+
+185
+00:17:46,275 --> 00:17:52,875
+只是为了测试每个函数，确保两个都运行正常，让我们按f5，看看会发生什么
+just to test out everything, make sure that we have both things working. Let's hit f5 see what happens.
+
+186
+00:17:52,875 --> 00:17:59,875
+显然，第一次，它不会是100%准确的，只是因为第一帧，我们实际上还没有任何记录
+Obviously, the first time around, it's not going to be 100% accurate, just because for the first frame, we don't actually have anything recorded yet.
+
+187
+00:18:00,275 --> 00:18:10,650
+我们还会收到一堆编译错误，所以这需要，我想我们需要包含Hazel/Core/Timstep
+We also get a bunch of compile errors. So this needs to be, I guess we need to include this. So include Hazel/Core/Timestep.
+
+188
+00:18:11,575 --> 00:18:18,400
+让我们再试一次，因为LastFrameTime默认设置为0，对吧
+Let's try and run that again. Because LastFrameTime by default is set to 0, right.
+
+189
+00:18:18,775 --> 00:18:23,320
+所以当执行time - m_LastFrameTime时，它将是自最后一帧以来的时间，这没有最后一帧
+So when we do time minus LastFrameTime, it's going to be the time since the last frame, there was no last frame.
+
+190
+00:18:23,525 --> 00:18:27,400
+所以它会有一点不准确，但那是正常的，完全没问题，我不会担心的
+So it's going to be slightly inaccurate, but that's normal and that's totally fine. I wouldn't worry about it.
+
+191
+00:18:27,825 --> 00:18:31,200
+好了，如果我们现在看这个，看看得到了什么，让我们停止这一切吧
+OK, if we look at this now, look at what we get. Let's stop this
+
+192
+00:18:31,750 --> 00:18:34,300
+因此这是个60Hz的监视器，并且启用了v-sync
+So this is a 60 Hz monitor and Vsync is enabled.
+
+193
+00:18:34,425 --> 00:18:45,000
+所以你们可以看到，我们得到了大约每帧16.6毫秒或0.016秒
+So you can see that we get about 16., about 16., like 5, 6, 7, whatever. Around 16.6 milliseconds per frame or 0.016 seconds.
+
+194
+00:18:45,175 --> 00:18:47,825
+好了，那就是我们得到的，挺不错
+OK, so that's what we get here. That looks pretty good to me.
+
+195
+00:18:48,200 --> 00:18:57,450
+现在让我们在实际的数学计算中使用它，对吧
+Now let's use this inside our actual, inside our actual math stuff here, right.
+
+196
+00:18:57,550 --> 00:19:00,100
+所以当我们真正做相机移动的时候，让我们使用这个
+So when we actually do the camera movement, let's use this stuff.
+
+197
+00:19:00,375 --> 00:19:06,925
+因此我们这样做的方法是，你们可以直接执行m_CameraMoveFast*ts.GetSecond()
+So the way we do that is you can just do m_CameraMoveSpeed*ts.GetSeconds().
+
+198
+00:19:08,100 --> 00:19:11,650
+现在你们可以做的只是添加一个，比如添加一个浮点运算符
+Now you could, what you could do is just add an, like add a float operator to this.
+
+199
+00:19:11,750 --> 00:19:17,275
+这样你们就可以隐式地将它转换为浮点数，然后你们就可以像那样乘以ts了
+so that you can cast it to a float implicitly, and then you can just do times ts like that.
+
+200
+00:19:18,325 --> 00:19:23,100
+老实说，那可能是值得做的事情，因为这个接口还可以，但不太喜欢它
+That's probably something that's worth doing, to be honest, because I, this API is OK, but I don't love it.
+
+201
+00:19:23,625 --> 00:19:32,550
+所以我们这样做的方法是，基本上是operator float()，然后返回m_Time，对吧，就那么简单
+So the way that we do that is we basically just see operator float, and then we can just see return m_Time, right It's that simple.
+
+202
+00:19:32,550 --> 00:19:40,650
+当然可以标记为const，它的作用是，被用来做很多事情，你们也可以把它转成布尔
+And of course, you can mark it as const. What this does is, it's like it's used for a lot of things. You can cast things to bool.
+
+203
+00:19:41,350 --> 00:19:45,225
+那也是非常频繁的，所以我们可以很容易地检查一些东西
+That's done very frequently as well, so that we can just if check something really easily.
+
+204
+00:19:45,575 --> 00:19:50,875
+例如共享指针或唯一指针，你们可以实际检查
+That's, for example, how shared pointers or unique pointers, you can actually check to
+
+205
+00:19:50,975 --> 00:19:58,000
+看看它们是否有值，只需执行if，然后指针，智能指针，在本例中，我们在这里只用了float
+see if they've got a value just by doing if and then the pointer, the smart pointer. In this case, we're just using float here.
+
+206
+00:19:58,275 --> 00:20:01,000
+并且那就是说，你们基本上可以把它当浮点数来使用
+And what that says is you can basically use this as a float.
+
+207
+00:20:01,240 --> 00:20:07,775
+它基本上就像一个静态强制转换操作符，实际上只是添加了隐式强制转换的能力，对吧
+It's basically like a static cast operator where you're actually just adding the ability to cast implicitly, OK
+
+208
+00:20:08,800 --> 00:20:15,480
+或者根本不去转换，因此实尝试强制转换为浮点数时，无论显式还是隐式，都只会返回时间
+Or to cast at all, really. So when you do try and cast to a float, whether explicitly or implicitly, it will just return time.
+
+209
+00:20:15,600 --> 00:20:18,750
+那就是将要发生的事情，对吧，基本上你们是在像强制转换运算符一样进行加法
+That's what's going to happen, right So you're adding like a cast operator, basically.
+
+210
+00:20:19,250 --> 00:20:23,900
+所以如果我们回到这里，那对我们来说就意味着，除了使用ts
+So if we go back over here, what that means for us is that instead of using ts
+
+211
+00:20:23,900 --> 00:20:27,875
+我们基本上可以做一些很酷的事情，比如float time = ts，对吧
+we can basically do cool stuff like float time equals ts, right
+
+212
+00:20:28,700 --> 00:20:35,525
+因为现在有了将ts转换为浮点型的方法，那就是使用这里的浮点型运算符，现在它是有用的
+Because we now have a way to convert ts into a float and that is by using this float operator here. Now, again, it's useful.
+
+213
+00:20:35,525 --> 00:20:41,725
+值得一提的是，在这种情况下，它将返回秒，如果你们想要毫秒，那就用这个
+It's worth mentioning the fact that in this case, it's going to return seconds. If you want milliseconds, you have to ask for it.
+
+214
+00:20:42,000 --> 00:20:49,024
+在你们认为使用秒或毫秒可能很重要的情况下，比只使用实际函数要好得多
+And in situations where you think it might matter if you're using seconds or milliseconds, it is much better to just use the actual function.
+
+215
+00:20:49,375 --> 00:20:55,125
+但由于我们基本上是在说，在Hazel中，默认情况下，TimeStep总是以秒为单位
+But since we're basically saying that in Hazel, by default, Timesteps are always going to be in seconds
+
+216
+00:20:55,250 --> 00:21:02,920
+然后毫秒是非典型的场景，显然，只要你们在文档中明确了这一点，就可以这样做
+and then milliseconds is the non-typical scenario. It's fine to just do this as long as you make it clear, obviously, in your documentation
+
+217
+00:21:02,920 --> 00:21:10,775
+在你们的代码中，这个只返回秒，好了，酷，所以现在把这个去掉，只有时间ts
+and in your code that this is going to give you seconds. OK, cool. So now we get rid of this, and we just have times ts.
+
+218
+00:21:11,500 --> 00:21:19,975
+我们到处都有它，好了，用于任何形式的移动，现在所有这些都与游戏的运行速度无关
+And we have that everywhere, OK, for any kind of movement. And now all of this stuff is not tied to the speed of our game running.
+
+219
+00:21:20,400 --> 00:21:24,275
+现在我想要做的是，让大家看看之前是什么样子的
+Now, what I want to do before I do that is show you guys what it was like before.
+
+220
+00:21:24,675 --> 00:21:27,525
+所以如果我不那么做，让我们看看有什么问题
+So if I don't do that, let's see what the problem is.
+
+221
+00:21:27,525 --> 00:21:34,550
+显然如果现在运行我的代码，已经打开了v-sync，意味着它将以每秒60次的速度运行
+So obviously, if I run my code right now, I've got v-sync turned on, which means that it's going to run at 60 times per second.
+
+222
+00:21:34,550 --> 00:21:40,625
+你们可以看到DeltaTime是每秒60，事实上我可能会回到之前实现，这样就可以看到那个
+And you can see that my DeltaTime was 60 per second. In fact, I might go back to what we had before just so that we can see that.
+
+223
+00:21:41,050 --> 00:21:47,200
+所以如果我连续<Ctrl-z>，这样就回到这里了，对吧，然后按f5
+So if I just control z a whole bunch, so that we get back to this, right, and I hit f5,
+
+224
+00:21:48,150 --> 00:21:58,840
+你们会看到，实际上得到的是0.16秒的TimeStep，所以在这里，0.016秒，对吧
+you'll see that what we actually end up with is a Timestep of 0.16 seconds, right. So over here, sorry, 0.016 seconds, right
+
+225
+00:21:58,975 --> 00:22:03,960
+那就是我们要做的，因为v-sync已经打开了，现在让我们继续创造个不同的版本
+That's what we're at because v-sync's turned on. Now let's go ahead and create a different story for ourselves.
+
+226
+00:22:04,175 --> 00:22:10,850
+我想在这里展示的最后一个是，你们可以看到，移动和旋转有多快，就是那么快，对吧
+Oh, and one last thing that I actually wanted to show here is you can see how fast the movement and rotation is, it's that fast, right.
+
+227
+00:22:11,575 --> 00:22:21,175
+因此如果进入Application，我不记得我们是否创建了这个接口，设置了v-sync，对吧
+So if we go into our Application, and I don't remember if we created this API or not. Yeah, so we have set v-sync, right.
+
+228
+00:22:21,275 --> 00:22:27,450
+因此如果我们返回到Application，当我们创建窗口时，实际将v-sync设置为false
+So if we go back to Application, when we create our window and actually set v-sync to be false,
+
+229
+00:22:27,700 --> 00:22:36,275
+对吧，那要做的就是把glfw交换间隔设置为0，对吧，而且它应该运行得更快
+right, what that's going to do is set the glfw swap interval to be zero, right. And it should run a lot faster.
+
+230
+00:22:36,350 --> 00:22:40,875
+我们将看到它渲染帧的速度的实际帧速率
+And we'll see our actual kind of real frame rate of how fast it's able to render frames,
+
+231
+00:22:40,875 --> 00:22:46,150
+因为现在它会以最快的速度实现这个，如果我们看一下TimeStep，你们会发现它要小得多
+because now it's going to do it as fast as possible. And if we look at our Timestep, you can see it's a lot smaller.
+
+232
+00:22:46,150 --> 00:22:51,700
+大概是3毫秒，对吧，0.003秒，好了，我认为它可能正在使用英特尔显卡之类的
+It's like three milliseconds, right, 0.003, okay. I think it's probably using the Intel GPU or something like that.
+
+233
+00:22:52,550 --> 00:22:59,350
+不，它使用的是NVIDIA，酷，所以现在如果我试着移动，看看这个，突然变得快多了，对吧
+No, it's using NVIDIA. Okay, cool. So now if I try moving, whoa, look at that. That's suddenly so much faster, right.
+
+234
+00:22:59,675 --> 00:23:02,900
+那就是我所说的问题，对吧，我们不想这样
+That's the problem that I'm talking about, right. We don't want this.
+
+235
+00:23:03,080 --> 00:23:09,650
+我们希望它的速度是相同的，无论打开还是关闭v-sync，对吧，那就是我们试图在这实现的
+We want it to be the same speed, no matter if we have v-sync on or off, right So that's what we're trying to achieve here.
+
+236
+00:23:09,975 --> 00:23:17,275
+现在如果我们把这个和ts相乘，对吧，所以我会复制这个，复制并粘贴很多次
+So now if we multiply this with ts, right. So I'll just grab this and copy and paste it a bunch of times.
+
+237
+00:23:19,700 --> 00:23:24,375
+并且我会去掉这个打印，现在它将乘以ts
+And I'll get rid of this print thing. Now it's going to be multiplied by ts.
+
+238
+00:23:24,525 --> 00:23:30,725
+所以无论我们运行得多快，总是以相同速度运行，不会出现像超慢或超快之类的
+So no matter how fast we run, we'll always run at the same speed. It won't be like super slow or super fast or anything.
+
+239
+00:23:30,725 --> 00:23:36,012
+它将以设定的速度运行，现在，它将是超级慢的，因为很明显我们的速度相当慢，对吧
+It'll be at the speed that we set it at. Now, right now it's going to be super slow because obviously our speed is quite slow, right.
+
+240
+00:23:36,475 --> 00:23:40,760
+所以我们已经说过，我们的移动速度大约是每秒0.1个单位之类的，那真的很慢
+So we've said that we're moving like 0.1 units per second or whatever. That's really quite slow.
+
+241
+00:23:40,925 --> 00:23:48,675
+因此我们的相机移动速度将变为1，相机转速是2，可能会把它改成10个单位左右
+So our camera move speed will change to be one. And our camera rotation speed is two. We might make that like 10 or something like that.
+
+242
+00:23:48,675 --> 00:23:55,200
+记住这是以度为单位的，所以想想，你们要让它在一秒内旋转多少度，那就是关键所在
+Remember, this is in degrees. So think about how much you want it to rotate in one second. That's what this is coming down to.
+
+243
+00:23:55,500 --> 00:24:02,325
+所以我们希望它每秒旋转10度，那样好吗，每秒移动一个单位，对吧，仔细想想
+So we want it to rotate 10 degrees per second. Is that fine Is moving one unit per second fine, right Think about that.
+
+244
+00:24:02,500 --> 00:24:09,550
+所以我可能会想，大概每秒30度之类的，不知道，那可能太快了
+So I might see maybe like 30 degrees per second or something. I don't know. That might be too fast.
+
+245
+00:24:10,425 --> 00:24:19,925
+每秒一个单位可能也太慢了，但我们可以看到，所以说旋转速度其实感觉相当慢的
+One unit per second is probably going to be too slow as well, but we can see. So that rotation speed is actually quite slow feeling.
+
+246
+00:24:20,300 --> 00:24:29,625
+移动速度也是如此，让我们把这个提高到180，所以也许需要一秒钟来旋转180度
+So is the movement speed. Let's bump this up maybe to five and to 180. So maybe it takes us a second to rotate 180 degrees.
+
+247
+00:24:29,875 --> 00:24:35,600
+那可能会更合理点，好了，你们可以看到，所以那大约需要一秒钟，对吧
+That might be a little bit more reasonable. Okay. And you can see, yep. So that takes about a second, right.
+
+248
+00:24:36,150 --> 00:24:41,700
+旋转，我们的移动速度要快得多，好了，所以那要看情况了，可能太快，你们可能不会
+To rotate and our movement speed is a lot faster. Okay. So that depends like this might be too fast for you might not be.
+
+249
+00:24:42,100 --> 00:24:47,200
+但这个想法是，你们知道，记住这个速度，对吧，它相当快
+But the idea is that, you know, remember this speed, right, It's quite fast.
+
+250
+00:24:47,875 --> 00:24:54,375
+现在我能做的就是返回到Application，确保我们没有v-sync，所以现在开启v-sync，对吧
+Now what I can do is go back to Application, make sure we're not doing v-sync. So now v-sync will be on, right
+
+251
+00:24:54,375 --> 00:25:00,175
+我们不再将其设置为false，现在我们应该得到的是什么，不妨猜猜
+We're not setting it to false anymore. And now what we should get is guess what.
+
+252
+00:25:00,175 --> 00:25:07,650
+相同的速度，尽管我们现在运行更新循环的次数少了很多，对吧
+The same exact speed, even though we're running the update loop a lot less times now, right.
+
+253
+00:25:07,650 --> 00:25:14,575
+就像少了很多，因为我们每秒只做60次，而不是我们以前运行的次数
+Like a lot less frequently, because we're only doing it 60 times per second instead of like, how many ever times we were doing it before.
+
+254
+00:25:14,925 --> 00:25:19,700
+好了，所以你们可以看到，为什么TimeStep很重要，以及我们如何才能真正轻松使用它们
+Okay. So you can see why Timesteps are important and how we can use them really easy.
+
+255
+00:25:19,700 --> 00:25:23,900
+我们已经创建了个为我们做所有这些的非常好的接口，可能只是个浮点数
+And we've created a really nice API for us that does everything for us again, could have just been a float
+
+256
+00:25:24,025 --> 00:25:26,850
+但这个明显要强大许多，我们可能会在以后拓展这个功能
+but this is a lot more powerful and we'll probably expand this in the future.
+
+257
+00:25:27,700 --> 00:25:31,725
+当我们想用我们的TimeStep做更高级的事情时，无论如何，我希望你们喜欢这期视频
+When we want to do more advanced things with our Timestep. Anyway, I hope you guys enjoyed this video.
+
+258
+00:25:31,725 --> 00:25:36,450
+如果喜欢的话，就为它点赞吧，你们也可以通过访问patreon.com/thecherno来帮助支持
+If you did, you can hit the like button. You can also help support the series by going to patreon.com/thecherno.
+
+259
+00:25:36,450 --> 00:25:41,112
+一如既往地非常感谢所有使这个系列成为可能的可爱的赞助人
+Huge thank you as always to all the lovely patrons that make this series possible.
+
+260
+00:25:42,175 --> 00:25:47,400
+希望那能提供一些帮助说明什么是DeltaTime，什么是游戏引擎和游戏中的TimeSteps
+Hope that was kind of informative about what DeltaTime, what Timesteps are in game engines and in games in general.
+
+261
+00:25:47,675 --> 00:25:56,536
+我认为它是个非常简单的话题，经常被隐藏，是的，它经常被隐藏起来
+I think that it's a very, very, very simple topic that is often like glossed over. It's often kind of glossed over.
+
+262
+00:25:56,800 --> 00:26:01,300
+这通常就像是被忽视的，就像，你们知道，无论什么，让我们把这个包含进来
+It's often just like disregarded and just like, you know, whatever, let's just jam this in.
+
+263
+00:26:01,300 --> 00:26:05,500
+并不重要，或者这很复杂，你们知道，我们必须处理好时间，那可能就太复杂了
+It's not important or it's such a complicated, you know, we have to deal with timing. That's probably so complicated.
+
+264
+00:26:05,675 --> 00:26:11,950
+牵涉到数学，你们知道，我们就是不去做，然而它只是如此简单，对吧，如此简单强大
+There's maths involved, you know, let's just not do it. Whereas it's just so simple, right And it's so simple. It's so powerful.
+
+265
+00:26:11,950 --> 00:26:17,000
+它能让你们的游戏在任何帧率或刷新率下正常运行，对吧
+It makes your game run properly on no matter what frame rate or refresh rate you're running on, right.
+
+266
+00:26:17,000 --> 00:26:23,800
+如果我现在想在120Hz或144Hz的显示器上玩这个游戏
+If I now want to play this game of mine on a monitor that has like 120Hz, 144Hz,
+
+267
+00:26:24,175 --> 00:26:27,625
+或者是240Hz，它实际上会正确地渲染更多的帧
+240Hz, it's actually going to render more frames properly.
+
+268
+00:26:27,975 --> 00:26:31,475
+就像它实际上会正常运行，你们会看到那种丝滑的效果
+Like it's actually going to run properly and you'll see that smooth effect.
+
+269
+00:26:31,850 --> 00:26:39,400
+我们所要做的只是一点数学和计时逻辑，只有三行时间的代码，对吧，非常简单的东西
+And all we had to do was just a little bit of maths and a little bit of timing logic, like three lines of just time, right, Really easy stuff.
+
+270
+00:26:40,325 --> 00:26:42,575
+那就是我想要的这个游戏引擎系列的主题，对吧
+That's kind of what I want this game engine series to be about, right.
+
+271
+00:26:42,575 --> 00:26:46,600
+只是向你们展示这有多简单，这些事情有多简单和容易做
+Just showing you guys how simple it is, how a lot of these things are so simple and easy to do.
+
+272
+00:26:46,725 --> 00:26:53,880
+现在，在下期，我想看看物体的变换，因为现在，我们已经有了相机，那太棒了
+Now, in the next episode, I want to kind of talk about object transforms, because at the moment, we have a camera, that's fantastic.
+
+273
+00:26:54,125 --> 00:26:57,900
+但如果我想渲染成三个不同的对象，三个不同的方块
+But what if I want to render like three different objects, three different like squares that
+
+274
+00:26:57,900 --> 00:27:00,989
+或者在屏幕上的不同位置有三个不同的三角形
+we have here, or three different triangles at different positions on the screen.
+
+275
+00:27:01,325 --> 00:27:06,225
+目前我还不能实现那个，但我希望能够做到，所以我们下期就会讲那个
+I can't actually do that at the moment, but I want to be able to do that. So we'll cover that next time.
+
+276
+00:27:06,625 --> 00:27:12,500
+然后我想，我们可能会做些令人兴奋的事情，比如与图形相关的
+And then we might move on to more exciting things like just graphics related things, I think.
+
+277
+00:27:12,800 --> 00:27:17,500
+再说一次，因为我的意思是，确实有很多东西要讲，但我认为，下期
+Again, because I mean, there's a lot of stuff to cover really, but I think, yeah, next time
+
+278
+00:27:17,500 --> 00:27:21,375
+我们将处理对象变换，看看我们实际上是如何告诉我们的渲染器
+we're going to deal with object transforms and see how actually we tell our renderer
+
+279
+00:27:21,650 --> 00:27:23,950
+在屏幕上我们想要渲染特定对象的位置
+where on the screen we want to render a particular object.
+
+280
+00:27:24,500 --> 00:27:30,325
+现在，在以后，当我们转向像实体组件系统或某种类似的可组合游戏对象时
+Now, in the future, when we move to like an entity component system or some kind of like composable game objects
+
+281
+00:27:30,625 --> 00:27:37,725
+或者任何一种实际处理实体或游戏对象的类似系统，它们都会有自己的变换组件
+or any kind of like system that actually deals with entities or game objects, they're going to have their own transform component.
+
+282
+00:27:38,075 --> 00:27:41,200
+并且然后那最终都会输入到渲染器中
+And then that's going to kind of feed into the renderer eventually.
+
+283
+00:27:41,200 --> 00:27:44,625
+但就目前而言，我们将有一个更简单的系统，让我们只需安排
+But for now, we're going to have a more simple system that just lets us arrange stuff.
+
+284
+00:27:44,625 --> 00:27:48,321
+但无论如何，我们将在下期视频中集中地讨论那个，感谢你们的观看，拜
+But anyway, we'll talk more about that in the next video. Thank you for watching. Goodbye.
+

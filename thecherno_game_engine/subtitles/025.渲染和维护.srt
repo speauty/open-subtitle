@@ -1,0 +1,1250 @@
+﻿1
+00:00:00,133 --> 00:00:03,275
+嘿，大家好，我是TheCherno，欢迎回到我的游戏引擎系列
+hey, what's up guys, my name is TheCherno, welcome back to my game engine series
+
+2
+00:00:03,325 --> 00:00:08,550
+所以在过去几周里，生活像往常一样忙碌，对于那些不知道的人来说，我两周后就要结婚了
+so over the last few weeks, of course my life has been hectic as always and getting married in two weeks for those of you who don't know
+
+3
+00:00:09,500 --> 00:00:12,800
+我真的很高兴能坐下来，有时间再花点时间在Hazel上
+I'm really excited to just sit down, and have some time to spend on Hazel once again
+
+4
+00:00:12,800 --> 00:00:16,900
+我迫不及待地想等我生活中发生的一切都结束了
+and I can't wait for all of this stuff is going on in my life to kind of just be over
+
+5
+00:00:17,150 --> 00:00:25,000
+这样我就可以重新过上正常的平静生活了，但不管怎样，还是让我们继续说说Hazel吧
+so that I can just kind of get back to just having a normal peaceful life, but anyway anyway let's just kind of move on and talk about Hazel
+
+6
+00:00:25,000 --> 00:00:29,175
+因为我在这期之前所做的一切都是完全没有计划的，这一切都不是有计划的
+because what I did before this episode is like this is completely unplanned, none of this is planned
+
+7
+00:00:30,200 --> 00:00:33,900
+我大概知道我要做什么，只是因为我已经考虑过了，但没有任何计划
+I know roughly what I'm going to do just because I've thought about it, but there's nothing's planned
+
+8
+00:00:33,900 --> 00:00:39,000
+所以我们要做期精彩的现场直播，因为你们似乎很喜欢，似乎不喜欢我计划事情的时候
+so we're just going to have a nice live episode, because you guys seem to love that, you guys seem to not like when I plan things
+
+9
+00:00:39,000 --> 00:00:42,366
+然后只是复制一些代码，我甚至不知道今天需要写什么代码
+and then just copy and base some code, I actually don't even know what code I want to write today
+
+10
+00:00:42,366 --> 00:00:45,125
+我们只是想看看进展如何，说一些事情
+we're just gonna kind of see how we go, we're gonna talk about some stuff
+
+11
+00:00:45,475 --> 00:00:49,075
+这几乎很像cherno之前的视频风格
+it's almost gonna be like a good old fashioned kind of cherno episode
+
+12
+00:00:49,075 --> 00:00:52,425
+像往常一样，我想做的第一件事就是感谢让这一切成为可能的人
+first thing I want to do as always is just thank the people who make this possible
+
+13
+00:00:52,425 --> 00:00:58,800
+patreon.com/thecherno是你们支持我的一种方式，确保我可以继续创作这些视频
+patreon.com/thecherno is a way for you guys to support me, and make sure that I can keep making these videos
+
+14
+00:00:59,500 --> 00:01:03,550
+尤其是在这样的时候，对所有让这一切成为可能的人来说，这是一件大事
+especially in time like this a huge thing here to everyone who's making this stuff possible
+
+15
+00:01:05,550 --> 00:01:11,650
+今天我们将讨论Hazel的情况，我们将从渲染器开始，以及整个渲染器方面
+today we're gonna just talk about what is going on with Hazel, we're gonna start on the renderer, and the whole renderer side of things
+
+16
+00:01:12,566 --> 00:01:18,625
+我们就那样讨论，在Hazel架构中有很多东西，我已经忽视了一段时间了
+and we're just gonna talk about like that, there's a bunch of things going on in Hazel architecturally that I have kind of been ignoring for a while
+
+17
+00:01:19,425 --> 00:01:25,950
+事实上，我甚至不能百分之百确定是否真的会建立一个干净的仓库，所以还有很多事情要做
+and in fact I'm even not 100% sure that a clean check out of the depository actually will build, so there's just a lot of things going on
+
+18
+00:01:25,950 --> 00:01:32,475
+但今天它将讨论很多事情，这将是一个什么样的方向，以及如何开始渲染器
+but it's going to kind of talk about a lot of things today, and where this is going to kind of go as well as get a start on the renderer
+
+19
+00:01:32,475 --> 00:01:37,775
+因此这期视频的标题可能类似于你们知道的，渲染OpenGL，渲染上下文和交换通道之类的
+so this video will probably be titled something like you know, rendering OpenGL, rendering context and swap channel something like that
+
+20
+00:01:37,775 --> 00:01:45,099
+我不知道，但我们也会讨论一些事情，所以第一步是看看所有事情的状态
+I don't know, but we'll kind of just talk about things as well, so first step is to take a look at the state of everything
+
+21
+00:01:45,100 --> 00:01:49,250
+那么让我们继续看一下我打开Hazel时看到的内容，好吧
+so let's just go ahead and take a look at what I saw when I opened Hazel, alright
+
+22
+00:01:49,250 --> 00:01:56,450
+所以我想我实际上做了什么，在某种意义上我忘记了什么，如果我们看看这个错误列表
+so I think what I actually did and what I kind of forgot about in a sense, if we just take a look at this error list
+
+23
+00:01:57,775 --> 00:02:05,550
+我刚刚做了一个干净的构建，我想到了一切，我们有这个，所以有很多警告，三个链接错误
+I just did a clean build, I think of everything and we have this, so we have a lot of warnings, and we have three linking errors
+
+24
+00:02:05,550 --> 00:02:11,170
+因为我实际上完全忘记了，所以我继续描述渲染器，并介绍了渲染视频
+because I actually completely forgot, I went on to describing the renderer with the introduction to rendering video
+
+25
+00:02:11,400 --> 00:02:15,150
+以及渲染接口架构视频
+as well as the actual kind of rendering api architecture video
+
+26
+00:02:15,825 --> 00:02:21,075
+但在此之前，我问了你们一个问题，我们如何解决这些问题
+but before that what I did was I actually gave you guys a question as to how do we fix these
+
+27
+00:02:21,075 --> 00:02:26,525
+我们这里的ImGui链接错误，对吧，然后我展示给大家，让大家完全忘记那些东西
+ImGui linking errors that we have over here, right, and then I presented to completely forget about that stuff
+
+28
+00:02:26,525 --> 00:02:32,766
+因为我现在的生活当然是一团糟，但无论如何，不是那样，这是一团糟，但只是
+because of course my life is just huge mess right now, but anyway, not that, it's a bad mess but it's just
+
+29
+00:02:32,766 --> 00:02:38,275
+只是很难做很多事情，不管怎样都要解决，所以我们有这样的链接错误
+it's just it's very hard to do a lot of things, that want settle anyway, so we have these kind of linking errors
+
+30
+00:02:39,200 --> 00:02:42,975
+我问你们为什么会有它们，因为实际上发生了什么
+and I asked you guys why we having them, because essentially what's happening
+
+31
+00:02:43,350 --> 00:02:48,835
+我向你们提出了一个问题，我们如何解决这个问题，这里发生的是
+and I gave you guys the question of how do we fix this stuff, what's happening here is that
+
+32
+00:02:49,650 --> 00:02:56,125
+如果我们看看这里所有这些模块的架构，就会发现
+if we look at kind of the just the build architecture of all these modules that we have here, what's happening is
+
+33
+00:02:56,566 --> 00:03:00,700
+ImGui是作为一个静态库构建的，对吧，如果我们转到这里的属性
+ImGui is being built as a static library, right, if we just go to properties over here
+
+34
+00:03:00,966 --> 00:03:10,075
+我们来看看这个配置类型在哪里，它当然是一个静态库，我们在premake中做了那个
+and we take a look at where are we this this configuration type, it's such a static library of course, and we did that in premake
+
+35
+00:03:10,866 --> 00:03:15,625
+那意味着它是静态构建的，对吧，所以我们用所有ImGui代码构建一个静态库
+what that means is that it's building statically, right, so we're building a static library out of all of the ImGui code
+
+36
+00:03:15,625 --> 00:03:21,675
+很好，对吧，但接下来发生的事情被链接到Hazel，Hazel是一个dll文件，对吧
+which is great, right, but then what's happening is being linked into Hazel, Hazel is a dll file, right
+
+37
+00:03:22,000 --> 00:03:27,650
+这意味着链接实际上发生了，对吧，dll文件与exe文件非常相似，因为它们只是
+which means that linking actually occurs, right, dll files are very much like exe files in the sense that they just kind of
+
+38
+00:03:28,200 --> 00:03:35,970
+它们有相似的入口点和所有这些，但在这个意义上，它们将实际的库链接到
+well they have like entry points and all of that, but in this sense, they link the actual the actual library into
+
+39
+00:03:36,250 --> 00:03:43,850
+就像库实际上被链接到这个dll文件中一样，所有的事情都必须在链接时解决，对吧，那很好
+like libraries actually get linked into this dll file, and everything has to be resolved at link time, right, so that's great
+
+40
+00:03:43,850 --> 00:03:49,650
+因为这意味着Hazel中ImGui的任何使用都将在链接或链接所有函数中得到解决，那很好
+because it means that any usage of ImGui inside Hazel will just be resolved in the link or link all the functions, and that's great
+
+41
+00:03:50,133 --> 00:04:02,725
+但问题来自Sandbox，当决定在Sandbox中实际使用ImGui函数时，只需链接我们链接的内容
+but the issue comes from Sandbox, when we decide to actually hmm use ImGui functions in Sandbox by just linking what we link which is
+
+42
+00:04:03,600 --> 00:04:05,975
+实际上，它甚至不是这个东西
+well it's actually not even this stuff
+
+43
+00:04:05,975 --> 00:04:09,509
+它是在额外的依赖关系中，我们实际上已经链接到链接器中的东西
+that's in the additional dependencies is just stuff that we've actually linked into the linker
+
+44
+00:04:09,733 --> 00:04:20,325
+在本例中，它与C++标准库类似，也与Visual Studio类似于microsoft windows类库
+which in this case, is just like C++ standard library libraries, and also Visual Studio kind of like microsoft windows kind of libraries
+
+45
+00:04:20,325 --> 00:04:25,731
+你们知道，就像kernel32之类的库，但如果我们看引用，你们可以看到引用了Hazel
+you know, like kernel32 and use the 32 that kind of stuff, but if we look at references, you can see references Hazel
+
+46
+00:04:26,450 --> 00:04:30,595
+那就是链接所发生的，所以Sandbox是一个可执行文件，它链接这个Hazel.dll文件
+that's what the linking is happening, so Sandbox is an exe, that links this Hazel.dll file
+
+47
+00:04:30,800 --> 00:04:38,450
+问题是如果我们在Sandbox中使用ImGui的Begin和End，对吧，但在Hazel中并没有使用
+problem is if we use something like ImGui Begin and End inside Sandbox, right, however that hasn't been used inside Hazel
+
+48
+00:04:38,450 --> 00:04:43,150
+猜猜当Hazel链接ImGui时会发生什么，它不会去链接那些符号
+well guess what happens when Hazel links ImGui, it does not link those symbols
+
+49
+00:04:43,150 --> 00:04:45,850
+对吧，因为为什么没有使用它们，对吧，所以它们崩了
+right, because why because they're not used, right, so they're dead
+
+50
+00:04:45,850 --> 00:04:51,625
+为什么它们在这个二进制文件中包含这些函数，如果它们不被使用，它就不会执行那个
+why on earth were they include those functions in this binary, if they're not used, it doesn't do that
+
+51
+00:04:52,133 --> 00:04:57,175
+但正因为如此，这意味着它们没有暴露在Sandbox中，那么如何解决这个问题呢
+but because of that, it means that they're not exposed to Sandbox, so what is the way of fixing this
+
+52
+00:04:57,275 --> 00:05:03,874
+我们有几种方法可以解决这个问题，对吧，有一种方法就是看看ImGui::Begin
+well there's several ways we could fix this, right, we could like one way literally is just like oh look ImGui::Begin
+
+53
+00:05:04,125 --> 00:05:12,625
+如果来到Hazel/ImGui，抱歉不是vendor，是Hazel/src，你们知道ImGuiLayer或其他什么
+well you know if we were to go into Hazel ImGui, sorry not vendor, Hazel src, you know ImGuiLayer or whatever
+
+54
+00:05:13,000 --> 00:05:20,850
+并且我也不知道，那就直接用ImGui::Begin()和ImGui::End()吧
+and I don't know just use like Begin, let's just use Begin and End
+
+55
+00:05:20,900 --> 00:05:24,625
+对吧，如果我再构建一次所有这些东西，好吧，因此那就无法运行了
+right, if I do a build again of all of this stuff, okay, so that didn't work
+
+56
+00:05:24,625 --> 00:05:30,916
+那可能是因为我认为任何ImGui符号都不会以这种速度导出，IMGUI_API正是我们所需要的
+and that's probably because I don't think any ImGui symbols are actually being exported at this rate, IMGUI_API is kind of what we need
+
+57
+00:05:31,825 --> 00:05:38,850
+那可能根本设置不正确，我不知道这是否值得探索，因为这只是一个临时解决方案
+and that's probably not set correctly at all, I don't know if it's worth exploring this, because it's just a temporary solution
+
+58
+00:05:38,850 --> 00:05:46,225
+但如果我们看看Hazel/vendor/ImGui，然后看看premake文件，我想我们会发现
+but if we take a look at perhaps Hazel/vendor/ImGui, and then the premake file, I think we'll find that
+
+59
+00:05:46,993 --> 00:05:55,975
+好像它根本没有定义，而我们可能应该定义IMGUI_API，应该是
+yeah like it's not defined at all, whereas we should probably define ImGui, the IMGUI_API here to be
+
+60
+00:05:57,400 --> 00:06:03,850
+让我来看看，例如，应该定义IMGUI_API来处理所有导出
+let me just find something, and for example IMGUI_API should probably be defined to deal all export
+
+61
+00:06:05,000 --> 00:06:10,275
+所以让我们继续，我真的不想做这个，但我会很快实现这个来证明我的观点
+so let's go ahead and again I don't really want to do this, but I'll do this just quickly to demonstrate my point
+
+62
+00:06:11,133 --> 00:06:21,150
+因此把ImGui_API定义为空，事实上，让我们这样做，只是因为它不仅仅是期演示视频
+so let's define ImGui_API as no one, in fact let's just do it in this,  just because it is a, just because it is not just a demo video
+
+63
+00:06:21,150 --> 00:06:28,174
+因此，我们将ImGui_API定义为__declspec(dllexport)，我们将构建ImGui和Hazel，对吧
+so we'll define ImGui_API to be __declspec(dllexport), we will build ImGui and Hazel, right
+
+64
+00:06:31,600 --> 00:06:37,050
+然后我们要做的是去掉__declspec(dllexport)，它实际上触发了重建
+and then what we'll do is we'll take away that __declspec(dllexport), which actually my trigger a rebuild
+
+65
+00:06:37,325 --> 00:06:44,074
+现在我想我可能真的很蠢，是的，的确如此，没关系，那行不通，所以不如做得更好一点
+now that I think about I'm probably really stupid, yes it did, never mind, that's not gonna work, so instead how about we do it a bit better
+
+66
+00:06:44,466 --> 00:06:50,685
+在ImGui中构建功能，我们实际上包含了这些东西，但实际上并没有包含所有内容
+and inside the ImGui to build functional, we actually include this stuff, which we don't actually include everything
+
+67
+00:06:51,600 --> 00:06:55,850
+不管怎样，这是没有办法的，让我们好好做吧，我本来打算通过黑客破解
+anyway, there's no really way around this, let's just do it properly, I was going to hack my way through this
+
+68
+00:06:55,850 --> 00:07:00,600
+但很明显那不太好，所以我很快要做的是，对于Hazel
+but clearly that's just not great, so what I'll do quickly here is for Hazel
+
+69
+00:07:01,325 --> 00:07:14,850
+在预处理器内部，我将把IMGUI_API设置为__declspec(dllexport)，好了
+inside the preprocessor, I'll just set IMGUI_API equal to __declspec(dllexport) like that, all right
+
+70
+00:07:15,933 --> 00:07:20,200
+然后在ImGui中，我想我也会这样做
+and then inside ImGui, I guess I'll do the same
+
+71
+00:07:22,075 --> 00:07:28,400
+然后在Sandbox中，我会将其设置为dllimport，对吧，这只是一个小小的快速破解
+and then inside Sandbox, I'll set it to import, right, this is just a little quick hack
+
+72
+00:07:29,800 --> 00:07:37,175
+希望现在这个能解决这些符号，因为它们已经被使用了，让我们看看，好了
+and then hopefully this now should actually resolve those symbols, because they've been used, so let's take a look at that, okay
+
+73
+00:07:37,175 --> 00:07:40,475
+所以我们在这里得到了一个成功的构建，对吧，或者那已经解决了
+so we get a we get a successful build here, right, or that's kind of been resolved
+
+74
+00:07:41,450 --> 00:07:43,900
+所以那就是你们能做的，可以把它向前推进
+so that's what you can do, you can just kind of forward that
+
+75
+00:07:43,900 --> 00:07:50,350
+但问题是，如果我们实际上不使用符号，对吧，所以我不知道，我会尝试删除这个
+but again the problem is that, if we don't actually use the symbols, right, so I don't know I'll try and remove this
+
+76
+00:07:50,350 --> 00:07:56,100
+我不确定它在这种情况下是否可行，这取决于它们以前是否被使用过
+I'm not sure if it like it might work in this situation, it depends if they've been used before like yeah so that built
+
+77
+00:07:56,766 --> 00:08:03,566
+但如果我们尝试使用ImGui::，你们知道的ColorEdit4或其他一些你们知道的函数
+but if we maybe try and use something like ImGui, you know ColorEdit4 or something you know
+
+78
+00:08:06,925 --> 00:08:09,275
+让我们试着做一些类似的事情，只是把它黑进去
+let's just try and do something like that, just to hack it in
+
+79
+00:08:10,350 --> 00:08:15,275
+然后可能最终不会链接，好吧，它确实链接了，很棒
+then that might ultimately not link, okay, it does link, great
+
+80
+00:08:15,400 --> 00:08:19,625
+在这一点上，一切都是最糟糕的，一切都正常，一切正常，但不应该运行
+everything's the worst at this point, everything just works, everything works, but it's not supposed to work
+
+81
+00:08:20,000 --> 00:08:26,199
+无论如何，我的观点是，某些符号可能无法完全转发，但那只是一个解决方案
+anyway, my point again being that, certain symbols might not get completely forwarded, but that is a solution
+
+82
+00:08:26,199 --> 00:08:31,375
+我给你们看的是一个解决方案，你们可以确保它们在某处被实际使用
+what I'm just showing you is a solution, you can just kind of make sure that they're actually used somewhere
+
+83
+00:08:31,375 --> 00:08:39,250
+然后根据需要执行__declspec(dllimport)导入，使用这些符号，就像我向你们展示的那样
+and then do a __declspec(dllimport) as requires that you actually get to use those symbols, right, in the way that I showed you
+
+84
+00:08:39,666 --> 00:08:44,725
+实际上，那是完全可能的，如果我们只是这样做，我甚至不知道我们的目标是什么
+that's totally possible in effect, if we just run this, I didn't even know what out goal was it
+
+85
+00:08:44,725 --> 00:08:48,025
+只要有一个窗口，上面写着hello world，我想，它就在那里
+just to have a window that says hello world I guess, and there it is
+
+86
+00:08:48,025 --> 00:08:50,775
+对吧，我们可以把它拖出来，这很酷，好了
+right, and we can drag it out, which is pretty cool, okay
+
+87
+00:08:51,100 --> 00:08:58,425
+因此我们有个漂亮窗口，这是一个解决方案，另一个解决方案，只想重申一下这个问题
+so there we have that window beautiful, that is a solution, another solution, and I just want to reiterate the problem
+
+88
+00:08:58,425 --> 00:09:03,100
+我知道这应该是一个渲染视频，但可能会有点偏离轨道，因为这是完全没有计划的
+I know this was supposed to be a rendering video, but maybe moved on a little bit off the rail, because this is completely unplanned
+
+89
+00:09:03,525 --> 00:09:07,800
+但无论如何，你们可以做的另一件事可能是更好的解决方案
+but anyway, another thing that you could do and the board would probably be the better solution
+
+90
+00:09:08,566 --> 00:09:14,875
+长期而言，因为这再次依赖于我们再次遇到的问题是，ImGui将静态库构建到dll文件中
+long term because again this relies the problem we have again is that, ImGui builds a static library into a dll file
+
+91
+00:09:14,875 --> 00:09:22,725
+但是dll文件有能力从ImGui中删除所有未使用的内容，因此如果链接dll文件的exe文件
+but the dll file has the power to strip everything that's unused from ImGui, so if the exe file which links the dll file
+
+92
+00:09:22,725 --> 00:09:27,875
+其中有一个静态lib，如果它决定使用不存在的东西，就会出现链接错误
+which has a static lib in it, if that decides to use something that is not present, there will get a linking error
+
+93
+00:09:29,225 --> 00:09:34,723
+理想情况下，你们要做的是确保ImGui中的所有内容都导出到dll文件中
+ideally what you would do is make sure that everything from ImGui is exported into the dll file
+
+94
+00:09:34,933 --> 00:09:38,450
+但是，在不实际使用这些函数或确保使用它们的情况下，如何做到这一点呢
+but how do you do that without actually using those functions or making sure that they are used
+
+95
+00:09:39,200 --> 00:09:44,725
+答案基本上是使用一个模块文件，一个模块定义文件，即def文件def，对吧
+the answer is basically to use a module file, a module definition file which is the def file def, right
+
+96
+00:09:45,066 --> 00:09:50,600
+在这里，你们要做的是列出所有要导出的函数签名，那就是dll将导出的函数
+what you do in there is you list all the function signatures that you want to export, and that is what the dll will export
+
+97
+00:09:51,550 --> 00:09:57,200
+如果我们快速过一下Hazel，我甚至不知道它在哪里，因为我认为这是一个输入
+if we take a look at Hazel really quickly, I don't even know where this is, because I think it's an input
+
+98
+00:09:57,200 --> 00:10:01,700
+是了，我们有一个模块定义文件，所以我们基本上可以像Hazel.def文件一样
+yeah we have a module definition file, so we can make like a Hazel def file essentially
+
+99
+00:10:01,966 --> 00:10:05,650
+其中列出了我们要从ImGui导出的所有函数
+which has all of the functions that we want to export from ImGui listed
+
+100
+00:10:05,950 --> 00:10:11,600
+那意味着Hazel从ImGui中链接的所有函数都在这个定义文件中
+what that means is that everything that Hazel links in from ImGui, that is inside this definition file
+
+101
+00:10:11,900 --> 00:10:19,025
+它实际上还将包含在二进制文件和标记导出，以便可以在Sandbox中导入它，那将解决问题
+it will also actually include in our binary and marked for export, so that we can import it inside Sandbox, and that will fix the problem
+
+102
+00:10:19,800 --> 00:10:27,475
+不幸的是，这些def文件不容易制作，就像你们必须手动制作一样，据我所知，没有工具
+unfortunately these def files are not easy to make, like you have to make them manually, as far as I know there's no tools to do them
+
+103
+00:10:27,975 --> 00:10:33,900
+我相信我真的有一个，如果我们快速看一看，非赞助人的小预告
+and I believe I actually have one of them, if we take a look really quickly little sneak preview for non patrons
+
+104
+00:10:34,133 --> 00:10:41,700
+我们切到Hazel开发库，看看Hazel，你们可以看到我实际上在这里创建了一个def文件
+we just jump into the Hazel dev repository, and take a look at Hazel, you can see I actually made a definition file here
+
+105
+00:10:41,800 --> 00:10:47,500
+所以我们有Hazel.def文件，它有ShowDemoWindow，Begin，End和ColorEdit4之类的签名
+so we have a Hazel.def file, which has like ShowDemoWindow Begin and ColorEdit4 that kind of stuff, right
+
+106
+00:10:48,050 --> 00:10:51,525
+你们可以看到，我们有库Hazel，它导出以下选项
+and you can see that we have library Hazel, and it exports the following options
+
+107
+00:10:51,525 --> 00:10:56,275
+那就是我们如何将它们传递到我们的Sandbox项目中，所以这很痛苦
+and that's how we can actually propagate them into our Sandbox project, so this is a pain
+
+108
+00:10:56,275 --> 00:11:01,225
+因为你们必须获得签名，对吧，然后每次都必须手动对所有函数执行签名
+because you have to get the signature, right, and then every time you have to do that for all the functions manually
+
+109
+00:11:01,400 --> 00:11:09,750
+所以说实话，这很糟糕，我讨厌它，这就是为什么我一直在和所有用户频道的人讨论
+so it sucks, to be honest, I hate it, which is why I've kind of been having a discussion with all the people on the patron channel
+
+110
+00:11:09,750 --> 00:11:16,225
+这是Hazel开发频道，一直在讨论是否应该将Hazel转换为静态库
+which is the Hazel dev channel, kind of been having a discussion as to maybe we should convert Hazel into a static library
+
+111
+00:11:16,700 --> 00:11:21,275
+因为dll文件很棒，但老实说，我也不喜欢dll文件
+because dll files are great, but they also, to be honest, I don't like dll files
+
+112
+00:11:22,575 --> 00:11:27,200
+我最初想与Hazel达成妥协的原因可能是因为可能存在热更新代码
+the reason I wanted to make Hazel a deal originally is because of maybe the possibility of hot swapping code
+
+113
+00:11:28,533 --> 00:11:33,575
+而且也只是为了让客户端的链接更容易
+and and also just to make a client side kind of linking easier
+
+114
+00:11:33,575 --> 00:11:38,225
+这意味着如果我们用Hazel做一个游戏，在这种情况下是Sandbox，对吧
+meaning that if we make a game with Hazel, which in this case is Sandbox, right
+
+115
+00:11:38,225 --> 00:11:46,199
+唯一需要链接的是Hazel，因为Hazel是个dll，其中包含所有其他内容，那显然有好处
+the only thing we have to link is Hazel, because Hazel is a dll file, which contains everything else, that has a benefit obviously
+
+116
+00:11:46,199 --> 00:11:52,175
+但它也有缺点，首先，这个好处很容易修复，因为我们使用的是premake构建系统
+but it also has the drawback, well first of all, that benefit is easily fixed, because we're using premake sr build systems
+
+117
+00:11:52,175 --> 00:11:58,200
+所以我们没有理由不能生成一个游戏类的premake文件，它实际上链接了所有需要的东西
+so there's no reason why we can't generate a game kind of premake file, which actually links everything that's needed anyway
+
+118
+00:11:58,600 --> 00:12:02,000
+在我看来，无论何时我要用Hazel制作一个游戏
+and in my opinion, whenever I'd be work making a game with Hazel
+
+119
+00:12:02,000 --> 00:12:06,425
+我都希望有一个VS解决方案，其中包含所有内容，对吧
+I would want a visual studio solution with everything in it anyway, right
+
+120
+00:12:06,775 --> 00:12:11,025
+所以事实上，我们只需要将一件事与游戏联系起来并没有什么大不了的
+so the fact that we only have to link one thing into the game isn't actually that big of a deal
+
+121
+00:12:11,025 --> 00:12:16,400
+因为同样，每次我们创建一个新项目时，我们都会设置好premake文件，它会显示所有内容
+because again, we'll have the premake file already set up, every time we create a new project, which looks everything 
+
+122
+00:12:16,400 --> 00:12:25,950
+不管怎样，静态库的好处当然是，所有内容都链接到我构建的exe文件中
+anyway, benefits of static libraries of course are essentially that, everything just gets linked into that exe file I built time
+
+123
+00:12:25,950 --> 00:12:31,775
+这意味着一切都是正确的版本，一切都是最新的，C++标准库，我们有一个版本
+which means everything is kind of the right version, everything's up to date, the C++ standard library, we have one version of that
+
+124
+00:12:31,775 --> 00:12:40,600
+我们不需要像现在这样动态链接，静态链接有速度优势，对吧，这意味着
+which we do not need to dynamically link like we are right now, there's speed benefits for static linking right meaning that
+
+125
+00:12:41,400 --> 00:12:46,225
+因为链接器知道所有输入的符号，所以它实际上可以进行诸如内联之类的优化
+because the linker is aware of all the symbols coming in, it can actually do optimizations like inlining
+
+126
+00:12:46,225 --> 00:12:51,025
+这对于dll文件是不可能的，因为它是一个单独的模块，我们也有好处
+which is impossible with the dll file, because it's a separate module, we also have benefits
+
+127
+00:12:51,025 --> 00:12:54,800
+比如我们不需要动态链接库文件，我们只有一个exe文件
+such as what we don't need dll files floating around, we just have one exe file
+
+128
+00:12:54,800 --> 00:12:56,848
+那就是我们的整个游戏，就是那样，没有动态链接库
+and that's our entire game, that's it, no dlls
+
+129
+00:12:57,750 --> 00:13:04,425
+这是我脑子里想不到的，我们不需要愚蠢的导出输入宏，如果我们看看有多少警告
+what else is this just off the top of my head, we don't need stupid export input macros, and like if we look at just how many warnings we have
+
+130
+00:13:04,425 --> 00:13:09,850
+在我说话的时候，会做个快速重建，如果我们看看所有这些警告，其中一半真的很烦人
+I'll just do a quick rebuild while I'm talking, if we have a look at all these warnings we have, half of them are just really annoying
+
+131
+00:13:09,850 --> 00:13:19,525
+因为dll的边界，就像这个例子，所以停在这里，你们知道，我错过了它，它在哪里
+and because of dll boundaries, you know like this for example, so kind of stop this here, you know, and I missed it where is it
+
+132
+00:13:21,100 --> 00:13:24,800
+你们知道这个shared_ptr需要有dll接口才能供客户端使用，那是一个非常恼人的错误
+you know this shared_ptr needs to have dll interface to be used by clients, that's a really annoying error
+
+133
+00:13:24,800 --> 00:13:29,375
+这基本上是无法修复的，因为我们正在跨dll边界使用shared_ptr，对吧
+which you basically can't really fix, because we're using shared_ptr across dll boundaries, right
+
+134
+00:13:29,666 --> 00:13:34,578
+那真的很烦人，模板有时也会受到影响，所以有很多非常重要的
+that's really annoying templates also sometimes suffer, so there's a lot of like really important
+
+135
+00:13:34,900 --> 00:13:39,500
+我的意思是，我们通过dll遇到了很多非常恼人的错误，老实说，我现在的方式是
+I mean a lot of really annoying errors that we have via dll, so to be honest, at the way I'm landing right now is
+
+136
+00:13:39,500 --> 00:13:46,875
+我可能只是想用预热来处理它，这是我很久以来一直在做的事了
+I might just want to nuke this and just go with, it's a time man I've been doing so long
+
+137
+00:13:47,333 --> 00:13:51,925
+我可能总是想取消它并使用静态库，对吧，那是一种想法
+I might always want to nuke that and go with static libraries, right, that's kind of the idea
+
+138
+00:13:51,925 --> 00:13:56,600
+所以我想那就是我要做的，让我知道你们对在评论中将Hazel转换为静态库的想法
+so I think that that's what I'll do, let me know what your thoughts are regarding converting Hazel to a static library in the comments
+
+139
+00:13:57,250 --> 00:14:01,099
+很明显，两者都可以支持，因此如果你们想将其构建为dll，你们可以
+there is obviously the possibility of supporting both, so if you want to build it as a dll, you can
+
+140
+00:14:01,100 --> 00:14:06,766
+如果你们想构建一个静态库，你们可以，我想得越多，对支持这两种方式的兴趣就越小
+if you want to build a static library, you can, the more I think about it than less interest I have in supporting both ways
+
+141
+00:14:07,100 --> 00:14:14,325
+我相信，尤其是对于像Hazel这样的项目，它主要是由我一个人完成的，对吧，支持太多了
+I believe that especially for a project like Hazel, which has worked on primarily by just me, right, supporting too much
+
+142
+00:14:14,325 --> 00:14:21,475
+支持一个非常灵活的构建风格或工作流将是一个很难维护的问题，我认为这并不健康
+and supporting a very flexible build style or workflow is just going to be a pain to maintain, and I don't think it's healthy
+
+143
+00:14:21,866 --> 00:14:24,875
+我认为，对于Hazel来说，我们作为一个团队
+I think that it's better for Hazel for us as a group
+
+144
+00:14:24,875 --> 00:14:30,450
+最好定义一组好的相似的东西来遵循Hazel，对吧，这意味着
+to define a good set of like things to follow for Hazel, right, meaning that
+
+145
+00:14:31,500 --> 00:14:34,900
+你们知道，让我们定义在Hazel中构建游戏的方式，对吧
+you know let's define the way that you build games in Hazel, right
+
+146
+00:14:34,900 --> 00:14:37,950
+在这种情况下，当你们使用静态库时，如何构建它们，对吧
+how do you build them while you use a static library in this case, right
+
+147
+00:14:38,500 --> 00:14:45,166
+你们有一个实际的流水线工作流，它定义得非常好，非常健壮，然后人们就会遵循它
+you kind of have an actual pipeliner workflow, that's really well defined and really robust, and then people will follow that
+
+148
+00:14:45,166 --> 00:14:51,750
+弹性回收就是为什么像unity和unreal一样，有时对某些特定任务来说确实不是很好的引擎
+you know, this flexibility garbage is why like unity and unreal, sometimes are really not good engines for certain specific tasks
+
+149
+00:14:51,750 --> 00:14:54,358
+它们只是通用引擎，一切都做得很好
+they're just generalist engines, which do everything really well
+
+150
+00:14:54,733 --> 00:14:59,600
+那很好，非常灵活，很容易使用，但我想我不想在Hazel上使用它
+which is great and really flexible and easy to work with, but I don't want that in Hazel I guess
+
+151
+00:14:59,650 --> 00:15:05,500
+因为就像我们不能建立一个大型的通用扩展那样，意思是我没有1k人团队来处理这个问题
+because like we can't build a big general extension does it, I mean I don't have a team of 1000 people working on this
+
+152
+00:15:05,725 --> 00:15:10,800
+对吧，我们不能构建那么大的引擎，所以我们应该做的是，我认为只是有个紧密的工作流
+right, we can't build an engine that big, so what we should do, I think is just have a really tight workflow
+
+153
+00:15:10,800 --> 00:15:18,000
+对于一些人来说，这可能会激怒些人，但希望我们能在这里尝试定义和决定些合理的东西
+which again for some people, might annoy some people, but hopefully we'll try to define and decide on something sensible here
+
+154
+00:15:18,866 --> 00:15:23,350
+那样的话，一切都会变得非常干净，非常容易，而且会很好地运行
+and then that way, everything will be just kind of really clean and really easy, and will really work well
+
+155
+00:15:24,050 --> 00:15:27,250
+但我们也不必以简单的方式结束这一切
+but we don't have to end it all literally simple probably as well
+
+156
+00:15:27,250 --> 00:15:32,550
+因为同一功能没有1000个不同的代码部分，这取决于你们想怎么做，对吧
+because there's not like 1000 different code parts for the same thing, depending on how you want to do this or that, right
+
+157
+00:15:32,550 --> 00:15:38,600
+我不喜欢那样，我知道这对Hazel不太好，所以那就是为什么我想以某种方式做这件事
+I don't like that, it's not going to work out well for Hazel, I know it, so that's why I want to do this in a certain way
+
+158
+00:15:38,600 --> 00:15:44,600
+在这种情况下，我想也许我们只是说，Hazel将建立一个静态库，它将简化很多事情
+and in this case, I'm thinking maybe we just say, Hazel's gonna build a static library, it's gonna simplify so many things
+
+159
+00:15:44,966 --> 00:15:49,699
+这意味着，是的，一切都是在构建时进行的，但那很好，因为事情是
+it's gonna mean that, yes, everything is kind of at build time, but that's fine, because the thing is um
+
+160
+00:15:49,900 --> 00:15:56,200
+如果你们把Hazel看作是软件的一种模型，那么就没有理由让它热加载
+there's no reason really to have Hazel hot-swap, if you look at like it's software's kind of model
+
+161
+00:15:56,566 --> 00:16:00,125
+他们在很多游戏中都是这样做的，比如《末日》，在那里他们至少有三个，在那里他们有
+that they do for a lot of games like doom, where they kind of old them three at least, where they had
+
+162
+00:16:00,700 --> 00:16:07,400
+他们在大多数引擎游戏中都是这样做的，但他们的游戏实际上是作为dll构建的
+and they do it for most of their engine games, but they have the game actually being built as a dll
+
+163
+00:16:07,400 --> 00:16:14,800
+然后引擎加载dll，那就是你们的游戏，非常有用，非常好，因为意味着你们的处理方法
+and then the engine loads that dll, and that's your game, that's really useful, and that's really nice, because it means that your deal
+
+164
+00:16:14,800 --> 00:16:19,525
+你们知道游戏是一个dll文件，就可以使用它进行热加载，并可以随心所欲地使用它
+you know the game is a dll file, which you're gonna get riot and hot-swap and do whatever you want with
+
+165
+00:16:19,525 --> 00:16:22,517
+然后是引擎处理，比如为什么你们希望引擎可以热加载
+and then the engine deal, like why would you want the engine to be hot-swap
+
+166
+00:16:23,475 --> 00:16:28,085
+这没有任何意义，因为理想情况下，你们使用这个引擎来制作游戏或应用程序
+that doesn't make any sense, because ideally you're using this engine to make a game or an application
+
+167
+00:16:28,400 --> 00:16:31,566
+所以引擎已经完成，引擎已经准备好，你们不只是一直在修改引擎代码
+so the engine's done, the engine's ready, you're not just modifying engine code all time
+
+168
+00:16:31,566 --> 00:16:35,704
+你们在修改什么游戏代码或应用程序代码，那是你们需要热加载的部分
+what are you modifying your game code or your application code, that's the part that you want a hot-swap
+
+169
+00:16:35,933 --> 00:16:41,500
+因此这种设计无论如何都不是真正有益的，它只对引擎开发有益，而不是对使用引擎有益
+so this design is not really beneficial anyway, it's only beneficial for engine development, not for actually using the engine
+
+170
+00:16:41,500 --> 00:16:45,625
+这就是我们想长期考虑的，显然那是一种长期战略
+which is what we want to think about long term, obviously that's like a long term kind of strategy
+
+171
+00:16:46,900 --> 00:16:53,699
+所以那也是我认为很重要的一点，然后另一件事是我们要有脚本，我们要百分之百地有脚本
+so that's an important point I think as well, then the other thing is that we're gonna have scripting, we have 100% gonna have scripting
+
+172
+00:16:53,700 --> 00:16:56,725
+这是不可能的，这个引擎不会有脚本，不是所有都是C++，对吧
+this is no way, this engine's not gonna have scripting, it's not gonna be in C++ as well as everything, right
+
+173
+00:16:57,666 --> 00:17:02,400
+因此，很明显，脚本将是实时可编辑和实时热加载的
+so because of that, obviously the scripts are gonna be live live editable and live hot-swap easy
+
+174
+00:17:02,800 --> 00:17:06,975
+好吧，那很好，那意味着，这种C++代码
+right, that's fine, that's implied, this kind of stuff C++ code
+
+175
+00:17:06,975 --> 00:17:09,600
+我认为我们不应该做任何努力来确保这是热加载的
+I don't think we should put any effort into making sure, that's hot-swap
+
+176
+00:17:09,600 --> 00:17:18,175
+因为这是不必要的，所以那是一种想法，我还想说什么，是的，这将解决很多错误
+because it's just not necessary, so that's kind of the idea, what else did I want to say, yeah so it's going to solve a lot of errors
+
+177
+00:17:18,175 --> 00:17:22,959
+这意味着我们不必处理dll边界问题或安全库的不同版本
+it's going to mean that we don't have to deal with dll boundary issues or different versions of the safe possible library
+
+178
+00:17:23,800 --> 00:17:29,575
+可能会导致非常恼人的错误，这意味着我们不必导出或导入东西
+potentially causing really annoying errors, it means that we don't have to export or import things
+
+179
+00:17:29,575 --> 00:17:33,500
+我不知道，设置一个热加载库确实能更好的运行，因为它们只是在运行
+I don't know, set a hot-swap just really nice to work with, because they're just work
+
+180
+00:17:33,500 --> 00:17:39,025
+对吧，它们只包含所需的符号，然后在最后，将其添加到exe文件中，并添加到最终产品中
+right, they only contain the symbols they need, and then at the end, add into the exe file into your actual final product
+
+181
+00:17:39,275 --> 00:17:44,100
+那就是一切都被拉入和链接的地方，这也让你们在运行时获得更快的性能
+that's where everything gets pulled in and linked, which gives you just faster performance at runtime as well
+
+182
+00:17:44,300 --> 00:17:51,850
+因此，我现在很难做到这一点，考虑了几个星期后，我真的很难证明实际使用dll是合理的
+so it's hard to kind of for me right now, having thought about this for several weeks, it's really hard for me to justify actually using dlls
+
+183
+00:17:52,050 --> 00:17:59,900
+例如，假设我们有一个用C#编写的级别编辑器，它是用WPF之类编写的
+if we had like a level editor that was written in C#, for example hypothetically, and that was written in WPF or something like that
+
+184
+00:18:00,625 --> 00:18:06,550
+是的，我们可能不得不使用dll，这是没有办法的，但我没有这个计划
+yeah we'd probably we would have to use a dll, there's no way around that, but I have no plans for that
+
+185
+00:18:08,150 --> 00:18:16,275
+正如我所说的，关卡编辑器和游戏引擎工具都是原生编写的，对吧，在这个阶段使用ImGui
+as I said the level editor and all the game engine tools are going to be written natively, right, using ImGui at this stage
+
+186
+00:18:16,275 --> 00:18:21,059
+虽然我们使用什么ui系统并不重要，但关键是它们本质上是作为游戏编写的，对吧
+although it doesn't matter what ui system we use, the point is they're going to be written as games essentially, right
+
+187
+00:18:21,300 --> 00:18:25,625
+它们将被编写为实时运行时应用程序，这也是最好的
+they're going to be written as real time runtime applications, which is going to be again the best 
+
+188
+00:18:25,675 --> 00:18:34,200
+在我的情况下，快速方式就像是编写这些工具的最快方式，因为我没有团队
+and fast way like the fastest way to actually write these tools, in my situation, because I don't have a team
+
+189
+00:18:34,825 --> 00:18:37,675
+那还将带来跨平台的额外好处
+and that's also gonna have the added benefit of being cross platform
+
+190
+00:18:37,850 --> 00:18:43,800
+没错，WPF是跨平台的，仅限windows，显然可以使用Qt，但没有办法，老实说，我想用Qt
+right, the WPF is in cross platform is windows only, obviously we could use Qt, but there's no way, I want to use Qt to be honest
+
+191
+00:18:45,850 --> 00:18:51,125
+我们可以写所有的东西，比如ImGui，都是运行时，都准备好在所有平台上运行
+we can write everything, ImGui everything's runtime, everything's kind of ready to go on all platforms
+
+192
+00:18:51,733 --> 00:18:57,125
+包括像外国或我们选择在Hazel支持的任何东西，我认为这肯定是最好的策略
+including like foreigns or whatever we choose to support in Hazel, I think it's gonna be the best strategy for sure
+
+193
+00:18:57,766 --> 00:19:03,025
+我们当然不需要dll来真正运行，我们只需要静态库就可以了
+and we definitely don't need a dll for that to actually work, we just need like static libraries will be fine
+
+194
+00:19:03,025 --> 00:19:11,100
+事实上，就我所知，更好的是，那就是我的计划，希望你们能参与进来
+and in fact even better, as far as I can see, so that's my plan, hopefully you guys can get on board um with that
+
+195
+00:19:11,100 --> 00:19:15,400
+但是让我知道我是什么意思如果我，如果我错过了一些非常重要的事情，我会有一点压力
+but let me know what like I mean if I, if I'm missing something really big, I'm getting a little stress
+
+196
+00:19:15,400 --> 00:19:22,075
+我可能会挤一下，嗯，如果你们有什么，如果我错过了什么大事，或者你们这么认为
+I might just give this a squeeze, um if you guys have anything, if I've missed something big or you guys think that
+
+197
+00:19:22,075 --> 00:19:28,011
+等等，你们在做什么，为什么你们的dll更好，这样做，在下面留下评论，对吧，这是讨论
+whoa hang on what are you doing why are you dlls are better, you know, do that, leave a comment below, right, this is a discussion
+
+198
+00:19:29,133 --> 00:19:31,900
+我真的很想听听你们对我们应该做什么的看法
+and I really want to hear your opinion on what we actually should do
+
+199
+00:19:32,766 --> 00:19:36,316
+但是如果我们决定使用静态库，我认为我们应该
+but if we do decide to go with static libraries, which I think we should
+
+200
+00:19:36,550 --> 00:19:48,150
+我们可能应该在下一期中完成，喜欢这个声音吗？我们肯定应该在下一期中完成
+we should probably get that done in the next episode, you like that sound, we should definitely do that in the next episode
+
+201
+00:19:48,600 --> 00:19:54,175
+因为如果我们能够完成这些工作，我们将创建许多不同的接口类和类似的东西来进行渲染
+because if we can get that stuff done, we're about to make a lot of different api classes and stuff like that for rendering
+
+202
+00:19:54,533 --> 00:20:03,866
+因此，如果我们选择使用静态库的话，我们就可以完全摆脱Hazel API，而不必使用任何东西
+so instead of having to sprinkle everything with Hazel API, we can get rid of that entirely, if we choose to go with the static library thing
+
+203
+00:20:03,866 --> 00:20:09,675
+所以我们可能会在下一期播出，所以我会等几天再播出下一期，看看你们对此的反应
+so we'll probably do that next episode, so I'll wait a few days before I make the next episode, just to see your response to this
+
+204
+00:20:10,333 --> 00:20:16,350
+但我想这就是我们要去的方向，然后在那之后的一期，我想我们要从渲染器开始
+but I think that's the direction we're gonna go in, and then the episode after that, we're gonna I guess start on the renderer
+
+205
+00:20:17,266 --> 00:20:22,375
+如果你们对模块定义文件感兴趣的话，我可以做一个
+and kind of deal with that, so and then I might make a, if you guys are interested in that module definition file
+
+206
+00:20:22,375 --> 00:20:28,325
+我想我可能会在未来制作，我已经写下来了，我会制作一个综合系列视频，涵盖那个
+I think I might make in the future, I've already written it down, I will make a syposized series video which covers that
+
+207
+00:20:29,100 --> 00:20:35,800
+然后你们可以走那条路线，如果你们选择的话，无论如何，很抱歉这次我们没有进行渲染
+and then you can kind of go that route personally if you kind of choose to, anyway, sorry that we didn't get to rendering this time
+
+208
+00:20:35,800 --> 00:20:39,866
+但我很高兴我们讨论了这件事，因为事实上，如果我们跳到这里
+but I'm glad that we talked about this stuff, because like in fact, if we just jump in here
+
+209
+00:20:39,867 --> 00:20:47,000
+因为我甚至没有解决所有问题，如果在这里停一下，然后看看，你们知道，再也没有错误了
+cause I didn't even address everything, if we jump in here for a second, then we take a look at, you know, we got no errors anymore
+
+210
+00:20:47,000 --> 00:20:52,625
+因为只是一些烦人的警告，对吧，一半是因为dll问题，一半是因为看出来
+because some of annoy warnings, right, half this stuff is because of dll issues, half this stuff like see out
+
+211
+00:20:52,625 --> 00:20:58,525
+就像你们知道的那样，这些东西不安全是因为用了弃用函数，但这不是我们的，这是ImGui
+like you know this stuff being unsafe is because we were using deprecative functions, but again, this isn't us, it's ImGui
+
+212
+00:20:59,300 --> 00:21:06,250
+我可能会使用sscanf_s，它只为你们搜索的缓冲区提供一个大小
+I will probably use s scan s s scan f on the score s, which just provides a size for the buffer you're scouting into
+
+213
+00:21:06,250 --> 00:21:13,850
+只是为了避免溢出，那是一件非常容易的事情，但由于这不是我的代码，要做的就是构建
+just so that you don't overflow it, and that's a really easy thing to do, but again since that's not my code what we'll do is just build 
+
+214
+00:21:14,175 --> 00:21:19,175
+ImGui或构建任何我们需要的库就在premake文件中定义_CRT_SECURE_NO_WARNINGS
+ImGui or build whatever we need with this _CRT_SECURE_NO_WARNINGS defined in the premake file
+
+215
+00:21:20,550 --> 00:21:26,471
+dll的东西，然后这些东西就是，在premake文件中，不应该在premake文件中
+dll stuff, and then this stuff is just stuff, that's in the premake file, that should not be in the premake file
+
+216
+00:21:26,800 --> 00:21:33,450
+所以我们有很多重要的事要做，因为我两周后就要结婚了，我忙得不可开交
+so there's a lot of major and stuff that we will do, and potentially again, because I am getting married in two weeks, and I am crazy busy
+
+217
+00:21:33,450 --> 00:21:40,575
+因为我仍然在全职工作，虽然我也在婚礼前一周休息了，就像你们知道的
+because I'm still working full time, although I did take the week before the wedding off as well, just like you know
+
+218
+00:21:41,100 --> 00:21:46,200
+回到现实中来，不要到处乱跑，为我的婚礼感到压力
+just come back into reality, and just not be running around everywhere, and be stressed from my wedding
+
+219
+00:21:47,225 --> 00:21:49,425
+因为婚礼现在一切都在进行
+because of the wedding, and everything is going on right now
+
+220
+00:21:49,425 --> 00:21:53,425
+我想也许我们可以放轻松，那样的话，我仍然可以每周给你们一期
+I think that maybe we can just take it easy, and that way, I could still give you guys an episode every week
+
+221
+00:21:53,425 --> 00:21:57,000
+但它可能有点温和，我们可能会花点时间来清理东西
+but it might be a little bit tamer, and we might just take this time to just clean stuff up
+
+222
+00:21:57,966 --> 00:22:03,350
+说到这里，就像我已经准备好录制渲染那期一样，我想进行渲染
+with that being said, like I'm ready to make the rendering episodes as well, I want to make the rendering
+
+223
+00:22:03,733 --> 00:22:09,400
+我们要做的第一件事，我今天早上刚制定了一个计划，我们要做的是，我们要开始创造
+the first thing we'll do, I kind of just made a plan this morning is what we're going to do is, we're going to start off way creating
+
+224
+00:22:09,400 --> 00:22:14,975
+就像OpenGL的渲染上下文和交换链一样，对吧，最后很明显，当我们支持其他接口时
+like a rendering context and swap chain kind of for OpenGL, right, and eventually obviously when we support other apis
+
+225
+00:22:15,300 --> 00:22:21,300
+它们也会有这些类，所以一旦我们有了这些类，我们就可以继续创建
+they will have those classes as well, so once we have that, we can probably move on to creating
+
+226
+00:22:21,500 --> 00:22:26,980
+我想从创建一个非常基本的着色器编译文件开始，这样我们就可以很容易地创建着色器
+I want to probably start off with creating a very basic shader compilation file, just so we can really easily just create shaders
+
+227
+00:22:28,333 --> 00:22:33,550
+因为那很重要，这样我们在制作东西的时候，仍然可以在屏幕上看到东西
+because that's gonna be important, and then that way as we build stuff, we'll still be able to have stuff on the screen
+
+228
+00:22:33,550 --> 00:22:39,000
+因为我们总是可以在需要的时候编写OpenGL客户端，然后
+because we can always write our OpenGL clients side, when we need to right, and then we'll kind of just
+
+229
+00:22:39,000 --> 00:22:43,675
+你们知道，这样我们每期都会在屏幕上显示一些东西，这不像嘿，这里有五期渲染的东西
+you know, that way we have something on the screen every episode, it's not like hey, here's five episodes of rendering stuff
+
+230
+00:22:43,933 --> 00:22:49,672
+最后，我们会看到一个三角形，没有原因，通常是这样的，我们总是会看到一个三角形
+and then at the end, we'll see a triangle, no cause, that's kind of how it usually goes, we'll always see a triangle
+
+231
+00:22:49,766 --> 00:22:56,350
+然后，我们会慢慢地将这些代码抽到类中，然后类似地抽到实际的渲染接口和渲染中
+and then we'll kind of slowly pull that code away into classes and into like into our actual rendering api and into our render
+
+232
+00:22:56,566 --> 00:22:57,550
+所以那就是我的计划
+so that's my plan with that
+
+233
+00:22:58,475 --> 00:23:02,575
+希望你们喜欢这个视频，如果喜欢的话，就为它点赞吧，让我知道你们对这一切的想法
+hope you guys enjoyed this video, if you did, you can hit the like button, let me know your thoughts about all this
+
+234
+00:23:02,675 --> 00:23:07,675
+再说一次，你们知道，老实说，我真的很沮丧，没有继续构建这个渲染器
+again, you know, it's really frustrating for me to be honest to just not kind of move on and build this renderer
+
+235
+00:23:07,675 --> 00:23:10,795
+但你们必须明白我现在正经历着人生的一段时期
+but again like you have to understand I'm going through a period of my life right now
+
+236
+00:23:11,066 --> 00:23:20,575
+在那里，我不能像我想做的那样多而不发疯，所以我宁愿像另一个月一样抵消这一点
+where I just cannot like just do as much as I want to without going insane,so I would rather just offset this like another month essentially
+
+237
+00:23:20,866 --> 00:23:27,050
+或者就像你们所知道的那样，下个月再做，然后在一切都安定下来后再努力搞
+or just like just kind of you know, again be a bit cruzy over this next month, and then hit it hard after everything settles down
+
+238
+00:23:27,050 --> 00:23:33,550
+那就是我们要做的，我想那会比现在全力以赴投降要好得多
+and just that's when we'll do it, and I think that'll be a lot better than just kind of going full spit ahead and surrendering right now
+
+239
+00:23:34,325 --> 00:23:39,486
+然后不得不休息一下，因为很明显我要离开了，我就像度蜜月一样
+and then having to take a break, because obviously I will be going away I'm like a honeymoon and all of that stuff
+
+240
+00:23:40,666 --> 00:23:48,225
+所以你们还可以帮助支持patreon.com/thecherno，非常感谢所有使本系列成为可能的人
+so yes, you also have to help support series on patreon.com/thecherno, huge thank you to everyone who makes this series possible
+
+241
+00:23:48,726 --> 00:23:56,100
+如果你们不能等完成这些清理，并且你们想尽快得到这些东西，请支持我在patreon上的工作
+if you can't wait for me to do all this cleanup code, and you want to just get this stuff as soon as possible support me on patreon
+
+242
+00:23:56,100 --> 00:24:02,750
+你们可以访问Hazel开发分支的github存储库，它已经有了类似OpenGL的渲染器
+you'll get access to the github repository for the development branch of Hazel, which already has like an OpenGL renderer written basically
+
+243
+00:24:03,350 --> 00:24:09,650
+它没有那么完整，你们不会看到像pbr阴影一样的，但它要成熟得多
+it's not like complete, you're not going to see like pbr shading yet, but it is a lot more mature
+
+244
+00:24:09,650 --> 00:24:14,306
+有一个渲染器指令队列，它将所有希望代码渲染指令的内容写入指令缓冲区
+there's like a renderer command queue, that's written everything wishing codes rendering commands into like a command buffer
+
+245
+00:24:14,600 --> 00:24:18,250
+然后在另一个线程上执行它们，所有这些东西都已经存在了
+and then executes them to actually on a different thread, all that kind of stuff is already there
+
+246
+00:24:18,250 --> 00:24:22,800
+如果你们迫不及待地想看看，否则，嗯，看看你们能做多少
+so if you can't wait check that out, otherwise um see how much you can do
+
+247
+00:24:22,800 --> 00:24:26,225
+我想这是你们自己的，所有这些我提到的清理引用
+I guess of this by yourself all this cleanup quote that I've mentioned
+
+248
+00:24:26,300 --> 00:24:30,497
+对于你们来说，一个非常好的家庭任务就是把Hazel转化为静态库
+a really good kind of home web task for you guys can vert Hazel into a static library
+
+249
+00:24:30,666 --> 00:24:36,266
+看看看看你们是怎么做的，因为有一些小事情你们必须调整
+see how you, see how you go with that, because there are a few kind of little small things that you will have to tweak
+
+250
+00:24:36,266 --> 00:24:41,400
+看看你们能不能得到零警告的Hazel，这是你们的挑战，下次见，再见
+and see if you can get Hazel building with zero warnings, that's your challenge, I will see you next time, goodbye
+

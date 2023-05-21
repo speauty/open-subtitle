@@ -1,0 +1,1330 @@
+1
+00:00:00,000 --> 00:00:06,440
+嘿，大家好，我叫 TheCherno，欢迎回到游戏引擎系列，今天有个非常激动人心的插曲
+ hey, what's up guys, my name is TheCherno, welcome back to my game engine series, so today we've got a very, very exciting episode
+
+2
+00:00:08,350 --> 00:00:10,560
+但也许不会，也许这会让某些人兴奋 
+ but maybe not, maybe it'll be exciting to some people
+
+3
+00:00:10,560 --> 00:00:14,925
+这对我来说真的很令人兴奋，即使它可能被认为是客观的平淡
+ it's actually pretty exciting to me, even though it might be considered objectively tame
+
+4
+00:00:15,250 --> 00:00:20,880
+但今天我们要讨论引用和智能指针以及所有有趣的东西 
+ but today we're going to be talking about references and smart pointers and all of that fun stuff
+
+5
+00:00:20,950 --> 00:00:28,560
+我们只需要考虑我们的核心引擎，因为这种东西是你们只是在地毯下刷的东西 
+ that we just need to consider for kind of our core engine, because this kind of stuff is stuff that you kind of just brush under the rug
+
+6
+00:00:28,900 --> 00:00:35,275
+这是每个人都喜欢忽略的东西，然后最终你们所有的技术都会崩溃 
+ it's stuff that everyone loves to just ignore, and then eventually all of your technology will come crashing down
+
+7
+00:00:35,275 --> 00:00:40,150
+因为你们刚开始做这件事的时候就没有考虑过这个 
+ because you just didn't consider this back in the day of you kind of beginning this stuff
+
+8
+00:00:40,150 --> 00:00:45,160
+所以上次我们说了些我什么也不记得的事情，我们上次讨论了什么 
+ so last time we talked about something else that I can't even remember, what did we talk about last time
+
+9
+00:00:47,525 --> 00:00:51,320
+着色器抽象和统一变量，所以如果你们还没有观看那期视频，就去看看吧 
+ shader abstraction and uniforms, so check out that video if you haven't already
+
+10
+00:00:51,320 --> 00:00:55,475
+我不得不在手机上查看，因为我太专注于今天这期视频了 
+ I had to check that on my phone, because I'm so focused on today's episode
+
+11
+00:00:55,475 --> 00:00:59,150
+也就是引用、智能指针和唯一指针，以及整个系统是如何运行的 
+ which is references and smart pointers and unique pointers, and how all that system works
+
+12
+00:00:59,560 --> 00:01:03,975
+好吧，废话已经够多了，我们现在要开始讨论了
+ oK, so enough kind of fluff, enough of that crap, we're going to actually get into it now
+
+13
+00:01:04,450 --> 00:01:12,920
+那么现在我们的代码发生了什么，几乎所有地方我们都在使用这种共享指针 
+ so what is going on right now with our code, pretty much everywhere we're using this kind of shared pointer thing
+
+14
+00:01:12,920 --> 00:01:17,160
+你们知道，我们只需要创建一个着色器，所以它需要在堆上创建 
+ where, you know, just we need to create a shader, so it needs to be created on the heap
+
+15
+00:01:17,160 --> 00:01:22,040
+那么我们要做什么，我们出于两个目的把它封装在一个共享指针对象中
+ so what do we do, we encapsulate it inside a shared pointer object for two purposes
+
+16
+00:01:22,075 --> 00:01:28,100
+首先，因为我们想控制这个对象的生命周期，所以我们想将所有权绑定到 SandboxApp 
+ first of all, because we want to control the lifetime of this object, we want to somewhat tie the ownership to SandboxApp
+
+17
+00:01:28,425 --> 00:01:33,920
+但也要做到这一点，这样如果这个应用程序被破坏或者我们正在处理的任何范围被破坏 
+ but also make it, so that if this app kind of gets destroyed or any scope that we're dealing with gets destroyed
+
+18
+00:01:34,225 --> 00:01:38,850
+这个对象也将被销毁，因为它是提供的共享指针，没有其他引用 
+ this object too will get destroyed, because it's a shared pointer provided, there are no other references to it
+
+19
+00:01:39,350 --> 00:01:42,370
+现在我们可以在这里使用个唯一指针，没有理由不用 
+ now we could have used a unique point to here, no reason kind of not to write
+
+20
+00:01:42,550 --> 00:01:49,240
+你们会想，你们知道的，只要输入unique_ptr，但我认为有些人确实在评论中建议 
+ you would think, you know, just type in unique pointer scope, but I think some people actually did suggest that in the comments
+
+21
+00:01:49,550 --> 00:01:54,250
+那为什么这不是个唯一指针，因为它需要，你们知道，很明显生命周期与此相关 
+ that why is this not a unique pointer, because it needs to be, you know, clearly the lifetime is tied to this
+
+22
+00:01:54,450 --> 00:01:59,225
+它不能存在于SandboxApp之类的之外，我们应该使用唯一指针吗 
+ it can't exist outside of SandboxApp or anything like that, should we be using unique pointer
+
+23
+00:01:59,225 --> 00:02:06,475
+智能指针很有趣，因为它们提供了个可以帮助我们的系统，对吧，它们是来帮助我们的 
+now smart pointers are interesting because they kind of provide us with a system that helps us, right, they're there to help us
+
+24
+00:02:06,560 --> 00:02:09,720
+它们在那里看到你们实际上不会调用delete
+ they're there to see that you're not going to actually call delete
+
+25
+00:02:09,800 --> 00:02:18,500
+我会根据你们要处理那个智能指针的对象的特征来为你们处理 
+ I will handle that for you based on the kind of traits of the object that you're kind of shoving into that smart pointer
+
+26
+00:02:18,500 --> 00:02:25,150
+现在我有个关于智能指针的视频，甚至在C++系列中有期视频专门介绍对智能指针的看法
+ now I have a video on smart point, I even have a video in the C++ series specifically about what I think of smart pointers
+
+27
+00:02:25,150 --> 00:02:29,525
+现在我认为那个视频已经变了，我认为不一定是我对它们的看法 
+ now I think that has changed in that video, I think isn't necessarily about what I think of them
+
+28
+00:02:29,525 --> 00:02:34,525
+但这正是我认为应该教他们的方式，因为我认为人们最近非常重视智能指针 
+ but it's just how I think they should be taught, because I think there's a lot of emphasis on smart pointers these days
+
+29
+00:02:34,825 --> 00:02:39,280
+人们在评论中变得非常生气，在我的评论中，就像，为什么 
+and people getting really angry in comments, in my comments, being like, why
+
+30
+00:02:39,400 --> 00:02:48,480
+为什么Cherno只写new，只写delete，为什么，那是错误的，关键是智能指针太棒了 
+ why did Cherno just write new, did Cherno just write delete, why, that's wrong, the point is smart pointers are fantastic
+
+31
+00:02:48,480 --> 00:02:51,280
+没有智能指针我活不下去，因为如果智能指针不存在 
+ I wouldn't live without smart pointers, because if smart pointers didn't exist
+
+32
+00:02:51,280 --> 00:02:57,520
+我会写一个智能指针类，我们会用它，但问题更多，比那更深 
+ I would just write a smart pointer class, and we would just use that, but the problem is more, it's kind of deeper than that
+
+33
+00:02:57,925 --> 00:03:01,800
+问题是它不仅仅是关于new和delete的事实 
+ the problem is the fact that it's not just about new and delete
+
+34
+00:03:01,800 --> 00:03:10,325
+不仅仅是将其抽象化，尤其删除部分自动化，它的50%(如果不是更多)与所有权有关 
+ It's not just about abstracting that away and especially automating that delete part, it's 50% of it, if not more, is about ownership
+
+35
+00:03:10,480 --> 00:03:17,160
+这变成了所有权问题，对吧，这现在归某物所有，如果将它设为唯一指针，你们猜怎么着 
+ it becomes a question of ownership, right, this is now owned by something, if we make this a unique pointer, guess what
+
+36
+00:03:17,525 --> 00:03:22,240
+那意味着这个Sandbox类确实拥有那个着色器，对吧
+that means that this Sandbox class literally owns that shader, right
+
+37
+00:03:22,240 --> 00:03:25,520
+因为如果它不拥有那个，以及一些Sandbox类，ExampleLayer类 
+ because if it doesn't own that, and some of the Sandbox classes, the ExampleLayer class
+
+38
+00:03:25,550 --> 00:03:31,080
+但关键是ExampleLayer类确实拥有那个着色器，为什么，你们无能为力，你们不能复制它 
+ but the point is that ExampleLayer class literally owns that shader, why, there's nothing you can do, you can't copy it
+
+39
+00:03:31,080 --> 00:03:33,640
+你们不能交出所有权，就是那样
+ you can't hand over ownership, that's it
+
+40
+00:03:33,640 --> 00:03:38,480
+当 ExampleLayer 从 LayerStack 弹出时，因为应用已关闭
+ when that ExampleLayer gets popped off the LayerStack, because the application's closed
+
+41
+00:03:38,480 --> 00:03:44,560
+因为我们想过渡到一个新的水平，因为我们想做任何类似的事情，一旦结束，就是那样
+ because we want to transition to a new level, because we want to do anything like that, right, as soon as that dies, that's it
+
+42
+00:03:44,560 --> 00:03:51,600
+我们的着色器从地球表面擦掉了，如果内存被释放，它可以立即回收，消失了，对吧 
+ our shader's wiped off the face of the earth, if the memory is released, it could be instantly reclaimed, it's gone, right
+
+43
+00:03:52,925 --> 00:03:57,300
+我想建议那实际上是一个问题，那确实是个问题，我们不能那样
+ I want to suggest that that is actually an issue, that's a problem, we can't have that
+
+44
+00:03:57,700 --> 00:04:04,000
+我们真的不能那样做，因为现在，如果发生这种情况，我想我们可能会没什么
+ we literally can't have that, because right now, if that were to happen, I think we'd probably be okay
+
+45
+00:04:04,525 --> 00:04:09,050
+但你们必须考虑更大的背景，让我们看一下渲染器 
+ but you have to consider the bigger picture, let's take a look at a renderer
+
+46
+00:04:09,475 --> 00:04:15,275
+让我们想一想，如果我们的渲染器实际上是个实体渲染器，它会是什么样子 
+ let's have a think about what our renderer would be like if it was actually, you know, a solid renderer
+
+47
+00:04:15,275 --> 00:04:20,840
+不仅仅是一堆函数，你们知道的，我的意思是，我们还正在实现的路上
+ and not just like a bunch of functions, and you know, I mean, we're on our way, we're on our way
+
+48
+00:04:20,840 --> 00:04:25,025
+我们后面会实现那个的，但是现在这个渲染器，你们知道的，非常简单(无聊？)
+ we're going to get there, but right now this renderer is, you know, very, very bare bones
+
+49
+00:04:25,500 --> 00:04:30,320
+如果我们有个真正的渲染器，想想它会是什么样子，好了，所以有渲染器提交，对吧
+ if we had a real renderer, let's have a think of what that would look like, okay, so we have our renderer submission, right
+
+50
+00:04:30,320 --> 00:04:34,880
+我们调用Hazel::Renderer->Submit()，它是做什么的，目前它需要接收一个着色器 
+ we call hazel renderer submit, what does that do, well at the moment it takes in a shader
+
+51
+00:04:34,880 --> 00:04:41,100
+在未来，正如我所说，它可能会接收材质，但现在它接收个着色器，我们现在完成了什么 
+ in the future, as I said, it would take in a material potentially, but right now it takes in a shader, what have we done
+
+52
+00:04:41,525 --> 00:04:48,650
+我们已经提交了渲染的着色器，提交了渲染顶点数组，顶点数组也是种资产，对吧 
+ we've submitted a shader for rendering, we've submitted a vertex array for rendering, a vertex array, that's also an asset, right
+
+53
+00:04:48,850 --> 00:04:51,680
+任何一种资产都会是个指针 
+ any kind of asset is going to be a pointer
+
+54
+00:04:51,680 --> 00:04:56,600
+本质上，它会是一个堆分配对象，最终可能不会在堆中分配
+ essentially, it's going to be a heap allocated object and eventually probably not allocated in the heap
+
+55
+00:04:56,600 --> 00:05:05,600
+但是在我们的内存领域之类的的东西中分配，顶点数组是一种资源 
+ but allocated in kind of our memory arena or something like that, vertex array is a, it's a resource
+
+56
+00:05:05,600 --> 00:05:08,880
+这是我们实际需要用来渲染的资产 
+ it's an asset that we need to actually use to render that
+
+57
+00:05:08,880 --> 00:05:14,775
+我们现在有个map4的变换，我的意思是，可能不是真正的资产 
+ and we have a transform now, a transform that's a map4, I mean, arguably you could just not really a real asset
+
+58
+00:05:14,775 --> 00:05:20,000
+如果你们想要64字节的数据，可能会复制它，然后接收它，就是那样，可以处理它 
+ you could, if you wanted to 64 bytes of data, you'd probably copy that, and you'd take that, and that's it, you can just deal with that
+
+59
+00:05:20,000 --> 00:05:25,640
+但是对于着色器来说，对吧，那个着色器，那个顶点数组，它们是实际资产，对吧 
+ but shaders, right, that shader, that vertex array, they're actual assets, right
+
+60
+00:05:25,640 --> 00:05:29,480
+我的意思是我们不能只是决定如果我想保留资产，就直接复制它 
+ what I mean by that is we can't just like decide that if I want to retain an asset, I'll copy it
+
+61
+00:05:29,480 --> 00:05:34,440
+永远不应该那样做，因为它是种资产，你们知道的，它可能很大，对吧，我的意思是
+ that should never be done, because it's an asset, you know, it might be huge, right, I mean, sure
+
+62
+00:05:34,440 --> 00:05:41,960
+就像个OpenGLID之类的，但就所有意图和目的而言，它是种资产，所以我们做了什么
+ it might just be like an OpenGL ID or something, but for all intents and purposes, it's an asset, so what have we done
+
+63
+00:05:41,960 --> 00:05:50,480
+我们已经提交渲染了，渲染，我一直在说什么渲染，它被延迟了，对吧 
+ we've submitted it for rendering, rendering, what did I, what have I said about rendering all this time, it's deferred, right
+
+64
+00:05:50,480 --> 00:05:56,840
+你们不会立即渲染东西，如果我们现在查看Submit，调用了RenderCommand::DrawIndexed
+ you will not be rendering stuff immediately, if we look at Submit right now, it calls RenderCommand::DrawIndexed
+
+65
+00:05:56,840 --> 00:06:00,760
+它在干什么，立即绘制，以后不会发生了，对吧
+ what is it doing, it's immediately drawing, not going to happen in the future, right
+
+66
+00:06:00,760 --> 00:06:08,800
+因为正如我所说，我们需要能够在开始渲染之前拥有我们想要实际渲染的整个场景的上下文 
+ because as I talked about, we need to be able to have a context of an entire scene that we want to actually render before we start rendering
+
+67
+00:06:09,250 --> 00:06:16,475
+对吧，所以在真正开始在屏幕上渲染独立对象之前，我想要几乎所有的东西的完整场景
+ right, so before we actually start even rendering one single object on the screen, I want to have practically the full scene of everything
+
+68
+00:06:16,475 --> 00:06:23,240
+因为我需要排序，所以需要做些实际的事情，比如隐式移除，对吧，需要Batch并提高性能
+ because I need to do sorting, I need to do actual like culling potentially, right, I need to batch things together and improve the performance
+
+69
+00:06:24,075 --> 00:06:26,300
+我可能想做很多事情，对吧
+ so many things I might want to do, right
+
+70
+00:06:27,075 --> 00:06:33,575
+我必须拥有整个场景才能实现那个，这样就不会低效的渲染，因为那对我们来说尤其糟糕 
+ I have to have the whole scene in order to do that, so that I don't do inefficient rendering, because that would be bad especially for us
+
+71
+00:06:33,575 --> 00:06:35,675
+因为我们都在努力变得酷炫时髦 
+ because we're trying to be all cool and hip and trendy
+
+72
+00:06:36,150 --> 00:06:44,520
+所以重点是我需要使用刚刚提供给我的着色器对象，并且我需要持有对它的引用 
+ so the point is I need to take this shader object that has just been given to me, and I need to kind of hold a reference to it
+
+73
+00:06:45,250 --> 00:06:52,920
+如果我不持有对它的引用，那会有问题的，顶点数组，同样的，稍后需要那个，对吧 
+ if I don't hold a reference to it, that's going to be problematic, the vertex array, same thing, I need that vertex array later, right
+
+74
+00:06:52,920 --> 00:06:58,280
+多久之后，好吧，我的意思是，我也不知道，就以后，我将在以后渲染这个 
+ how later, well, I mean, I don't know, in the future, I'm going to render this in the future
+
+75
+00:06:59,350 --> 00:07:05,000
+所以首先，第一步就是延迟渲染，现在第二步就是，大多数引擎都是多线程的，对吧 
+ so first of all, step one is rendering is deferred, now step two, most engines are multi-threaded, right
+
+76
+00:07:05,000 --> 00:07:08,200
+你们不会想要在单个线程上运行引擎吧，我认为那应该没有出现过
+ you would not run an engine on a single thread, I don't think that's ever happened
+
+77
+00:07:08,425 --> 00:07:15,040
+好吧，这肯定发生过，但我认为最近没有任何真正发布过采用单线程的游戏引擎
+ well, it's definitely happened before, but I don't think recently any engine really that has shipped a game has probably shipped on a single thread
+
+78
+00:07:15,040 --> 00:07:22,000
+为什么，因为你们的电脑，你们使用的设备有多个内核，多个实际的虚拟线程 
+ why, because your computer, your device that you're on has multiple cores, multiple actual virtual threads
+
+79
+00:07:22,325 --> 00:07:26,520
+它有一个同时处理事物的系统
+ it has a system for dealing with stuff at the same time
+
+80
+00:07:27,075 --> 00:07:33,520
+所以如果你们真的打算不那样做，那就是在浪费你们本该免费享有的隐藏性能
+ so if you're literally not doing that, you're just wasting potential performance, stuff that you could get for free
+
+81
+00:07:33,850 --> 00:07:39,040
+你们只是在浪费它，对吧，它有点像有煤气炉，你们需要做五种不同的菜
+ you're just wasting it, right, it's kind of like having a gas stove, you have like five different things you need to cook
+
+82
+00:07:39,040 --> 00:07:44,000
+你们需要煎这个，需要在不同的平底锅里煎所有的东西，然后只使用一个煤气炉，对吧
+ you need to fry up this, you need to fry up that all in separate pans, and you use one of your gas burners, right
+
+83
+00:07:44,000 --> 00:07:48,775
+如果你们出于某种原因有一个电炉，那么你们知道，将这个比喻成那个
+ if you've got an electric stove for some reason, then you know, adapt that metaphor to that
+
+84
+00:07:49,025 --> 00:07:52,640
+但我的意思是，你们不会那样做，你们会使用所有四个炉子
+but my point is, you wouldn't do that,  you'd use all four burners
+
+85
+00:07:52,640 --> 00:07:56,775
+顺便说一句，我当场想到了这个，但是四个就很完美一样，因为很多东西都有四个核心 
+ I came up with this on the spot, by the way, but four is like perfect, because a lot of things have like four cores
+
+86
+00:07:57,075 --> 00:08:02,480
+无论如何，关键是，你们不会一次只使用一个炉子，那很愚蠢，对吧，否则食物会变冷
+ and anyway, the point is, you're not going to use a single burner at a time, that's silly, right, or your food's going to get cold
+
+87
+00:08:02,775 --> 00:08:08,775
+你们将同时使用所有四个炉子，你们将创造这个杰作，Cherno煮饭的时间快到了，很快
+ you're going to use all four burners at once, and you're going to create this masterpiece, when is cooking with Cherno coming, very soon
+
+88
+00:08:09,275 --> 00:08:16,960
+但我的意思是你们不会那样做，你们将实际使用每个炉子，同样，这里同样的操作
+ but my point is that you're not going to do that, you're going to actually use each stove, same, same thing here
+
+89
+00:08:16,960 --> 00:08:22,475
+你们不会只写一个使用单线程的引擎，因为那有点傻
+ you wouldn't just write an engine that uses a single thread, because that's somewhat silly
+
+90
+00:08:22,700 --> 00:08:28,500
+所以因为我们在引擎中使用了多个线程，所以我们已经延迟了RenderCommand队列
+ so because we use multiple threads in our engine, that RenderCommand queue that we've kind of deferred
+
+91
+00:08:28,500 --> 00:08:33,240
+那就是我们的渲染器必须要实现的，那将在一个独立线程上运行 
+ that's all the stuff that our renderer has to do, that's going to run on a separate thread
+
+92
+00:08:33,500 --> 00:08:40,600
+这意味着虽然我们当前的线程种类，比如游戏线程、更新线程、应用线程等等 
+ what that means is that while our current kind of thread, our game thread, our update thread, our application thread, whatever
+
+93
+00:08:40,825 --> 00:08:43,925
+虽然那只是，你们知道的，将数据提交给渲染器
+ while that is just you know, submitting data to the renderer
+
+94
+00:08:43,925 --> 00:08:49,975
+但渲染器实际上同时处理和渲染前一帧的数据
+the renderer is actually at the same time processing and rendering that previous frame worth of data
+
+95
+00:08:50,950 --> 00:08:54,525
+对吧，所以我们最终得到的实际上是上一帧的东西 
+ okay, so what we end up with effectively something that is one frame behind
+
+96
+00:08:55,125 --> 00:09:00,950
+现在发生的事情是一旦那个应用完成提交它需要为当前帧做的所有事情 
+ now what happens is once that, once that application has finished submitting everything it needs to do for this current frame
+
+97
+00:09:01,225 --> 00:09:09,240
+它会在渲染器渲染该帧时移动到下一帧，考虑一下，我们已经改变了级别，对吧，我不知道 
+ it will move on to the next frame while the renderer renders that frame, consider this, we've changed our level, right, well, we've, I don't know
+
+98
+00:09:09,240 --> 00:09:12,575
+我们已经从内存中释放了一个对象，因为应用线程已经处理完了
+ we've released an object from memory, because the application thread is done with it
+
+99
+00:09:13,225 --> 00:09:19,622
+让我们看看，那是 ExampleLayer，已经从内存中释放了 ExampleLayer，对吧，它消失了
+ right now that up, that let's just see, that's ExampleLayer, we've released ExampleLayer from memory, right, and it's gone
+
+100
+00:09:20,080 --> 00:09:26,800
+然而，下次我们滚动到渲染器要渲染的下一帧时，对吧 
+ however, next time we roll around to the next frame that our renderer is going to want to render, right
+
+101
+00:09:26,800 --> 00:09:32,160
+那个着色器对象，那个顶点数组已经被删除，所以炸了，没有渲染 
+ that shader object, that vertex array has been deleted, so explosion, nothing gets rendered
+
+102
+00:09:32,160 --> 00:09:39,950
+我们就只有哭吧，可能只是每个人，每个人，你们所有人就哭吧，太荒谬了，对吧 
+ we crash tears everywhere, probably from just everyone, everyone, all of you crying at the same time, ridiculous, right
+
+103
+00:09:40,300 --> 00:09:41,500
+所以我们不能那样 
+ so we can't have that
+
+104
+00:09:42,040 --> 00:09:51,025
+那意味着以某种形式，渲染线程实际上必须对该对象具有强引用
+ what that means is that in some form or another, that render thread has to actually have a strong reference to that object
+
+105
+00:09:51,025 --> 00:09:57,225
+强引用，意味着它有一个有点像所有权的引用，这意味着直到该引用被释放 
+ strong reference, meaning that it has a reference that is somewhat counts as like ownership, meaning that until that reference is released
+
+106
+00:09:57,225 --> 00:10:02,550
+对象就不怕内存丢失了，这听起来很像引用计数系统，对吧 
+ the object is not afraid from memory, this sounds exactly like a reference count system, right
+
+107
+00:10:02,800 --> 00:10:06,725
+那就是引用计数系统，对吧，共享指针是一个引用计数系统
+ that's a ref count system, okay, shared pointer is a ref count system
+
+108
+00:10:06,925 --> 00:10:09,120
+那就是我们现在使用共享指针的原因
+that's why we're using shared pointers at the moment
+
+109
+00:10:09,800 --> 00:10:13,825
+现在这儿有另一个需要注意的
+ now here's another little careful
+
+110
+00:10:14,000 --> 00:10:21,150
+顺便说一句，这儿那个解释，请记住，那就是为什么我个人认为 
+ and by the way, that little explanation there, just keep in mind that, that is why I personally think that
+
+111
+00:10:21,800 --> 00:10:27,320
+几乎引擎中的每个对象都应该是一个共享指针 
+ pretty much every object in your engine should probably be a shared pointer
+
+112
+00:10:29,225 --> 00:10:39,480
+人们可能会说那是低效的，在很多情况下你们必须使用唯一指针，我可能会同意，但并不是
+ people may say that that's inefficient, you have to use unique pointer in a lot of cases, and I would probably maybe agree, but no
+
+113
+00:10:39,800 --> 00:10:46,480
+因为使用共享指针而不是唯一指针的性能开销可以忽略不计 
+ because the performance overhead is so negligible from using a shared pointer over a unique pointer
+
+114
+00:10:46,875 --> 00:10:51,320
+在某些场景，你们百分百可能想使用唯一指针 
+in certain situations, 100%, you might want to use a unique pointer
+
+115
+00:10:51,320 --> 00:10:58,725
+但老实说，我是根据经验思考的，现在我只是在脑海中回想，大多数情况下都是这样 
+ but to be honest, I think from experience, and I'm just kind of thinking back in my head now, most of the times where that has been the case
+
+116
+00:10:58,850 --> 00:11:04,480
+我刚刚使用了一个原始指针，只是因为，对吧
+ I've just used a raw pointer, because, just because, right
+
+117
+00:11:04,480 --> 00:11:11,640
+我不认为如果我正在处理那种性能问题的东西，我通常会使用原始指针 
+ I don't think if I'm dealing with that kind of stuff where performance is such an issue, I'll mostly usually use raw pointers
+
+118
+00:11:11,640 --> 00:11:16,280
+不仅仅是因为唯一指针很慢，当然，它们不是，它们的开销为零 
+ not just because unique pointers are slow, of course, they're not, they have zero overhead
+
+119
+00:11:17,300 --> 00:11:23,525
+这是因为需要的那种代码库最有可能从原始指针中受益 
+ it's because that kind of code base that requires that is most likely going to benefit from a raw pointer
+
+120
+00:11:23,525 --> 00:11:27,240
+你们仍然可以将它封装起来，如果愿意的话，你们仍然可以将它封装在唯一指针中 
+ you could still enclose it in, you could still encapsulate it inside a unique pointer if you wanted to
+
+121
+00:11:27,240 --> 00:11:29,675
+但那只是根据经验来说的，可能不是我没有实际做过的
+ but from experience, probably not something that I've actually done
+
+122
+00:11:30,150 --> 00:11:32,680
+关键是唯一指针很棒，你们可能想使用它们 
+ the point is that unique pointers are great, and you might want to use them
+
+123
+00:11:32,680 --> 00:11:41,300
+但在几乎所有情况下，尤其是现在，当你们不仅仅因为 90% 的线程时间而成为瓶颈时 
+ but in pretty much all cases, especially right now, when you're not just bottlenecked by the fact that 90% of your thread time
+
+124
+00:11:41,475 --> 00:11:46,800
+是因为共享指针在递增和递减引用，事实并非如此 
+ is because shared pointers are incrementing and decrementing references, that's not the case
+
+125
+00:11:47,125 --> 00:11:52,560
+所以引擎中提交给渲染线程的每一个资产都应该是共享指针 
+ so every single asset in the engine that gets submitted to the render thread especially should be a shared pointer
+
+126
+00:11:52,560 --> 00:11:53,800
+并且那就是我们正在处理的事情 
+ and that's kind of what we're dealing with
+
+127
+00:11:54,750 --> 00:12:00,080
+在我们进入代码之前，先来看看这个，因为我想做的是改变实际表示共享指针的方式 
+ now, before we get into the code, and we take a look at this, because what I want to do is change the way that we actually present shared pointers
+
+128
+00:12:00,080 --> 00:12:02,950
+比如改变它们的样子，你们马上就会明白我的意思 
+ like just change the way they look, and you'll see what I mean in a minute
+
+129
+00:12:04,275 --> 00:12:08,680
+在我们开始之前，我只想快速提一下共享指针确实有开销 
+ before we get into that, I just want to quickly mention shared pointers do have overhead
+
+130
+00:12:09,550 --> 00:12:14,080
+对吧，我刚刚提到它可以忽略不计，我可能是对的 
+ right now, I've just mentioned that it's negligible and I'm probably right
+
+131
+00:12:14,625 --> 00:12:25,440
+但在某些特定情况下，也许我们决定不需要共享指针，对吧，因为共享指针做了一些事情 
+ but in some certain situations, maybe we decide that we don't want a shared pointer necessarily, right, because shared pointers do a few things
+
+132
+00:12:25,440 --> 00:12:28,425
+我的意思是，首先，它们不是侵入式引用计数对象
+ I mean, first of all, they're not an intrusive ref count object
+
+133
+00:12:28,425 --> 00:12:32,960
+这意味着引用计数不会存储为你们分配的实际对象的一部分 
+meaning the reference count is not stored as part of the actual object that you've allocated
+
+134
+00:12:32,960 --> 00:12:38,325
+它存储在一个单独的控制块中，在大多数情况下将与你们的对象保持一致
+ it's stored in a separate control block, which in most cases is going to be in line with your object
+
+135
+00:12:38,325 --> 00:12:41,000
+因此在某种程度上否定了那个问题
+so that somewhat negates that issue
+
+136
+00:12:41,600 --> 00:12:47,480
+如果我们吹毛求疵，我们可能面临的另一个问题是线程安全 
+ the other issue that we could potentially face, if we're nitpicking is thread safety
+
+137
+00:12:47,480 --> 00:12:52,600
+所以共享指针是线程安全的，这意味着它们实现线程安全的具体方式是 
+ so shared pointers are thread safe, meaning that the way that they achieve that thread safety specifically is
+
+138
+00:12:52,600 --> 00:12:55,240
+它们使用原子增量和原子减量
+ they use an atomic increment and an atomic decrement
+
+139
+00:12:55,725 --> 00:13:03,640
+递减，递减，我从不说那个词，无论如何，它们递减。。。它必须是递减 
+ decrement, decrement, I never say that word, anyway, they decrement, decrement, decrement, it's got to be decrement
+
+140
+00:13:04,150 --> 00:13:11,040
+它们以原子方式递减和递增指针，引用计数，这对于线程安全来说非常棒 
+ they decrement and increment the pointers, the reference count atomically, which is fantastic for thread safety
+
+141
+00:13:11,080 --> 00:13:18,200
+意味着我们永远不会出错，真的，但显然必须锁定所有内容并执行原子增量，减量 
+ means we'll never get errors, really, but that obviously has to lock everything up and do that atomic increment, decrement
+
+142
+00:13:18,600 --> 00:13:24,160
+那样就会需要时间，可能会增加一些开销，看吧，我不会和你们争论
+ that stuff takes time, could potentially add a little bit of overhead, now, look, I'm not going to argue with you
+
+143
+00:13:24,450 --> 00:13:30,550
+我不是那些疯狂的人中的一员，他们绝对会为这么小的事情而战
+ I'm not one of those just crazy people who will absolutely fight over such a small
+
+144
+00:13:31,050 --> 00:13:34,480
+就像在现实中一样，这么小的性能障碍 
+like in reality, such a small kind of hitch in performance
+
+145
+00:13:34,875 --> 00:13:38,520
+对吧，尤其是因为还有很多其他我们可以优化的东西 
+ right, especially because there's so many other things we could optimize
+
+146
+00:13:39,050 --> 00:13:44,320
+但因为这可能是个问题，而且可能想说，我们不需要线程安全 
+ but since it could be a problem, and since we might want to say, ah, we don't need thread safety
+
+147
+00:13:44,400 --> 00:13:49,440
+我们只想跑得快，并不是说我们不会用这个跑得快，但是，你们知道，耐心等待我 
+ we want to just run fast, not that we won't run fast with this, but, you know, just bear with me
+
+148
+00:13:50,225 --> 00:13:53,280
+我们可能想把它改成我们自己的引用计数对象，对吧 
+ we might want to change it into our own kind of ref count object, right
+
+149
+00:13:53,550 --> 00:13:57,300
+就所有意图和目的而言，那可能是一个共享指针类 
+ which would, for all intents and purposes, probably be a shared pointer class
+
+150
+00:13:57,725 --> 00:14:02,925
+就像它可能完全一样，除了它会做一个正常的递增递减，而不是原子的 
+ like it would probably be exactly the same, except it would do a normal increment, decrement instead of an atomic one
+
+151
+00:14:03,825 --> 00:14:07,680
+因此，无论出于何种原因，我们可能希望在未来做出改变 
+ because of that, we might want to change in the future for whatever reason
+
+152
+00:14:07,680 --> 00:14:09,600
+共享指针可能不是我们永远坚持的东西 
+ shared pointers might not be something we stick with forever
+
+153
+00:14:10,250 --> 00:14:14,525
+因此那会是一个非常困难的改变，因为我们必须找到
+ So because of that, that's going to be a very difficult change, because we'll have to find
+
+154
+00:14:14,525 --> 00:14:16,560
+替换所有共享指针，并用其他东西替换它们 
+ replace all shared pointers, and replace them with something else
+
+155
+00:14:17,400 --> 00:14:23,240
+也许在某些情况下我们确实想要使用共享指针，所以我们现在需要的是，有两个问题
+ maybe in some cases we actually do want to use shared pointers, though, right, so what we need right now is, well, there's two issues
+
+156
+00:14:23,240 --> 00:14:28,160
+就是那样，我刚刚提到过，但还有一个事实是 st​​d::shared_ptr 无处不在，看起来有点难看
+ there's that, which I've just mentioned, but there's also the fact that std::shared_ptr everywhere kind of looks a bit ugly
+
+157
+00:14:28,160 --> 00:14:30,480
+不，这不是世界上最糟糕的事情，但它看起来有点丑 
+ no, it's not the worst thing in the world, but it kind of looks ugly
+
+158
+00:14:30,925 --> 00:14:34,720
+所以我们要做的是创建我们自己的小类型，它本质上是一个共享
+ so what we're going to do is we're going to create our own little type, that is essentially a shared
+
+159
+00:14:34,720 --> 00:14:36,320
+它现在将成为一个共享指针 
+ it's going to be a shared pointer right now
+
+160
+00:14:36,480 --> 00:14:41,840
+在以后，它可能会扩展成自己的类型，就像，你们知道的，实际上是一个类
+ in the future, it could blossom into its own type where it's like, you know, actually a class and everything
+
+161
+00:14:42,100 --> 00:14:46,040
+但现在，我们只是要改变它，让它成为我们自己的东西 
+ but for right now, we're just going to change it, so that it's going to be our own thing
+
+162
+00:14:46,040 --> 00:14:49,720
+那将是，它将被称为Ref，所以它将被称为 Hazel::Ref
+ and that's going to be, it's going to be called a Ref, so it's going to be called a Hazel::Ref
+
+163
+00:14:50,175 --> 00:14:58,560
+我们要做的是，对于唯一指针，还将创建Hazel::Scope，对吧，所以就有了Scope和Ref
+ ok, and what we'll do is for the unique pointers, we'll also create a Hazel::Scope, right, so we have a Scope and we have a Ref
+
+164
+00:14:58,950 --> 00:15:04,320
+所以Scope类型的指针将成为我们的Hazel::Scope，然后我们的Ref也就是共享指针 
+ so the scoped kind of pointer is going to be our Hazel scope thing, and then our ref is going to be a shared pointer
+
+165
+00:15:04,400 --> 00:15:11,680
+那么就是唯一指针，也就是Scope，就是那样，它只是个Scope，至于引用，我们就叫Ref
+ so unique pointer Scope, because that's what it is, it's just a Scope, and our reference, we're going to call Ref
+
+166
+00:15:11,775 --> 00:15:15,920
+所以让我们看看它会是什么样子，看看它是否让我们的代码库看起来更好 
+ so let's take a look at what that's going to look like and see if it makes our code base look nicer
+
+167
+00:15:16,075 --> 00:15:22,880
+好了，所以我们要做的第一件事就是打开Core.h文件，它包含几乎所有的核心内容 
+ all right, so the first thing that we're going to do is go to our Core.h file, which contains pretty much all of the core stuff
+
+168
+00:15:23,300 --> 00:15:28,840
+我要添加一个名为 Hazel 的命名空间，对吧，没什么特别的 
+ and I'm going to add a namespace called Hazel, right, nothing too special there
+
+169
+00:15:28,840 --> 00:15:36,200
+然后我们要做的是本质上创建一个类型定义，所以我们将对两种不同的类型使用 using 
+ and then what we're going to do is create essentially a type def, so we're going to use using for our two different types
+
+170
+00:15:36,350 --> 00:15:40,280
+那么Scope就是一个包裹的唯一指针，对吧，所以就是std::unique_ptr
+ so Scope being a scoped pointer, right, so this will be a unique pointer
+
+171
+00:15:41,100 --> 00:15:47,400
+然后我们还要为我们的引用计数对象创建Ref，也就是共享指针 
+ and then we're also going to create ref for our ref counted object, which is a shared pointer
+
+172
+00:15:48,725 --> 00:15:52,320
+因此，当然，我们希望它与模板一起运行，那就是我们实际使用 using 的原因 
+ so because, of course, we want this to work with templates, that's why we're actually using using
+
+173
+00:15:52,320 --> 00:15:58,280
+除了 using 是当今使用的事实之外，它还使我们能够将其实际定义为模板 
+ apart from the fact that using is the thing to use these days, it also enables us to actually define this as a template
+
+174
+00:15:58,280 --> 00:16:03,640
+所以我们有一个模板类型名称 T，然后就到这里 
+ so we have a template type name T, and then this just goes here
+
+175
+00:16:03,900 --> 00:16:12,000
+现在我们实际上可以做的是在创建它时，无论何时使用它，都将Scope与一个类型一起使用
+ and now what we can actually do is use scope with a, you know, a type when we actually make it, whenever we end up using it
+
+176
+00:16:12,150 --> 00:16:18,240
+所以这显然很重要，因为否则这不会真正起作用，我们必须，我的意思是，那是另一回事 
+ so this is obviously vital, because otherwise this wouldn't really work, we'd have to like and I mean, that's the other thing
+
+177
+00:16:18,240 --> 00:16:23,760
+就像你们绝对可以做的事情一样，你们知道的，让我们看看我们有一个Shader类
+ like you could definitely do stuff like, you know, let's just see we had a Shader class
+
+178
+00:16:23,760 --> 00:16:31,480
+对吧，而不是你们当前做的Ref<Shader>，这个刚好相反，也就是std::shared_ptr
+ right, instead of writing Ref<Shader>, which you currently have to do, and this is as opposed to, you know, std::shared_ptr
+
+179
+00:16:31,875 --> 00:16:38,280
+所以基本上完​​成的是使我们能够将这段代码更改为只是简单地编写Ref<Shader>
+ so what is basically done is enabled us to change this code into just simply writing Ref<Shader>
+
+180
+00:16:38,500 --> 00:16:41,480
+如果我们在 Hazel 命名空间之外，我们将不得不那样做
+ and if we're outside of the Hazel namespace, we'll have to do that
+
+181
+00:16:42,700 --> 00:16:48,000
+很容易向你们展示它是个 Hazel::Ref，或者对于唯一指针，我们会就会用Scope
+ kind of shows you very easily that it's a Hazel::Ref, or for a unique pointer, we would do Scope
+
+182
+00:16:48,300 --> 00:16:57,400
+但除此之外，你们还可以创建自己的using，ShaderRef是一种新类型，就是那样
+ right, but apart from doing that, you could also create your own using where basically ShaderRef is a new type, that is that
+
+183
+00:16:57,640 --> 00:17:02,520
+对吧，如果你们经常那样做，也许就是有用的，但那不是我们特别关心的事情 
+ right, and if you do that a lot, maybe that might make sense, but that's not something that we particularly care about
+
+184
+00:17:03,000 --> 00:17:06,125
+这是另一种常见的方法，基本上你们只是定义一个新类型
+ it's another common way to do this, where basically you just define a new type
+
+185
+00:17:06,125 --> 00:17:08,880
+你们知道的，比如在你们的Shader类末尾，也就是Shader.h文件
+you know, at the end of your Shader class, like literally in Shader.h
+
+186
+00:17:08,880 --> 00:17:16,680
+我的意思是，我们添加比如ShaderRef = std::shared_ptr<Shader>之类的
+ I mean, we could potentially just add like a using ShaderRef equals, you know, either std::shared_ptr<Shader> or whatever
+
+187
+00:17:16,680 --> 00:17:19,240
+或者你们在这种场景下，可以简化为Ref<Shader>
+ or you could just simply in this case, just write Ref<Shader>
+
+188
+00:17:19,575 --> 00:17:24,760
+但我认为Ref<Shader>不太难写，我不喜欢创建太多不同的类型
+ but I think Ref<Shader> is not too difficult to write, and I don't, I don't like creating a billion different types
+
+189
+00:17:25,825 --> 00:17:31,600
+因此，你们基本上可以坚持下去，现在这就是我们需要的所有代码，对吧，真的很简单 
+ so because of that, you can basically just stick with this, now this is all the code that we need, right, it's really simple
+
+190
+00:17:31,775 --> 00:17:38,400
+这意味着将来我们可以简单地改变这个Scope，成为一个实际的模板，所以typename
+ what it means in the future is we can simply just change this scope thing, you know, to be an actual template, so typename
+
+191
+00:17:39,775 --> 00:17:50,840
+我在做什么，template<typename T>，Scope之类的，如果我们想的话，可以从中创建类 
+ what am I doing, template<typename T> and then, you know, class scope or whatever, and then we can just make a class out of it if we want to
+
+192
+00:17:50,840 --> 00:17:54,800
+并且只要我们使用Scope，就不需要更改代码库中的任何内容
+ and we don't need to change anything in our code base as long as where we've used Scope
+
+193
+00:17:54,800 --> 00:17:59,480
+和Ref，只要这些接口与shared_ptr和unique_ptr一致
+ and Ref as long as long as those APIs are consistent with shared_ptr and unique_ptr
+
+194
+00:17:59,480 --> 00:18:06,000
+无论如何，搞定，非常令人兴奋，我们要做的是在这里包含内存，以防万一包含这个头文件 
+ anyway, that's done, super exciting, what we'll do is we'll include memory up here, just in case we include this header file
+
+195
+00:18:06,000 --> 00:18:10,775
+我们不想突然出现问题，如果这个头文件像包含在另一个头文件之前 
+ we don't want to suddenly have issues, if this header files like included before another one
+
+196
+00:18:10,775 --> 00:18:13,920
+突然不知道什么是std::unique_ptr或shared_ptr
+ and suddenly doesn't know what std::unique_ptr or shared_ptr are
+
+197
+00:18:14,175 --> 00:18:18,840
+所以我们只在这里包含内存，然后我们可以开始改代码，好了，现在这是有趣的部分 
+ so we'll just include memory up here, and then we can start changing everything, oK, now this is the fun part
+
+198
+00:18:19,225 --> 00:18:24,600
+所以我们要做的是再次处理所有这些，如果想让它成为一个唯一指针，只需要Hazel::Scope
+ so what we'll do is for all of this stuff again, if we wanted it to be a unique pointer, we would just do Hazel::Scope
+
+199
+00:18:24,600 --> 00:18:28,880
+因为我们现在在Sandbox类中，而不在Hazel命名空间中 
+ because we're in the Sandbox class right now, and we haven't we're not inside the Hazel namespace
+
+200
+00:18:29,225 --> 00:18:35,360
+但当然，我们希望所有内容都是Ref，那就是资源，所以我们将其放入 
+ but of course, we want everything to be a ref, that is a resource, so we'll pop this in
+
+201
+00:18:35,625 --> 00:18:41,225
+当然，我想快速提及的另一件事是，这不会以任何方式干扰 
+ and of course, one other thing that I want to quickly mention is this does not in any way interfere with the
+
+202
+00:18:41,800 --> 00:18:44,280
+有可能拥有资产管理系统 
+ with the possibility of having like an asset manager system
+
+203
+00:18:44,400 --> 00:18:50,760
+老实说，以一种非常粗略的方式，这有点像资产管理系统 
+ this like honestly, in a very rough way is kind of like an asset manager system
+
+204
+00:18:51,000 --> 00:18:56,560
+由于我们对所有内容进行引用计数，我们知道如果给定资产，如果有人持有引用 
+ since we're reference counting everything, we know that if a given asset, if anyone is holding a reference
+
+205
+00:18:56,560 --> 00:19:03,200
+所以换句话说，如果任何人出于任何原因需要任何给定资产，该资产将启动，存活
+ so in other words, if anyone requires any given asset for any reason, that asset will start that asset will stay alive
+
+206
+00:19:03,200 --> 00:19:07,750
+但是一旦，你们知道的，基本上已经卸载了关卡，关卡类就像消失了一样
+ but as soon as like, you know, we've basically unloaded the level, right, the level class is like gone
+
+207
+00:19:07,950 --> 00:19:10,080
+我们没有了，不再需要这个资产了 
+and we don't have we don't need this asset anymore
+
+208
+00:19:10,080 --> 00:19:12,280
+它可以从内存中释放 
+ it can it will get released from memory
+
+209
+00:19:13,175 --> 00:19:16,000
+不管你们是否想要那个，我的意思是，在一个真正的引擎中
+ whether or not you want that, I mean, in a real engine
+
+210
+00:19:16,000 --> 00:19:19,610
+你们可能不想要那个，对吧，因为资产可以在关卡之间共享 
+you probably wouldn't want that, right, because assets can be shared between levels
+
+211
+00:19:19,802 --> 00:19:21,520
+你们也有整个系统 
+ and you kind of have this whole system as well
+
+212
+00:19:21,520 --> 00:19:28,800
+所以换句话说，在未来，我们将有资产管理，在那里可能会以更细粒度的方式控制所有权
+ so in other words, in the future, we will have an asset manager, where we can probably control the ownership in more kind of a finer grain fashion
+
+213
+00:19:28,800 --> 00:19:32,280
+不仅仅是将其作为共享指针，但这是一个美妙的开始 
+ than just by having it as a shared pointer, but this is a fantastic start
+
+214
+00:19:32,280 --> 00:19:37,125
+如果你们只是需要，比如，在你们的游戏引擎中有一个快速的小资产系统
+ and if you just need to, like, have a quick little asset system in your game engine
+
+215
+00:19:37,125 --> 00:19:39,520
+老实说，只需要使用 shared_ptr 就好了 
+like honestly, just use shared_ptr is that great
+
+216
+00:19:40,200 --> 00:19:48,080
+所以那已经差不多完成了，我想，对于这个类，我要做的就是搜索std 
+ so that's pretty much done, I think, for this class, really, all I'm going to do is just search for std
+
+217
+00:19:48,975 --> 00:19:53,360
+我不认为我们有太多这样的东西，但 std::shared_ptr 贯穿我的整个方案
+ and I don't think we've got too many of these, but std::shared_ptr across my entire solution
+
+218
+00:19:53,850 --> 00:19:59,920
+也许整个解决方案是没有必要的，我们实际上确实有很多，但到处都在使用，对吧 
+ maybe the entire solution was a was not necessary, we actually do have quite a lot of them, of course, but we use them everywhere, right
+
+219
+00:20:01,200 --> 00:20:06,480
+对于这样的，所以这就是Ref，你们可以看到，因为在Hazel里面，不需要做任何事情
+ for things like this, so this just becomes a ref, and you can see that, because we're inside Hazel, we don't need to do anything
+
+220
+00:20:06,480 --> 00:20:13,000
+我们可以将其更改为Ref，我想我们将基本上完成所有这些并将它们全部更改为Ref
+ we can just change this to be Ref, and I guess we'll just work through all of these basically and change them all to be Ref
+
+221
+00:20:13,600 --> 00:20:18,880
+可能有很多，好吧，所以我们有，你们知道，它们就在这里 
+ there might be quite a lot of them, oK, so we have like, you know, we have them up here as well
+
+222
+00:20:19,200 --> 00:20:24,560
+现在，请注意，对吧，我不会在这里更改它们，我将其保留为 std::shared_ptr
+ now, note this, right, I'm not changing them here, this I'm leaving as std::shared_ptr
+
+223
+00:20:24,800 --> 00:20:31,760
+这个指针不只是重命名标准模板库并创建我们自己的版本，不，那是愚蠢的 
+ the pointer of this is not to just rename the standard template library and just create our own version of it, no, that's silly
+
+224
+00:20:31,850 --> 00:20:39,325
+我的意思是，我们不会输入def String std::string， 就像带有大写字母的字符串
+ right, I mean, we're not going to we could type def string, std::string to just be like string with uppercase, with an uppercase S
+
+225
+00:20:40,200 --> 00:20:43,440
+那就像我们的字符串类，对吧，我们不是，我们不想那样做 
+ and that would be like our string class, right, no, we're not, we're not trying to do that
+
+226
+00:20:43,440 --> 00:20:49,160
+我们要做的是阐明什么是Hazel::Ref，什么是std::shared_ptr
+ what we're trying to do is shed some light as to what is like a Hazel reference and what is like, you know, an std::shared_ptr
+
+227
+00:20:49,160 --> 00:20:54,480
+这就像这是一个日志的东西，对吧，如果想的话，我们仍然会在代码中使用共享指针 
+ this is like this is a log thing, right, we're still going to use shared pointers in our code, if we want to
+
+228
+00:20:54,750 --> 00:21:01,280
+但对于明确仅限于 Hazel 的事情，对吧，将来可能会由资产管理处理的事情 
+ but for things that are explicitly Hazel only, right, things that maybe in the future would be handled by an asset manager
+
+229
+00:21:01,280 --> 00:21:09,320
+所以换句话说，资产，对吧，那就是我们试图重命名为Ref，比如Scope
+ so in other words, assets, right, that's the kind of stuff we're trying to rename into refs and like, you know, scope pointers as well
+
+230
+00:21:09,525 --> 00:21:11,360
+所以那就是为什么我们会保留这些 
+ so that's why we're going to just leave these alone
+
+231
+00:21:12,575 --> 00:21:16,440
+好了，让我们看看，VertexArray，看看它是如何像IndexBuffer一样返回的
+ oK, let's see, VertexArray, for example, see how this is returning like an IndexBuffer
+
+232
+00:21:16,440 --> 00:21:21,200
+很明显，IndexBuffer只是一种资产 
+ llearly that index buffer is simply a, it's like, it's an asset
+
+233
+00:21:21,325 --> 00:21:28,000
+所以我们只返回一个Ref，这是返回一个向量，还有这些东西 
+ so we just return a reference, and this is returning a vector, and this stuff as well
+
+234
+00:21:28,000 --> 00:21:35,240
+vertex buffers 和 index buffers，这些也是资产，看起来不错 
+ vertex buffers and index buffers, those are also assets, that looks pretty good
+
+235
+00:21:35,875 --> 00:21:42,240
+让我们看看RendererAPI，这里有这个，所以我只是重命名它，你们应该已经明白了 
+ let's look at RendererAPI, we have this here, so I'll just rename this, you guys kind of get the point of this
+
+236
+00:21:42,750 --> 00:21:44,500
+我可能只是把视频剪到这里，然后自己做
+ I could probably just cut the video here and do this myself
+
+237
+00:21:44,500 --> 00:21:50,640
+但还是会复习下，以防遇到任何有趣或不寻常的事情 
+but I'll still go over this just in case we run into anything fun or or unusual
+
+238
+00:21:51,675 --> 00:21:53,440
+好了，然后是Renderer.cpp
+ oK, and then Renderer.cpp
+
+239
+00:21:55,424 --> 00:22:01,560
+我们重命名这些东西，确实让代码也更清晰，那是我喜欢这样做的事情之一 
+ we rename this stuff really does make our code a lot cleaner as well, that's one of the things that I like about doing this
+
+240
+00:22:04,040 --> 00:22:07,880
+好了，我们有很多这样的代码，这个需要换成Hazel::Ref
+ oK, we've got a bunch of these things, and this needs to be a Hazel::Ref
+
+241
+00:22:14,625 --> 00:22:19,800
+在我们的ExampleLayer中，我们创建的数据中得到了一大堆这样的代码
+ got a bunch of these for all of our data that we create inside our ExampleLayer
+
+242
+00:22:21,850 --> 00:22:28,440
+好了，看起来不错，我将再次搜索std::shared_ptr
+ yeah, that looks pretty good, I'll just do another search again for std::shared_ptr
+
+243
+00:22:29,000 --> 00:22:33,400
+好了，所以看起来好多了，我们在Log中有一些，但继续，完全没问题 
+ oK, so we're looking a lot better, we've got stuff in log, but that's again, that's totally fine
+
+244
+00:22:33,400 --> 00:22:37,000
+我们不去管它，然后在OpenGLVertexArray还有一些
+ we're going to leave that alone, and then there's a bunch of stuff in OpenGLVertexArray
+
+245
+00:22:37,400 --> 00:22:42,960
+我可以做查找替换，但你们会注意到我是手动做的，只是因为有时我们想要 Hazel 命名空间 
+ I could, again, I could do a find replace, but you'll notice I'm doing this manually, just because sometimes like we want the Hazel namespace
+
+246
+00:22:43,200 --> 00:22:45,280
+有时我们不想要 Hazel 命名空间 
+ sometimes we don't want the Hazel namespace
+
+247
+00:22:45,750 --> 00:22:52,430
+正因为如此，这很容易，你们知道，为此，我可以很容易地在当前文档中找到引用的位置 
+ and so because of that, it's just easy, you know, for this, though, I can easily just find a place that to just a ref in this current document
+
+248
+00:22:52,430 --> 00:23:01,360
+因为那会很好地解决问题，酷，应该就是那样了，我会再搜索一次，以确保百分百
+ because that will just work out nicely, oK, cool, that should be it, again, I'll do another search just to be like 100% sure
+
+249
+00:23:02,240 --> 00:23:07,080
+好了，现在你们在搜索中可以看到的共享指针是在Log和Core中，太棒了 
+ oK so now the only references you can see in the search are inside Log and Core, which is fantastic
+
+250
+00:23:07,080 --> 00:23:14,320
+所以我们基本上没有在任何地方使用智能指针，除了Log外，没有在任何地方使用共享指针
+ so we're not using smart pointers basically anywhere, I mean, we're not using shared pointer anywhere except the log class
+
+251
+00:23:14,320 --> 00:23:18,720
+我们只是简单地使用了Hazel::Ref，酷，好了 
+ we're just simply using Hazel Ref, which is pretty cool, all right
+
+252
+00:23:18,720 --> 00:23:21,680
+显然，我们将尝试编译这段代码，确保我们没有犯任何错误 
+ obviously, we're going to try and compile this code, make sure that we didn't make any mistakes
+
+253
+00:23:21,680 --> 00:23:27,160
+我的意思是，它应该像往常一样编译和运行，好吧，所以我们没有编译错误 
+ and I mean, it should compile and run as usual, all right, so we get no compile errors
+
+254
+00:23:27,160 --> 00:23:34,000
+现在如果尝试运行这段代码，应该会得到与上次相同的结果，我们在这里拥有那种
+ and now if I try and run this code, we should get the same result as last time where we have our kind of world here
+
+255
+00:23:34,000 --> 00:23:39,360
+一切似乎都正常运行，现在我希望你们喜欢这期视频，如果喜欢的话，就为它点赞吧
+ and everything seems to be working correctly, now I hope you guys enjoyed this video, if you did, you can hit the like button
+
+256
+00:23:39,360 --> 00:23:44,360
+你们可以通过访问 patreon.com/thecherno 帮助支持系列以及我在 YouTube 上所做的
+ you can help support this series and everything I do here on YouTube by going to patreon.com/thecherno
+
+257
+00:23:44,360 --> 00:23:49,240
+非常感谢所有让这个系列成为可能的可爱赞助人 
+ huge thank you as always to all the lovely patrons that make this series possible
+
+258
+00:23:49,480 --> 00:23:55,300
+开始制作新的独家视频，正如上次提到的那样，如果你们支持，即使每月只需3刀
+ started doing new exclusive videos, as I mentioned last time, where basically if you support even for as little as $3 a month
+
+259
+00:23:55,600 --> 00:24:01,360
+你们可以访问一大堆独家视频，在上期视频中，我实际上展示了一堆像 Hazel 开发分支 
+ you get access to a whole bunch of exclusive videos, in the last one, I actually showed a bunch of like the Hazel development branch
+
+260
+00:24:01,575 --> 00:24:05,440
+我想我真的要上传那个视频了，它可能已经上传好了 
+ and I think that I actually am going to put that video up, it might already be up
+
+261
+00:24:06,175 --> 00:24:10,360
+只是通常与你们分享的那期独家视频 
+ just kind of share that exclusive video with kind of all of you in general
+
+262
+00:24:10,360 --> 00:24:15,725
+但是那里有很多东西需要探索，以及访问 Hazel 开发分支源代码，其中包含这些东西 
+ but there's just tons of stuff to kind of explore there, as well as access to the Hazel development branch source code in which this stuff
+
+263
+00:24:15,725 --> 00:24:22,360
+还有更多，包括像基于物理的渲染，像动画，还有一大堆东西已经完成了 
+ and much much more, including like physically based rendering, and like animation, and a whole bunch of stuff has already been done
+
+264
+00:24:23,025 --> 00:24:28,475
+显然它有助于支持这个系列，并确保我可以继续全职制作这些视频 
+ and obviously it helps support this series, and just ensures that I can keep making these videos full time
+
+265
+00:24:28,475 --> 00:24:32,040
+因为那是我的，这就是我现在的全职工作，真的非常酷 
+ because that's my, this is my full time job right now, which is really, really cool
+
+266
+00:24:32,225 --> 00:24:37,625
+这一切都要感谢你们，我对未来感到非常兴奋，我们下次见，拜
+ and it's all thanks to you guys, and I'm super excited for it for the future, I'll see you guys next time, goodbye
+

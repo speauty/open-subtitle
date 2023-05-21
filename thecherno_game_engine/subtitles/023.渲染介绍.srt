@@ -1,0 +1,1480 @@
+﻿1
+00:00:00,166 --> 00:00:05,566
+嘿，你们好，我是TheCherno，欢迎回到我的游戏引擎系列，那么今天有了些不同的东西
+hey, what's up guys, my name is TheCherno, welcome back to my game engine series, so today we've got something a little bit different
+
+2
+00:00:05,566 --> 00:00:09,025
+首先，我想让你们看上一期视频，如果还没有看过的话
+first of all, I want you guys to watch the previous episode, if you haven't already
+
+3
+00:00:09,250 --> 00:00:14,175
+现在我们已经完成了所有我想做的ImGui内容
+that's us finishing up all of the ImGui stuff that I wanted to actually do, now that we've done that
+
+4
+00:00:14,466 --> 00:00:22,000
+我们将继续讨论一个非常大的新主题，就是渲染器，首先，让我们谈谈本期的不同之处
+we're going to move on to a very big new topic called renderer now, first of all, let's talk about what's different in this episode
+
+5
+00:00:22,533 --> 00:00:28,166
+我的电脑刚刚完全坏了，好像根本不能运行，真是太棒了
+my computer has just completely broken himself, like just will not work at all, which is all great
+
+6
+00:00:28,166 --> 00:00:31,250
+如果我有足够的时间，我可能会修好它，但不幸的是我没有时间
+and I could probably fix it, if I had enough time, but unfortunately I don't have time
+
+7
+00:00:31,250 --> 00:00:36,650
+因为目前，我在EA的寒霜引擎全职工作，我也在装修我的公寓
+because at the moment, I'm working full time of course at EA on Frostbite, I'm also renovating my apartment
+
+8
+00:00:36,650 --> 00:00:41,500
+我大约一个月后就要结婚了，所以我要做很多婚礼准备，我的生活非常忙碌
+I'm also getting married in about a month, so I have to do a lot of wedding preparation, and my life is just completely hectic
+
+9
+00:00:41,850 --> 00:00:47,725
+但我今天还是很想给你们拍一期视频，所以我想，你们知道的，今天我们谈谈
+but I still really wanted to make a video for you guys, today, so I thought, you know, what let's just talk about stuff today
+
+10
+00:00:48,166 --> 00:00:55,575
+因为我们将要深入研究的整个渲染器主题非常复杂
+because this whole renderer topic that we're about to dive into is so incredibly complicated
+
+11
+00:00:55,800 --> 00:01:04,800
+如果我想想我以前写过多少次渲染器
+and just just enormous that you just really cannot plan enough, and if I think about how many times I've written a renderer before
+
+12
+00:01:04,800 --> 00:01:13,399
+我以前写过多少次渲染器接口抽象，不管我写了多少次，50年以后
+and how many times I've written renderer api abstractions before, doesn't matter how many times I do this, I'm gonna be 50 years old
+
+13
+00:01:13,400 --> 00:01:21,575
+我还是会用另一种方式来写，因为它只是，它是难以置信的，就像它是疯狂的，多么复杂
+and I'm still gonna be writing them a different way, because it's just, it's just incredible, like it's just crazy, how just complicated
+
+14
+00:01:21,575 --> 00:01:25,085
+还有多少事情需要知道，而我仍然不知道我在做什么
+and how much stuff there is to actually know, and I still don't really know what I'm doing
+
+15
+00:01:25,575 --> 00:01:31,050
+所以，因为就像一个节拍被打破了一样，我真的什么都做不了，所以我选择了字体平移纸
+so because like a beat is broken, and I can't really do anything of it, I've gone font pan paper
+
+16
+00:01:31,400 --> 00:01:34,725
+我们将讨论未来几周我们将要做的很多事情
+and we're actually going to talk about a lot of what we're going to do in the coming weeks
+
+17
+00:01:34,725 --> 00:01:39,800
+因为我们现在在Hazel中要做的是，对吧，基本上是一个渲染器
+because what we're going to do now in Hazel is, right, a renderer basically
+
+18
+00:01:39,800 --> 00:01:43,875
+好吧，那么那意味着我们今天要谈什么
+okay, so what does that mean we're gonna talk today
+
+19
+00:01:43,875 --> 00:01:49,100
+我们将讨论那到底意味着什么，下周，我想做的实际上是把
+we're gonna talk about what that means exactly, next week, what I want to do is actually put together probably
+
+20
+00:01:49,100 --> 00:01:54,325
+比如一个带有图表的PPT，像接口结构和所有内容
+like a powerpoint presentation with like diagrams, and like the structure of the api and everything
+
+21
+00:01:54,325 --> 00:02:01,308
+我们正在以一种更正式的形式制作这段视频，对吧，现在实际上正在为每个人同时直播
+we're doing in more of a formal kind of format this video, right, now is actually going live for everyone at the same time
+
+22
+00:02:01,308 --> 00:02:05,000
+所以赞助商们没有提前收到这段视频，只是因为我没有电脑
+so patrons aren't getting this video early, just because of the fact that I've had no computer
+
+23
+00:02:05,000 --> 00:02:09,600
+我可能要在我的笔记本上编辑这个，太糟糕了，不管怎么说，那只是一方面
+and I'm probably gonna have to edit this on my laptop, which is gonna be terrible, anyway, that a side
+
+24
+00:02:09,600 --> 00:02:14,750
+每个人都在同一时间得到这个，这很酷，因为我可以立即得到你们的反馈，那将非常好
+everyone's getting this at the same time, which is cool, because I can get your feedback immediately, and that's gonna be quite good
+
+25
+00:02:14,750 --> 00:02:23,500
+因为下周我要做的是录制一段视频，在那里我会谈论整个事情的设计，对吧
+because next week what I want to actually do is record a video, where I actually talk about the design of this whole thing, right
+
+26
+00:02:23,500 --> 00:02:28,300
+那会使用到PPT，因为我无法说服自己
+and that's going to be like with a powerpoint kind of presentation, because there's no way I can just talk myself into this
+
+27
+00:02:28,300 --> 00:02:33,484
+这将是太多的信息，如果不画出来的话，很难想象
+it's just going to be too much information, and it's going to be very hard to kind of visualize, if it's not drawn
+
+28
+00:02:33,825 --> 00:02:39,450
+就像给你们的实际图表一样，那就是下周要发生的事情，但今天我们只想谈谈这个
+like like as an actual diagram for you guys, so that's what's gonna happen next week, but today we're just gonna talk about this
+
+29
+00:02:39,766 --> 00:02:44,750
+我只想告诉你们我的经验，这是渲染器的一般情况，并谈谈这对Hazel意味着什么
+I'm just gonna give you my experience, which is renderer in general, and talk about what this means for Hazel 
+
+30
+00:02:44,750 --> 00:02:51,750
+就像我们要谈谈，好吧，那么第一步，我在这里列出的第一件事
+and like just we're just gonna talk, okay, so step one, and the first thing that I have on my list here
+
+31
+00:02:51,750 --> 00:02:57,050
+只是这是一个非常困难和复杂的话题，我们确定我们定义了这个话题实际上是什么
+is just that it's a really hard and complex topic, we sure we define what the topic actually is
+
+32
+00:02:57,050 --> 00:03:00,250
+那么渲染器，渲染器涉及什么，我们在游戏引擎中需要什么
+so renderer, what does renderer involve, what do we needed in a game engine
+
+33
+00:03:00,634 --> 00:03:05,050
+你们知道，它的目的是什么，为什么它在Hazel里，它做什么，好了
+you know, what what is its purpose, why is it in Hazel, what does it do, okay
+
+34
+00:03:05,400 --> 00:03:13,325
+所以渲染器基本上是指我们在屏幕上绘制图形的能力，那通常意味着
+so renderer refers to basically our ability to draw graphics on the screen, now what that means usually is
+
+35
+00:03:13,533 --> 00:03:17,575
+嘿，比如这个3D模型，我想绘制，我有这个世界，我想绘制
+well hey, I have like this 3D model, I want to draw, I have this world, I want to draw
+
+36
+00:03:17,575 --> 00:03:22,900
+我有我构建的整个场景，我想实时渲染
+I have this whole scene that I've built up, I want to render this in a in a real time fashion
+
+37
+00:03:23,125 --> 00:03:32,475
+那就是你们知道的足够快的实时性，所以可能每秒60帧，也就是每帧16.7毫秒
+that is you know fast enough to actually be real time, so probably 60 frames per second, which is 16.7 milliseconds per frame
+
+38
+00:03:33,100 --> 00:03:39,666
+我希望它是交互式的，那意味着在输入和实际之间必须有相当低的延迟
+and I want it to be interactive, which means that there has to be fairly low latency between input and actual
+
+39
+00:03:39,800 --> 00:03:45,541
+你们知道，如果执行某些操作并以某种方式影响渲染器，则渲染器本质上就是那样的
+you know, if doing something and affecting the renderer in some way, that is essentially what renderer is
+
+40
+00:03:46,700 --> 00:03:53,950
+现在，为什么它如此复杂，我们实现渲染器的方式如此快速
+now why is it so complicated, well, the way that we achieve renderer that is fast
+
+41
+00:03:54,200 --> 00:04:02,300
+它能够产生高保真的图形，这也是完全的，看，我一点都不专业
+and that is capable of producing high fidelity graphics, which again is completely, see, I'm not professional at all
+
+42
+00:04:03,333 --> 00:04:09,025
+我们生产高保真度的东西的方式，对吧，这也是一个对每个人都有吸引力的术语，对吧
+the way that we produce something that is high fidelity, right, which is again a term that like it to each their own, right
+
+43
+00:04:09,025 --> 00:04:12,675
+就像高分辨率对你们来说就是高保真图像，对吧
+like what is high resolution was what's high fidelity graphics to you, right
+
+44
+00:04:12,675 --> 00:04:19,125
+你们知道，你们今天看到的很多可能都是一些由大公司发布的新游戏
+a lot of what you see today is maybe some of the like new games, that are being released by huge companies, you know
+
+45
+00:04:19,125 --> 00:04:22,650
+你们看，我甚至可能在这里玩其中的一些，我不知道我是否能在版权方面
+you see, like I might even play some of them here, I don't know if I can copyright wise
+
+46
+00:04:22,650 --> 00:04:26,575
+但是你们知道像《战场5》中新的光线追踪之类的东西
+but you know stuff like the new ray tracing stuff in battlefield 5
+
+47
+00:04:26,575 --> 00:04:30,300
+你们知道你们已经有了所有这些即将面世的高保真图形
+you know you've got all of these kind of high fidelity graphics that are coming out
+
+48
+00:04:31,166 --> 00:04:35,300
+我们通常认为它们是高保真的，因为它们接近真实照片
+and we perceive them as high fidelity usually, because they're close to being photorealistic
+
+49
+00:04:35,300 --> 00:04:39,775
+这意味着渲染器技术实际上能够产生一些东西
+which means that that renderer technology is actually capable of somewhat producing something
+
+50
+00:04:39,775 --> 00:04:48,166
+那看起来像是电影或实时照片，对吧，人们经常把它与现实世界的运行方式进行比较
+that looks like a movie or a photograph in real time, right, and people compare it to how the real world works a lot
+
+51
+00:04:48,166 --> 00:04:54,000
+还有这些东西，比如基于物理的渲染器，实际上是基于曲面物理属性的渲染器
+and you have these things, like physically based renderer, which is actually renderer based on physical properties of surfaces
+
+52
+00:04:54,000 --> 00:04:58,775
+就像光和光子是如何运行的，那是我们的追求
+and like how light works and photons and all that kind of stuff, and that's kind of our pursuit
+
+53
+00:04:59,100 --> 00:05:05,175
+像我们一样，我们也在寻求一种实时渲染照片级真实感图形的方法，因为我们可以
+our, like us actually pursuing a way to render photorealistic graphics in real time, because we can
+
+54
+00:05:05,466 --> 00:05:11,225
+我们或多或少可以渲染照片级真实感图形，对吧，但实时渲染确实很有挑战性
+we can more or less render photorealistic graphics, right, but doing it in real time is really really challenging
+
+55
+00:05:11,533 --> 00:05:19,866
+人们之间有一种巨大的事情，显然想要实时做到那个
+and there's like a huge, like huge, huge like thing going on with with people, obviously trying to achieve that in real time
+
+56
+00:05:19,866 --> 00:05:24,381
+但那还不是很好，当然这种光线追踪
+but that's still kind of not really quite there yet, and certainly this kind of ray tracing
+
+57
+00:05:25,366 --> 00:05:29,100
+硬件以类似rtx的形式出现，例如在任何视频上
+hardware is coming out in the form of like rtx for example on it on any video
+
+58
+00:05:29,366 --> 00:05:32,650
+那绝对像是步入了正确的方向，因为每个人都知道那个
+that stuff is definitely like stepping into the right direction, because everyone knows that
+
+59
+00:05:33,000 --> 00:05:38,400
+光线跟踪就是，有多少离线渲染器，所以非实时渲染器
+ray tracing is how you, how a lot of offline renderers, so non real time renderers
+
+60
+00:05:38,400 --> 00:05:41,450
+那么就是人们用来制作电影之类的渲染器
+so renderers that people use for like movies and stuff like that
+
+61
+00:05:41,925 --> 00:05:48,900
+他们是如何通过光线跟踪类渲染器来实现照片真实感的
+how they're able to achieve photorealism like quite unquote, right, is by using ray tracing kind of renderers 
+
+62
+00:05:48,900 --> 00:05:56,466
+但无论如何，在这里超越我自己，这是非常复杂的，因为除了做所有那些
+but anyway, getting ahead of myself here, it's very complicated, because apart from doing all of that
+
+63
+00:05:56,466 --> 00:06:00,300
+我们实际实现高性能的方式
+the way that we actually achieve that high performance, or performance that is at the level 
+
+64
+00:06:00,300 --> 00:06:04,925
+我们可以实时完成这些工作，同时仍能获得高保真的外观
+where it's possible for us to do this stuff in real time, and still achieve a high fidelity look
+
+65
+00:06:06,000 --> 00:06:11,025
+我们需要使用GPU，它是图形处理单元，是一个专用的硬件
+we need to use something called the GPU, which is the graphics processing unit, it's a dedicated piece of hardware
+
+66
+00:06:11,300 --> 00:06:17,000
+它存在于大多数计算机中，有时它集成到我们的CPU中，有各种不同的体系结构
+that resides in most computers, sometimes it's integrated into our CPU, there are various architectures
+
+67
+00:06:17,000 --> 00:06:21,200
+比如这个硬件实际上是如何设置的，但最终它是一个专用芯片
+for how this hardware is actually set up, but ultimately, it is a dedicated chip
+
+68
+00:06:21,525 --> 00:06:24,700
+它位于我们的计算机或我们正在使用的任何设备上
+that is on our computer or our whatever device we're using
+
+69
+00:06:25,000 --> 00:06:34,550
+能够执行某些非常常见的数学运算或算法，例如
+that is capable of performing or executing certain mathematical operations or algorithms, that are very common, for common
+
+70
+00:06:34,550 --> 00:06:41,382
+就像最终的渲染器任务或常见的图形处理任务一样，所以我们对图形所做的很多事情是
+like renderer tasks eventually or common graphics processing tasks, so a lot of what we have to do with graphics is
+
+71
+00:06:41,866 --> 00:06:46,575
+在屏幕上显示大量像素，如果我们有全高清显示器，那个大约是200万像素
+display a large number of pixels on the screen, if we have a full hd display, that's about 2 million pixels
+
+72
+00:06:46,966 --> 00:06:53,600
+我们通常需要一种方法来确定每个像素的颜色，这与其他像素无关
+we need a way to determine the color for each pixel usually, this is independent of every other pixel
+
+73
+00:06:53,600 --> 00:06:59,300
+所以有可能并行地做这些事情，对吧，这是GPU通常非常擅长的事情
+so it's possible to do that stuff in parallel, right, that is something that a GPU is usually quite good at
+
+74
+00:06:59,733 --> 00:07:04,804
+好了，其他的事情，就像你们知道的，我们处理很多四维向量，我们处理很多四乘四矩阵
+okay, other things, like you know, we deal a lot with four component vectors, we deal a lot with four by four matrices
+
+75
+00:07:05,325 --> 00:07:13,249
+我们对GPU上的操作进行了硬件优化，这就是为什么它比在CPU上做这类事情更快的原因
+we have hardware optimizations for operations like that on the GPU, which is why it's faster than doing these kinds of things on the CPU
+
+76
+00:07:13,249 --> 00:07:17,700
+所以并行处理和许多具体的数学运算就是它关键
+so parallel processing and a lot of specific maths operations is the gist of it
+
+77
+00:07:18,075 --> 00:07:24,050
+显然，我们有特定的光线跟踪过程和其他类型的架构，它们可能有很多东西
+obviously we have specific like ray tracing processes and other kind of architectures that may have a lot of things
+
+78
+00:07:24,050 --> 00:07:27,666
+但那只是为了让它保持基本，这是因为
+but that's kind of just to dumb it down to keep it basic, it's because of that
+
+79
+00:07:27,666 --> 00:07:34,700
+是因为我们想在GPU上使用渲染器图形的数学运算速度更快，因为有专门的硬件
+is because the math that we kind of want to use for renderer graphics is faster to do on the GPU, because of dedicated hardware for that
+
+80
+00:07:35,125 --> 00:07:39,844
+然后我们基本上有一个巨大的并行操作
+and then also we have a large like huge paralyzation essentially
+
+81
+00:07:40,066 --> 00:07:47,075
+那让我们可以同时做很多操作，就像并行一样，好吧
+that lets us do a lot of operations in just at the same time essentially like in parallel, okay
+
+82
+00:07:47,525 --> 00:07:52,900
+所以为了与这个GPU交互，我们必须使用一个叫做渲染接口的东西
+so to interface with this GPU, we have to use something called a rendering api
+
+83
+00:07:53,450 --> 00:07:56,125
+现在我确实有一个OpenGL系列，你们可以去看看
+now I do have an OpenGL series, which you can check out
+
+84
+00:07:56,250 --> 00:08:03,050
+但我确实意识到，随着时间的推移，OpenGL变得越来越少，我的意思是看着我自己
+but I do realize as time goes on OpenGL is becoming less and less like a thing, and I mean look me personally
+
+85
+00:08:03,050 --> 00:08:09,500
+比如，如果你们问我个人，在高性能引擎中会使用什么
+like if you ask me personally, what is yan chernikov, what is thecherno, going to use in his high performance engine
+
+86
+00:08:09,733 --> 00:08:18,425
+它会是OpenGL吗？当然不是，如果你们想成为最前沿的人，我不推荐使用OpenGL
+is it gonna be OpenGL, of course not, OpenGL is not something that I can recommend using, if you're going for bleeding edge, cutting like edge
+
+87
+00:08:18,425 --> 00:08:22,800
+我不知道，我想在2009年用最好的图形渲染引擎完成最好的游戏
+I don't know I want to make the best game end of the best graphics rendering engine in 2009
+
+88
+00:08:22,800 --> 00:08:24,275
+当然不是，你们不想用OpenGL
+of course not, you don't want to OpenGL
+
+89
+00:08:24,600 --> 00:08:30,225
+如果你们完全处于顶端，你们可能想要Vulcan和DirectX12，对吧
+you probably if you're absolutely at the top edge, you want probably the Vulcan DirectX12, right
+
+90
+00:08:31,235 --> 00:08:36,900
+我们不是一个大型游戏工作室或大型渲染引擎
+we are not a huge game studio or a huge rendering powerhouse
+
+91
+00:08:36,900 --> 00:08:42,275
+它能够以某种方式立即实现Vulcan或DirectX 12渲染器
+that is capable of implementing a Vulcan or a DirectX 12 renderer immediately in a way
+
+92
+00:08:42,275 --> 00:08:50,925
+那也可以教给你们所有人，因为Vulcan和DirectX12，特别是对Vulcan的研究是极其复杂的
+that can also teach it to all of you guys, because Vulcan and DirectX12,  specifically looking at Vulcan bow is extremely complicated
+
+93
+00:08:52,013 --> 00:09:01,450
+首先你们并没有好好看看Vulcan，我，比如我，并没有人能给我确切的解释
+first of you have not taken a good look at Vulcan, I like I am, there is no one to me cable of explaining exactly 
+
+94
+00:09:01,625 --> 00:09:09,900
+Vulcan交换链实际上是如何运行的，以及OpenGL代码如何运行的，对吧，我可能会写
+how like the Vulcan swap chain actually works, and how like OpenGL code, right, I can I can write you probably
+
+95
+00:09:09,900 --> 00:09:15,350
+OpenGL内存中基于物理的渲染器，与所有接口命令一样，一切正常
+a physically based renderer from memory in OpenGL, like all api commands everything just correct
+
+96
+00:09:15,500 --> 00:09:21,650
+好吧，我可以那样做，因为它很简单，我可能无法在Vulcan为你们绘制一个三角形
+right, I can do that, because it's simple Vulcan, I probably wouldn't be able to draw a triangle for you in Vulcan
+
+97
+00:09:21,775 --> 00:09:26,450
+在我的脑海里，不可能，不，我肯定不能，对吧，我曾用过Vulcan
+off the top of my head, no way, no, I definitely wouldn't be able to, right, and I've worked with Vulcan 
+
+98
+00:09:26,450 --> 00:09:32,850
+实际上，在它发布之前，我确实有很多使用Vulcan的经验，但我不能实现那个
+since before it was released actually, so I do have quite a bit of Vulcan experience, and yet I'm not able to do that
+
+99
+00:09:33,333 --> 00:09:38,475
+因为这里非常复杂，比如需要1500行代码或其他东西来渲染一个三角形
+because it's incredibly complicated here, like 1500 lines of code or something to render a triangle
+
+100
+00:09:38,966 --> 00:09:43,800
+那就是为什么我在一开始特别选择OpenGL作为渲染接口的原因
+so that's why I've specifically gone with OpenGL as a rendering api in the beginning
+
+101
+00:09:44,100 --> 00:09:46,950
+为什么，是因为它是最好的选择吗？显然不是
+why is it, is it because it's the best choice obviously not
+
+102
+00:09:46,950 --> 00:09:52,600
+但问题是，我不能花几百个视频建立一个Vulcan交换链来向你们展示这个
+but the thing is, I can't spend hundred videos setting up a Vulcan swap chain to show you guys this
+
+103
+00:09:52,600 --> 00:09:58,250
+因为那会失去很多观众，那不会有意思，好吧，不是我们需要的东西
+because that's gonna lose a lot of viewers, and that's not gonna be interesting, okay, and it's not something that we need
+
+104
+00:09:58,500 --> 00:10:03,400
+为什么呢，因为我可能更愿意让Hazel达到这样的程度，在那里可以渲染3D的PBD场景
+why, because I might rather get Hazel to the point, where I can render like a pbr scene in 3d
+
+105
+00:10:03,533 --> 00:10:06,325
+然后就像，嘿，你们知道吗，也许现在将实现Vulcan
+and then be like, hey, you know what, maybe now will implement Vulcan
+
+106
+00:10:06,325 --> 00:10:08,925
+因为我们已经到了关键时候，可能有必要
+because we're getting to the point, where it might be necessary
+
+107
+00:10:09,266 --> 00:10:14,150
+所以你们必须从这种角度来看，很多人问我，如果我构建Hazel的方式
+so you have to look at it from this kind of point of view, a lot of people asked me, if the way that I'm building Hazel
+
+108
+00:10:14,150 --> 00:10:18,800
+是我将如何构建我的引擎，或者如果我做出了所有正确的决定，我将做出正确的决定
+is how I would build my engine, or if I'm making all the right decisions, I'm making the right decisions
+
+109
+00:10:18,800 --> 00:10:23,525
+考虑到这是YouTube上的一个视频系列，我想说得非常清楚，实际上非常像这期视频
+considering it's a video series on YouTube, I want to make that absolutely clear, actually quite like this video
+
+110
+00:10:23,525 --> 00:10:28,525
+我只是在咆哮，只是在解释一切是如何运行的，这很好，因为我读到了很多评论
+I'm just ranting a lot, I'm venting I'm just explaining how everything's working, which is good, because there's so many comments I've read
+
+111
+00:10:28,525 --> 00:10:30,675
+还有很多我想说的话，但我无论如何都不能
+and so many things I wanted to say, but I can't, anyway
+
+112
+00:10:31,900 --> 00:10:35,775
+嗯，所以说，那就是为什么我们展示了一个OpenGL
+huh so that being said, that's why we've kind of shows an OpenGL
+
+113
+00:10:35,775 --> 00:10:42,125
+因为它允许我们访问显卡并实际使用它，但它是实现那个最简单的接口
+because it allows us to tap into our graphics card, and actually use it, but it's the most simple api for doing that
+
+114
+00:10:42,450 --> 00:10:49,350
+OpenGL非常简单，就抽象的层次或程度而言，它就比如10个难度，这是对的
+OpenGL is extremely simple, it's like 10 out of 10 in terms of how high level or over an abstraction, it is right
+
+115
+00:10:49,350 --> 00:10:56,275
+而Vulcan可能是1，DirectX12可能在3，而DirecX11和Metal可能是5或6左右
+whereas Vulcan might be like a one, DirectX 12 might be like a three, DirectX 11 and like Metal might be around a five or six
+
+116
+00:10:57,675 --> 00:11:05,750
+而Vulcan就像你们所知道的一样在一个极端，OpenGL在另一个极端，也很有趣
+whereas Vulcan is like you know on one extreme, and OpenGL is on the other upstream, which is quite interesting as well to just look at
+
+117
+00:11:06,400 --> 00:11:14,050
+好吧，这里的情况变得更复杂了，所以好吧，你们选择个渲染接口，允许使用显卡
+okay, so here's where it gets even more complicated though, so okay, you pick a rendering api, which lets you use the graphics card
+
+118
+00:11:14,050 --> 00:11:18,150
+这就是要执行渲染的操作，对吧，那在某种程度上来说就是我们的任务
+which is what you want to do to perform rendering, right, that's our task in a way
+
+119
+00:11:18,666 --> 00:11:30,575
+但问题是一个显卡接口是不够的，现在OpenGL至少在过去发生过，现在更多
+but the problem is one graphics api is not enough, now OpenGL is something that happens to at least in the past, now more
+
+120
+00:11:30,575 --> 00:11:35,975
+所以它越来越被遗弃，越来越不受欢迎，就像被踢出了一样，随便你们怎么说
+so it's getting more deprecated, and it's getting more or less kind of removed, like channeled out, whatever you want to call it
+
+121
+00:11:36,400 --> 00:11:43,868
+所以现在有点不同了，但在过去OpenGL非常好，从某种意义上说，它可以处理所有的事情
+so it's a little bit different now, but in the past OpenGL was extremely good, in the sense that it just worked on everything
+
+122
+00:11:43,868 --> 00:11:50,350
+几乎和Java一样，实际上我可以将其与Java进行比较，因为Java在任何地方都可以运行星号
+was almost like Java, actually I might compare it to java, because java worked asterisk everywhere
+
+123
+00:11:50,350 --> 00:11:56,100
+但这是最垃圾的，对吧，我想说OpenGL就像是绝对的垃圾或类似的东西
+but it was most the garbage, right, I want to say OpenGL is like just absolute garbage or anything like that
+
+124
+00:11:56,100 --> 00:12:01,750
+实际上，我非常喜欢OpenGL，因为它非常简单，非常漂亮，非常温暖
+I actually quite like OpenGL in the sense that it's just so simple, it's so nice and warm
+
+125
+00:12:01,750 --> 00:12:07,650
+在其他最终渲染接口上花了一段时间后，又回到了OpenGL，像这样真是太疯狂了
+and inviting to come back to OpenGL after spending some time in other redener apis and being like this is insane
+
+126
+00:12:08,566 --> 00:12:13,666
+在某种程度上回到OpenGL是很好的，尽管我仍然认为接口并不令人惊奇
+it's nice to come back to OpenGL in a way, even though I still think the api is not amazing
+
+127
+00:12:14,250 --> 00:12:17,366
+但回到OpenGL并不是很令人惊奇还是很好的
+it's still nice to come back to OpenGL and not amazing
+
+128
+00:12:17,366 --> 00:12:20,350
+顺便说一句，我把它放得很轻，但不管怎样，回到OpenGL总是很好的
+I'm putting it lightly by the way, but anyway coming back OpenGL is always nice
+
+129
+00:12:20,350 --> 00:12:23,150
+因为它非常简单，对吧，非常简单
+because it's so simple, right, it's incredibly simple
+
+130
+00:12:24,866 --> 00:12:34,300
+现在的问题是，我甚至不记得我要说的是什么，但问题是当你们有了真正的
+now the thing is though, and I don't even remember where I was going with this, but the thing is when you have something really
+
+131
+00:12:36,133 --> 00:12:41,725
+当你们回到设计所有这些渲染接口时，你们会考虑实际需要什么
+when you go back to designing all these rendering apis, and you think about what you actually need
+
+132
+00:12:43,375 --> 00:12:48,950
+这就成了一个问题，我基本上是在什么平台上发布的，对吧
+it becomes a problem of what platforms essentially am I kind of shipping on, right
+
+133
+00:12:49,375 --> 00:12:57,085
+所以，在完全忘记要说什么之前，当刚才谈论这个时，把它往回点，我说的是OpenGL
+so to drag this back a little bit as I was just talking earlier, before I completely forgot where I was going, I was saying that OpenGL
+
+134
+00:12:57,550 --> 00:13:01,950
+在当时，它有点像java，因为它在任何地方都能运行
+back in the day, it was kind of just like java in the sense that it just worked everywhere
+
+135
+00:13:02,300 --> 00:13:09,925
+对吧，我是说Windows Mac Linux Android IOS，都运行了，它们都能够运行OpenGL
+right, I mean Windows Mac Linux Android IOS, they all ran, they were all capable of running OpenGL
+
+136
+00:13:10,333 --> 00:13:15,675
+然而现在如果看看发生了什么，就像你们知道的一样，并不是说在Windows上不是绝对的好
+whereas now if you take a look at what's happening, we're like you know, not saying Windows wasn't absolutely great with it
+
+137
+00:13:16,400 --> 00:13:21,125
+但就像Android IOS一样，你们知道Mac Linux，它们都是在它上面运行的，对吧
+but like Android IOS, you know Mac Linux, they all kind of ran on it, right
+
+138
+00:13:21,575 --> 00:13:26,400
+但是现在如果你们看看接口的状态，在给定的平台上，什么是最好的渲染接口
+but now if you look at the state of apis, what is the best api render on a given platform
+
+139
+00:13:26,600 --> 00:13:29,237
+对于Windows，是DirectX 11或DirectX 12
+for Windows, it's DirectX 11 or DirectX 12
+
+140
+00:13:29,750 --> 00:13:35,500
+对于Mac，它是Metal，对于IOS，它是Metal，对于Linux，它是Vulcan
+for Mac, it's Metal, and for IOS it's Metal, for Linux, it's Vulcan
+
+141
+00:13:35,750 --> 00:13:40,200
+对于Android，它是Vulcan，可能是GL，对吧，也就是Glass
+for Android, it's Vulcan, maybe gl gls right glass
+
+142
+00:13:40,500 --> 00:13:43,475
+但那可能是针对老式设备的，主要是Vulcan，对吧
+but that's for probably older devices mostly Vulcan, right
+
+143
+00:13:43,775 --> 00:13:48,600
+我漏了什么吗，对于Xbox，通常是DirectX 12
+did I miss anything, for Xbox, it's DirectX 12 usually
+
+144
+00:13:48,900 --> 00:13:59,825
+对于ps4，漏掉的是索尼自己的专有接口，我总是忘记它的名字，因为我不太经常用它
+and for ps4 which I'm missing out on is sony's own proprietary api, which I always forget the name of, because I don't deal with it too often
+
+145
+00:14:01,050 --> 00:14:06,425
+然后就像任天堂交换机一样，老实说，我想它也可能是Vulcan，但我不是百分之百确定
+and then for like the Nintendo Switch, I think it might be Vulcan as well, to be honest, but I'm not 100% sure
+
+146
+00:14:06,425 --> 00:14:10,550
+不管怎样，对于那些平台，你们可以看到OpenGL是不存在的
+anyway for those kind of platforms, you can see that OpenGL is not existent
+
+147
+00:14:10,900 --> 00:14:13,050
+对吧，我选择OpenGL了吗，没有
+right, do I pick OpenGL, well no
+
+148
+00:14:13,050 --> 00:14:16,875
+也许在旧的Android设备上，这可能是你们选择OpenGL的唯一原因
+maybe on older Android devices, it's pretty much maybe the only reason you pick OpenGL
+
+149
+00:14:16,875 --> 00:14:19,800
+对吧，仍然可以在Windows上渲染OpenGL
+right, you can still render OpenGL on Windows
+
+150
+00:14:19,800 --> 00:14:24,300
+但是，如果你们真的想在Windows上渲染，那么应该使用DirectX，不是吗
+but is it preferred, no, you should be using DirectX, if you're serious about rendering on Windows
+
+151
+00:14:24,733 --> 00:14:33,333
+就那么简单，我要说的是，你们需要提升，不能只使用一个渲染接口
+it's as simple as that, where I'm going with this is that you need to ascent, you can't get away with using with using one rendering api
+
+152
+00:14:33,333 --> 00:14:37,975
+那就是渲染变得非常复杂的原因，其中一个原因是如果渲染变得复杂
+and that's why rendering becomes really complicated, well one of the reasons is if it becomes complicated
+
+153
+00:14:38,366 --> 00:14:42,021
+因为你们需要做一些事情，所以需要设计一个接口抽象
+because you need to do something, you design an api abstraction
+
+154
+00:14:42,300 --> 00:14:48,950
+它将所有实际的渲染接口类调用隐藏在你们自己的抽象背后
+which hides away all of the actual render api like calls behind your own abstraction
+
+155
+00:14:49,166 --> 00:14:57,825
+因此，理想情况下，在这种情况下，Hazel有自己的接口，它有自己的渲染接口
+so that ideally you basically are in this case, Hazel has its own api, it has its own rendering api
+
+156
+00:14:58,166 --> 00:15:04,925
+然后渲染接口可以使用DirectX12，可以使用DirectX11，可以使用Vulcan，使用OpenGL
+and then that rendering api could be using either DirectX 12, could be using DirectX 11, could be using Vulcan, could be using OpenGL
+
+157
+00:15:04,925 --> 00:15:12,145
+可以使用Metal，对吧，它可以同时使用任何渲染接口，但你们告诉Hazel
+could be using Metal whatever, right, it could be using any rendering api at once, but you tell Hazel
+
+158
+00:15:12,145 --> 00:15:17,700
+我想上传一个充满数据的顶点缓冲区，它会实现那个，它是如何使用哪个接口实现的
+I want to upload a vertex buffer full of data, it does that, how it does that using which api
+
+159
+00:15:17,700 --> 00:15:28,225
+那是我们不想担心的实现细节，我们有一个抽象层，一个可以告诉Hazel的接口
+that's implementation details that we don't want to worry about, we have this abstraction layer, an api where we can generically tell Hazel
+
+160
+00:15:28,533 --> 00:15:33,100
+上传这个顶点缓冲区，上传这个纹理数据，你们知道的，我想渲染
+upload this vertex buffer, upload this texture data, you know I want to render
+
+161
+00:15:33,850 --> 00:15:36,350
+你们知道从这个索引缓冲区中有三个索引
+you know from this index buffer three indices
+
+162
+00:15:36,800 --> 00:15:39,650
+用这个顶点缓冲区，用这个材质，用这个着色器
+and with this vertex buffer, with this material, with this shader
+
+163
+00:15:40,000 --> 00:15:46,050
+有了这个拓扑结构，我不知道，只有100万个不同的细节，对吧，但关键是我们告诉Hazel
+with this you know topology, I don't know, just 1 million different details, right, but the point is we tell Hazel
+
+164
+00:15:46,050 --> 00:15:49,575
+我们想让Hazel知道，好吧，我们在Windows上运行
+we want that Hazel figures out, okay well, we're running on Windows
+
+165
+00:15:49,575 --> 00:15:52,350
+目前正在使用DirectX 11，因为那是我们选择的
+and we're currently using DirectX 11, because that's what we've selected
+
+166
+00:15:52,575 --> 00:15:58,799
+当然我会用它，或者我们现在在Mac上运行，所以我会用Metal，我想成为你们，明白了吧
+definitely I'm gonna use that, or we're currently running on a Mac, so I'm gonna use Metal, I wanted to be you kind of get the point, right
+
+167
+00:15:58,800 --> 00:16:03,425
+我们有这个抽象层，所以我们的应用程序代码不会根据其运行的内容而改变
+we have this abstraction layer, so that our application code doesn't change based on what it's running on
+
+168
+00:16:03,700 --> 00:16:09,361
+它将在我们实际设置的平台和配置上使用最佳的渲染接口
+and it will be using the optimal rendering api on the platform and configuration that we've actually set up
+
+169
+00:16:11,175 --> 00:16:21,201
+那是非常困难的，好吧，那是非常困难的，因为你们需要做的是在某处画一条线
+that's extremely difficult to do, okay, that's extremely difficult to do, because what you need to do is draw a line somewhere
+
+170
+00:16:21,700 --> 00:16:31,250
+这就是我的接口看起来的样子，那真的很难，因为图形处理得越多，就越深入
+and see this is what my api looks like, that's really difficult, because the more you go on with graphics, and the further you get
+
+171
+00:16:31,250 --> 00:16:36,575
+而且，你们开始实现的技术越先进，你们可能需要更多的控制
+and the more advanced techniques you start implementing, you may need more control
+
+172
+00:16:38,475 --> 00:16:42,475
+拖动整个接口的界限是一项巨大而昂贵的任务
+dragging the whole api line is a huge expensive task to do
+
+173
+00:16:43,166 --> 00:16:48,100
+如果你们不清楚我所说的接口是什么意思，那就是抽象的地方，换句话说
+case you guys aren't clear by what I mean by api line, it's where you draw the abstraction, so in other words
+
+174
+00:16:48,400 --> 00:16:59,700
+很高的级别可能是在这里绘制三角形，很低的级别可能比如解锁Vulcan信号灯，对吧
+where really high level might be drawed triangle at this location and really low level might be like, unlock my Vulcan semaphore, right
+
+175
+00:16:59,900 --> 00:17:03,500
+那可能是两个极端，或者你们知道的
+that's kind of maybe the two extremes, or like you know
+
+176
+00:17:03,500 --> 00:17:10,800
+就像在释放内存或其他类似的，你们在哪里划界非常重要，对吧
+like on releases memory fence or whatever like it it, where you draw the line is really important, right
+
+177
+00:17:11,056 --> 00:17:20,125
+通常我倾向于从概念上思考，所以它们只是在这期视频中掉了两次
+now usually what I tend to do is I like to think of it conceptually, so things like, so they just do that again twice in one video man
+
+178
+00:17:21,333 --> 00:17:28,200
+不管怎样，我们这样做，在一个点上画一条线，我喜欢可能想说，我想要一个顶点缓冲区
+anyway, so we do it, we kind of draw the line at a point, where I like, I might want to say, I want a vertex buffer
+
+179
+00:17:28,400 --> 00:17:35,293
+我想要一个索引缓冲区，一个纹理，一个着色器，我想要，你们知道，着色器上有什么接口
+I want an index buffer, I want a texture, I want a shader, I want to, you know, what api exists on the shader
+
+180
+00:17:35,533 --> 00:17:40,375
+我想找出关于我的统一变量信息作为我的属性，我想能够设置统一变量缓冲区
+well I want to find out information about my uniform as my attributes, I want to be able to set up uniform buffers
+
+181
+00:17:40,375 --> 00:17:46,750
+我希望能够上传统一缓冲区的部分，我可能希望检索有关属性的信息
+I want to be able to kind of upload sections of uniform buffers, I might want to retrieve information about attributes
+
+182
+00:17:47,000 --> 00:17:51,600
+我可能想检索某些其他信息，对吧，你们可能想做很多事情
+I might want to retrieve certain other information, right, there's a lot of things that you might want to do
+
+183
+00:17:51,600 --> 00:17:57,075
+我可能想获得附加到该着色器的所有资源，例如不同的纹理，以及比如采样
+I might want to get all the resources attached to that shader, such as different textures, and like samples
+
+184
+00:17:57,075 --> 00:18:05,650
+也许它像有多少纹理，多少输出，我必须打开它们到帧缓冲区，你们必须有一种接口
+maybe it like how many textures, how many outpluses do I have to open them up to frame buffers, you have to you have to kind of have an api
+
+185
+00:18:05,900 --> 00:18:12,050
+那足够灵活，允许你们实现所有这些渲染器技术，但也可以抽象掉所有这些接口
+that is flexible enough that allows you to implement all these renderer techniques, but also abstracts away all of these apis
+
+186
+00:18:12,050 --> 00:18:19,522
+但还有一个问题，这些接口的运行方式不同，对吧，这些接口的运行方式不同
+but here's the other problem, these apis do not work the same way, right, these apis do not work the same way
+
+187
+00:18:19,933 --> 00:18:22,100
+OpenGL与Vulcan完全不同
+OpenGL is completely different to Vulcan
+
+188
+00:18:22,550 --> 00:18:25,875
+对吧，我的意思是，在概念上，你们可以把它抽象出来，然后看到
+right, I mean yes conceptually you can abstract it out and see
+
+189
+00:18:26,600 --> 00:18:32,950
+你们知道，好吧，我怎么绘制一个三角形，从概念上来说，你们可以说，好吧，我需要什么
+you know, okay, how do I render a triangle, conceptually what you could say is, okay, well, what do I need for that
+
+190
+00:18:33,166 --> 00:18:38,975
+我首先需要设置一些上下文，但在Vulcan，你们必须设置大量的上下文
+I need to first of all set up some kind of contexts, but right in Vulcan, you'd have to set up like a crazy amount of things
+
+191
+00:18:39,266 --> 00:18:41,800
+例如，像命令提示一样，你们知道渲染设备
+such as like command cues, you know rendering devices
+
+192
+00:18:41,800 --> 00:18:48,550
+像逻辑设备、物理设备，它们的其他提示实例是什么
+like logical devices, physical devices, what what is the rest of their cues instances
+
+193
+00:18:49,200 --> 00:18:53,075
+我甚至不记得所有的事情，但至少我记得你们在Vulcan需要设置的所有事情
+I didn't even remember everything, but I kind of at least all the things you need to set up in Vulcan
+
+194
+00:18:53,275 --> 00:18:56,050
+你们需要设置很多东西，而我，你们知道，我可以加入我特别喜欢的
+there's a lot of stuff you need to set up, whereas I'm, you know, I can join my particularly like
+
+195
+00:18:56,325 --> 00:18:58,825
+好吧，还有帧缓冲显然也在Vulcan
+okay, frank, oh and frame buff is obviously in Vulcan as well
+
+196
+00:18:58,825 --> 00:19:01,775
+就像你们需要得到所有的交换链一样，需要设置交换链
+like you need to get all the swap chain, you need to set up your swap chain
+
+197
+00:19:01,775 --> 00:19:05,225
+设置帧缓冲区，为每个缓冲区或交换链设置帧缓冲区
+and set up frame buffers, frame buffers for each buffer in the swap chain
+
+198
+00:19:06,000 --> 00:19:09,650
+这有很多你们需要做的事情，但本质上可以归结为
+lots of stuff you need to do, but essentially it comes down to
+
+199
+00:19:10,333 --> 00:19:18,375
+我设置了我的上下文和渲染帧缓冲区，对了，我上传了一个顶点缓冲区和一个索引缓冲区
+I set up my context and my rendering frame buffer, right, I upload a vertex buffer with vertices, I upload an index buffer with indices
+
+200
+00:19:18,600 --> 00:19:27,037
+我上传了一个着色器，设置了视口，以及其他类型的渲染上下文，然后发出个DrawCall
+I upload a shader, I set my viewport maybe, and other kind of rendering context things, and then I issue a DrawCall
+
+201
+00:19:27,800 --> 00:19:34,175
+很可能就是那样，对吧，我就是那么做的，很明显，Vulcan中的流程需要更多的代码
+that's probably about it, right, that's what I do, and like obviously that process in Vulcan is gonna require a lot more code
+
+202
+00:19:34,700 --> 00:19:42,025
+但那可能是你们，那可能是你们在屏幕上实际渲染三角形所需的步骤
+but that might be your kind of, that might be the steps that you need to actually render a triangle on the screen
+
+203
+00:19:43,000 --> 00:19:47,100
+那么考虑到那一点，你们有足够的时间去你们能看到的地方
+so with that in mind, you kind of have enough to go on where you can see
+
+204
+00:19:47,466 --> 00:19:50,900
+我想我可以在Vulcan和OpenGL中都能做到这一点
+I'm gonna I can make this work in both Vulcan and OpenGL
+
+205
+00:19:50,900 --> 00:19:53,864
+因为我知道我需要什么，我知道我的步骤，它们看起来会不同
+because I know what I need, I know my steps and they're just gonna look different
+
+206
+00:19:54,200 --> 00:19:58,552
+但本质上我已经画出了这条线，我有一个顶点缓冲区类
+but essentially I've drawn that line at, I have a vertex buffer class
+
+207
+00:19:58,650 --> 00:20:02,675
+那就是我的抽象结束的地方，对吧，所以在顶点缓冲区类中
+that's where my abstraction ends, right, so inside that vertex buffer class
+
+208
+00:20:02,675 --> 00:20:09,158
+我将有一个顶点缓冲区类的不同实现，它适用于Vulcan和OpenGL，对吧
+I'll have a different implementation of that vertex buffer class, which applies to Vulcan OpenGL for example, right
+
+209
+00:20:09,525 --> 00:20:15,928
+然后是将要公开的接口，比如我想创建一个顶点缓冲区，它应该是这么多字节，对吧
+and then the api that will be exposed of things, like I want to create a vertex buffer, it should be this many bytes, right
+
+210
+00:20:16,266 --> 00:20:24,825
+应该是这种用法，所以无论是动态的还是静态的，我都希望能够上传一个部分
+it should be this kind of usage, so like whether it's kind of dynamic or static things like that, I want to be able to upload a section
+
+211
+00:20:24,966 --> 00:20:30,375
+我希望能够映射缓冲区或将一段数据上载到缓冲区中的特定偏移量
+I want to be able to maybe map the buffer or upload a section of data to a particular offset in the buffer
+
+212
+00:20:30,375 --> 00:20:35,525
+所以我希望接口可用，我希望能够看到缓冲区的大小，希望能够设置缓冲区的布局
+so I want that api available, I want to be able to see the size of the buffer, want to be able to set the layout of the buffer
+
+213
+00:20:35,525 --> 00:20:40,766
+这样我们就知道如何使用它进行实际渲染，以及其中的数据是什么样子的，对吧
+so that we know how to actually render with it, and what the data inside there looks like those kinds of things, right
+
+214
+00:20:40,766 --> 00:20:45,775
+我想绑定缓冲区，我想做很多事情，对吧，但关键是你们已经创建了一个接口
+I want to bind the buff, I want lots of stuff to do, right, but the idea is you've created an api
+
+215
+00:20:46,733 --> 00:20:51,645
+所以那是我们需要做的第一件事，我们需要创建一个，我们需要创建一个渲染器接口
+so that's really the first thing that we need to kind of do, we need to create a, we need to create a renderer api
+
+216
+00:20:51,900 --> 00:20:57,300
+现在没办法了，我想坐在这里，把每一个类和每一个细节都写下来
+now there is no way, I want to sit down here, and write you everything every single class and every single detail right now
+
+217
+00:20:57,300 --> 00:21:03,350
+因为那将非常冗长，你们知道，就像设计一个完整的规范
+because that'll be extremely lengthy, and you know, that's like designing a whole specification
+
+218
+00:21:03,350 --> 00:21:08,326
+我们会一直这样做，但正如我下次所说的，当我想为你们做一个小小的PPT时
+we're gonna do it as we go along, but as I said next time, when I have like a little powerpoint presentation for you guys
+
+219
+00:21:09,798 --> 00:21:14,900
+那就是我要接受的可能来自评论的一些建议，以及在这方面有经验的人的建议
+that's where I'm gonna take in probably some suggestions with the come from the comments, as well from people who are experienced in this
+
+220
+00:21:15,566 --> 00:21:20,600
+就像我看起来一样，我已经做了很多年了，很多年了，很明显，在专业方面也是如此
+just because like I look, I've been doing this for years and years and years and years, and professionally as well obviously
+
+221
+00:21:21,066 --> 00:21:24,625
+我对想法非常开放，因为这类东西
+and I'm more than open to ideas, because this kind of stuff
+
+222
+00:21:25,000 --> 00:21:30,200
+你们知道，有时我会突然学到一些新东西，我会想，哇，哇，我想重温这整件事
+you know sometimes I'll learn something new suddenly, I'll be like whoa whoa I want to revisit this whole thing
+
+223
+00:21:30,200 --> 00:21:36,400
+现在我有了这些基本信息，所以我们设计了一个接口
+and rewrite it from scratch, now that I have this basic information, right, anyway, so we designed an api
+
+224
+00:21:36,400 --> 00:21:44,550
+我们需要拿出一个接口，从本质上讲，在这里画出了抽象线，这样才能真正知道低级别
+we need to come up with an api, essentially where we where we draw the line of abstraction, so that we actually know how kind of low level 
+
+225
+00:21:44,900 --> 00:21:52,192
+顺便说一句，那通常是最终发生的事情，你们有一个渲染接口抽象层
+that'll be usually what ends up happening by the way is that you have like kind of a, you have your render api abstraction layer
+
+226
+00:21:52,500 --> 00:21:58,375
+最重要的是，你们有一个渲染器，所以不喜欢渲染器不直接与任何渲染接口对接
+and then on top of that, you have a Renderer, so you don't like the renderer does not directly interface with any rendering api
+
+227
+00:21:58,925 --> 00:22:03,575
+但你们仍然有那样的能力，对吧，所以渲染中继就是你们可能有场景图之类的东西的地方
+but you still kind of have that, right, so the render relay is where you probably have things like your scene graph
+
+228
+00:22:03,933 --> 00:22:07,575
+你们知道任何批处理逻辑着色逻辑之类的东西
+you know any kind of batching logic coloring logic that kind of stuff
+
+229
+00:22:07,575 --> 00:22:13,750
+那就是渲染器级别，对吧，嗯，还有渲染排序之类的东西
+that's it like that renderer level, right, um and like render sorting and all of that kind of stuff
+
+230
+00:22:13,750 --> 00:22:19,847
+对吧，虽然你们知道，渲染器不处理渲染器接口的事情是像上传顶点缓冲区，上传纹理
+right, whereas you know, the renderer ya doesn't deal with the renderer api is things like upload a vertex buffer, upload a texture
+
+231
+00:22:21,075 --> 00:22:24,725
+它本质上类似于渲染命令，但你们分散了它
+it's like render commands essentially, but you've distracted it out
+
+232
+00:22:25,000 --> 00:22:28,125
+因此可以将渲染器接口切换到任何需要的位置
+so that you can switch out the renderer api to whatever you want
+
+233
+00:22:28,275 --> 00:22:32,800
+好了，所以那就是我们需要设计的接口，我们现在要讨论渲染器
+okay, so that's the api that we need to design, we're going to talk about the renderer just yet
+
+234
+00:22:32,800 --> 00:22:39,275
+我们将只讨论渲染器接口抽象，那是我们需要做的一件事，我们将在下周讨论
+we're just going to talk about that renderer api abstraction, that's one thing we need to do, and we'll talk about that next week
+
+235
+00:22:41,100 --> 00:22:47,019
+你们知道，我这里还有很多其他的东西，比如命令执行和多线程
+you know, I've got a lot of other things here as well, you know, there are things like command exec and multi threading
+
+236
+00:22:47,366 --> 00:22:51,333
+我不是说渲染器多线程，我是说像游戏引擎多线程
+and I don't mean renderer multi threading, I mean like game engine multi-threading
+
+237
+00:22:51,333 --> 00:22:57,333
+例如，从游戏线程或应用程序线程提交命令是非常常见的
+so it's very common for example to actually submit commands from your game thread or from your application thread
+
+238
+00:22:57,666 --> 00:22:59,699
+但那只是命令的提交
+but all that is is a command submission
+
+239
+00:22:59,700 --> 00:23:05,829
+所以你们看到，我想上传这个纹理，或者请在GPU上为我创建一个顶点缓冲区，对吧
+so you see, I want to upload this texture, or please create a vertex buffer for me on the GPU, right
+
+240
+00:23:06,075 --> 00:23:12,166
+该代码的作用是获取exec，将其放入一个称为指令exec或类似于渲染指令exec的东西中
+what happens with that code is it gets exec, it gets put into something called a command exec, or like a render command exec
+
+241
+00:23:12,166 --> 00:23:17,791
+然后发生的是渲染线程，当它启动时，它会遍历命令列表并执行它们
+and then what happens is the render thread, when that starts up, it goes through the list of commands and executes them
+
+242
+00:23:17,791 --> 00:23:23,855
+好了，很多接口实际上都是这样做的，比如Vulcan和DirectX，在它们里面有这样的东西
+okay, a lot of api actually do stuff like this, like Vulcan DirectX well for example have that stuff in them
+
+243
+00:23:24,166 --> 00:23:29,075
+但就像OpenGL没有那样，现在通常都是自己设计这些东西
+but like OpenGL doesn't, so usually it's common nowadays to actually design that stuff yourself
+
+244
+00:23:29,075 --> 00:23:32,466
+我们可能得把它做好，我来教你们怎么做
+we'll have to do that right probably, and I'll show you guys how to do that
+
+245
+00:23:32,466 --> 00:23:37,150
+因为它很，我不知道，它很酷，我很喜欢它，尽管它有时很乏味
+because it's quite, I don't know, it's quite cool, I quite like it, even though it is sometimes tedious
+
+246
+00:23:37,150 --> 00:23:45,966
+但本质上，你们有一个类似的命令和代码，它可以复制命令所需的所有数据以及命令本身
+but essentially you have like a command and code that goes through, and like it copies all the data you need for a command plus the command itself
+
+247
+00:23:45,966 --> 00:23:50,525
+加上一个函数指针，然后像二进制缓冲一样存储所有那些
+plus maybe like a function pointer, and then you store all of that in like a binary buff
+
+248
+00:23:50,525 --> 00:23:56,781
+就像所有连续的内存一样，都是崩溃友好的，然后渲染线程就完成了
+like it's all contiguous memories, that it's all kind of cash friendly, and then you kind of the render thread goes through that
+
+249
+00:23:57,066 --> 00:24:01,725
+这就像CPU读取CPU指令一样，就像不同的操作码一样
+and like, it's almost like a cpu reading cpu instructions, where you go through it like different opcodes
+
+250
+00:24:01,950 --> 00:24:04,250
+你们看到，好了，我现在正在执行这个命令
+and you see, okay, I'm doing this command now
+
+251
+00:24:04,250 --> 00:24:08,675
+代表你们知道，接下来的12个字节是以三个浮点形式的参数
+the rep you know, the next 12 bytes are parameters in the form of three floats
+
+252
+00:24:08,900 --> 00:24:16,150
+所以像那样传输它们，这实际上很有趣，而且非常，你们可以使它非常有效，真的很酷
+so transmit them like that, and it's actually quite interesting, and it's very, you can make it very efficient, which is really cool
+
+253
+00:24:17,700 --> 00:24:23,600
+因此，我们必须涵盖那样的内容，我们将讨论其中的一些缺点和优点
+so we'll have to cover stuff like that, and we'll talk about some of the negatives of that as well as the positive
+
+254
+00:24:23,600 --> 00:24:28,225
+所以渲染有很多事情要做，我只是想让你们明白我有点不知所措
+so there's a lot to do with rendering, I just want you guys to understand that I'm kind of overwhelmed
+
+255
+00:24:29,466 --> 00:24:35,925
+我想尽可能多地设计这个，我一直知道这会以某种方式发生
+I want to design this as much as possible, I always knew this would happen in a way 
+
+256
+00:24:35,925 --> 00:24:42,175
+但就像我一样，我们现在正在渲染的这个渲染几乎让人恼火
+but like I just it's almost annoying that this rendering that we're up to rendering now
+
+257
+00:24:42,175 --> 00:24:44,399
+因为正如我所说的，我下个月就要结婚了
+because as I said, I'm getting married next month
+
+258
+00:24:44,400 --> 00:24:48,366
+然后我要去度一段时间的蜜月，所以我会离开，这里会有视频
+and then I'm gonna go on a honeymoon for a little bit of time, so I'll be away, and there will be videos here
+
+259
+00:24:48,366 --> 00:24:55,325
+很明显，我不想为渲染器架构和Hazel而担心，我应该要结婚了
+and obviously I don't want to be warring about renderer architecture and Hazel, well I'm supposed to be getting married
+
+260
+00:24:55,325 --> 00:25:04,625
+所以正因如此，我想请你们在接下来的一两个月里对我放松，可能是五月中的两个月
+so because of that, I'm just like asking you guys to just take it easy on me for the next month or two probably two months like in may
+
+261
+00:25:04,800 --> 00:25:10,725
+我应该百分之百地回来，但现在，我只是，我还是要试着每周发布一期视频
+I should be back in action 100%, but like for now, I'm just, I'm gonna still try to release a video a week
+
+262
+00:25:11,025 --> 00:25:14,600
+但如果它不像你们想象的那么饱和，或者不如你们想象的那么好
+but if it's like not as saturated, or not as good as you kind of
+
+263
+00:25:14,600 --> 00:25:16,897
+那么我们就没有你们想象的那么多
+not as much we don't get as much done as you expect to
+
+264
+00:25:17,666 --> 00:25:20,733
+因为我只是想把这事说清楚
+it's because I just kind of want to talk this through
+
+265
+00:25:20,733 --> 00:25:26,605
+我想确定我们有设计，因为这可能是Hazel最复杂的部分之一
+I want to make sure we have a seller design, because this is probably one of the most complicated parts of Hazel
+
+266
+00:25:28,166 --> 00:25:35,025
+这绝对是最大的Hazel系统，我绝对想确保我们做到这一点，对吧
+it's definitely the biggest system of Hazel, and I definitely want to just make sure that we get this kind of right
+
+267
+00:25:35,025 --> 00:25:39,925
+但你们也明白这一切的含义，因为这是一个教育系列
+but also that you guys understand all the implications with this, because this is an educational series
+
+268
+00:25:39,925 --> 00:25:45,125
+我不是在为自己写Hazel，我们在一起做Hazel，我想让你们明白一切都是有效的
+I'm not just writing Hazel for myself, we're building Hazel together, and I want you guys to understand everything works
+
+269
+00:25:46,050 --> 00:25:53,166
+无论如何，我想就那样吧，下次我们真正要做的是讨论渲染接口抽象
+anyway, I think that's about it, next time what we're actually gonna do is talk about that rendering api abstraction
+
+270
+00:25:53,166 --> 00:25:58,550
+我要看看你们在评论中说了些什么，但我也要准备好那个PPT
+I'm gonna see what you guys say in the comments, but also I'm going to get that power presentation ready
+
+271
+00:25:58,550 --> 00:26:06,400
+我们实际上讨论了如何将其抽象出来，将变成什么，以及一切将如何进行
+where we actually talk about how we are going to abstract that, and what's going to turn into, and how everything's going to work
+
+272
+00:26:06,400 --> 00:26:14,525
+渲染器的整个体系结构实际上是我们下周要讨论的内容，而不是渲染器的体系结构
+the whole architecture of the renderer is really what we're going to talk about to next week, and not really the architecture of the renderer
+
+273
+00:26:14,525 --> 00:26:21,850
+就像渲染接口抽象的架构，或者渲染接口、图形接口抽象，无论你们想怎么叫它
+so much as the architecture of the render api abstraction, or the rendering api, graphics api abstraction, whatever you want to call it
+
+274
+00:26:22,333 --> 00:26:27,175
+好了，那就是下周，希望你们喜欢这期视频，我也需要在下周之前修复我的电脑
+okay, so that's next week, hope you guys enjoyed this video, and I need to fix my computer before next week as well
+
+275
+00:26:27,175 --> 00:26:33,562
+所以这周不会是一个有趣的一周，不管怎样，我这周在EA工作室也有来自像frostbite的人
+so this is not gonna be a fun week, anyway, now I've got people from like frostbite over in the EA studio this week as well
+
+276
+00:26:33,562 --> 00:26:37,650
+有太多事情发生了，我希望你们喜欢这个视频
+there's so much stuff happening, I hope you guys enjoyed this video
+
+277
+00:26:37,650 --> 00:26:41,999
+如果你们喜欢的话，就为它点赞吧，可以通过patreon.com/thecherno来支持我
+if you did, please hit that like button, you can help support me on patreon by going patreon.com/thecherno
+
+278
+00:26:42,000 --> 00:26:46,875
+我现在比以往任何时候都需要你们的支持，因为我就像
+I need you guys support more than ever right now, because I'm just like just
+
+279
+00:26:46,875 --> 00:26:51,550
+我甚至想请无薪假期，因为这只是，一切都是压倒性的
+I'm thinking of even taking like unpaid leave from work, because it's just, everything is just overwhelming
+
+280
+00:26:51,933 --> 00:27:01,700
+所以我想，你们知道，我真的很想继续为你们制作这些视频，因为我喜欢它，对吧，即使
+so I would, you know, I really want to keep making these videos for you guys, because I love it, right, like even though
+
+281
+00:27:02,133 --> 00:27:07,125
+我现在可能有更重要的事情要做，我真的很喜欢为你们制作这些视频
+there are potentially more important things for me to be doing right now, I really love making these videos for you guys
+
+282
+00:27:07,925 --> 00:27:12,475
+就像你们对我来说很重要，真的想为Hazel编写这个渲染器
+like you mean a lot to me, and really do want to write this renderer for Hazel
+
+283
+00:27:12,475 --> 00:27:14,400
+和你们一起工作会很酷的
+it's gonna be so cool, and working with you guys as well
+
+284
+00:27:14,400 --> 00:27:20,650
+那将是惊人的，所以如果你们能支持我，将可以访问很多源代码
+and that is gonna be amazing, so if you can please support me, and you'll get access to a lot of this source code
+
+285
+00:27:20,650 --> 00:27:25,375
+我已经编写了，比如像渲染命令q，你们知道，就像在不同的线程上运行一样
+I've already written like a render command q, you know, runs like on a different thread
+
+286
+00:27:25,375 --> 00:27:29,722
+我不认为它运行在不同的线程上，是的，但它是一种完整的命令处理器和命令q
+I don't think it runs on a different thread, yeah but it is a full kind of command processor and command q
+
+287
+00:27:31,133 --> 00:27:36,775
+你们知道，可以提交命令的方式，我已经写了所有这些东西，它可以与OpenGL一起运行
+you know, the way you can submit commands, I've already written all that stuff, and it works with OpenGL
+
+288
+00:27:37,133 --> 00:27:45,999
+我们正在接触的不仅仅是一个三角形，所有那些东西都在Hazel开发库中，已经准备好了
+and we are entering more than just a triangle, all that stuff is in the Hazel development repository, already ready to go
+
+289
+00:27:46,000 --> 00:27:50,800
+所以，如果你们想向前看，看看这会是什么样子，一定要看看，我想我是
+so if you want to kind of jump ahead and see kind of how this is going to look, definitely check that out, and I think that I am
+
+290
+00:27:51,566 --> 00:27:55,500
+因为那是OpenGL，我不确定具体在哪里，但我已经开始抽象了
+because that is OpenGL, I'm not sure exactly where, but I am already beginning that abstraction
+
+291
+00:27:55,800 --> 00:28:01,700
+所以我在玩类似的东西，所以一定要看看，然后通常你们会提前一周收到视频
+so I'm playing around with things like that, so definitely check that out, and then usually you'll get a videos a week early
+
+292
+00:28:01,700 --> 00:28:06,800
+我不能保证在接下来的两个月内，基本上在创作之前，你们每周都会很早收到视频
+I can't promise for the next like two months, basically until made, you will get videos early every week
+
+293
+00:28:06,800 --> 00:28:10,875
+我会努力的，但就像我这周的意思一样，因为电脑的原因，我不能做那个
+I'll try, but like I mean with this week, I kind of couldn't do that, because my computer
+
+294
+00:28:10,875 --> 00:28:16,775
+也许那样会更好，但你们的支持对我和这个系列来说意义重大，我告诉你们
+maybe that'll be better, but again your support means a lot to me and this series, just I'm telling you like
+
+295
+00:28:17,200 --> 00:28:19,950
+因此，如果没有这些出色的支持者，它就不会在这里
+so it would not be here without all those wonderful supporters
+
+296
+00:28:20,400 --> 00:28:24,734
+非常感谢你们，希望你们喜欢这期视频，下期见，拜
+so thank you so much, hope you guys enjoy this video, I will see you next time, goodbye
+

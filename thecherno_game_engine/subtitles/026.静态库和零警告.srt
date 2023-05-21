@@ -1,0 +1,1085 @@
+﻿1
+00:00:00,100 --> 00:00:06,775
+嘿，大家好，我是TheCherno，欢迎回到我的游戏引擎系列，所以上次只看了些维护演讲
+hey, what's up guys, my name is TheCherno, welcome back to my game engine series, so last time we took a look at just some maintenance talk
+
+2
+00:00:06,775 --> 00:00:14,308
+在开始渲染器的大量工作之前，我们想做的一些事情
+and some of the stuff that we kind of wanted to get done before we started heavy duty kind of full steamer head work on the renderer
+
+3
+00:00:14,866 --> 00:00:18,800
+尤其是因为我下周就要结婚了，我根本没有时间
+especially because I'm getting married next week, and I'm just not going to have time at all
+
+4
+00:00:18,800 --> 00:00:25,750
+我有点想把渲染器的开头改成结婚后的样子，这样我就可以像《砰砰砰砰》这期一样
+I kind of wanted to shift the beginning of the renderer to kind of after I get married, so that I can just be like bam bam bam episode episode
+
+5
+00:00:25,750 --> 00:00:32,390
+所以我们可以在没有巨大间隔的情况下完成很多工作，因为这是无论如何都需要清理的
+and so we can get a lot done without kind of having this huge gap, so because this is stuff that we need to clean up anyway
+
+6
+00:00:32,390 --> 00:00:35,875
+因为我和你们谈过之后做了一些改变
+and because I've made some changes after talking about this with you guys
+
+7
+00:00:37,650 --> 00:00:41,725
+我只是想，这将是一个非常好的地方，我们只要把这件事做好，然后
+I just figured that it would be a really good spot for us to just get this done, so that then later
+
+8
+00:00:41,725 --> 00:00:47,975
+我们不必再回来，像以前那样继续下去，我们应该改变这个，否则将来就更难改变了
+we don't have to come back and be like before we can continue, we should change this, or it'll be harder to change in the future
+
+9
+00:00:47,975 --> 00:00:50,750
+我们现在就把一切都做好，认为那是最好的计划
+we just get everything done right now, think that's the best plan
+
+10
+00:00:50,750 --> 00:00:56,075
+尽管我知道迫不及待地要开始渲染器，这对一些人来说很烦人，但相信我，我就是其中之一
+even though I know that it is annoying for some that we just can't wait to start the renderer, believe, me I'm one of those people
+
+11
+00:00:56,075 --> 00:01:04,675
+渲染是整个引擎中我最喜欢的部分，所以我真的很想开始，但我们必须完成这些工作
+I rendering my favorite part of this whole engine anyway, so I really want to be able to start that, but we have to get the stuff done
+
+12
+00:01:05,100 --> 00:01:08,963
+所以今天我们要做的是把Hazel变成一个静态库
+so today what we're gonna do is we're gonna convert Hazel to be a static library
+
+13
+00:01:09,200 --> 00:01:15,600
+我想，我们还将清理所有类型的构建项目，我认为仓库也存在一些问题
+and we're also going to clean up all of our kind of build projects I guess, and I think there are some issues with the repository as well
+
+14
+00:01:16,266 --> 00:01:22,925
+因为如果你们执行比如Hazel的清除检查，我想举例来说，它不包括premake.exe 文件之类的
+because if you do like a clean check out of Hazel, I think for example it doesn't include the premake.exe file or something like that
+
+15
+00:01:22,925 --> 00:01:28,075
+我不确定到底发生了什么，但我们来看看这类事情，我只是想把一切都做好
+I'm not sure exactly what happens, but we'll take a look at this kind of stuff, I just want to get everything done
+
+16
+00:01:28,075 --> 00:01:33,051
+这样我们就可以将这些premake文件清理干净
+so that we have those premake files clean, and as they're meant to be without anything extra
+
+17
+00:01:33,051 --> 00:01:39,025
+我认为，如果我们的目标真的是减少我们现在的警告，现在有点像是将仓库减少到零
+I think we if we the goal really is to reduce the warnings we have right now, now kind of repository to zero
+
+18
+00:01:39,166 --> 00:01:44,975
+当我们构建这个东西时，应该没有警告，希望在这期视频结束时，我不认为会花费太长时间
+when we build this stuff, we should have a zero warning, it's hopefully by the end of this video, I don't think it'll take too long at all
+
+19
+00:01:45,966 --> 00:01:50,375
+当然，另一件重要的事情是将Hazel转换为静态库，而不是动态库
+and then the other major thing of course is just converting Hazel to be a static library instead of a dynamic library
+
+20
+00:01:50,375 --> 00:01:57,725
+因为我们上一次讨论过那个，这将非常容易做到，而且这将大大简化开发过程
+because we talked about that last time is just going to be pretty easy to do, and it's just kind of simplify the development so much
+
+21
+00:01:57,725 --> 00:02:02,829
+正如我在上期中所讨论的，我认为Hazel不需要是一个动态库
+and as I discussed in the previous episode, I don't think Hazel needs to be a dynamic library
+
+22
+00:02:02,829 --> 00:02:06,900
+所以，因为在进行了更多的设计工作之后，我们有点失去了那个用例，
+so because we've kind of lost that use case after some more design work went in, 
+
+23
+00:02:07,475 --> 00:02:10,075
+我认为那只会简化每个人的生活
+I think that it's just gonna simplify everybody's lives
+
+24
+00:02:10,800 --> 00:02:17,439
+如果Hazel以静态库构建，然后链接到游戏中，那么仅仅是实习生就可以得到优化的应用
+and just an intern result in a more optimized application, if Hazel actually builds as a static library, and then links into the game
+
+25
+00:02:19,166 --> 00:02:26,925
+那并不是说我们将来不能像动态链接模块那样，那是完全可能的
+that's not to say by the way that we can't link modules in as like dynamically in the future, that's totally possible
+
+26
+00:02:27,400 --> 00:02:32,725
+比如你们能做什么，我不能探索什么，因为我知道这就像是其中之一，对不起
+like what you could do and what I can't explore, because I know this was like one of those things excuse me
+
+27
+00:02:33,200 --> 00:02:40,750
+人们提到的其中一件事是，我喜欢it软件的设计，比如厄运引擎等等
+one of those things that people kind of brought up were, I like kind of it software's design on like the doom engine and everything
+
+28
+00:02:40,750 --> 00:02:45,975
+他们如何将游戏作为一个dll链接到引擎，引擎运行那个dll，我喜欢那个设计
+how they have the game as a dll that hooks into the engine, the engine kind of runs that dll, I like that design
+
+29
+00:02:45,975 --> 00:02:51,325
+也许我们可以做这样的事情，不是因为简单，老实说，我不认为我们需要
+maybe we can do something like that, I don't want to do for simplicity sacred, because I don't think we need it to be honest
+
+30
+00:02:51,866 --> 00:02:59,950
+但我不允许他们，我们将来肯定能做的是动态加载模块化dll，它可以包含C++代码
+but what I won't allow them, what we definitely can do in the future is actually dynamically load a modular  dll, which can contain C++ code
+
+31
+00:02:59,950 --> 00:03:04,400
+那实际上将作为游戏的一部分执行，或者类似的，那很容易做到
+that will actually be executed as part of that game more or anything like that, that's pretty easy to do
+
+32
+00:03:04,666 --> 00:03:11,125
+如果愿意，仍然可以设置dll热加载，所有这些都可正常运行，所以那绝对是我们可以做的
+and we can still set up dll hot swapping, if we wanted to all of that will just work, so that's definitely something that we can do
+
+33
+00:03:11,575 --> 00:03:15,400
+这种转移到静态库的设计并不排除将来所有dll
+this design moving to a static library does not rule out all dlls for the future
+
+34
+00:03:15,700 --> 00:03:19,325
+这只意味着核心Hazel库将构建为一个静态库
+it just means that the core Hazel library will be built as a static library
+
+35
+00:03:19,325 --> 00:03:25,400
+必须静态地与我们的实际application.exe 文件，所以那是唯一真正改变的东西
+and has to be statically linked into our actual application.exe file, so that's the only real thing that's changing
+
+36
+00:03:25,932 --> 00:03:30,766
+让我们开始看看我们如何实现那个的吧，以及这个解决方案的一般做法
+let's jump in and take a look at how we can do that, and just in general the state of this solution
+
+37
+00:03:30,766 --> 00:03:34,400
+好了，我现在要做的就是清理整个解决方案，然后构建它
+okay, so what I'm going to do right now is just clean this whole solution and just give it a build
+
+38
+00:03:34,975 --> 00:03:42,250
+我还原了上一期我们做的所有内容，你们可以很快看到我们有警告，比如未知忽略未知选项
+I reverted all of the stuff that we did last episode, you can see straightaway that we have warnings, like unknown ignoring unknown option
+
+39
+00:03:43,100 --> 00:03:49,075
+还有-std=c11，还有gdi32的链接，但老实说，我甚至不知道那是从哪里来的
+and the c11 kind of std, and also this linking the gdi32 later, but I don't even know where that came from, to be honest
+
+40
+00:03:49,075 --> 00:03:55,400
+就像premake中那样，但我不知道为什么会有很多这样的警告，这只是种必须使用的dll接口
+like we wrote it in the premake, but I don't know why we have a lot of these warnings, which is just kind of dll interface has to be used
+
+41
+00:03:56,733 --> 00:04:00,700
+它需要有一个dll接口才能使用，而这本质上是来自内部的类似共享指针
+it needs to have a dll interface to be used, and this is from like shared pointers inside essentially
+
+42
+00:04:00,700 --> 00:04:02,250
+只是因为它们类似于模板类
+just because they're like template classes
+
+43
+00:04:03,400 --> 00:04:10,525
+那导致了个跨dll边界的问题，那个问题将会解决，因为我们正在迁移到静态库，还有什么
+and that is causing an issue across dll boundaries, that'll be resolved, because we're moving to a static library, um what else is there
+
+44
+00:04:11,266 --> 00:04:20,075
+所以我们得到了这些警告，这些东西需要修复，只需声明_CRT_SECURE_NO_WARNINGS
+so we got these warnings, this stuff needs to be fixed, just by declaring, just by using this macro called _CRT_SECURE_NO_WARNINGS
+
+45
+00:04:20,375 --> 00:04:25,600
+如果这是我们的代码，我可能会使用函数的安全版本，它只需要缓冲区的大小
+again if it was our code, I'd probably use the secure version of the function, which just takes in a size for the buffer
+
+46
+00:04:25,600 --> 00:04:29,350
+所以它不会溢出缓冲区，但因为它不是我们的代码，它是ImGui的代码
+so that it doesn't overflow the buffer, but because it's not our code it's ImGui's code
+
+47
+00:04:30,333 --> 00:04:35,750
+很明显，我们会相信那些代码，并确保它不会失败，因为那是他们的领域
+we're gonna obviously trust that code, and see that it's not going to fail, because that's their kind of domain
+
+48
+00:04:35,866 --> 00:04:41,725
+所以我们只需要启用正确的宏定义来构建代码，应该没什么问题，如果我们想这样做的话
+so we're just gonna enable the right macro code to build that code, which should be fine, if we wanted to do that by the way
+
+49
+00:04:42,000 --> 00:04:48,600
+但请记住，有些简单方法可以解决这个问题，对吧，让我们看一下，可能会在最后看下错误
+but keep in mind, there are easy ways to fix this, right, let's take a look at, we'll take a look at these errors probably at the end
+
+50
+00:04:48,600 --> 00:04:54,975
+因为它们真的很简单，但我知道你们中的很多人可能会，我真的想尽可能多地改变这点
+because they're really simple, but I know that a lot of you might be like, and I just really wanna move this over as much as possible
+
+51
+00:04:54,975 --> 00:04:57,775
+所以你们可以看到，但你们很多人可能会
+so you guys can actually see, but a lot of you might be like well you know
+
+52
+00:04:57,775 --> 00:05:03,650
+为什么系统使用_CRT_SECURE_NO_WARNINGS，比如为什么，仅仅因为ImGui有那样的提示
+why this whole use this whole _CRT_SECURE_NO_WARNINGS thing, like why just because ImGui has that
+
+53
+00:05:03,700 --> 00:05:08,425
+为什么我们要在整个Hazel项目中启用它，而问题是我们没有，对吧，如果你们看看这个
+why do we have to enable that for our entire Hazel project, and the thing is we don't, right, if you take a look at this
+
+54
+00:05:09,000 --> 00:05:16,866
+这个文件导致，imgui_impl_opengl3.cpp，即将到来，它是从ImGuiBuild.cpp构建的
+this file this causing, this is this imgui_impl_opengl3.cpp file, that's coming, that's being built from ImGuiBuild.cpp
+
+55
+00:05:16,866 --> 00:05:23,775
+因为那就是ImGui构建文件的方式，所以我们可以在那里定义宏，对吧，那就好了
+because that's how kind of you build file for said ImGui stuff, we can just define that macro there, right, and that'll be fine
+
+56
+00:05:24,133 --> 00:05:30,000
+我们不必在项目设置中定义它，现在，我们可以在那里定义它
+we don't have to define it in the project settings, and now premake settings or anything like that, we can just define it just there
+
+57
+00:05:30,000 --> 00:05:32,475
+对吧，就在那个文件中，那样的话
+right, just in that file, and then that way
+
+58
+00:05:32,475 --> 00:05:38,000
+如果我们使用不推荐的函数，Hazel的其余部分仍然会收到警告
+the rest of Hazel will still kind of have to will still receive warnings, if we use deprecated functions
+
+59
+00:05:39,350 --> 00:05:43,775
+不用太担心，不管怎样，我想那可能需要一个月的时间，对吧
+don't worry too much about that, anyway, I think that's probably a little bit of a month, right
+
+60
+00:05:45,000 --> 00:05:48,925
+现在，当我们遇到类似的情况时，我们也会遇到一些运行时冲突，如你们所知
+now and when we have some kind of like, we have some runtime conflicts as well, like you know
+
+61
+00:05:48,925 --> 00:05:53,425
+这些链接警告，其中这种默认lib与其他lib的使用发生冲突
+these linking warnings, where this kind of default lib just conflicts with use of other libs
+
+62
+00:05:53,425 --> 00:05:59,766
+那是因为这些静态库的不同dll文件最终使用的是不同版本的运行库
+that's because these different dll files of static libraries, essentially end up using different versions of the runtime library
+
+63
+00:05:59,766 --> 00:06:05,350
+我认为应该解决这个问题，一旦切换到静态链接，无论如何，如何切换到静态链接
+which I think should be resolved, once we switch to static linking, anyway, how do we switch to static linking
+
+64
+00:06:05,800 --> 00:06:08,982
+好吧，神奇的是所有代码都在我们的premake文件中
+well the magic, and all of the code really is inside our premake files
+
+65
+00:06:09,800 --> 00:06:17,566
+我在这里要做的只是让事情变得非常简单，就是搜索所有.lua或premake文件
+what I'm gonna do here just to make things really really easy is just search for all probably all .lua files or just all premake files
+
+66
+00:06:17,566 --> 00:06:22,600
+没关系，一旦我得到了所有这些，我将用vs打开它们，好了，现在我们已经打开了这些
+doesn't matter, and once I've got all of these, I'm just going to open them with vs code, okay, so now we've got these open
+
+67
+00:06:22,600 --> 00:06:26,650
+我们将对这些进行分类，所以我们有glfw、glad、Hazel的和ImGui的
+we're just going to sort through these, so we have glfw, the glad one, the Hazel one, and the ImGui one
+
+68
+00:06:26,650 --> 00:06:31,600
+我只想把Hazel放在第一位，因为，首先，让我们看看这里有什么
+I'm just going to put the Hazel one first because the tribute, first, let's take a look at what we have here
+
+69
+00:06:31,600 --> 00:06:37,125
+所以目前Hazel构建为一个共享库，我们只需要将其更改为静态库
+so currently Hazel builds as a shared library, we just need to change this to say static library
+
+70
+00:06:37,125 --> 00:06:45,400
+从技术上讲，就是这样，它现在是一个静态库，对吧，因为在哪里链接它作为一个静态库
+and technically speaking, that is it, it's now a static library done, right, now because where linking it as a static library
+
+71
+00:06:45,400 --> 00:06:53,700
+我们也应该静态链接运行库，好的，所以我只打开它，好了，那意味着本质上
+we should link the runtime library statically as well, okay, so I'll just turn that on, okay, what that means is that essentially
+
+72
+00:06:53,700 --> 00:06:58,250
+当我们构建可执行文件时，它将链接到自己的运行库中，就是那样
+when we build our executable, it will link in its own runtime library, and that'll be it
+
+73
+00:06:58,575 --> 00:07:06,025
+我们不想在动态库中使用此功能的原因是，如果要动态链接dll文件，则需要
+the reason we didn't want to have this for dynamic libraries is because if we're linking dynamically a dll file needs to have
+
+74
+00:07:06,500 --> 00:07:11,125
+它实际上需要链接运行库，因为dll文件就像最终产品一样
+it actually needs to have the runtime library linked in, because the dll files come like a final product
+
+75
+00:07:11,600 --> 00:07:14,885
+因此如果我们静态链接，这意味着在构建时
+and so because of that, if we link statically, it means at build time
+
+76
+00:07:14,885 --> 00:07:19,712
+理论上，我们构建的每个dll都可能有不同版本的库，那是一个巨大的问题
+every dll that we build could theoretically have different versions of the library, and that is a huge issue
+
+77
+00:07:19,875 --> 00:07:24,700
+就像有些可能有符号或额外的调试代码一样，有些可能没有，那是一个大问题
+like some might have symbols on or extra debug codes, some might not, that's a huge problem
+
+78
+00:07:24,700 --> 00:07:29,250
+如果使用运行时库的调试版本分配内存，并使用发布版本释放内存
+if you allocate memory with the debug version of the runtime library, and free it with the release version
+
+79
+00:07:29,250 --> 00:07:34,668
+那将导致程序崩溃，如果不会导致大量内存损坏，因为它们分配内存的方式不同
+that will crash your program, if not cause massive memory corruption, because they allocate memory differently
+
+80
+00:07:35,500 --> 00:07:40,450
+那样的问题可能会出现，但如果我们链接，如果这是静态库，可以静态链接所有内容
+so problems like that can arise, but if we link, if this is a static library, we can link everything statically
+
+81
+00:07:40,450 --> 00:07:49,000
+一切都应该很好，至于这个cppdialect，不需要是特定于窗口的东西
+and everything should be fine, this kind of stuff cppdialect, that doesn't need to be a window specific thing really
+
+82
+00:07:49,133 --> 00:07:55,637
+所以我会把它放在语言上，我们有location kind language，然后是语言和dialect，保持一起
+so I'll put it on the language, so we'll have kind of location kind language, and then language and dialect, we'll keep together
+
+83
+00:07:55,866 --> 00:08:04,125
+然后打开静态运行时，所以systemversion latest在windows下面，除了定义
+and then static runtime on, so systemversion latest is the only thing we have kind of under windows apart from defines
+
+84
+00:08:04,533 --> 00:08:09,325
+这个postbuildcommands不再需要存在，因为当我在生成后复制dll文件时
+this postbuildcommands no longer needs to exist, because when I'm copying dll files after building anymore
+
+85
+00:08:09,425 --> 00:08:13,950
+下一步是我们所有的配置，所以就是Debug，Release和Dist
+and the next step is going to be kind of this all of our configuration, so debug release and disc
+
+86
+00:08:14,500 --> 00:08:19,525
+所以这东西差不多，我只想用小写，因为它们不需要大写
+so this stuff is gonna say pretty much the sound, I'm just gonna make these lower case, because they don't need to be upper case
+
+87
+00:08:20,100 --> 00:08:23,550
+这是premake建议你们在dock分支上做
+just this tick with what premake actually recommends you do in their docks
+
+88
+00:08:24,566 --> 00:08:32,275
+但符号的意思是这将是库的调试版本，这和我想的是一样的，也许我错了
+but so symbols on meaning this will be the debug version of the library, this is kind of the same thing I think we had or maybe I'm wrong
+
+89
+00:08:32,275 --> 00:08:36,875
+但我想是的，我们有这种东西，对吧，这只是意味着像链接/MT
+but I think yeah, we had this kind of stuff, right, which just means like link the multi thread of
+
+90
+00:08:38,000 --> 00:08:44,200
+就像链接库的版本一样，也就是说，没有调试符号，那就是为什么在发布时做那个的原因
+like the link the version of the library, that is, that doesn't have debug symbols in it, right, and that's why we did that for release
+
+91
+00:08:44,200 --> 00:08:49,825
+但不需要那样，因为从技术上看，一团糟，我们就要解决这个问题，别担心，不需要那样
+we don't need that though, because technical look at this mess, we're about to fix this stuff, don't worry, we don't need that
+
+92
+00:08:49,825 --> 00:08:52,775
+因为如果你们在上面开启优化，那就是库的发布版本
+because if you write optimize on, that's the release version of the library
+
+93
+00:08:52,775 --> 00:09:01,000
+如果启用symbols，那就是运行时库的调试版本，因此那就是最终链接的内容
+if you write symbols on, that's the debug version of the runtime library, so that's essentially what ends up getting linked
+
+94
+00:09:01,533 --> 00:09:06,450
+所以我们有这个看起来很棒，当然我们也有运行时版本
+so we have this this looks great, and of course we've got runtime release as well
+
+95
+00:09:06,766 --> 00:09:11,100
+但启用symbols，所有这些都意味着我们要生成调试符号，在这里，我们要优化代码
+but symbols on and all of that just means that we're gonna generate debug symbols, where it's here, we're gonna optimize that code
+
+96
+00:09:11,225 --> 00:09:18,525
+好了，那很好，runtime也定义了它，所以runtime特别指的是C++标准运行时
+all right, so that's fine, runtime defines that as well, so runtime specifically meaning the C++ standard runtime
+
+97
+00:09:18,525 --> 00:09:29,533
+当然，如果不清楚的话，Sandbox也启用了runtime，我们会再次将cppdialect移到这里
+of course in case that's not clear, Sandbox set a runtime on, and we're going to again move cppdialect up here
+
+98
+00:09:30,300 --> 00:09:36,775
+所以我们有那个，这东西对我来说很好，我们显然不需要任何类型的
+so that we have that there, this stuff looks pretty good to me, we obviously don't need any kind of gl copping
+
+99
+00:09:36,775 --> 00:09:41,075
+不管怎么说，我们没有，而且其他一切看起来都很好，我可能会像之前一样把这些改成小写
+which we don't have, anyway, and everything else looks good, I might just make these low case as we did before
+
+100
+00:09:41,075 --> 00:09:49,059
+那应该是真正的Hazel，好了，我觉得很好，那就是我们所需要的，让我们转到glfw
+that should be eat for actual Hazel, right done, yeah that looks good to me, that's all we need, let's move on to the glfw one
+
+101
+00:09:49,600 --> 00:09:55,275
+所以我们正在构建一个静态库，当然语言是这样说的，所以我们不需要任何cppdialect
+so we're building a static library, of course the languages say, so we don't need any kind of cppdialect things
+
+102
+00:09:55,966 --> 00:10:04,725
+这些是我们要包含的文件，对于Windows，我们根本不需要这些标志，反正它们什么都不做
+these are the files we're including, and then for Windows, we don't need these flags at all, they don't do anything anyway
+
+103
+00:10:05,175 --> 00:10:11,000
+正如我们所看到的，当我们构建时，systemversion应该设置为最新，staticruntime应该启用
+as we saw, when we built stuff, systemversion should be set to latest, and staticruntime should be set to on
+
+104
+00:10:11,225 --> 00:10:17,275
+有趣的是，那是开启的，因为那应该是关着的，但不管怎样，我们有files
+interesting that, that was on, because that should have probably been off, l a, but anyway, we have files
+
+105
+00:10:17,275 --> 00:10:22,025
+我们在这里有特定于Windows的defines，对于这些东西，我们真的不需要这个
+we have defines specific to Windows under here, and then again for this stuff, we really don't need this
+
+106
+00:10:22,333 --> 00:10:28,225
+我们需要做的是回到这里，确保我们基本上复制了这些东西
+what we do need to do is go back into here, and make sure that we essentially grab these things
+
+107
+00:10:28,700 --> 00:10:36,166
+我认为glfw只有Release和Debug，所以我们只需要确保，我们将删除Dest
+I think that glfw only has Release and Debug, so we just need to make sure that, we'll get rid of Dest
+
+108
+00:10:36,166 --> 00:10:43,425
+但只要确保我们基本上只有正确的runtime版本和为Debug和Release实际启用symbols
+but just make sure that we basically just have the right version of the runtime and the right symbols actually set up for Debug and Release
+
+109
+00:10:43,425 --> 00:10:50,950
+所以我们确实有symbols用于Debug，optimize用于Release，没有调试符号，那很酷
+so that we do have debug symbols on for Debug and optimization on for Release with no debug symbols, that's cool
+
+110
+00:10:51,526 --> 00:10:56,700
+顺便说一句，混合使用这些也很常见，你们可能已经启用了optimize，但仍然保留symbols
+it's also quite common to have a mix of these, by the way, where you might have optimizations on, but you still keep symbols
+
+111
+00:10:57,066 --> 00:11:01,966
+但当我要担心像这样的高级配置时，staticruntime也启用了
+but when I'm gonna worry about kind of advanced configurations like that at the moment, staticruntime on as well
+
+112
+00:11:01,966 --> 00:11:08,125
+我们要把它移上来，因为它应该启用，不仅仅是Windows，好吧，我觉得很好
+we're gonna pull this up, because that should be on, not just for Windows prefer everything, okay, that looks good to me
+
+113
+00:11:08,375 --> 00:11:13,100
+我可能要做的一件事就是查看此处的空白，只是因为我想想想这个
+one thing I might do is just view the white space here, just because I want to think of this
+
+114
+00:11:13,400 --> 00:11:17,325
+只是因为我想确保一切，是的，你们看，我们这里有空格，然后这里有Tab制表符
+just because I want to make sure that everything, yeah you see, how we have spaces here and then we have tabs here
+
+115
+00:11:17,600 --> 00:11:26,675
+我只是想确保这里有正确的东西，因为如果没有，它在某些文本编辑器上可能看起来很奇怪
+I just want to make sure that we actually have the right thing here, because if not, it can look weird on certain text editors
+
+116
+00:11:26,675 --> 00:11:32,775
+而且对齐都很奇怪，所以我要确保我们在任何地方都有同样的空格
+and also alignment all be weird, so I'm just going to make sure that we have the same kind of whitespace everywhere
+
+117
+00:11:32,775 --> 00:11:38,250
+看起来我们在使用，哦，太好了，所以我们在这里使用空格，在这里是Tab
+it looks like we're using, oh great, so we're using spaces here and tabs here
+
+118
+00:11:38,950 --> 00:11:40,966
+我们可能应该在我感觉到的任何地方都使用空格
+we probably should just use spaces everywhere I feel
+
+119
+00:11:40,966 --> 00:11:47,350
+顺便说一句，我更喜欢Tab，但好吧，没关系，只要我们在整个文件中使用相同的Tab
+I mean by the way, I prefer tabs, but yeah okay, it doesn't matter, as long as we're using the same across the file
+
+120
+00:11:47,350 --> 00:11:52,425
+那就是所有的问题，所以我们这里有Tab，在l里面有空格，当然，不管怎样，现在都不担心
+that's really all the matters, so we have tabs here and space in the l one, sure whatever I'm not gonna worry about that now
+
+121
+00:11:53,375 --> 00:11:58,100
+好了，下一个，再次看看我们是如何得到这种混合的
+alright, next one, glad, so again see how we have this mix
+
+122
+00:11:58,625 --> 00:12:05,625
+我只是想去掉这种混合，因为我想，所以1 2 3 4 1 2 3 4
+I'm just gonna get rid of that mix because I want to, so 1 2 3 4 1 2 3 4
+
+123
+00:12:07,700 --> 00:12:16,825
+我可以把它放在那里，好吧，酷，看起来不错，所以这很好，我们也不需要这个
+and I can just put that there, okay, cool, that looks good, so this is fine, again we don't need this
+
+124
+00:12:17,533 --> 00:12:24,875
+我要确保的是，这里有runtime，并且设置为on
+all I'm going to make sure is that you know, static runtime we have over here, and that's set to on
+
+125
+00:12:26,975 --> 00:12:33,925
+然后让我们看看我们还需要什么，我们需要确保我们也复制这种东西
+and then let's see what else do we need, we need to make sure that we copy this kind of stuff as well
+
+126
+00:12:38,466 --> 00:12:42,150
+所以对于Debug和Release，和以前一样的设置
+so for debug and release, same kind of setup as before
+
+127
+00:12:42,450 --> 00:12:47,050
+我只需要在那里多留一行，没有间距，就像我应该做的那样
+I'll just leave one extra line there with no spacing just like I should
+
+128
+00:12:47,050 --> 00:12:56,725
+每一个文件的末尾，很酷，我想就是那样，我想我们会看到的，然后是最后一个ImGui
+everywhere just at the end of every file, cool, and I think that's it, well I guess we'll see, and then the last ones ImGui
+
+129
+00:12:57,025 --> 00:13:04,850
+这实际上是在我的意思是，从技术上讲，我认为这些都在子模块中，所以必须更新子模块
+this actually is in the I mean all of them I think are technically in the submodules, so I'll have to update the submodules as well
+
+130
+00:13:05,000 --> 00:13:12,100
+就像我必须把这段代码推到子模块，这很好，看起来很好，我们会像以前一样做同样的事情
+like I have to push this code to the submodules, which is fine, that looks good, and again we'll do the same kind of thing as we did before
+
+131
+00:13:12,966 --> 00:13:20,100
+cppdialect应该在这儿，那么我们在链接静态，所以就是staticruntime on
+cppdialect in this case goes up here, so does the fact that we're linking static ally, staticruntime on
+
+132
+00:13:21,866 --> 00:13:29,475
+当然，它会像它应该的那样构建一个静态库，而且这些东西也会被我们这里的东西所取代
+of course it builds a static library like it should, and again this this stuff will be replaced by what we have here
+
+133
+00:13:32,225 --> 00:13:35,334
+老实说，我都不知道这个旧代码是从哪里来的
+I don't even know where I got the old code, to be completely honest with you guys
+
+134
+00:13:35,666 --> 00:13:41,050
+我想也许我只是在网上的某个地方找到了它，然后复制粘贴了下来
+I think maybe I just found it somewhere online and just copied and pasted 
+
+135
+00:13:41,050 --> 00:13:46,125
+因为我不太清楚为什么所有这些都与其他东西如此不同
+because not really sure why all of it's so different than everything else
+
+136
+00:13:46,125 --> 00:13:50,025
+我们继续，好吧，酷，我想那就是我们所需要的
+we go, right, okay, cool, I think that's all we need
+
+137
+00:13:50,566 --> 00:13:54,775
+我可能错了，但谁知道呢，好吧，现在这对我来说很好
+I might be wrong, but who knows, okay, so this was good to me right now
+
+138
+00:13:55,333 --> 00:14:03,166
+我现在要做的就是运行GenerateProjects，所以我们继续吧，没有错误，真棒
+what I want to do now is just kind of run our GenerateProjects file, so here we go, no errors, great
+
+139
+00:14:03,166 --> 00:14:08,800
+如果回到VS并重新加载所有内容，我们希望现在可以看到所有设置都是静态的
+and if we go back to visual studio and just reload all, we can see hopefully everything now setup is static
+
+140
+00:14:08,800 --> 00:14:14,866
+所以如果我现在查看Hazel，它应该有配置类型的静态库，我还是要清理所有的东西
+so if I look at Hazel now, it should have the configuration type static library, again I'm just gonna clean everything
+
+141
+00:14:14,866 --> 00:14:21,700
+因为我想做一个我称之为超净的东西，所以我要完全删除bin和bin-int目录，好吧
+and because I want to do like an ultra clean as I call it, I'm just gonna delete bin and bin-int directories completely, okay
+
+142
+00:14:22,000 --> 00:14:27,425
+现在让我们构建我们的解决方案，看看会发生什么，好吧，所以我觉得一切都很好
+so now let's build our solution, and see what happens, okay, so everything looks pretty good to me
+
+143
+00:14:28,166 --> 00:14:34,225
+很明显，我们需要做的另一件大事是停止所有这些东西，局部定义简单是重要的
+now obviously what the other big thing we need to do is actually to stop all of this stuff, locally define simple being important
+
+144
+00:14:34,566 --> 00:14:42,800
+所有这些东西实际上只是为了让我们，这个Hazel在哪儿，我们看看Application和Core
+all of this, all this stuff is actually just to go into our, where is this Hazel, we'll just see Application Core
+
+145
+00:14:42,966 --> 00:14:47,625
+你们可以直接访问我们的Core.h文件，它可能应该被称为base之类的文件
+you can just go to our Core.h file, which probably should be called something like a base
+
+146
+00:14:48,466 --> 00:14:55,042
+但不管怎样，我认为那就是开发分支的名称，这个HAZEL_BUILD_DLL，仍在导出和导入
+but anyway, I think that's what it's called in the development branch, this HAZEL_BUILD_DLL, we're still exporting and import
+
+147
+00:14:55,042 --> 00:15:03,725
+我们不应该这样，所以从技术上讲，我能做的只是再做Hack之类，把这个隐藏起来
+right, we shouldn't be, okay, so technically speaking what I can do is just again as a hack or whatever I can just hide this behind
+
+148
+00:15:04,500 --> 00:15:10,300
+你们知道，HZ_DYNAMIC_LINK，如果是这样
+you know, HZ_DYNAMIC_LINK, and say if that's the case
+
+149
+00:15:10,300 --> 00:15:16,575
+那么就是那样，否则，我们可以将HAZEL_API定义为nothing，对吧
+then that, otherwise, we can just define HAZEL_API as nothing, right
+
+150
+00:15:16,575 --> 00:15:23,800
+那是一种想法，所以定义HAZEL_API，好吧，这样一来，就什么都找不到了
+that's kind of the idea, so define HAZEL_API, alright, so that way, this gets to find as nothing
+
+151
+00:15:23,800 --> 00:15:29,687
+这意味着，如果我们从字面上看这里的任何类，这就是空，这意味着它只是那样，对吧
+which means that if we look at literally any class here, this is just nothing, which means it kind of is just that, right
+
+152
+00:15:30,933 --> 00:15:37,375
+所以那就是一种想法，很明显，若我们永远都不想有动态链接的话
+so that's kind of the idea, now obviously if we never ever ever want to have dynamic linking ever
+
+153
+00:15:37,600 --> 00:15:42,175
+然后我们应该完全删除HAZEL_API，然后所有内容都会这样声明
+then we should just remove HAZEL_API completely, and then everything will just be declared like this
+
+154
+00:15:42,175 --> 00:15:47,950
+那可能是我们将来要做的事情，我只是不想现在浪费时间，比如搜索和替换一切
+and that's probably something we will do in the future, I just don't wanna waste time right now, like search and replace everything
+
+155
+00:15:47,950 --> 00:15:54,300
+我的意思是这不会太难，伙计们想这么做，你们可以搜索HAZEL_API，然后用空来代替它
+I mean it's not gonna be too difficult, guys want to do this, you can just do HAZEL_API space and replace that with literally nothing
+
+156
+00:15:54,300 --> 00:16:00,266
+这样就可以清除所有HAZEL_API，一般来说应该可以运行，我不认为，我的意思是除了这里
+and that will just clear all the HAZEL_API, that should work generally well, I don't think, I mean apart from maybe in here
+
+157
+00:16:00,266 --> 00:16:02,925
+你们必须做额外的工作，但在其他任何地方都可以
+you'll have to do additional work, but everywhere else that should just work
+
+158
+00:16:03,866 --> 00:16:09,900
+但我要做的是再次清理解决方案，然后构建所有内容，好了，看看那个
+but what I want to do is just again just clean the solution after this and build everything, okay, look at that,
+
+159
+00:16:09,950 --> 00:16:14,334
+现在看起来干净多了，因为我们没有关于dll接口的错误
+so this looks a lot cleaner now, because we don't have those errors about the dll interface stuff
+
+160
+00:16:15,500 --> 00:16:21,725
+我们没有特定区域的警告，但我们也没有来自的警告，你们知道
+and we don't have those warnings a certain area's warnings, but we also don't have the warnings from, you know
+
+161
+00:16:21,725 --> 00:16:25,675
+使用了错误的命令行选项，很好，所以我们只剩下一个了
+the wrong kind of command line options being used, which is great, so the only one is we have left
+
+162
+00:16:25,675 --> 00:16:33,275
+我们可以查看错误列表以确保，在ImGuiLayer中有一个，我们可以从需要float的转换
+and we can look at the error list to make sure, well there's this one inside ImGuiLayer, where we convert from once I need to float
+
+163
+00:16:33,675 --> 00:16:43,755
+所以我们可以在这里添加(float)来修复它，让我们进行另一个构建，这样我们可能需要重建
+so we can just add a little float cast here to fix that up, let's do another build, there you go we might have to rebuild
+
+164
+00:16:44,266 --> 00:16:48,850
+我们可能只需要重建Sandbox，这样我们就可以恢复那些原始警告，好了，继续吧
+we might just have to rebuild Sandbox, so that we get those original warnings back, okay, there we go
+
+165
+00:16:49,500 --> 00:16:58,625
+所以现在我们只剩下三个警告了，我们可以做的是，我们只需要再次定义这个常量
+so now we've only got three warnings left and this stuff, what we could do is we just need to again have this macro
+
+166
+00:16:59,100 --> 00:17:05,100
+如果你们都能从屏幕上看到的话就不会了！！！，但基本上这个文件使用的是这样的函数
+not if you guys can see it all the way off the screen there!!!, but basically this file is using functions like these
+
+167
+00:17:05,466 --> 00:17:13,400
+不是下划线的那种安全版本，因此它们被弃用，因此，它生成了一个警告
+not the underscore s kind of secure version, and because of that they're deprecated, because of that, it's generating a warning
+
+168
+00:17:14,333 --> 00:17:18,725
+我们所能做的当然是解决那个问题，我们可以回到premake文件中
+what we could do is of course to kind of fix that, we could go back into our premake files
+
+169
+00:17:19,000 --> 00:17:28,300
+确保Hazel在定义中，我们在定义中，我的意思是在Sandbox没有任何定义，没有任何定义
+and make sure that Hazel in defines we're out defines, I mean we don't have any defines on the Sandbox, we don't have any defines
+
+170
+00:17:28,300 --> 00:17:33,075
+我认为对于所有平台来说，我们似乎从来没有定义过Windows，但在旧平台上
+I think for all platforms, it looks like we've never got defines Windows, but in the old platform's one
+
+171
+00:17:33,333 --> 00:17:37,150
+我们必须基本上添加_CRT_SECURE_WARNINGS，我们可以那样做，那是一个解决方案
+we'd have to basically add _CRT_SECURE_WARNINGS, we could do that, that's one solution
+
+172
+00:17:37,550 --> 00:17:42,830
+但由于我确实想强制执行那个，因此我们在其他地方没有弃用的函数
+but since I do want to kind of enforce that, we don't have deprecated functions everywhere else
+
+173
+00:17:43,133 --> 00:17:47,133
+我的意思是，我们还是会看到的，因为老实说，我并没有真正使用安全版本
+I mean we still might we'll see, because to be honest, I don't really use the secure version
+
+174
+00:17:47,133 --> 00:17:52,575
+安全版本，我通常使用普通版本，但也许将来，我们会尝试使用安全版本
+the secure versions March, I usually use the normal ones, but maybe going forward, we will try and use the secure ones
+
+175
+00:17:53,166 --> 00:17:58,466
+因此，我可以看看这些文件是从哪里构建的，就是ImGuiBuild.cpp
+because of that, I can just take a look at where this files being built from, which is ImGuiBuild.cpp
+
+176
+00:17:58,466 --> 00:18:05,975
+因为它就像我们的小统一构建cpp文件一样，ImGui不是单独构建的
+because it's like our little unity build that cpp file, the ImGui one isn't being built separately like by itself
+
+177
+00:18:05,975 --> 00:18:13,275
+我的意思是，如果进入ImGuibuild.cpp，它不会被输入到编译器，我可以在这里定义，对吧
+I mean it's not being fed into the compiler, if we go into ImGuibuild .cpp, I can just define that here, right
+
+178
+00:18:13,700 --> 00:18:18,950
+很明显，只有在粘贴了这个代码之后，才会将这个定义应用于这个翻译单元
+and then that will obviously only apply this define for this translation union after this code kind of gets pasted in
+
+179
+00:18:19,225 --> 00:18:26,300
+因此你们知道，我们并不是到处都反对它，对吧，或者更确切说，不允许到处都使用这个
+so that way you know, we're not kind of deprecating it everywhere, right, or rather we're not allowing this code everywhere
+
+180
+00:18:26,300 --> 00:18:31,276
+就在这个文件中，我们正在抑制那里的警告，所以我现在要重建所有内容
+just in this file, we're just suppressing the warning there, so I'll do a rebuild of everything now
+
+181
+00:18:31,600 --> 00:18:38,450
+希望我们不会收到任何警告，好吧，不管怎样，我们还是会收到它们，那很有趣
+and hopefully we should get no warnings, okay, so somehow we still actually get them, that's interesting
+
+182
+00:18:39,766 --> 00:18:46,630
+我们绝对不应该，我能想到的唯一一件事是，包含它们的函数可能会出现在这里
+we definitely shouldn't, the only thing I can think of is maybe the functions that are including them are probably coming in here
+
+183
+00:18:47,000 --> 00:18:53,150
+因此我们可能需要将其拖动到pch文件之前，让我们再进行一次构建，但如果这样做的话
+so we might have to just drag that up before our pch file, let's give that another build, but of course if we do that
+
+184
+00:18:53,150 --> 00:18:55,725
+我们不能那样做，因为我忘了pch头文件
+we can't do that, because it's brick and piled header which I forgot about
+
+185
+00:18:55,966 --> 00:19:04,462
+因此，这实际上变成了一个比我预期的更大的问题，所以我的意思是它在这里定义了它
+so this is actually turning into little bit a little bit more of a problem than I would hope it would be, so I mean it defines it here
+
+186
+00:19:04,700 --> 00:19:10,125
+如果我们真的看源代码，它应该在这里定义，但在这种情况下它没有，因为已经定义了它
+it's supposedly supposed to define it here, if we actually look at the source code, but it doesn't in this case, because we've got it defined
+
+187
+00:19:10,125 --> 00:19:17,100
+所以实际上，从技术上讲，甚至应该需要它，因为现在它被定义了，但是它仍然会引起问题
+so actually we should even need it, technically speaking, because see now as being defined, however it's still causing problems
+
+188
+00:19:17,933 --> 00:19:24,450
+我怀疑那是因为我们的预编译头已经包含了不应该包含的内容或其他内容
+and I suspect that's because our precompiled header is already including the stuff that, that it shouldn't be or others
+
+189
+00:19:24,450 --> 00:19:31,650
+它已经包含了函数，因为你们可以看到，这个声明实际上在string.h中
+it's already including functions, that have that, because you can see, this declaration is actually inside string.h
+
+190
+00:19:31,650 --> 00:19:37,000
+当然，它之前就被包含在内了，就像它被包含在我们的？？？中一样
+which of course is being included before like it's being included in slide our freaking pilot header
+
+191
+00:19:37,000 --> 00:19:47,480
+所以从技术上讲，如果我转到hzpch，在string之前或我定义的任何地方，应该在这里生效
+so technically speaking again, if I go to hzpch and before string or whatever I define that, that should actually take effect here
+
+192
+00:19:48,400 --> 00:19:54,450
+或者我们甚至必须在那之前定义它，我不认为我有一个流定义了那些东西，所以那有点奇怪
+or maybe we'll have to define it even before that, I don't think I have a stream defines that stuff, so that's a little bit weird
+
+193
+00:19:54,666 --> 00:20:01,766
+但如果我们看这个，我们继续，所以ImGuiBuild在那里实际构建，我们什么都没有
+but if we look at this, yeah there we go, so ImGuiBuild actually builds there, and we don't have anything
+
+194
+00:20:01,766 --> 00:20:08,075
+但不幸的是，那是一样的，就像我们在任何地方禁用它，而不仅仅是在使用它的地方
+but unfortunately, that's kind of the same, like we disable it everywhere, not just where it's used
+
+195
+00:20:08,466 --> 00:20:13,475
+这有点烦人，我想可能是，嗯，但很明显那是有道理的
+which is a little bit annoying, I thought that maybe um, but yeah obviously it makes sense that it would
+
+196
+00:20:13,475 --> 00:20:19,400
+它会在任何地方禁用它，或者在任何地方都禁用，而不是基于使用，因为很明显，弃用标志
+it would disable it everywhere either everywhere not based on usage, because obviously that deprecation flag
+
+197
+00:20:19,725 --> 00:20:25,050
+deprecation的编译器属性实际上存在，当编译函数本身时，它只是不会被使用
+the compiler attribute for deprecation is actually there, when the function itself is compiled, it's not used
+
+198
+00:20:25,050 --> 00:20:31,525
+比如基于模板或类似的东西，不管怎样，它可能是，所以我们要么有它，要么我猜
+like based on templates or anything like that, like it might be, anyway, so we either have it there, or I guess
+
+199
+00:20:31,733 --> 00:20:38,466
+在这种情况下，正确的做法实际上是我第一次做我在第一种解决方案中所做的事情
+the correct thing to do in this case would actually in fact to go to my first to do what I did in my first kind of solution
+
+200
+00:20:38,466 --> 00:20:50,125
+那只是为了在这里为所有平台添加定义，_CRT_SECURE_NO_WARNINGS，那么继续
+and that's just to add a define here for all platforms, where we just do _CRT_SECURE_NO_WARNINGS, so there we go
+
+201
+00:20:50,400 --> 00:20:58,566
+我会确保我们到处都有标签，很好，现在如果重新生成项目，回到这里，重载所有内容
+and I'll just make sure we got tabs everywhere, good, and now if we just regenerate projects, go back here, reload everything
+
+202
+00:20:59,100 --> 00:21:08,500
+我将再次清理，并进行构建我们最终应该没有警告，现在可能是打开警告的好时机
+I'll clean again, and do a build we should have zero warnings finally, and we now would probably be a good time to turn on warnings
+
+203
+00:21:08,500 --> 00:21:13,550
+错误或类似的东西，如果我们真的想把这构建联系得很紧密，我可能不会那样做
+as errors or something like that, if we really want to keep this building tightly, but I probably won't do that
+
+204
+00:21:13,550 --> 00:21:18,875
+因为那可能会很烦人，好吧，我们继续，一切都成功了，没有警告，没有错误
+because that might get annoying, okay, there we go, everything succeeded, no warnings, no errors, nothing like that
+
+205
+00:21:19,050 --> 00:21:24,400
+太好了，它又漂亮又干净，如果我们运行它，一切当然都会跑起来，现在我们有了，好了
+wonderful, it's nice and clean, and if we launch it, everything of course should work, and there we have it, okay
+
+206
+00:21:24,725 --> 00:21:30,016
+差不多了，好吧，差不多了，如果你们喜欢这期视频，就为它点赞吧
+so that is pretty much it, alright, so that's pretty much it, if you guys enjoyed the video, please hit the like button
+
+207
+00:21:30,266 --> 00:21:35,275
+同时，非常感谢所有使这一系列成为可能的赞助人，我可能会离开，比如下周
+also a huge thank you to all the patrons that make this series possible, I'm gonna be away for like the next
+
+208
+00:21:35,450 --> 00:21:42,100
+我不知道，可能两到三个星期吧，我们拭目以待，希望下周我有时间拍一期视频
+I don't know two to three weeks, we'll see, hopefully I should have time to maybe make a video next week
+
+209
+00:21:42,100 --> 00:21:46,700
+因为要休息一周，所以如果婚礼的事情没有太多阻碍的话
+because of taking the week off work, so maybe if the wedding stuff doesn't get too much in the way
+
+210
+00:21:46,700 --> 00:21:51,775
+很明显有可能，很明显我会优先考虑那个，我不能保证任何事情
+which obviously it might, and obviously I'll prioritize that, I don't want to promise anything
+
+211
+00:21:51,775 --> 00:21:57,775
+但我可能会从现在开始制作两周的视频，我们拭目以待，但除此之外，我会离开几周
+but I might make a video for two weeks from now, we'll see, but apart from that, I'm gonna be away for a few weeks
+
+212
+00:21:57,933 --> 00:22:05,631
+所以如果你们真的想，如果你们不想让它就在这里，那么如果你们支持patreon上的系列
+so if you do want to kind of, if you don't want to just let this sit here, then the, if you support the series on patreon
+
+213
+00:22:06,266 --> 00:22:10,275
+你们可以访问开发分支，那个分支已经完成了许多这种渲染器的工作
+you can get access to the development branch, which has a lot of this kind of renderer stuff already done
+
+214
+00:22:10,525 --> 00:22:13,550
+所以如果你们想快进，或者想自己做一些事情
+so if you want to jump ahead, or if you're kind of doing stuff on your own
+
+215
+00:22:13,550 --> 00:22:19,200
+但是你们想看看我是怎么做的，或者想看看你们是否用正确方式实现，或者我打算怎么做
+but you want to see how I do it, or you want to see if you've done it the correct way, or how we're intending to do it
+
+216
+00:22:19,466 --> 00:22:24,816
+然后你们一定要去看看那个，也确实有助于支持这个系列，很好，我等不及要回来等你们了
+then you can definitely check that out, and also it will really help support a series, which is great, I can't wait to be back for you guys
+
+217
+00:22:26,300 --> 00:22:33,675
+我们终于可以开始渲染器了，希望你们喜欢这期视频，下期见
+and we can finally get on to the renderer stuff, so yes hope you guys enjoyed this video, I will see you next time goodbye
+

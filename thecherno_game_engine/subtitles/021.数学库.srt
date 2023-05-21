@@ -1,0 +1,985 @@
+﻿1
+00:00:00,200 --> 00:00:03,375
+嘿，你们好，我是TheCherno，欢迎回到我的游戏系列教程
+hey, guys, my name is TheCherno, and welcome back to my game engine series
+
+2
+00:00:03,566 --> 00:00:08,375
+那么上期我们看了一下按键和鼠标代码，然后设置了所有那些东西
+so last time we took a look at key and mouse codes and just setting up all that stuff
+
+3
+00:00:08,375 --> 00:00:14,200
+因此，我们可以在Hazel中找到实际的按键代码和鼠标代码，而不依赖其他库(GLFW)
+so that we can have actual key codes and mouse codes to find inside Hazel, and not relying on other libraries such as GLFW
+
+4
+00:00:14,566 --> 00:00:21,533
+如果你们还没有看过的话，一定要看看那期，还有上次我问过你们下一步该怎么做的问题
+definitely check out that video, if you haven't already, and also last time I asked you guys the question of where we should proceed next
+
+5
+00:00:21,533 --> 00:00:27,125
+几乎没有人回应，最热门的评论基本上就是这个，所以ImGui Docking听起来很不错
+and there were few responses, and the top comment was basically this, so the ImGui Docking sounds really nice
+
+6
+00:00:27,125 --> 00:00:29,500
+在那之后，我觉得一个好的路线可能是渲染
+and after that, I feel like a good path might be rendering
+
+7
+00:00:29,500 --> 00:00:35,600
+然后是渲染潜力，渲染相关任务，如ECS、序列化、级别格式
+and then like rendering potential, rendering related tasks like that, ECS, serialization, level format
+
+8
+00:00:35,900 --> 00:00:41,625
+我基本上同意这一点，事实上，我肯定会像那一步那样进行渲染
+I mostly agree with this, and in fact I'll definitely do the rendering like definitely that step 
+
+9
+00:00:41,625 --> 00:00:49,350
+我想我们接下来最好就是ECS和序列化，实际上我可能会按照相反的顺序进行
+I think we'll be good to do next as far as like ECS and serialization, I might actually do them in the in like the reverse kind of order
+
+10
+00:00:49,350 --> 00:00:53,925
+所以，首先是序列化，然后是ECS，级别格式，脚本，是的，非常好
+so serialization first, then ECS, level format, scripting, yeah, pretty much good
+
+11
+00:00:54,800 --> 00:01:02,150
+因此，我们将大致遵循这个路线图，从渲染开始，然后是ImGui Docking
+so we're going to pretty much follow this roadmap starting with rendering, so, and then the ImGui Docking 
+
+12
+00:01:02,700 --> 00:01:05,825
+还有像我一直在看的ImGui视口分支一样的窗口
+and windowing like the ImGui viewports branch as well that I've been looking at
+
+13
+00:01:05,825 --> 00:01:12,150
+我想我上次提到的也是我真的很想做的事情，所以那可能会发生
+which I think I mentioned last time is something that I really want to do as well, so that's probably what's gonna happen
+
+14
+00:01:12,150 --> 00:01:17,100
+但是今天我们不需要进行ImGui Docking，我想我们只需要开始渲染
+but instead of doing ImGui Docking today which we could do, we're just gonna kind of get started with rendering I think
+
+15
+00:01:17,900 --> 00:01:24,800
+具体来说，数学是其中的一部分，因此渲染在很大程度上依赖于数学
+and specifically the mathematics kind of part of that, so rendering is very much reliant on maths
+
+16
+00:01:24,875 --> 00:01:28,625
+就像你们必须有一个数学库才能做几乎任何事情，对吧
+like you have to have a math library to do pretty much anything, right
+
+17
+00:01:28,625 --> 00:01:30,400
+我的意思是如果你们想在屏幕上绘制一些东西
+I mean if you want to draw something on the screen
+
+18
+00:01:31,275 --> 00:01:34,200
+你们知道，我们正在处理一个潜在的2D或3D渲染器
+you know, we're dealing with a potentially 2D or a 3D renderer
+
+19
+00:01:34,200 --> 00:01:37,700
+所以我们需要有二维向量，所有三维向量
+so we need to have you know two component, all three component vectors
+
+20
+00:01:37,750 --> 00:01:42,650
+对吧，通常还有四维向量，对了，还有变换矩阵等等
+right, four component vectors usually as well, right, and matrices for transforms and all of that kind of stuff
+
+21
+00:01:42,650 --> 00:01:47,350
+所以你们需要一个数学库，显然也不是必须需要那个，你们可以有一个浮点数数组之类的
+so you need a math library there, obviously you don't need to have that, you could just have like a float array or something
+
+22
+00:01:47,600 --> 00:01:53,025
+然后将缓冲区发送到GPU，然后根据需要渲染任何地方，因为那就是最终的结果
+and then just send that buffer to the GPU, and then render wherever you want, because that's what it comes down to in the end
+
+23
+00:01:53,566 --> 00:01:57,950
+但我的意思是，既然我们不是在谈论奇怪的实现方式
+but I mean, since we are not talking about weird ways to do things
+
+24
+00:01:57,950 --> 00:01:59,550
+我们实际上想在这里构建一些好的东西
+and we actually want to set up something good here
+
+25
+00:01:59,933 --> 00:02:08,450
+我们需要一个数学库，所以在数学方面，有很多相当好的数学库
+we need to have a math library, so with maths, there are quite a number of rather good maths libraries
+
+26
+00:02:08,566 --> 00:02:13,525
+我的意思是，老实说，在我一生参与过的每个专业项目中，它们总是有自己的数学库
+I mean, honestly, in punish every project that I've worked on in my life professionally, they always have their own
+
+27
+00:02:14,566 --> 00:02:18,775
+所以我们可以继续写我们自己的数学库，但问题是
+so we could go ahead and just write our own maths library, but see here's the problem
+
+28
+00:02:19,366 --> 00:02:25,800
+通常来说，自己写一个数学库只是为了满足最低要求，运行起来其实并不难
+writing a maths library by yourself typically speaking is to get the bare minimum up and running is actually not that difficult
+
+29
+00:02:27,000 --> 00:02:31,700
+你们需要有一组基本的类，比如你们知道的基础向量类，对吧
+you need to have a basic set of classes, such as you know, your basic vector classes, right
+
+30
+00:02:31,700 --> 00:02:37,650
+所以二维，三维，四维向量，你们还需要一个三乘三矩阵或四乘四矩阵
+so two component, three component, four component vector, you need to have a three by three matrix or four by four matrix
+
+31
+00:02:38,275 --> 00:02:47,750
+也许还有一个射线类，还有一个原始方向，那很有用，四元数，还有什么我想不起来的
+maybe like a ray class as well with like an original direction, that's pretty useful, Quaternions, what else is just going off the top of my head
+
+32
+00:02:47,750 --> 00:02:52,199
+顺便说一句，我想大概就是这样，而且很明显也有一堆工具函数
+by the way, I think that's probably about it, and obviously like a bunch of utility functions as well
+
+33
+00:02:52,200 --> 00:02:57,500
+很明显，所有的向量类都将包括点积和叉积，以及分量乘法
+and obviously all the vector classes will include things like dot and cross product, as well as a component wise multiplication
+
+34
+00:02:58,250 --> 00:03:00,775
+所有这些东西你们都可以很容易地自己写出来
+all of that stuff you can write yourself pretty easily
+
+35
+00:03:00,775 --> 00:03:04,333
+如果这是你们第一次写的话，比如一天之内，可能会更少，对吧
+like in a day, maybe less, right, if it's your first time
+
+36
+00:03:04,333 --> 00:03:09,825
+也许你们会花一整天的时间，但这真的没那么难，完全可以自己做
+then maybe you'll take you a whole day, but it's really not that difficult, totally easy to do by yourself
+
+37
+00:03:10,425 --> 00:03:18,475
+但是如果你们想写一个好的数学库，那就更难了，因为为了让数学计算更快
+but if you want to write a good math library, that's where it becomes more difficult, because in order for maths to be fast
+
+38
+00:03:18,666 --> 00:03:26,375
+为了以一种好的方式编写它，你们需要利用SIMD，本质上是单指令多数据
+and in order to actually write it in a good way, you need to take advantage of SIMD, essentially which is single instruction multiple data
+
+39
+00:03:26,866 --> 00:03:32,475
+所以本质上，你们要做的是在你们的CPU上使用128位宽的寄存器
+so essentially what you want to do is use like 128 bit wide registers on your CPU 
+
+40
+00:03:32,475 --> 00:03:38,775
+来进行四乘四的乘法运算，或者点积运算，或者所有这些数学运算
+to actually do that kind of four by four measures multiplication or like dot product or all those kind of math operations
+
+41
+00:03:38,775 --> 00:03:44,825
+因为你们实际上可以在一条CPU指令中执行这些操作，而不必使用数字和变量加载寄存器
+because you can actually do them in a single CPU instruction instead of having to load registers with num with variables
+
+42
+00:03:45,100 --> 00:03:51,575
+然后将它们一次乘一个浮点数，以便在neon或任何平台上执行SSE或AVX操作
+and multiply them kind of one float at a time, in order to do kind of SSE or AVX on neon or whatever platform you're on
+
+43
+00:03:51,900 --> 00:03:53,950
+为了实际使用这些扩展
+in order to actually use those extensions
+
+44
+00:03:55,125 --> 00:03:59,150
+SSE与Intel在流媒体SIMD扩展上的做法类似，并希望使用所有这些扩展
+SSE being like the Intel on streaming SIMD extensions, and wanted to use all of that
+
+45
+00:03:59,466 --> 00:04:00,925
+你们需要编写汇编代码
+you need to either write assembly code
+
+46
+00:04:00,925 --> 00:04:04,166
+老实说，没有人真正喜欢汇编代码，而我参与过的项目都没有人做过的
+which no one really does like to be honest, and everything I worked on no one's ever
+
+47
+00:04:04,166 --> 00:04:10,475
+你们曾经确实这样做过，但也可以那样做，另一种方法是使用编译器内部函数
+you ever really done it that way, but it is possible to do it that way, the other way to do it is by using compiler intrinsics
+
+48
+00:04:10,975 --> 00:04:16,899
+如果在使用编译器内部函数时，很明显，我的意思是，仅此定义就意味着它是每个编译器的
+now if you use in compiling intrinsics obviously like, I mean, that definition alone means that it's per compiler
+
+49
+00:04:17,133 --> 00:04:24,666
+所以，clang使用了与MSVC不同的变量，对吧，不同类型的变量名，不同的函数等等
+so clang uses a different ones than MSVC does, right different kind of you know variable names different functions all that stuff
+
+50
+00:04:24,666 --> 00:04:30,600
+例如，在MSVC中的__128，那是一种变量类型
+like for example, in MSVC's __128, that's the kind of variable type 
+
+51
+00:04:30,600 --> 00:04:38,625
+它包含128位宽的寄存器变量，对吧，那是类型，所以，那是MSVC编译器的固有特性
+that holds that 128 bit wide register variable, right, that's the type, so, and that's intrinsic to the MSVC compiler
+
+52
+00:04:39,200 --> 00:04:47,300
+因此，由于我们在使用所有这些方面存在问题，因此你们必须单独编写SSE或SIMD代码
+so because we have this problem of using all this stuff, you have to individually write SSE code essentially or SIMD code 
+
+53
+00:04:47,300 --> 00:04:50,450
+我要说的是，对于所有主要的平台，在编译器上
+I'll say for all major platforms, on compilers
+
+54
+00:04:50,700 --> 00:04:54,225
+即使是针对一个编译器，也很难做到这一点
+and even if you were doing it for one compiler, it's still difficult
+
+55
+00:04:54,366 --> 00:05:00,550
+这仍然像是你们需要学习的东西，而本系列并不是关于它的原理
+and it's still like something that you need to learn how to do, and this series is not about how that works
+
+56
+00:05:00,733 --> 00:05:05,975
+我的意思是，我将来可能会制作一些视频，只针对C++来处理这类东西
+I mean I might make some videos just to C++ in the future to do with that kind of stuff
+
+57
+00:05:05,975 --> 00:05:08,900
+因为我知道它在评论中出现过几次
+because I know it's come up a few times in comments
+
+58
+00:05:09,800 --> 00:05:15,666
+但是因为基本上是因为SIMD，因为那才是编写数学库的正确方法
+but because of basically because of SIMD, and because that's the proper way to write a math library
+
+59
+00:05:15,666 --> 00:05:19,725
+老实说，我不会考虑一个不支持这一点的数学库
+and really I wouldn't consider a math library that didn't support that, to be honest
+
+60
+00:05:19,725 --> 00:05:25,900
+因为在大型高性能游戏引擎Hazel中，那样的速度太慢了
+because why like that's just gonna be too slow in a large scale kind of good high performance game engine like Hazel
+
+61
+00:05:25,900 --> 00:05:32,225
+这是因为那是Hazel的目标之一，因此，你们知道，除非你们有时间去搞那个
+like that's because that's one of the goals for Hazel, because of that, you know, unless you kind of have the time to do that
+
+62
+00:05:32,225 --> 00:05:38,275
+而我们没有，那么你们应该使用一个支持它的库，所以我们要使用一种叫做glm的库
+which we don't, then you should just use a library which supports that, so we're going to use something called glm
+
+63
+00:05:38,766 --> 00:05:43,975
+这是一种OpenGL数学库，让我们看看这台计算机，那么这就是所谓的OpenGL数学库
+which is kind of the OpenGL math library, let's just go over to this computer here, so this is what it is called OpenGL mathematics
+
+64
+00:05:44,050 --> 00:05:46,725
+现在它是一个用于图形编程的C++数学库
+now it's a C++ math library for graphics programming
+
+65
+00:05:47,025 --> 00:05:53,566
+我的意思是看，它叫做OpenGL Math，它说它是基于GLSL的
+I mean look it's called OpenGL Math, and it says it's kind of based on GLSL
+
+66
+00:05:53,600 --> 00:05:58,900
+因为它应该是GLSL所做的一切，所以可以看到语法非常类似于GLSL，例如mat4
+because it's supposed to everything the GLSL does, you can see the syntax is very much like GLSL, so for example it is mat4
+
+67
+00:05:59,166 --> 00:06:05,425
+你们知道，你们有你们自己的vec3，而不是像float3，这就是GLSL的样子
+you know, you have your kind of vec3 instead of like float3, which is what GLSL would be like
+
+68
+00:06:06,533 --> 00:06:11,775
+所以它是基于OpenGL的，但你们必须意识到这与OpenGL无关
+so it is kind of based a lot on OpenGL, but you have to realize that this has nothing to do with OpenGL
+
+69
+00:06:11,775 --> 00:06:15,600
+就像它与OpenGL无关一样，对吧
+like it's not tied to OpenGL at all, right
+
+70
+00:06:15,600 --> 00:06:19,475
+它只是一个数学库，它在语法上是基于OpenGL的
+it's just a math library, that's syntactically based on OpenGL
+
+71
+00:06:19,475 --> 00:06:24,303
+它们的矩阵内存布局的顺序可能也是一样的
+and probably the ordering of like their memory layout for matrices is probably the same as well
+
+72
+00:06:24,933 --> 00:06:31,875
+但它并不局限于GLSL的特性，对吧，它还有四元数之类的东西，那在GLSL中是不存在的
+but it's not limited to GLSL features anyway, right, and it's got things like quaternians, which don't exist in GLSL
+
+73
+00:06:32,733 --> 00:06:39,077
+我相信它实际上是由模板组成的，所以我相信你们可以改变它的内存顺序
+and I'm sure that in fact it's made out of templates, so I'm sure that you could probably change the memory order of you and wanted to basically
+
+74
+00:06:39,166 --> 00:06:43,100
+根据我的经验，这是一个很好的数学库，如果我们看看git仓库
+in my experience, it's quite a good maths library, and if we take a look at the git repository
+
+75
+00:06:44,133 --> 00:06:52,166
+你们会发现他们确实实现了SIMD，对吧，所以我的意思是我就像矩阵一样
+you'll see that they actually do have you know SIMD stuff, right, so I mean I've been like matrix for example
+
+76
+00:06:52,966 --> 00:06:59,400
+你们知道的，看起来这就像我说的MSVC的SSE一样，对吧
+you know look like this is like the SSE kind of stuff that I was talking about the MSVC has, right
+
+77
+00:06:59,725 --> 00:07:06,825
+就像这里有这么多SSE代码一样，你们可以再次看到它非常复杂，很难编写，对吧
+like they've got all this kind of SSE code in here, which again you can see it's quite complicated, it's quite hard to write, right
+
+78
+00:07:07,666 --> 00:07:13,966
+所以它们有我们正在寻找的所有东西，这只是一个非常容易使用的数学库
+so they've got all of that stuff which is what we are looking for, and it's just a really easy to use math library
+
+79
+00:07:13,966 --> 00:07:17,733
+我以前用过，我很喜欢，它真的是我需要的数学库
+I've used it before, I quite like it, it's really my grocery math library
+
+80
+00:07:17,733 --> 00:07:21,866
+我的意思是，我既不使用这个，也不可能使用DirectX数学库，虽然那个很棒
+I mean I neither use this or potentially the DirectX math library, which is very good
+
+81
+00:07:21,866 --> 00:07:25,700
+但你们知道，那在某种程度上仅限于DirectX
+but that's kind of you know limited to DirectX in some form
+
+82
+00:07:25,700 --> 00:07:28,366
+我的意思是，你们可以将其用于任何库，但无论如何，我们不会涉足其中
+I mean you can use it with everything, but anyway, we're not gonna get into that
+
+83
+00:07:28,766 --> 00:07:34,510
+我们将开始使用glm，也许在将来的某个时候，如果我也有一个月的空闲时间
+we're gonna be using glm to begin with, maybe sometime in the future, if I have like a spare month also in my life
+
+84
+00:07:34,725 --> 00:07:38,875
+四年后，不管怎样，我可能会像你们知道的那样，让我们写自己的数学库吧
+four years from now or whatever, I might be like you know what, let's just write our own math library
+
+85
+00:07:39,200 --> 00:07:43,275
+我会做一个关于这个或其他的小系列，那会很有趣，如果有时间的话，我不介意那样做
+and I'll do a little series on that or whatever, that'll be fun, I wouldn't mind doing that if I had the time
+
+86
+00:07:43,275 --> 00:07:48,366
+但我不知道，这是我们需要做的一切，所以一方面，你们可以看到
+but I don't, and this does everything we need to do, so on one hand, and you can see
+
+87
+00:07:48,366 --> 00:07:54,675
+我的意思是它有AVX2等功能，AMD的一种功能，它实现了，很好
+I mean it does AVX2 and stuff,  which is AMD's kind of stuff, it does, it's great
+
+88
+00:07:54,675 --> 00:07:57,100
+对吧，你们应该用它，所以我们要用这个
+right, you should use it, so we're going to use this
+
+89
+00:07:58,300 --> 00:07:59,650
+所以我们将要去发布页面
+so we're going to go to the releases
+
+90
+00:08:00,375 --> 00:08:05,750
+我们可以将其添加为git子模块，老实说，可能应该那样做
+we could add this as a git submodule, we probably should to be honest
+
+91
+00:08:06,266 --> 00:08:12,275
+所以，是的，让我们将其添加为git子模块，所以我只打开这个，我们将转到Hazel
+so yeah let's add it as a git submodule, so I'll just open this, we'll go to Hazel
+
+92
+00:08:13,066 --> 00:08:17,650
+你们可以看到这一期几乎没有准备好，因为你们喜欢它，现场直播
+you can see this episode is pretty much not prepared, because you guys love it want to do stuff live
+
+93
+00:08:18,066 --> 00:08:22,700
+我们就这么做吧，git status，一切都很好，所以我们只需执行git submodule add
+let's just do it, git status, everything's fine, so we'll just do git submodule add
+
+94
+00:08:22,866 --> 00:08:25,600
+事实上，我甚至不记得这些命令是什么
+and in fact I don't even remember what the commands are
+
+95
+00:08:26,075 --> 00:08:31,700
+所以我们可以添加一个名称，然后再添加一个存储库，或者至少它有
+so we can add a name and then a repository I think, or at least it has a
+
+96
+00:08:34,150 --> 00:08:40,825
+然后是路径存储库，存储库，然后是路径，所以我们要这样做
+and then path repository, repository, and then path, so we'll do this
+
+97
+00:08:42,266 --> 00:08:45,750
+顺便说一下，关于这个，我们根本不需要premake或类似的东西
+we don't, by the way, we don't need premake or anything like that for this at all
+
+98
+00:08:46,225 --> 00:08:52,566
+因为它是只有一个头文件的库，所以非常非常好，然后我们将它添加到Hazel中
+because it's a header or only library, so that's quite, that makes it quite nice, and then we'll add it into Hazel and
+
+99
+00:08:53,975 --> 00:09:00,550
+我猜是Hazel/vendor，Hazel/vendor，然后是glm
+and I guess Hazel/vendor, Hazel/vendor and then just glm
+
+100
+00:09:00,550 --> 00:09:04,775
+怎么做呢？他它们几乎总是用小写字母写的
+and how to be it's they pretty much write at lowercase all the time 
+
+101
+00:09:04,775 --> 00:09:10,150
+所以我们也将它改为小写，我将看到Hazel/vendor/glm
+so we will also make it lowercase, I'll see Hazel/vendor/glm, okay
+
+102
+00:09:11,275 --> 00:09:14,054
+好了，我们将添加它，好了，现在完成了
+so we're gonna add that, okay, and now that that's done
+
+103
+00:09:14,600 --> 00:09:20,400
+如果我们真的可以像刷新这个一样，你们会看到，glm出现在我们的解决方案视图中
+if we just we literally can just like refresh this, and you'll see, glm appears over here in our solution view
+
+104
+00:09:21,333 --> 00:09:28,650
+我们可以把所有都包含进来，真的只需要包含glm，我的意思是你们根本不需要做太多
+we can include everything, we kind of need into here, we really just need to include glm, I mean like you don't need to do much at all
+
+105
+00:09:29,133 --> 00:09:32,900
+所以我只想右键单击并点击包含它，实际上我不应该这样做，因为我们正在使用premake
+so I'm just going to right click and hit include it, I actually shouldn't do that though, because we are using premake
+
+106
+00:09:34,066 --> 00:09:41,600
+但问题是，为了完全公平，我们根本不需要包含它，因为是的，我确实想添加一个包含路径
+but the thing is we don't need to include it at all, to be completely fair, because yeah I do want to add an include path
+
+107
+00:09:41,733 --> 00:09:49,575
+让我们等待VS再次开始响应，好吧，现在很好，所以我们可以快速查看premake文件
+let's just wait for the visual studio to start responding again, okay, it's good now, so we could like if we just look at the premake file quickly
+
+108
+00:09:50,200 --> 00:09:55,900
+我的意思是我确实想把它作为一个包含目录添加到Hazel和Sandbox中
+I mean I do want to add it as an include directory to like Hazel and also to Sandbox
+
+109
+00:09:56,933 --> 00:10:02,609
+所以你们知道，我们可以做我们包含目录的事情是的
+so you know, we could do what we have included directory yeah
+
+110
+00:10:03,350 --> 00:10:06,750
+我想我们把所有的依赖项都放在这里，所以我会把它放在这里
+I guess we kind of are putting all our dependencies here, so I will put it here
+
+111
+00:10:07,200 --> 00:10:12,725
+所以glm，然后我想就那样了，因为这样我们需要做的事情就是包含glm/glm.h
+so glm, and then I think that's it, because then we can do glm/glm.h or whatever that we need to do
+
+112
+00:10:13,375 --> 00:10:24,550
+我认为那可能很好，所以我们将只包含目录glm，好了
+and I think that's probably good,  so we'll just do include directory glm, alright
+
+113
+00:10:24,550 --> 00:10:29,350
+然后我们可以做同样的事情，将目录包含到Sandbox
+and then we can do the same thing for include directories into Sandbox
+
+114
+00:10:29,350 --> 00:10:33,200
+那应该可以正常运行的，我不明白为什么不能
+that should just work, I don't see why it wouldn't
+
+115
+00:10:34,933 --> 00:10:43,840
+所以在Hazel/vendor/glm中，我觉得很好，然后如果我们重新运行，但我们可能不想包含
+so it's in Hazel/vendor/glm, that looks good to me, and then if we rerun, but we probably don't want to include
+
+116
+00:10:44,133 --> 00:10:47,500
+但这并不包含在项目中，如果我们想将其包含在项目中
+but this isn't including it in the project, if we want to include in the project
+
+117
+00:10:47,500 --> 00:10:50,444
+你们必须像我们刚刚添加的这些文件一样添加它
+you have to add it as like one of these files that we just add
+
+118
+00:10:51,175 --> 00:10:54,275
+因为我不这样做，我不确定我是否真的需要那样做
+the reason like I don't, I'm not sure if I really want to do that
+
+119
+00:10:55,466 --> 00:10:59,533
+因为当你们搜索时，它们都会出现在项目中
+because then they'll all kind of appear actually in the project, when you search
+
+120
+00:10:59,533 --> 00:11:05,275
+当你们执行<shift+o>时，比如视觉辅助，但是我们这里还有其他的东西
+and when you do all <shift+o> the visual assist for example, but then again like we do have everything else here
+
+121
+00:11:05,475 --> 00:11:11,347
+很明显，就像所有这些内容一样，它现在来自glm，因为我通过右键单击将其包含在内
+obviously like all this stuff from well it's from glm now, because I included it by right clicking
+
+122
+00:11:11,600 --> 00:11:13,375
+但如果它不在那里，它就不会出现在那里
+but if it wasn't in there, it wouldn't appear there
+
+123
+00:11:13,375 --> 00:11:15,899
+所以我不确定我们是否想要所有这些，因为它会或所有东西
+so I'm not sure if we want all that, because it does cloud or everything up
+
+124
+00:11:15,900 --> 00:11:23,450
+我们可能不需要经常查看它，但如果你们愿意，可以将其添加到Hazel的文件中
+and we probably won't need to look at it very often, but if you wanted to, you can just add it into the files into Hazel
+
+125
+00:11:23,450 --> 00:11:29,250
+然后很明显会出现，举个例子，因为有些人可能对此感兴趣
+and then obviously would be there, so just as an example, because some people might be interested in this
+
+126
+00:11:30,133 --> 00:11:38,866
+我们可以这样做，你们知道项目名称是Hazel，vendor，glm，glm，例如
+we can just do, you know project name which is Hazel, and then vendor and then glm and then glm for example
+
+127
+00:11:38,866 --> 00:11:43,975
+然后那将包含我刚才在这里所做的一切，好吧，让我们重新运行它，看看会发生什么
+and then that would include everything that I just did here, okay, so let's rerun that, and see what happens
+
+128
+00:11:44,175 --> 00:11:52,650
+运行GenerateProjects，好了，这样就完成了，如果我现在重新加载解决方案
+GenerateProjects, okay, so that's done, if I reload the solution now 
+
+129
+00:11:53,733 --> 00:12:01,975
+你们将看到，我们有vendor/glm，所有这些内容都包含在内，但实际上也包含这些内容
+you'll see that we have vendor/glm, all this stuff is included as you can see, but this stuff actually is also included
+
+130
+00:12:01,975 --> 00:12:08,550
+太好了，也许我搞混了路径，所以在Hazel/vendor/glm/glm内
+so that's wonderful, maybe I messed up a path here, so that's inside Hazel/vendor/glm/glm
+
+131
+00:12:08,550 --> 00:12:15,566
+那么我到底做了什么，让我们看看，所以我们的是%\{pro.name\}/vendor/glm/glm
+so what on earth did I do, let's take a look, so we had %\{pro.name\}/vendor/glm/glm
+
+132
+00:12:15,566 --> 00:12:21,675
+显然我需要包含我想要的文件，因为你们不能只包含目录，就像那样
+well obviously I need to actually like include the files that I want, because you can't just include a directory like that
+
+133
+00:12:22,533 --> 00:12:28,733
+现在我想看的是，好吧，它们都是hpp文件，我想真的是这样，我不认为还有其他文件
+now what I wanted to see, okay, so they're all hpp files, I think that's really it, I don't think there are any other
+
+134
+00:12:28,933 --> 00:12:31,869
+我的意思是也有内联文件，所以我们将包含这些文件，
+I mean there's inline files as well, so we'll include those, 
+
+135
+00:12:40,175 --> 00:12:44,650
+是了，可能就是这样，它们似乎不使用头文件或cpp文件
+yeah that's probably it, they don't seem to use header files or cpp files
+
+136
+00:12:45,333 --> 00:12:49,250
+因为是的，好了，酷，所以让我们重新运行GenerateProjects
+because yeah, okay, cool, so let's rerun GenerateProjects
+
+137
+00:12:49,375 --> 00:12:54,400
+完成，重新加载，我们希望看到它们现在包含在这里
+done, reload, and we should hopefully see them include it now in here
+
+138
+00:12:54,400 --> 00:13:02,225
+可以看到它们，好了，所以现在很明显，它们会出现在这里，作为解决方案的一部分
+and you can see they are okay, great, so now obviously they will show up kind of in here as part of our open falling solution and all that
+
+139
+00:13:03,100 --> 00:13:06,999
+就是那样，我的意思是，我想我们应该创建一个包含目录
+and that's really it, I mean, I think we set up an include directory
+
+140
+00:13:07,000 --> 00:13:15,400
+所以我们可以通过尝试你们知道包括glm/glm来测试它，对吧
+so we can probably test it out by trying to you know include glm/ like glm, right
+
+141
+00:13:15,400 --> 00:13:20,550
+如果你们看一下这里的示例，这些东西都做了
+and if you look at the sample here, that kind of did all of this stuff
+
+142
+00:13:20,550 --> 00:13:22,850
+我们是否包含在Sandbox中，那就是我想知道的
+did we included in Sandbox or not, that's what I want to know
+
+143
+00:13:23,900 --> 00:13:31,575
+因为我忘了，所以看看这个，是的，确实包含了，因此应该可以通过SandboxApp访问它
+because I forgot, so let's look at this, yeah we did actually, so with that, that should be accessible through the SandboxApp
+
+144
+00:13:31,700 --> 00:13:37,325
+所以，也许让我们试试那个演示，我们将在这里，复制几乎整个代码
+so maybe let's just try that demo, we'll go over here, we'll grab pretty much this entire code
+
+145
+00:13:38,125 --> 00:13:46,750
+我们只需将其粘贴到SandboxApp.cpp中，就像那样，我们将点击<Ctrl-f7>来构建该文件
+we'll just paste it into SandboxApp.cpp, just like that, we'll hit <Crl-f7> to just build that file
+
+146
+00:13:47,166 --> 00:13:49,175
+然后，如果它成功构建，那么我们知道一切都起了作用
+and then if it builds successfully, then we know everything has worked
+
+147
+00:13:50,000 --> 00:13:51,775
+你们可以看到它确实起了作用，对吧，很多警告
+and you can see it does, right, lots of warnings
+
+148
+00:13:51,775 --> 00:13:53,850
+顺便说一下，我们很快就会解决这些警告，我保证
+we will address these warnings soon by the way, I promise
+
+149
+00:13:54,200 --> 00:13:56,775
+但是如果你们向下滚动到最底部，不知道是否可以看到
+but if you scroll down to the very bottom, don't know if you can see
+
+150
+00:13:56,775 --> 00:14:02,050
+但你们可以看到，0个失败，那么那确实起作用了，好吧，然后如果我们
+but you can see once excited zero failed, so that did in fact work, okay, and then if we
+
+151
+00:14:02,733 --> 00:14:09,700
+我不知道，如果我们真的想，我想我们可以到这里，比如我的ExampleLayer
+I don't know, if we really wanted to, I guess we could go over here, into my ExampleLayer for example
+
+152
+00:14:10,600 --> 00:14:22,875
+然后执行，这个代码是，变换为5，然后是另一个旋转向量(0.5, 0.5)，让我们看看
+and then do, what even is this code translation 5, and like anthoer a rotation vector of point five point five, let's just see
+
+153
+00:14:23,566 --> 00:14:29,900
+好了，然后返回一些东西，然后我们可以尝试记录它
+alright, and then that returns something, and then we can probably try and log it
+
+154
+00:14:30,533 --> 00:14:40,050
+我不知道，这儿没有日志函数，但让我们在这里打一个断点
+I don't know, if there's probably no log in functions for this, but let's just set a breakpoint here
+
+155
+00:14:40,200 --> 00:14:56,075
+按f5编译所有这些代码，然后如果我们按f10，你们应该会看到我们有一个cam
+hit f5 to compile all of this code, and then if we hit f10, you should see we have a cam
+
+156
+00:14:56,600 --> 00:15:02,106
+这里有一堆值在我们的矩阵中，我觉得很好，好吧，酷
+with a bunch of values over here that are inside our matrix, and it looks pretty good to me, alright, cool 
+
+157
+00:15:02,525 --> 00:15:11,375
+这几乎有点不好看，因为它有很多这样的别名，所以x和r是同一个变量，我猜，s也是
+and this is almost a bit hard read, because it kind of aliases a lot of these things, so x and r are the same variable and I guess, so is s
+
+158
+00:15:12,366 --> 00:15:29,825
+所以我们有一些其他的东西，我不知道我们有xyzw，rgba，rstq，好吧，很抱歉，stpq
+so we have kind of st something else, I don't know we have xyzw, and we have like rgba, and then we also have rstq, okay, so sorry, stpq it seems
+
+159
+00:15:31,133 --> 00:15:35,025
+因此，对于相同的变量，我们有很多不同类型的别名，以防我们处理颜色
+so we have a lot of different kind of alias for the same variables, just in case we're dealing with colors
+
+160
+00:15:35,025 --> 00:15:44,150
+或者我们在处理纹理坐标，或者在处理位置xyz，所以glm给了我们那些
+or we're dealing with texture coordinates, or we're dealing with you know just positions xyz, so glm kinda gives us that
+
+161
+00:15:44,475 --> 00:15:49,250
+但不管怎样，你们可以看到那很好，我将删除这个示例，如果你们愿意，可以自己尝试一下
+but anyway, you can see that works fine, I'm going to delete this example, you can try it out for yourselves if you want to
+
+162
+00:15:50,500 --> 00:15:56,450
+但除此之外，包含只有一个头文件的库是多么简单，现在我们可以在任何地方使用它
+but otherwise, that's really how simple it is to include a header only library, and we can use it everywhere now
+
+163
+00:15:56,766 --> 00:16:01,175
+我想给它添加一些日志功能，这样我们就可以做HZ之类的事情
+I would like to add things like logging functions to it, so that we can just do something like HZ
+
+164
+00:16:02,166 --> 00:16:10,125
+你们知道HZ_TRACE，然后比如给它一个mat4，对吧，实际上它有一个TRACE，可能是
+you know HZ_TRACE and then like give it like a mat4 or something like that, right, and actually have it have a trace that probably um
+
+165
+00:16:11,166 --> 00:16:14,400
+所以为了实现那个，我们需要做的基本上和我们在事件中做的一样
+so to do that, we kind of need to do basically the same thing that we did in event
+
+166
+00:16:14,400 --> 00:16:17,950
+我们需要决定如何实际呈现那些数据，因为它是一个四乘四矩阵
+we need to decide how we actually want to present that data, because it is a four by four matrix
+
+167
+00:16:18,600 --> 00:16:21,198
+然后我们要做的基本上就是我们对所有这些事件所做的
+and then we have to do basically what we did with all these events
+
+168
+00:16:22,075 --> 00:16:32,125
+我想是这样的，有一个ToString函数，最终被调用了，我想事件调用了那个
+which I think was just having something like this having a ToString function, which then eventually was called, I think event calls that
+
+169
+00:16:33,000 --> 00:16:38,670
+是的，我们有一个operator，这就是我们的日志库spdlog或spdlog所寻找的
+yeah we have this operator which is what our logging library spdlog or a spdlog looks for
+
+170
+00:16:39,366 --> 00:16:43,425
+然后我们只是简单地将矩阵记录在那里，所以这就是事件的情况
+and then we just simply actually log that matrix there, so this is the case for an event
+
+171
+00:16:43,675 --> 00:16:45,925
+显然，我们可以在glm中添加类似的内容
+obviously we could add something like this in the glm name
+
+172
+00:16:45,925 --> 00:16:50,050
+比如我们可以在某处、任何地方添加一些，我们可以在某处添加此函数
+like we could add some somewhere, anywhere, we could add this function somewhere
+
+173
+00:16:50,566 --> 00:16:57,325
+它接收像这样的glm类型，并以它的格式记录，然后这样我们就可以进行打印
+which takes in like a glm type like this one, and actually logs it in its kind of format, and then that way we could have that printing
+
+174
+00:16:57,325 --> 00:17:05,925
+所以那就是我将来想做的事情，我想我真的想添加ImGui之类的显示组件
+so that's that's something I want to do in the future, and then also I really want to add and ImGui kind of display component I guess
+
+175
+00:17:07,325 --> 00:17:10,975
+对于这些数学类型，例如，我们可以很容易地看到矩阵
+for these math types, so that we can easily for example see a matrix
+
+176
+00:17:11,325 --> 00:17:16,050
+也可以通过在ImGui类窗口中查看矩阵来操作矩阵
+and also manipulate a matrix just by looking at it in an ImGui kind of window
+
+177
+00:17:16,450 --> 00:17:20,850
+因为当我们开始处理图形编程和调试所有那些时，那将非常有用
+because that's going to be really useful, when we start having to deal with graphics programming and debugging all of that
+
+178
+00:17:21,175 --> 00:17:28,475
+因为下期，我们可能会重写，也不算重写，但要引入那个Docking，也就是ImGui Docking
+because next time, we're going to probably rewrite not rewrite, but I'm going to put in that Docking, ImGui Docking 
+
+179
+00:17:28,475 --> 00:17:35,133
+还有我谈到的视口实现，可以将窗口拖动到我们自己的Hazel窗口之外
+and also viewports implementation that I talked about being able to drag windows outside of our own Hazel window
+
+180
+00:17:35,133 --> 00:17:40,166
+所有这些我已经在Hazel开发分支上运行过了，下期可能会去实现那个
+and all of that which I've already got running in the Hazel development branch, probably going to do that next time
+
+181
+00:17:40,166 --> 00:17:45,999
+然后，我们将开始规划实际的渲染器，并开始在Hazel中实现渲染器
+and then after that, we're going to start planning our actual Renderer, and start implementing the renderer into Hazel
+
+182
+00:17:46,000 --> 00:17:50,575
+所以那就是现在的计划，我希望你们喜欢这期视频，如果你们喜欢的话，就为它点赞吧
+so that is kind of the plan now, I hope you guys enjoyed this video, if you did, you can hit that like button
+
+183
+00:17:50,900 --> 00:17:53,250
+你们知道的，可以通过访问patreon.com/thecherno来支持这个系列
+you know, I'm supposed to series by going to patreon.com/thecherno
+
+184
+00:17:53,250 --> 00:17:58,299
+一如既往地非常感谢所有让这一切成为可能的人，没有你们，就没有这个系列
+huge thank you as always to everyone who makes this possible, the series would not be here without you guys
+
+185
+00:17:58,300 --> 00:18:03,175
+非常感谢你们持续的支持，如果你们想直接了解我们当前进度的话
+say thank you so much for your continuous support, if you want to jump ahead and see what we're kind of up to
+
+186
+00:18:03,175 --> 00:18:11,025
+因为已经实现了渲染器，已经有了渲染命令提示，已经有了ImGui Docking
+because there's already a renderer implemented, there's already like a render command cue, there's already a that ImGui Docking stuff 
+
+187
+00:18:12,025 --> 00:18:17,125
+那个ImGui可以像视口一样拖入，可以将其拖出不同的窗口
+and that ImGui to be able to drag in like it's called viewport, being able to drag it outside into different windows 
+
+188
+00:18:17,125 --> 00:18:20,333
+所有这些代码都已经在Hazel开发分支了
+and all of that stuff that stuff is already in the Hazel development branch
+
+189
+00:18:20,333 --> 00:18:25,600
+因此，如果你们现在想查看该代码，只需帮助支持patreon上的系列即可
+so if you want to take a look at that code right now, you can just by helping to support the series on patreon
+
+190
+00:18:27,933 --> 00:18:33,125
+是的，所以下期我们来看看这个ImGui的东西，可能不会太多工作
+yeah, so next time we're gonna take a look at this ImGui thing, it's gonna be probably not too much work
+
+191
+00:18:33,125 --> 00:18:38,266
+但这很有趣，因为我们有点回到了我们的方法，支持
+but it's interesting, because we're kind of going back a little bit on our approach in favor of something that is
+
+192
+00:18:38,266 --> 00:18:41,675
+在我看来，从长远来看，更像是更强更好
+in my opinion a bit more like just stronger and better in the long run
+
+193
+00:18:42,666 --> 00:18:47,366
+我想那只是通过减少实际ImGui开发中的分歧
+and that's just by reducing divergence I guess from the actual ImGui development
+
+194
+00:18:47,366 --> 00:18:52,325
+我们不想花太多时间来改变和适配Hazel
+which we don't want to spend too much time changing and adapting to work with Hazel
+
+195
+00:18:52,325 --> 00:19:00,100
+我们只是想能够把它拖放到Hazel上，然后就运行，对吧，因为那就是ImGui让我们做的
+we just want to be able to kind of you know drag and drop it into Hazel, and then just run, right, because that's kind of what ImGui like lets us do
+
+196
+00:19:00,100 --> 00:19:04,950
+如果我们以某种方式进行设置，那么我想利用那一点，下期我们将对此进行更多讨论
+if we set it up in a certain way, so I want to take advantage of that, and we'll talk a lot more about that next time
+
+197
+00:19:04,950 --> 00:19:10,925
+所以我们现在谈论这期视频不会让它变长，希望你们喜欢这期视频，下次再见
+so we're kind of won't make this video longer by talking about it now, hope you guys enjoy the video, I will see you next time, goodbye
+

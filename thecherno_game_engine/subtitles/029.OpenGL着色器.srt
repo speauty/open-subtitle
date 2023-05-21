@@ -1,0 +1,1960 @@
+﻿1
+00:00:08,050 --> 00:00:13,425
+嘿，你们好，我是TheCherno，欢迎回到我的游戏引擎系列，上期绘制了第一个三角形
+hey, what's up guys, my name is TheCherno, welcome back to my game engine series, so last time we drew our first triangle
+
+2
+00:00:13,425 --> 00:00:20,058
+如果你们还没看过，一定要看看那期视频，今天要讨论着色器，你们不知道着色器是什么
+definitely check out that video, if you haven't already, and today we're gonna talk about shaders, you guys don't know what shaders are
+
+3
+00:00:20,250 --> 00:00:27,900
+我建议你们看看我的OpenGL系列，那是一个关于OpenGL的系列，特别关注它的图形部分
+I would recommend that you check out my OpenGL series, it's a series all about OpenGL, and specifically focus on the graphics part of it
+
+4
+00:00:28,366 --> 00:00:32,475
+这个系列实际上还在继续，我没有停止它
+and it is a series that is still actually going on, I haven't stopped it
+
+5
+00:00:32,475 --> 00:00:35,300
+我只是暂停了这部分内容，专注于游戏引擎系列
+I've just kind of put it on pause to focus on the game engine series
+
+6
+00:00:35,850 --> 00:00:41,450
+但随着游戏系列越来越多地涉及到图形，就像现在这样，我将重新开始那个系列
+but as the game into series kind of gets more into graphics as it is right now, I'm gonna start up that series again
+
+7
+00:00:42,775 --> 00:00:48,850
+我们会重新开始那个系列，实际上会更深入地讲解之类的
+gonna start up that series again, and actually deal with more of the kind of in depth explanations and stuff like that
+
+8
+00:00:49,133 --> 00:00:54,800
+特别是图形，因为我意识到不是每个人都痴迷于图形，这是一个游戏引擎系列
+to do with graphics specifically, because I realized that not everyone is like obsessed with graphics, and this is a game engine series
+
+9
+00:00:54,850 --> 00:00:59,525
+所以一定要看看OpenGL系列中关于着色器的视频，实际上看看那整个系列吧
+so definitely check out the video on shaders in the OpenGL series, in fact check out that whole series
+
+10
+00:01:00,533 --> 00:01:05,250
+因为那个将教会你们所有关于图形的核心内容
+because that's really gonna teach you all the core kind of stuff about graphics specifically
+
+11
+00:01:05,600 --> 00:01:08,875
+我们仍然会讨论着色器是什么，因为每个人都需要知道着色器是什么
+we are still gonna discuss what shaders are though, because everyone needs to know what shaders are
+
+12
+00:01:08,875 --> 00:01:13,575
+不管你们是否在处理图形，或者是游戏引擎开发者，都需要理解着色器是什么
+doesn't matter if you're dealing with graphics or not, if you're a game engine developer, you need to understand what shaders are
+
+13
+00:01:13,575 --> 00:01:18,075
+因为它们非常重要，如果没有着色器，你们在屏幕上根本看不到任何东西
+because they're incredibly important, without shaders, you really wouldn't see anything on the screen at all
+
+14
+00:01:18,475 --> 00:01:23,266
+我的意思是，即使你们只是一个游戏引擎开发者，试着调试事件，然后我不知道
+so I mean  even if you're just a game engine developer, tryna debug events, and then I don't know
+
+15
+00:01:23,266 --> 00:01:27,666
+如果屏幕上的某些东西出了问题，或者某些东西不能正常运行，或者你们得到一个错误
+if something goes wrong with something that's on the screen, or something's not working correctly, or you get an error
+
+16
+00:01:27,900 --> 00:01:33,700
+或者着色器编译失败什么的，你们应该能够修复它，所以我们一定会讨论着色器是什么
+or a shader compilation failure or something, you should be able to fix that, so we are definitely going to talk about what shaders are
+
+17
+00:01:33,700 --> 00:01:37,875
+今天我们将为Hazel引擎编写着色器
+and we're actually going to write after us shaders for the Hazel engine right now today
+
+18
+00:01:37,875 --> 00:01:42,708
+但首先我要非常感谢所有的赞助人，是他们让这个系列得以播出
+but first I want to give a huge thank you to all the patrons that made this series possible
+
+19
+00:01:43,000 --> 00:01:47,725
+patreon.com/thecherno是那个链接，如果访问的话，你们就可以帮助支持这个系列
+patreon.com/thecherno is that link, if you go over there, you can help support this series
+
+20
+00:01:48,450 --> 00:01:53,750
+你们会得到非常酷的奖励，比如进入私人频道，在那里我会讨论我下一步要做什么
+you'll get really cool rewards such as access to private channels, where I kind of discuss what I'm going to do next
+
+21
+00:01:53,975 --> 00:02:00,100
+你们还可以访问Hazel开发库，里面包含了我为Hazel写的所有代码
+and you'll also get access to the Hazel development repository, which contains all the code that I've actually written for Hazel
+
+22
+00:02:00,100 --> 00:02:06,612
+但还没有制作成视频，所以我通常会在业余时间做Hazel的工作
+but haven't actually put into videos yet, so what I typically tend to do is I actually work on Hazel in my spare time
+
+23
+00:02:06,966 --> 00:02:13,299
+我像开发引擎一样开发它，然后从中提取代码，那就是我最终教的内容
+I kind of develop it as I would an engine, and then I take kind of code from that, and that's what I actually end up teaching
+
+24
+00:02:13,299 --> 00:02:18,250
+所以这就像一个Sandbox让我玩，但也有点计划引擎设计和架构所有这些
+so it's like a Sandbox for me to play around with, but also kind of plan the engine design and architecture all of that
+
+25
+00:02:18,700 --> 00:02:23,966
+里面有一些很酷的东西，我不想说谎，我的意思是，比在这里看到的要先进得多
+and it's got some pretty cool stuff, and I'm not gonna lie, like I mean, you know, it's a lot more advanced than what you see here
+
+26
+00:02:23,966 --> 00:02:29,400
+事实上，你们知道我一直在说的，就像一期接一期的，你们什么都没看到
+in fact you know what I've been saying that for like episodes and episodes, you guys aren't seeing anything
+
+27
+00:02:29,400 --> 00:02:34,700
+为什么我不向你们展示一下Hazel开发库中有什么，让我们直接看一看，好吧，看看这个
+why don't I just show you what is in that Hazel development repository, let's just jump in and take a look, alright, so check this out
+
+28
+00:02:34,700 --> 00:02:40,550
+这是目前的Hazel引擎，因为它出现在Hazel开发存储库中，赞助人可以访问它
+this is currently the Hazel engine, as it appears in the Hazel development repository, which patrons get access to
+
+29
+00:02:41,050 --> 00:02:47,600
+所以现在这是我刚刚整合的某种PBR演示，它绝不是完美的，我还在努力
+so this right now is some kind of PBR demo that I've just put together, it's by no means perfect, I'm still working on it
+
+30
+00:02:47,600 --> 00:02:52,750
+它有点不错，不过在这里，我们有一堆粗糙度不同的球，底部是金属
+it's a little pretty good, though here, we have a bunch of balls with just varying roughness, and the bottoms are metals
+
+31
+00:02:52,866 --> 00:02:58,325
+上面是电介质，基本上是塑料或任何非金属材料，你们可以看到我们有一个立方体图
+the top are dielectric, which are basically plastics or any kind of non metal material, you can see we've got a cube map
+
+32
+00:02:58,375 --> 00:03:03,475
+我们甚至可以旋转它，你们可以看到，环境贴图显示出来了
+which we can even kind of rotate, and you can see that, that environment map is showing up
+
+33
+00:03:03,900 --> 00:03:12,375
+在不那么粗糙的表面上，就像他们现在做的，我是说我做了一些事情，我不打算讨论太多
+on the kind of less rough surfaces here as they would currently the, I mean I've done a few things, I'm not gonna discuss this too much
+
+34
+00:03:12,375 --> 00:03:18,975
+但目前你们可以看到，反射并不是100%平滑，这只是因为我依赖于一个小技巧
+but currently you can see that the reflection isn't 100% smooth, that's just because I'm relying on like a bit of a trick
+
+35
+00:03:18,975 --> 00:03:25,300
+它只是在使用OpenGL动态生成立方体映射mips，而不是正确地预先过滤它们
+which is just kind of generating the cube map mips on the fly just using OpenGL, instead of actually pre filtering them properly
+
+36
+00:03:25,300 --> 00:03:30,475
+如果我马上启用那个，你们会看到它看起来好多了，但它的运行速度大概是每秒一帧
+if I turn that on for a second, you'll see that it looks a lot nicer, but it runs at like one frame per second
+
+37
+00:03:32,350 --> 00:03:39,966
+因为那应该是在实时完成的，然后不是按像素完成的，事实上，如果我们看一下模型视图
+because that's supposed to be done on flying, and then like not done actually per pixel anyway, and in fact if we take a look at the model view
+
+38
+00:03:39,966 --> 00:03:45,333
+我们甚至可以加载一个模型，这个模型只是通过，我会把这个链接留在下面的描述中
+we can even load a model, this model is just is by, I'll leave the link to this kind of in the description below
+
+39
+00:03:45,333 --> 00:03:53,375
+如果你们感兴趣的话，可以去看看，但如果我们可以在这里加载任何想要的网格和纹理
+if you guys are interested, to check it out, but if we you can actually load any mesh you want here, as well as any texture you want
+
+40
+00:03:53,666 --> 00:03:57,975
+如果我从这里导航到实际的纹理，我可以在这里加载反照率纹理
+so if I kind of navigate to the actual textures from this, I can load the albedo texture here
+
+41
+00:03:58,066 --> 00:04:03,927
+你们可以看到这是它的样子，我可以使用它，加载法线纹理，加载金属质感纹理
+you can see that's what it looks like, I can use that, I can load the normals texture, I can load a metalness texture
+
+42
+00:04:04,200 --> 00:04:15,000
+我可以加载一个粗糙度纹理，如果我使用所有这些，你可以看到我这里有一个非常漂亮的枪
+and I can load a roughness texture, if I just use all of those, you can see that what I have here is quite a nice looking gun
+
+43
+00:04:15,366 --> 00:04:22,250
+就像你们在这里看到的立方体地图的所有反射，是的，基本上你们可以看到，我的意思是
+which has like all the reflections as you can see of the kind of cube map over here, and yeah basically you can see that like I mean
+
+44
+00:04:22,250 --> 00:04:29,546
+Hazel开发库非常酷，你们在屏幕上看到的正是这个系列的发展方向
+the Hazel development repositories pretty cool, this what you see right here on the screen is exactly where this series is headed
+
+45
+00:04:29,933 --> 00:04:34,725
+有些人可能会想，我们在8个月后画出了第一个三角形，这要花多长时间
+so for those of you who are like, oh you know, we drew our first triangle after like 8 months, how long this is gonna take
+
+46
+00:04:35,000 --> 00:04:37,725
+我们会在今年把它搬上屏幕，肯定会在今年年底
+we're gonna have this on the screen by the year, by the end of the year for sure
+
+47
+00:04:38,800 --> 00:04:44,573
+但重要的是要知道，在最初的8个月里，我所做的很多事情都是为了让这些东西变得非常简单
+but it's just important to know that a lot of the stuff that I did in the first 8 months was to make stuff like this, really easy
+
+48
+00:04:44,866 --> 00:04:51,400
+我们讲过的所有东西，比如事件系统层的设置，比如DLL和静态库的设置，所有这些东西
+all the stuff that we covered like event systems layers setting up, like dll and static libraries properly, all of that stuff
+
+49
+00:04:51,400 --> 00:04:57,900
+数学库，那东西很重要，这样你们就能更有效率地完成这个
+the maths library, that stuff is important, so that you can just like do this effectively
+
+50
+00:04:57,900 --> 00:05:04,450
+我大概花了2到3天的时间才把这个东西准备好，因为一切都准备好了，ImGui也准备好了
+this took me, I think about 2 or 3 days to get this whole thing up and running, because everything was just ready, ImGui was ready
+
+51
+00:05:04,866 --> 00:05:10,575
+所有的数学库都准备好了，一切都准备好了，事件准备好了，一切都准备好了，准备好了
+all the math libraries were ready, just everything was just set up, events were ready, everything was set up and ready to kind of go
+
+52
+00:05:11,500 --> 00:05:18,150
+让这类事情变得非常非常简单，让我看看我能不能在这里得到一些漂亮的灯光
+which made this kind of thing really really simple, let me see if I can get like some nice lighting here
+
+53
+00:05:18,866 --> 00:05:23,125
+是的，你们可以看到，它看起来很酷，如果你们想访问这个代码
+so yeah you can see that I mean it looks pretty cool, if you want access to this code's trail
+
+54
+00:05:23,125 --> 00:05:28,950
+就像现在，你们可以在patreon.com/thecherno上帮助支持这个系列，就可以直接获取这个
+like right now you can just help support the stories on patreon.com/thecherno, and you can just literally just grab this
+
+55
+00:05:28,950 --> 00:05:33,475
+看看所有的代码，所有的着色器，玩它，做任何你们想做的，就像那样
+look at all the code, look at all the shaders, play around with it, do whatever you want, just like that
+
+56
+00:05:33,600 --> 00:05:38,075
+事实上，我们先回到球体上，球体也会显示出这些纹理
+in fact we just go back to the spheres for a second, the spheres in fact will show these textures as well
+
+57
+00:05:38,600 --> 00:05:43,950
+你们可以看到这看起来很酷，如果我去掉法线和金属贴图，我将保留金属贴图
+and you can see that that does look pretty cool, if I just get rid of the normals and maybe the metalness, I'll keep the metalness
+
+58
+00:05:44,725 --> 00:05:52,075
+可以看到这里的某些步骤看起来是多么的粗糙，我的意思是尽管它在地图上特别粗糙
+you can see how nice and like rough certain steps does look here, I mean although it is this particular rough in his map
+
+59
+00:05:53,075 --> 00:06:00,675
+不管怎样，它甚至像全HDR一样，所以你们可以在这里过度曝光，然后把它调低
+anyway oh, and it's even like full HDR as well, so there's exposure you can kind of like overexpose here, and then dial it down
+
+60
+00:06:00,675 --> 00:06:08,025
+你们可以看到它都是HDR，这很酷，所以我们继续，最后也许让我们改变光照辐射率
+you can see it's all kind of HDR, which is pretty cool, so there we go, and finally maybe let's just change the light radiance
+
+61
+00:06:08,666 --> 00:06:18,575
+去掉这些东西，你们可以看到在所有的灯光下，它是如何运行的，那里太亮了
+get rid of this stuff, and you can kind of see how that works as well with all of the lighting, it's way too bright there
+
+62
+00:06:20,133 --> 00:06:28,375
+让我们把它放在这里，很好，那就是了不起的Hazel开发分支
+and let's maybe get that somewhere here, cool alright, so that is the awesome Hazel development branch
+
+63
+00:06:28,375 --> 00:06:34,200
+那就是对你们所有人的预览，观看这个系列，关于我们的整个图形组件的方向
+that's a preview for all of you guys, watching this series, as to where we're heading with this whole graphics component
+
+64
+00:06:34,733 --> 00:06:39,825
+这将会非常酷，所以我真的很期待在未来做所有这些事情，对吧，酷
+it's gonna be pretty cool, so I'm really looking forward to doing all of this stuff in the future, right, cool
+
+65
+00:06:39,933 --> 00:06:43,354
+总之，回到着色器，因为没有着色器，不理解着色器的原理
+so anyway, back to shaders, because without shaders, without understanding how shaders work
+
+66
+00:06:43,354 --> 00:06:47,825
+我们就不能实现你们在屏幕上看到的任何东西，因为着色器非常重要
+we can't do anything that you just saw on the screen, because shaders are extremely important
+
+67
+00:06:47,825 --> 00:06:51,899
+因为它们实际上做的，它就是在显卡上运行的程序
+because what they actually do is their programs that run on the graphics card
+
+68
+00:06:51,899 --> 00:06:59,999
+告诉显卡如何处理我们发送给它的数据，所以整体理解图形管道非常重要
+which tell the graphics card what to do with the data that we actually send it, so it's really important to understand the graphics pipeline as a whole
+
+69
+00:06:59,999 --> 00:07:04,125
+我真的很想做一期关于图形管道的视频，以及如何渲染图形
+I actually really want to make a video about the graphics pipeline, and about how graphics that render
+
+70
+00:07:04,125 --> 00:07:10,825
+它可能是OpenGL系列的一部分，所以请密切关注，如果还没有订阅，这会是个很好的时间
+it probably is part of the OpenGL series, so keep an eye out for that, this would be a good time to subscribe, if you haven't already
+
+71
+00:07:11,900 --> 00:07:17,675
+我们会讲到它的原理，特别是在典型的渲染场景中会发生什么
+we're going to cover kind of how that works, but specifically what happens usually in a typical rendering scenario
+
+72
+00:07:17,675 --> 00:07:23,050
+我们把一堆数据以顶点缓冲区和索引缓冲区的形式发送给GPU
+is we send a bunch of data to the GPU in the form of like a vertex buffer and index buffer
+
+73
+00:07:23,366 --> 00:07:26,950
+你们知道某些着色器参数，着色器统一变量之类的东西
+you know certain shader parameters, shader uniforms that kind of thing
+
+74
+00:07:27,725 --> 00:07:33,750
+然后我们需要做的是把数据放到GPU上，然后处理它
+and then what we need to do is actually kind of get that data on the GPU and then process it
+
+75
+00:07:34,133 --> 00:07:39,302
+那主要是通过着色器完成的，具体来说是两种不同类型的着色器
+and the way that that's done primarily is through shaders, and specifically 2 different types of shaders
+
+76
+00:07:39,733 --> 00:07:46,425
+有很多不同类型的着色器，但有两种类型的着色器，它们比其他着色器使用得更多
+so there are a lot of different types of shaders, but there are 2 types of shaders, which are used more than like any other shaders
+
+77
+00:07:46,425 --> 00:07:52,700
+那就是顶点着色器，和片段着色器，在其他渲染器接口中也称为像素着色器
+and that is the vertex shader and the fragment shader, which is also known as the pixel shader in other renderer apis
+
+78
+00:07:52,775 --> 00:07:58,425
+OpenGL称它为片段着色器，这是有原因的，但在DirectX中
+OpenGL calls it the fragment shader, there are reasons for that, but in DirectX and then like
+
+79
+00:07:59,450 --> 00:08:05,700
+你们知道的，大多数其他类型的接口，比如控制台接口之类的，它被称为像素着色器
+you know most other kind of apis like the you know console apis stuff like that, it's known as a pixel shader
+
+80
+00:08:06,475 --> 00:08:12,525
+如果我们把它分解一下，那就意味着顶点着色器是一段运行在GPU上的代码
+which basically if we're going to break that down, what that means is that a vertex shader is a piece of code that runs on the GPU
+
+81
+00:08:12,866 --> 00:08:20,950
+对于我们决定渲染的每个顶点，顶点只是3D空间中的一个位置，当我们上期渲染三角形时
+for every vertex that we decide to render, so a vertex is just a position in 3D space, when we rendered the triangle last episode
+
+82
+00:08:20,950 --> 00:08:25,950
+我们定义了3个顶点，对，我们有三角形的顶部，左边的边和右边的边
+we defined 3 vertices, right, we had the top of the triangle, left kind of side the right side
+
+83
+00:08:25,950 --> 00:08:31,325
+我们就把这3个顶点发送给GPU，我们执行一个叫做DrawCAll的指令
+and what happened is we sent those 3 vertices to the GPU, we executed something called a DrawCall
+
+84
+00:08:31,600 --> 00:08:40,325
+也就是绘制这三个顶点，对吧，然后OpenGL实际上做的是在顶点着色器中处理这三个顶点
+in which we said draw these 3 vertices, right, and then what OpenGL actually did was it processed those 3 vertices in the vertex shader
+
+85
+00:08:40,466 --> 00:08:46,125
+那么顶点着色器在每个顶点上运行一次，所以实际上顶点着色器运行了3次，对吧
+so the vertex shader runs once per vertex, so effectively the vertex shader runs 3 times, right
+
+86
+00:08:46,466 --> 00:08:53,600
+顶点着色器负责找出那些顶点在裁剪空间中的位置，所以我们已经准备好了
+and the vertex shader is responsible for actually figuring out the position of those vertices in clip space, so we kind of were already
+
+87
+00:08:53,600 --> 00:08:57,225
+上次我们没有分享，对吧，所以我们已经有裁剪空间了
+we didn't have a share to last time, right, so we were kind of already in clip space
+
+88
+00:08:57,225 --> 00:09:03,760
+这意味着我们的坐标系在所有轴上都在-1到1之间，上期已经讨论过那个了
+which meant that our coordinate system was between -1 and 1 on all axes, and last episode we kind of discussed that
+
+89
+00:09:04,133 --> 00:09:10,777
+通常顶点着色器负责翻译我们有的任何东西
+so usually the vertex shader is responsible for actually translating any kind of thing that we have
+
+90
+00:09:10,900 --> 00:09:17,625
+任何我们在-1:1空间中的顶点数据，都是顶点着色器的有效输出
+any kind of vertex data that we have into that kind of -1:1 space, that's effectively the output of the vertex shader
+
+91
+00:09:17,625 --> 00:09:22,200
+我们需要告诉OpenGL，嘿，这是我的顶点数据，我要处理它
+we need to tell OpenGL, hey this is my vertex data, I'm going to process it
+
+92
+00:09:22,200 --> 00:09:28,100
+通常是将它与模型视图投影矩阵相乘，把它放到那个裁剪空间([-1, 1])
+usually by multiplying it with like a model view projection matrix to get it into that -1:1 space
+
+93
+00:09:28,100 --> 00:09:32,950
+当然我们以后会讲到那个，在OpenGL系列中，我相信已经讲过了，所以一定要去看看
+and of course we'll cover that in the future, and the OpenGL stories, I believe has already covered that, so definitely check that out
+
+94
+00:09:33,933 --> 00:09:41,775
+然后我们在管道上移动，最终到达片段着色器，片段着色器按像素运行
+and then we move on the pipeline, eventually getting to the fragment shader, and the fragment shader runs per pixel
+
+95
+00:09:42,375 --> 00:09:49,466
+对吧，顶点着色器针对每个顶点，意味着运行3次，现在片段着色器需要填充那个三角形
+okay, so the vertex shader per vertex, which means it runs 3 times, now the fragment shader needs to fill in that triangle
+
+96
+00:09:49,466 --> 00:09:56,325
+它需要着色那个三角形，那就是像素着色器的关键，它就被称为像素着色器或片段着色器
+it needs to shader that triangle, that's the point of the pixel shader, right, it's called the pixel shader or fragment shader
+
+97
+00:09:56,325 --> 00:10:03,975
+因为它是按像素或片段运行的，所以它会做什么，输出是什么，它计算出了
+because it runs per pixel or per fragment, right, so what it does and what the output of that is is, it figures out
+
+98
+00:10:04,125 --> 00:10:09,275
+那个像素实际需要的颜色，所以它为OpenGL需要着色的每个像素运行
+what color that pixel actually needs to be, so it runs for every pixel that OpenGL needs to shader
+
+99
+00:10:09,566 --> 00:10:16,050
+显然，取决于电脑屏幕上三角形的大小，那就意味着它会运行很多次，对吧
+so obviously depending on how big triangle is on your computer screen, that means that's how many times it will run, right
+
+100
+00:10:16,050 --> 00:10:21,475
+如果它是一个很小的三角形，可能只会运行几次，如果它很大，可能会运行100万次，对吧
+so if it's really small triangle, probably run like just a handful of times, if it's huge, it might run like 1,000,000 times, right
+
+101
+00:10:23,050 --> 00:10:30,001
+你们需要用一种特殊的颜色来着色那个三角形，所以我们今天要做的是渲染一个红色三角形
+and you need to shader that triangle in a particular color, so what we're going to do today is we're going to make a red triangle
+
+102
+00:10:30,300 --> 00:10:35,553
+我们会告诉OpenGL，嘿，我想让你把这些顶点位置放到这个特定的地方
+so we're going to tell OpenGL that, hey, I want you to put these vertex positions into this particular place
+
+103
+00:10:35,850 --> 00:10:43,921
+我想让你把每个像素都着色成红色或类似的颜色，现在你们在这里看到的Hazel开发分支
+and I want you to shader every pixel red or something like that, right, now what you saw here in the kind of Hazel development branch
+
+104
+00:10:44,226 --> 00:10:50,000
+显然，那不仅仅是在纯色上着色，它还做了一大堆的光照计算
+obviously that was doing a lot more than just shading at the solid color, it was doing a whole bunch of lighting calculations
+
+105
+00:10:50,000 --> 00:10:55,900
+一大堆像采样的东西叫做立方体地图，这基本上是我们所处的环境
+a whole bunch of like sampling something called a CubeMap, which is basically the environment that we're in to kind of
+
+106
+00:10:56,150 --> 00:11:00,900
+因为那实际上是通过基于图像的光照来影响光照的
+because that actually influences the lighting via something called image based lighting
+
+107
+00:11:01,266 --> 00:11:06,425
+它做了一大堆操作和纹理查找，所有都试图找出那个光照
+it does a whole bunch of operations and texture look ups, and everything actually try and figure that out
+
+108
+00:11:06,425 --> 00:11:10,533
+它是按像素实现的，大部分的光照都是在实际的像素着色器中完成的
+and it does that per pixel, most of that lighting stuff is done in the actual pixel shader
+
+109
+00:11:10,533 --> 00:11:14,525
+事实上，在顶点着色器中做的事情很少，大部分的顶点着色器
+in fact there's very little stuff that's actually done in the vertex shader, most of the vertex shader
+
+110
+00:11:14,525 --> 00:11:21,250
+顶点着色器做的大部分事情实际上是发送数据到片段着色器，并插值它和做些其他的
+most of what the vertex shader does is actually send stuff to that fragment shader, and interpolates it and does a bunch of other stuff
+
+111
+00:11:21,250 --> 00:11:24,600
+对吧，那也是我们在这里要讨论的
+right, and that's what we'll kind of talk about here as well
+
+112
+00:11:24,600 --> 00:11:29,554
+因为我们能做的另一件事就是从顶点着色器传递数据到片段着色器
+because another thing we can do is we can actually pass data from the vertex shader to the fragment shader
+
+113
+00:11:29,975 --> 00:11:35,100
+不管怎样，如果没有图表，如果不去看图形管道，这些是很难理解的
+um anyway, this is all kind of very hard to understand without diagrams and without actually looking at the graphics pipeline
+
+114
+00:11:35,100 --> 00:11:40,525
+我不想在那上面花太多时间，你们所需要知道的就是告诉GPU，如何处理我们发送的数据
+so I don't want to spend too much on that, all you need to know is that we need to tell the GPU, what to do with data we send it
+
+115
+00:11:40,875 --> 00:11:45,300
+顶点着色器告诉它如何处理它接收到的顶点数据
+vertex shader tells it what to do with the vertex data that it receives specifically
+
+116
+00:11:45,750 --> 00:11:53,375
+它的主要作用就是指出在裁剪空间的窗口中顶点实际位于哪里
+its primary responsibility is to point out where in that window in our clip space do the vertices actually lie in
+
+117
+00:11:53,625 --> 00:12:01,575
+对吧，它做那个转换，然后像素着色器或者片段着色器直接从。。。获取数据，对吧
+right, so it does that transformation, and then the pixel shader or the fragment shader takes in that data right from
+
+118
+00:12:02,000 --> 00:12:08,050
+通常你们会给它来自实际顶点着色器的数据，它会找出所有像素需要的颜色
+usually you would give it data from the actual vertex shader, right, and it figures out what color everything needs to be
+
+119
+00:12:09,400 --> 00:12:14,600
+当我们在OpenGL系列中深入更高级的着色器时，我可能不会在游戏引擎系列中这么做
+when we dive into more advanced kind of shaders in the OpenGL series, I'm not going to do it in the game engine series probably
+
+120
+00:12:14,600 --> 00:12:21,100
+但当我们深入到OpenGL系列中更高级的东西时，我可能会在下周继续讲，或者下下周
+but when we dive into more advanced things in the OpenGL series, which I actually might move on to next week or the week after
+
+121
+00:12:22,100 --> 00:12:26,066
+我们后面会讨论各种光照算法，以及所有数据是如何汇集在一起的
+we're actually going to talk about various lighting algorithms, and how all the data kind of comes together
+
+122
+00:12:26,066 --> 00:12:30,275
+那将会非常有趣，因为我喜欢图形，我知道你们很多人也喜欢
+and that's going to be a lot of fun, because I love graphics, and I know that a lot of you guys do as well
+
+123
+00:12:30,600 --> 00:12:36,875
+但主要的作用就是确定它当前处理的像素需要是什么颜色
+but the primary responsibility there is just determining what color the pixel that it's processing currently needs to be
+
+124
+00:12:37,325 --> 00:12:42,400
+好了，不论如何，那就深入看看着色器的原理吧，箭头着色器，看看能否把三角形变成红色
+alright, anyway; let's just dive in, take a look at how shaders work,  right, arrowing shaders, and see if we can get that triangle red
+
+125
+00:12:42,566 --> 00:12:47,650
+好了，那么如果你们点击这个链接，我会在下面的描述中放上这个链接
+okay, so if you check out this link here, which I will link in the description below
+
+126
+00:12:47,975 --> 00:12:55,650
+打开在khronos.org上的OpenGL维基页面，里面有一篇关于着色器编译的文章
+basically open the OpenGL wiki which is on khronos.org, it hasthis article about shader compilation
+
+127
+00:12:55,800 --> 00:12:59,900
+因为我们需要做的是编译这些着色器，它们只是常规程序
+because what we need to do is actually compile these shaders, they're just regular programs
+
+128
+00:12:59,900 --> 00:13:06,375
+它们是在OpenGL着色语言中指定的，而不是C++，但实际上，它就像一堆代码
+they're specified in this OpenGL shading language instead of C++, but effectively, it's just like a bunch of code
+
+129
+00:13:06,425 --> 00:13:10,775
+我们需要对代码做些什么，那就是需要编译它，把它变成某种程序
+and what do we need to do with code, we need to compile it and turn it into some kind of program
+
+130
+00:13:11,125 --> 00:13:17,500
+那就是这篇文章要告诉你们的，对吧，所以读这篇文章还是非常重要的
+so that's what thisarticle kind of just takes you through, right, so it's really important that you read this
+
+131
+00:13:17,975 --> 00:13:24,300
+你们也可以看看我OpenGL系列中关于着色器的视频，我想它也涵盖了很多内容
+you can also check out my OpenGL series video on shaders, I think that covers quite a lot of this as well
+
+132
+00:13:24,600 --> 00:13:28,566
+但我建议你们通读这篇文章，因为你们需要明白它是如何运行的
+but I would recommend that you read through this whole thing, because again you need to understand how it works
+
+133
+00:13:28,566 --> 00:13:33,125
+因为一旦出现问题，就很难找出问题出在哪里
+because when things go wrong, it's going to be a little bit hard to actually find out what the problem is
+
+134
+00:13:33,125 --> 00:13:39,500
+如果你们不知道自己在做什么，这里有一个完整的编译链接的例子关于顶点和片段着色器
+if you have no idea what you're doing, alright, anyway, there's a full compile link example of a vertex and fragment shader over here
+
+135
+00:13:39,866 --> 00:13:43,975
+我们只是照抄一下，完全没有必要自己写
+we're literally going to just copy this, there is absolutely no point in writing this out by yourself
+
+136
+00:13:44,550 --> 00:13:50,250
+我非常非常希望你们能通读这些代码，实际上我会在这期视频中解释它
+I really really hope that you will read through this code, in fact I'm going to explain it in this video
+
+137
+00:13:50,250 --> 00:13:54,906
+因为我不能只是粘贴一堆代码而不解释它，我认为那真的很愚蠢
+because I can't just paste a bunch of code and don't explain it, I think that's really stupid
+
+138
+00:13:55,866 --> 00:13:59,706
+但那段代码将编译一个顶点和片段着色器，你们真的不需要太多修改
+but that code will compile a vertex and fragment shader, you don't really need to modify it much
+
+139
+00:14:00,366 --> 00:14:06,425
+它会和我们的引擎保持一致，除了一些小的修改
+it will pretty much remain as is in our engine apart, maybe aside from like minor modifications
+
+140
+00:14:07,175 --> 00:14:14,375
+好了，那么这显然是OpenGL特定的代码，所以技术上讲，这应该在Platform/OpenGL目录
+okay, so this is clearly OpenGL specific code, so technically speaking, this should belong in Platform/OpenGL
+
+141
+00:14:14,700 --> 00:14:19,400
+但我想在未来做期视频，关于如何得到我们的平台的
+but I actually want to make a video, I think in the future about how we're actually got like what our platform
+
+142
+00:14:19,800 --> 00:14:22,900
+我们的渲染器接口抽象策略将是什么
+what our renderer api abstractions strategy is actually going to be
+
+143
+00:14:23,666 --> 00:14:29,325
+因为那是我们用于每个渲染接口特定类的模板，而不是渲染一个类
+because that's gonna be kind of the template we use for pretty much every render api specific class, not render a class
+
+144
+00:14:29,325 --> 00:14:36,025
+而是渲染接口特定的类，所以现在，先把它放到Hazel/Renderer，但那肯定会移动
+but render api specific class, so for now, we'll just stick it into Hazel renderer, but that's gonna definitely move
+
+145
+00:14:36,025 --> 00:14:41,538
+实际上我们叫它Shader，但它会移动到OpenGL特定的文件中
+and in fact we'll just call it shader, but again, that's going to move into an OpenGL specific file
+
+146
+00:14:41,800 --> 00:14:47,175
+它会被称为OpenGLShader，好吧，我们会把它插入Hazel命名空间
+which will be called something like OpenGLShader, right, okay, so we'll stick this into the Hazel namespace
+
+147
+00:14:48,300 --> 00:14:54,375
+就叫这个类为Shader，我们将有一个构造函数
+and I'll just call this class Shader, okay, we're going to have a constructor
+
+148
+00:14:56,200 --> 00:15:07,150
+现在我们将通过字符串引入着色器程序，所以我们有两个参数vertexSrc和fragmentSrc
+which for now we're just going to take the shader program in via just strings essentially, so we'll have our vertexSrc and our fragmentSrc
+
+149
+00:15:08,166 --> 00:15:12,975
+所以这些将是我们着色器的源代码，以后，我们会把它作为一个文件传入
+so these are going to be the source codes for our shaders, in the future, we're going to take this in as a file
+
+150
+00:15:13,733 --> 00:15:20,325
+但现在它会像这样存在，这里我们也会有一个普通的析构函数，而不是虚拟之类的
+but for now it's going to live like this, we're also just going to have a normal kind of destructor here, not like a virtual one or anything
+
+151
+00:15:21,025 --> 00:15:28,966
+在将来我们会在渲染接口的视频中讲到这个，但在将来我们想要有这个的子类
+in the future like we'll talk about this in the render API videos, but in the future we kind of want to have subclasses of this
+
+152
+00:15:28,966 --> 00:15:33,575
+本质上，那将在每个接口中实现，在那种情况下，我们将需要析构函数为虚函数
+essentially that will be implemented per API, and in that case, we would need to make the destructive virtual
+
+153
+00:15:34,566 --> 00:15:40,000
+所以我们有Bind和Unbind，Unbind不是必需的，我只用于调试目的
+so we have bind and unbind, unbind isn't really necessary, I only use it for debugging purposes
+
+154
+00:15:40,000 --> 00:15:44,775
+因为通常你们不会浪费时间去解绑定东西，只需要绑定下一个你们需要的东西
+because usually you don't waste time unbinding things, you just bind the next thing you need
+
+155
+00:15:45,766 --> 00:15:54,000
+但是，就把它保留在这里，用于调试，还会包含string，因为需要它，根据我们这里需要的
+but yeah we'll just keep it in here for kind of debug stuff, um and I'll also include string, because we need that, in terms of what we need here
+
+156
+00:15:54,325 --> 00:16:02,525
+我想我们唯一想保留的是着色器的Id
+I think really the only thing that we want to maybe keep is the actual like id of the shader
+
+157
+00:16:02,525 --> 00:16:09,350
+所以OpenGL通常给我们uint，有时只是普通的整型Id，我喜欢称它们为m_RendererId
+so OpenGL gives us unsigned int usually, sometimes just normal int id, and I like to call them m_RendererId
+
+158
+00:16:09,350 --> 00:16:14,625
+我想我可能以前做过，也许没有，所以这本质上就是一个唯一标识的数字
+I think I may have done this before maybe not, so what this is gonna be is essentially just a number that uniquely identifies
+
+159
+00:16:14,625 --> 00:16:21,750
+这个对象在OpenGL里面，这样我们就能引用它，那么接着创建个Shader.cpp文件
+this object kind of inside OpenGL, so that we can refer to it, okay, so we'll make a Shader.cpp file
+
+160
+00:16:24,066 --> 00:16:32,750
+我们会把它放在头文件旁边，当然，Shader.cpp会包含pch，也会包含Shader.h
+we'll just put it obviously next to the header file, of course shader.cpp will include our pch, we'll include our Shader.h file
+
+161
+00:16:32,750 --> 00:16:36,750
+我们会把它放到Hazel命名空间，我们会实现所有这些
+we'll put this into the Hazel namespace, and we'll implement all of these
+
+162
+00:16:36,925 --> 00:16:41,125
+如果我右键单击这里，我可以使用VisualAssists创建方法实现
+if I right click here, I can create the method implementations using VisualAssists
+
+163
+00:16:42,466 --> 00:16:51,518
+最后我们要做的是回到那个网站，复制那个代码，因为从那以后我做了很多复制
+and finally what we're going to do now is is go back to that website, copy that code, because I have done a lot of copying since then
+
+164
+00:16:52,775 --> 00:16:59,494
+把它粘贴到构造函数中，这将会很好很简单，那么继续，我们把它放到构造函数中
+and just paste it into the construct, it's going to be nice and simple, so here we go, past it into the constructor
+
+165
+00:16:59,733 --> 00:17:04,050
+当然，我们会修改一些这些东西，现在我要做的第一件事是包含glad
+and of course we'll modify some of this stuff, now first thing I'll do is include glad
+
+166
+00:17:04,050 --> 00:17:07,845
+因为我们需要访问传入的OpenGL顶点源(vertexSrc)片段源(fragmentSrc)
+because we need access to OpenGL vertex source fragment source we're already taking in
+
+167
+00:17:09,300 --> 00:17:21,400
+我可以完全去掉那个，稍微把这个(vertexSource)重命名为vertexSrc，至于fragmentSource
+I might just get rid of that entirely, and slightly rename this to just src, and fragment source
+
+168
+00:17:21,400 --> 00:17:25,933
+我还可以重命名为fragmentSrc，很好，除此之外
+I might as well rename to fragment source, okay, cool, and other than that
+
+169
+00:17:25,933 --> 00:17:30,550
+你们可以看到没有编译错误之类的，根据感觉，所以让我们一行一行地看下这段代码
+you can see we get no compile errros or anything according to Intel sense, so let's take a look at this code line by line
+
+170
+00:17:31,066 --> 00:17:37,650
+所以我们做的第一件事是创建着色器，你们会注意到，在OpenGL中做过的很多东西
+so the first thing we do is we actually create shader, you'll note that a lot of the stuff that we've been doing in OpenGL right now
+
+171
+00:17:37,650 --> 00:17:46,050
+如果看看Application.cpp，是gen，glGenBuffers，glGenVertexGrrays，这是更新的接口
+if we go to application, I think is like gen right, so glGenBuffers, glGenVertexGrrays, there's actually a bit of a newer api you know
+
+172
+00:17:46,050 --> 00:17:51,600
+我认为OpenGL 4.5甚至4.6，它实际上是glCreate而不是glGen
+I think OpenGL 4.5 or even 4.6, which is actually just glCreate instead of glGen
+
+173
+00:17:52,775 --> 00:17:59,675
+他们巩固了那个，使之更加一致，当我们创建这些类的时候，可能会切换到它
+they've kind of consolidated that, and made it a lot more consistent, we'll probably switch to it when we actually make these kind of classes
+
+174
+00:17:59,675 --> 00:18:06,075
+我想我们会切换到它，因为我不太想支持任何低于4.5版本的OpenGL
+I think we'll switch to it cause, I don't think I have much of a desire to support anything below, kind of OpenGL 4.5
+
+175
+00:18:07,566 --> 00:18:15,038
+但实际上，这种gen调用只会给我们分配唯一id
+but create gen will actually, this kind of gen call will only assign us with a unique id
+
+176
+00:18:15,300 --> 00:18:20,750
+它不会像GPU那样，在OpenGL中创建对象，它会得到creator
+it won't actually create the object in OpenGL like on our GPU, it actually gets creator
+
+177
+00:18:20,750 --> 00:18:27,425
+当我们第一次绑定特定目标时，比如GL_ARRAY_BUFFER，而creator实际上创建了所有东西
+when we do the binding for the first time with a particular target, like array buffer here, whereas creator actually creates everything
+
+178
+00:18:27,750 --> 00:18:32,394
+它实际上创建了所有东西，不只是给我们一个id，它实际上在GPU上创建了所有东西
+like actually it actually creates everything, doesn't just give us an id, it actually creates everything on our GPU
+
+179
+00:18:33,200 --> 00:18:40,050
+比如分配内存，做所有这些事情，然后验证对象，所以create就是用的这个而不是gen
+like allocates memories, does all of that stuff, and actually validates the object, so create is using this case instead of gen
+
+180
+00:18:40,266 --> 00:18:46,350
+现在你们大概知道了为什么所有东西最终会在后面被创建出来，就是那样
+now you kind of know why ultimately everything is going to be created in the future, it is now it's just that
+
+181
+00:18:46,350 --> 00:18:52,450
+如果你们看过很多OpenGL4.5版本之前的代码，它总是Gen和Bind，而不是create
+if you look at a lot of OpenGL code prior to like OpenGL 4.5, it's always gen and bind gen and Bind instead of just create
+
+182
+00:18:52,533 --> 00:18:59,250
+这是一种新的处理方法，我们在这里做的基本上就是得到这个源
+which is kind of the new way of doing things, what we're doing here is basically just getting this source
+
+183
+00:18:59,250 --> 00:19:07,825
+我们不需要将它强制转换为const GLchar，事实上，这就像这个c_str就是个const char类型
+we don't really need to cast this to a const GLchar, in fact this can just be like this c_str is a is a const char
+
+184
+00:19:08,733 --> 00:19:12,875
+我的意思是，如果你们看看GLchar是什么
+this this this is I mean, if you look at what GLchar is
+
+185
+00:19:13,366 --> 00:19:19,250
+他们喜欢使用他们自己的原语iri或者不喜欢这个，因为通常当我处理OpenGL时
+they like to use their own kind of primitives iri or don't really like this, just because usually when I'm dealing with OpenGL
+
+186
+00:19:19,250 --> 00:19:26,598
+我在写跨平台或者更确切说是交叉渲染接口之类的代码，我不只是使用独立接口实现引擎
+I'm writing cross platform or rather cross rendering api kind of code, I'm not just you know implementing an engine which with a single api
+
+187
+00:19:26,598 --> 00:19:33,875
+因此，我希望所有东西都一样，所以你们可以看到，这里我用的是uint32_t而不是GLuint
+and so because of that, I like to just have everything the same, so you can see over here, I used uint32_t instead of like GLuint
+
+188
+00:19:33,875 --> 00:19:37,900
+因为首先，为了得到GLuint，我必须在这里包含OpenGL头文件
+and because first of all, to get GLuint, and I'd have to include the OpenGL header here
+
+189
+00:19:38,333 --> 00:19:46,725
+还有为什么要用它，如果我知道它会是什么，我不想每次都用不同的类型
+but also why use it, if like I know what it's gonna be, and I don't want to kind of have a different thing every time
+
+190
+00:19:46,725 --> 00:19:54,733
+事实上，这可能最终会看起来像RendererID， RendererID被定义为一个uint32_t
+in fact this probably will end up looking something like RendererID with RendererID being defined as a uint32_t
+
+191
+00:19:55,700 --> 00:19:58,125
+但在这种情况下，你们可以看到他们在使用他们自己的东西，这很好
+but in this case, you can see they are using their own kind of stuff, which is fine
+
+192
+00:19:58,175 --> 00:20:05,350
+我们会让这段代码保持原样，不做太多操作，我认为这只是把源代码发送到OpenGL，对吧
+we're just going to leave this code out as is and not do too much to it, I think what this does is just sends our source code to OpenGL, right
+
+193
+00:20:05,700 --> 00:20:10,900
+我的意思是，注释甚至说它发送到我们已经生成的顶点着色器
+I mean the comment even says that sends it to our vertex shader which we've generated
+
+194
+00:20:10,900 --> 00:20:15,075
+这是顶点着色器的id，然后它会直接编译那个，对吧
+this is the id for our vertex shader, and then it just compiles that, right
+
+195
+00:20:16,333 --> 00:20:21,060
+这段代码的作用是检查编译是否成功
+and now what this code does is actually checks to see if the compilation succeeded or if it failed
+
+196
+00:20:21,500 --> 00:20:25,650
+那么如果这里这个GL_COMPILE_STATUS，我们会检查编译状态
+so if the compile status here, we're checking the compile status
+
+197
+00:20:25,650 --> 00:20:32,300
+我们从OpenGL中获取那种整数，我们把它保存在这里，如果那是假的
+we're getting that kind of integer from OpenGL, and we're saving it into here, if that is false
+
+198
+00:20:32,575 --> 00:20:38,812
+这意味着它没有编译成功，所以我们下一步要做的是找出它没有编译成功的原因
+it means that it didn't compile successfully, so what our next steps are is to figure out why it didn't compile successfully
+
+199
+00:20:39,200 --> 00:20:44,500
+所以我们在这里所做的是实际上得到了日志消息的长度，这说明了为什么它没有编译
+so what we do here is we actually get the length of the log message, which says why it didn't compile
+
+200
+00:20:44,600 --> 00:20:51,925
+这就给了我们一个长度，比如它有多少个字符，然后我们要做的就是把所有的信息推入
+so that just gives us a length like how many characters it is, and then what we're doing is we're shoving all of that information
+
+201
+00:20:52,100 --> 00:20:58,775
+OpenGL有一个日志，就像一个错误信息，它基本上就是说为什么我们的着色器不能编译
+so OpenGL has a log, which says why it's like an error message, which basically just says why our shader doesn't compile
+
+202
+00:20:59,000 --> 00:21:07,224
+我们得到它，把它推入这个向量，现在我相信我的OpenGL系列，我实际上分配了
+we're getting that, and we're shoving it into this vector, now I think I believe in my OpenGL series I actually allocated
+
+203
+00:21:07,500 --> 00:21:14,975
+所以我用allocate在栈上分配内存，我想它只是个GLchar或者像个char类型的数组
+so I used allocated to just allocate memory on the stack, and I think it was just a GLchar or like a just a char kind of array
+
+204
+00:21:15,533 --> 00:21:18,600
+你们可以在这里实现那个，他们做的只是一个动态分配的向量
+you can do that in here, they're doing a vector, which is dynamically allocated
+
+205
+00:21:18,600 --> 00:21:23,800
+但是在这里提供了最大长度，无论如何，我的观点是这不是最有效的解决方案，但并不重要
+but they are providing max length here, anyway, my point is it's not the most efficient solution, but it doesn't really matter
+
+206
+00:21:23,800 --> 00:21:31,025
+你们可能不会注意到这个，这只会发生在着色器编译失败时，在发行版构建中确实应该出现
+you probably won't notice this, this only happens when a shader compilation fails, which you know in distribution builds really should
+
+207
+00:21:31,025 --> 00:21:36,875
+无论如何，这段代码永远不会被触发，所以我不会在这段代码的编写上多说什么了
+this code should never ever get hit, anyway, so I'm not gonna be all like pedantic about how this is written
+
+208
+00:21:37,866 --> 00:21:42,150
+但实际上你们只需要知道那个日志，那是来自OpenGL的消息
+but effectively all you need to know is that log, that are a message from OpenGL
+
+209
+00:21:42,150 --> 00:21:48,475
+我们取它，把它放到这个GLchars的向量中，然后我们就删除着色器
+we take it, and we put it into this vector of GLchars, okay, and then we delete the shader of
+
+210
+00:21:48,475 --> 00:21:55,775
+因为我们不再需要它了，这种情况经常发生，我们分离它，不会在最后删除它
+because we don't need it anymore, this pretty much happens, anyway, well we detach it, we don't delete it at the end 
+
+211
+00:21:56,250 --> 00:22:02,575
+但你们知道这个没必要一直存在，因为显然这个特定的着色器，我们创建并编译过
+but you know there's no need for this to stay around, because obviously this particular shader, which we created and tried to compile
+
+212
+00:22:02,800 --> 00:22:08,767
+没有编译成功，所以去掉它，所以我们有了这个infoLog，那么我们需要做的就是
+didn't compile successfully, so get rid of it, so we have this infoLog, so what we need to do here
+
+213
+00:22:09,875 --> 00:22:21,311
+如果这个只是返回它，但我们要做的是写HZ，可能是CORE_ERROR，我们会像错误信息样
+if this is just returns it, but what we'll do is we'll just write HZ probably core error, we shall just be like our error message
+
+214
+00:22:21,466 --> 00:22:30,050
+所以我们可能会写一些东西，比如顶点着色器编译失败，然后我可能会做另一个错误
+so we might write something like vertex shader compilation failure, and then I might do another error
+
+215
+00:22:30,050 --> 00:22:38,566
+这实际上是我们的错误消息，我在这里写一下，应该怎么做，也许就是infoLog.data()
+which is actually going to be our error message, so I'll just write here, what should we do, probably just infoLog.data()
+
+216
+00:22:39,350 --> 00:22:44,733
+好了，和我写的一样，就是&infoLog[0]
+okay, same as writing I was going to write info log 0, like that with a memory address there
+
+217
+00:22:44,733 --> 00:22:50,250
+这给了我们第一个字符，显然这是一个字符指针，所以日志库知道该怎么处理它
+which just kind of gives us the first char, and then obviously it's a char pointer, so the logging library will know what to do with it
+
+218
+00:22:50,900 --> 00:22:56,775
+但我们也可以只写infoLog.data()，好吧，然后我想我可以断言，也就是HZ_CORE_ASSET
+but we can also just do infoLog.data(), okay, and then I think I'll asset okay, so HZ_CORE_ASSET
+
+219
+00:22:58,325 --> 00:23:07,675
+或者我可以把这个移到这里的断言中，我们在这里断言，显然设置为false
+or maybe I'll actually move this into the assert here, so we're just assert here, and obviously just a set false
+
+220
+00:23:07,825 --> 00:23:15,553
+好了，很好，那么继续，现在我们基本上记录了发生在我们的顶点着色器编译中的问题
+okay, cool, so there we go, now we basically are logging the problem, that has occurred in our vertex shader compilation
+
+221
+00:23:15,966 --> 00:23:21,325
+好了，接下来的事情是一样的，除了我们会用fragment替换vertex
+alright guess what the next thing is identical except we like find replace vertex with fragment
+
+222
+00:23:21,450 --> 00:23:26,800
+对吧，那么我们就创建个片段着色器，我们得到源，我们在这里重用源变量
+right, so we make a fragment shader, we get the source, we're actually reusing the source variable here
+
+223
+00:23:26,933 --> 00:23:35,075
+让我们清理一下，我们可以尝试，如果失败了，得到日志长度，就执行所有这些
+let's clean this up, we can pilot, we get the log length again if it failed, we do all of this stuff
+
+224
+00:23:35,825 --> 00:23:44,250
+这实际上把它们都删除了，因为那可能是个问题，因为我们已经删除了vertexShader
+this actually deletes both of them, because that might be a problem, because we've already deleted vertexShader in this case
+
+225
+00:23:44,250 --> 00:23:53,925
+我想我们可以在这里返回，因为如果我们的着色器编译失败了，不需要继续编译
+I guess we can probably return here, as we don't need to keep compiling, if if our shader failed to compile, right
+
+226
+00:23:54,575 --> 00:23:58,200
+在这种情况下，它删除了它们两个，因为即使顶点着色器运行了，但片段着色器还没有
+in this case it deletes both of them, because even if the vertex shader worked out, but the fragment shader didn't
+
+227
+00:23:58,200 --> 00:24:07,425
+比如它完全失败，删除所有东西，然后我们要做的是复制这些，把它放到这里，对吧
+we'd like it's to complete failure, anyway, delete everything, and then what we'll do here is we'll just grab this stuff, and pop it here, okay
+
+228
+00:24:09,200 --> 00:24:20,000
+除了我们显然会，对吧，片段着色器编译失败，好了，酷，那么现在它们已经成功编译了
+except we'll obviously, right, fragment shader compilation failure, okay, cool, so now now that they've been successfully compiled
+
+229
+00:24:20,125 --> 00:24:29,075
+所以我们指定的源代码显然是有效的，就用这个创建这个程序，这个程序，就像一个程序
+so that source code that we specified as obviously like valid, we take this create this program, and the program is just, it's like a program
+
+230
+00:24:29,125 --> 00:24:35,975
+它实际上是一个程序，它将是我们两个着色器的组合，我们可以在GPU上以某种形式运行
+it's literally a program, right, it's going to be the combination of both of our shaders in some kind of form that we can just run on the GPU
+
+231
+00:24:36,975 --> 00:24:42,766
+我们将着色器附加到程序中，因为程序由着色器组成，我们将程序链接起来，对吧
+we attach the shaders to our program, because the program consists of shaders, we link the program, right
+
+232
+00:24:42,766 --> 00:24:48,400
+它只是把这些着色器链接在一起，然后把东西弄出来，现在显然是编译阶段了
+which just kind of links those shaders together, and figures stuff out, and now obviously the compilation stage
+
+233
+00:24:48,400 --> 00:24:54,625
+我们知道成功了，但现在我们做链接，这个检查和编译做的完全一样
+we know succeededn but now we do the linking, okay, and this just checks exactly the same as what the compilation did
+
+234
+00:24:54,900 --> 00:25:01,775
+只不过它检查的是链接值而不是编译值，因此我们再次获得链接状态
+except it checks it for linking values instead of compilation values, so again we get the link status
+
+235
+00:25:01,775 --> 00:25:07,500
+如果链接状态为false，意味着链接失败，我们得到日志长度，我们得到日志数据
+if the link status is false, it means that the linking failed, we get the log length, we get the log data
+
+236
+00:25:07,875 --> 00:25:13,325
+我们把所有东西都删掉，这样就不会泄露你们的资源，然后把这个粘贴进去
+we delete everything, so that we don't leak in your resources, and then we'll just paste this in
+
+237
+00:25:13,900 --> 00:25:20,925
+那么我们会看到着色器链接失败，然后再次获取那个信息日志，并把它记录到控制台
+so we'll see shade the link failure, okay, and then we'll get that info log again, and log that to the console
+
+238
+00:25:21,200 --> 00:25:26,625
+最后我们分离所有东西，因为链接之后，我们就不需要它了，不需要实际的单个文件
+and then at the end we detach everything, because we don't need that after it's been linked, we don't need the actual individual files
+
+239
+00:25:26,625 --> 00:25:33,825
+我想这有点类似于我们编译CPP，如果我们有多个翻译单元，它们会生成obj文件
+this is kind of similar, I guess to how when we compile CPP, if we have multiple translation units, they generate obj files
+
+240
+00:25:34,050 --> 00:25:42,025
+我的意思是，即使我们有一个，它会用MSVC生成obj文件，这就像源代码中的目标文件
+I mean even if we have one, it generates an obj file using MSVC, which is like our kind of object file from our source code, right
+
+241
+00:25:43,025 --> 00:25:46,875
+但是当我们把它链接到exe文件后，我们就不再需要那些obj文件了
+but then after we've linked it into an exe file, we no longer need those obj files
+
+242
+00:25:47,175 --> 00:25:51,895
+就像那样，对吧，我们只是想分离所有东西，因为一旦被链接到程序中
+this is kind of like that, right, we just want to detach everything, because once I've been linked into a program
+
+243
+00:25:51,966 --> 00:26:01,000
+就是那样，对吧，在析构函数中，我们需要做的就是删除程序，glDeleteProgram
+that's that, and that's it, okay, in our destructor all we need to do is delete the program, glDeleteProgram
+
+244
+00:26:01,825 --> 00:26:10,575
+然后这就是，我在做什么，应该是RendererID，说到RendererID，实际上是把它传到程序
+and then this will be, what am I doing 0, RendererID, speaking of RendererID is actually instead of taking this into program
+
+245
+00:26:11,000 --> 00:26:18,566
+我们实际上应该做的是，对吧，m_RendererId，被glCreateProgram调用
+what we actually should do is oops is right m_RendererId called glCreateProgram
+
+246
+00:26:18,566 --> 00:26:26,850
+所以我们想把那个RendererID存储在一个成员变量中，这样就能在不同的函数中访问它
+so we want to actually store that renderer id in like as a member variable, so that we can then access it obviously in different functions
+
+247
+00:26:27,500 --> 00:26:30,975
+显然我们想要在这个构造函数的作用域之外
+and obviously we wanted to possess to outside the scope of just this constructor
+
+248
+00:26:32,350 --> 00:26:35,300
+很明显，你们可以看到这个程序，在这里的任何地方都在使用
+now obviously you can see the program is used everywhere here
+
+249
+00:26:35,666 --> 00:26:40,800
+所以我可能会做的是写，就是 GLuint program = m_RendererID
+so what I might just do is write as it was written, GLuint program equals m_RenderId
+
+250
+00:26:40,800 --> 00:26:47,666
+这样我们就不需要在这里到处粘贴m_RendererID，好了，酷，我们继续
+just so that just so that we don't need to paste m_RendererID everywhere here, okay, cool, there we go
+
+251
+00:26:47,666 --> 00:26:53,625
+显然它不会像这个值一样改变，这个变量不会在这里改变，所以这很好
+and obviously it's not gonna change like this value, this variable is not gonna change throughout here, so this is like totally fine
+
+252
+00:26:53,866 --> 00:27:00,950
+好了，酷，那么就删除程序，绑定很简单，只要调用glUseProgram，然后是m_RendererID
+okay, cool, so we delete the program, bounding it is as simple as just doing glUseProgram, and then m_RendererID
+
+253
+00:27:00,950 --> 00:27:08,775
+那么这是在用这个shader渲染之前所做的，然后对于Unbind，直接调用glBindProgram(0)
+so this is what we do before we want to render something with this shader, and then for unbind, we just do glBindProgram 0
+
+254
+00:27:09,366 --> 00:27:16,650
+好了，酷，那就是我们的Shader类，非常简单，现在让我们写个着色器，用它来渲染三角形
+okay, cool, that's our shader class, it's super simple, now let's actually write a shader, and render our triangle with it
+
+255
+00:27:16,766 --> 00:27:21,400
+所以如果我现在运行这段代码，我们会确保Shader类能够编译
+so if I just launched this code right now, we'll make sure that our shader class actually compiles
+
+256
+00:27:21,400 --> 00:27:24,775
+但我也想看看我们现在有什么，因为我们应该有一个白色的三角形
+but also I want to see what we have right now, because we should have a white triangle
+
+257
+00:27:25,375 --> 00:27:33,250
+你们可以看到，我们做得很好，让我们把它变成红色，所以我要做的是，我要
+you can see that we do wonderful, let's make that thing red, so what I'm going to do is I'm going to have to make
+
+258
+00:27:33,400 --> 00:27:39,950
+我将在Application.h中包含着色器，这显然是非常临时的Hazel/Renderer/Shader.h
+I'm going to include shader over here in application, this is obviously extremely temporary Hazel/Renderer/Shader
+
+259
+00:27:41,666 --> 00:27:51,625
+我们把它放在这里，放在另一种RendererID旁边，所以就是std:: unique_pointer
+we'll spoil down here, I'll put it over here next to our other kind of renderIds here, so I'll write std:: unique_pointer
+
+260
+00:27:52,200 --> 00:28:00,525
+这里就是Shader，把它命名成m_Shader，如果回到这，我会创建这个，可以有好几种方法
+this will be a Shader, I'll call this m_Shader, if I go back here, I'm going to create this, you can do this in a few ways
+
+261
+00:28:00,733 --> 00:28:10,200
+你们可以，比如std::make_unique，通常我喜欢reset，因为它显然代码更少
+you can do, you know std::make_unique for example, usually I like to do reset, just because it's obviously less code
+
+262
+00:28:10,200 --> 00:28:15,325
+你们可以看到，就是那样，如果使用共享指针，就没有必要设置唯一
+you can see that's it, there's no need to kind of make unique, if you're using shared pointers
+
+263
+00:28:15,325 --> 00:28:21,400
+你们通常应该使用make_shared，因为它还需要分配另一页内存用于引用计数
+you should usually kind of do make_shared, just because it needs to also allocate another book of memory for reference counting
+
+264
+00:28:22,000 --> 00:28:29,400
+但对于唯一指针，这并不重要，这里我要写new Shader，然后我们还需要一些源代码
+but with unique pointers, it doesn't really matter, so over here I'm actually going to write new shader, and then we need some source code
+
+265
+00:28:29,700 --> 00:28:36,916
+所以那就让我们写一些着色器的源代码，很多人非常讨厌用CPP写源代码
+so let's go ahead and actually write some shader source code, so a lot of people really hate writing a source code in CPP
+
+266
+00:28:36,916 --> 00:28:43,575
+比如字符串，因为很烦，但我会给你们展示个技巧让它变得更友好，有了顶点着色器源代码
+like as strings because it's just annoying, but I'll show you a little trick that makes it a lot better, so we have our vertex shader source code
+
+267
+00:28:44,133 --> 00:28:50,000
+我把它写成vertexSrc，我猜你们可以在这里做什么，有几种方法实现这个，对吧
+which I'll write as vertex as src, I guess what you could do here, there's several ways of doing this, right
+
+268
+00:28:50,400 --> 00:28:55,150
+第一种方法有点烦人，它只是意味着你们必须写，你们知道的，比如版本
+the first way is kind of annoying, and it just means that you have to write like you know version
+
+269
+00:28:55,150 --> 00:29:00,400
+比如你们用的是330 core，然后是\\{n}\{忘了制表符的方式\}，然后你们把所有东西都写出来
+like whatever you're using 330 core or whatever backslash n, and then you kind of write your whole thing out
+
+270
+00:29:01,225 --> 00:29:05,933
+通常这样做的方法是你们只需要换行，然后写些代码
+and usually the way that you do that is you'd kind of just make a new line, write some code
+
+271
+00:29:05,933 --> 00:29:13,375
+然后是反斜杠n，然后写一堆东西，写一堆东西，如果CPP看到多个字符串在一起
+and then you have your backslash n, and then write a bunch of stuff, and write a bunch of stuff, and if CPP sees multiple strings together
+
+272
+00:29:13,933 --> 00:29:20,075
+它只是把它们追加了，所以这很好，显然不会得到新的换行符，除非你们写了反斜杠n
+it kind of just appends them, so this is all fine, obviously you won't get new line characters, unless you actually write backslash n
+
+273
+00:29:20,966 --> 00:29:26,675
+所以这有点烦人，因为每一行都要写引号，每一行都要写 
+so it's kind of annoying though, because you have to write quotes every line, you have to write every line
+
+274
+00:29:26,675 --> 00:29:31,800
+你们就不能直接从网上粘贴着色器代码到这里，因为需要添加引号和做所有的事情
+you can't just paste shader code from the internet into here, because you need to add quotes and do all that stuff
+
+275
+00:29:31,800 --> 00:29:37,550
+那很烦人，所以换而言之，你们应该做的只是用这个叫R的前缀
+that's annoying, so instead of what you should do is just use this little prefix called r, right
+
+276
+00:29:37,966 --> 00:29:45,250
+然后是一个引号，然后是开括号，闭括号，这样你们就有了多个行字符串，对吧
+then a quote, then open, and close parentheses, what this less you do is actually have multiple line strings, okay
+
+277
+00:29:45,650 --> 00:29:49,726
+所以你们可以看到，我可以写那样的东西，猜猜这都是字符串的一部分，对吧
+so you can see, I can write stuff like that, and guess what it's all part of the string, okay
+
+278
+00:29:51,300 --> 00:29:58,700
+我们要做的是使用那个，然后我们会写一个普通的着色器，我们会写版本，比如330 core
+so what we're gonna do is use that, and then we're just gonna write a normal shader, so we'll write version like 330 core maybe
+
+279
+00:29:59,875 --> 00:30:04,800
+因为你们知道那很好，我们在这里使用的着色器语言的版本并不重要
+because you know that's fine, doesn't really matter what version of shade of the shading language we're using here
+
+280
+00:30:05,225 --> 00:30:09,550
+330 core应该就可以了，以后可能最少要450 core
+330 core would be fine, and the future will probably use 450 as a minimum
+
+281
+00:30:09,933 --> 00:30:18,171
+我想这将是我们的顶点着色器，所以我们需要做的是获取这种顶点数据
+I think this is going to be our vertex shader, so what we need to do is take in this kind of vertex data
+
+282
+00:30:18,171 --> 00:30:22,375
+记住这是每个顶点运行的，并告诉OpenGL，我们希望将其放置在何处
+remember this runs per vertex, and actually tell a OpenGL, where we want this to be positioned
+
+283
+00:30:22,533 --> 00:30:26,600
+我不打算讲如何写着色器，以及这里的运行原理
+now I'm not going to run through how to write shaders, and probably how everything works here
+
+284
+00:30:26,933 --> 00:30:37,175
+但基本上我们需要的是一个主函数，每个着色器都有这个，我们还需要接收这些属性
+but basically what we need is a main function here, every shader has this, and we also need to take in these attributes
+
+285
+00:30:38,525 --> 00:30:48,200
+所以这个属性是位置，所以我们可以写layout(location = 0) in vec3 a_Position
+so the attribute being the position, so we can just write layout location equals 0 in vec3, a _Position
+
+286
+00:30:48,200 --> 00:30:51,950
+所以我喜欢有一个命名约定，对于属性，有个下划线
+so I like to have a naming convention, which is a underscore for attributes
+
+287
+00:30:53,400 --> 00:30:57,150
+我们接收一个vec3，因为在这种情况下向量有三个分量，没关系
+we're taking in a vec3, because there are 3 component vector in this case, doesn't matter
+
+288
+00:30:57,150 --> 00:31:04,875
+可以引入个vec4，它实际上会完成转换，但这个布局位置为0，只是说它的下标为0
+you can take in a vec4, it will actually do the conversion for you, but this layout location 0, just says that it's at index 0
+
+289
+00:31:05,000 --> 00:31:11,400
+可以看到，调用了glEnableVertexAttribArray(0)，就是这里，对吧，VertexAttribPointer是0
+you can see we EnableVertexAttribArray(0), that's it over here, right, this VertexAttribPointer is 0
+
+290
+00:31:11,625 --> 00:31:19,725
+这个对应于这个，那实际上就是这个属性在顶点缓冲区中的位置，所以我们取这个位置
+this corresponds to this, that's actually where this attribute is inside our vertex buffer, so we take in the position
+
+291
+00:31:19,725 --> 00:31:24,975
+我们要做的是，我们不打算对它做什么，就是gl_Position = a_Position
+and all we're going to do is, we're not going to do anything to it, we're just going to write position equals a_Position
+
+292
+00:31:25,166 --> 00:31:31,250
+本质上，这是告诉OpenGL顶点的输出位置在这种情况下
+essentially okay, what this does is tells OpenGL that the output position of our vertex is in this case
+
+293
+00:31:31,400 --> 00:31:36,400
+和我们的输入位置是一样的，就是我们在这里得到的，我们以后可能会用到这个
+the same as our input position, which is exactly what we have here, we might play around with this in the future
+
+294
+00:31:36,866 --> 00:31:41,800
+只是看看它做了什么，现在gl_Position是vec4，所以需要把这个转换成vec4
+just to kind of see what it does, now glPosition is a vec4, so we need to actually convert this to a vec4
+
+295
+00:31:42,266 --> 00:31:50,575
+我们在最后加上1作为w分量，好了，酷，那么继续，那就是我们整个顶点着色器，搞定
+and we'll add 1 on the end here as the w component, okay, cool, so there we go, that is our entire vertex shader, done
+
+296
+00:31:51,000 --> 00:31:58,225
+我们复制粘贴这个，然后写片段着色器，我把这个变量改成fragmentSrc
+let's copy and paste this, and we'll write our fragment shader, so I'll change this variable to be fragmentSrc
+
+297
+00:31:59,200 --> 00:32:07,800
+现在我们不仅仅是输入一个位置，我们实际上输出了一个颜色，所以color是vec4，我叫它
+and now instead of us kind of just inputting a position, we actually output a color, so color is vec4, I'm just gonna call this
+
+298
+00:32:08,225 --> 00:32:15,566
+我不知道该怎么叫它，我就叫它color吧，这就是输出颜色，你们知道，也就是o_Color
+well I don't know what to call this, I'll just call this color, and this is our output color, you could, you know, do I want to o_Color
+
+299
+00:32:15,566 --> 00:32:20,800
+说实话，我没有一个约定，对于这样的输出变量，我们就叫它color
+I don't really have a convention to be honest, for output variables like this, we'll just call it color
+
+300
+00:32:22,166 --> 00:32:31,500
+color在这里，就设置成vec4(1.0, 0.0, 0.0, 1.0)，也就是纯红色，这样看起来可能更好
+and color in this case, we're gonna set to vec4 1.0 0.0 0.0 1.0, which is pure red, might make it look a little bit nicer
+
+301
+00:32:31,566 --> 00:32:38,750
+通过改成0.8 0.2 0.3，所以这就是向量的一个完整的分量
+by just doing a 0.8 0.2 0.3, so what this is, is a full component of vector here
+
+302
+00:32:38,925 --> 00:32:45,975
+这里的每个分量都是一种颜色，对吧，我们有红，绿，蓝，阿尔法
+which every component here is a color, right, so we have red, green, blue, alpha
+
+303
+00:32:46,050 --> 00:32:53,050
+对吧，所以就是RGBA，因为那是我们实际帧缓冲区的当前格式，我们稍后会渲染到它
+right, so RGBA, because that's the current format of our actual frame buffer that we're rendering to more than that later
+
+304
+00:32:53,900 --> 00:33:01,800
+可以把它设置为任何你们想要的颜色，但我们要把它设置为一个漂亮的红色，好了，就那样
+okay, you can set this to anything you want, but we're just gonna set it to a nice red color, okay, and that is actually it
+
+305
+00:33:01,975 --> 00:33:10,400
+那就是你们需要的，这是两个着色器，放到Shader构造函数，就是vertexSrc和fragmentSrc
+that's all you need just this is our entire 2 shaders, we're gonna put them into our shader constructor here, vertexSrc, fragmentSrc
+
+306
+00:33:13,200 --> 00:33:16,350
+然后我们可以在这里绑定着色器并留下它
+and then we're going to, we could bind the shader here and leave it
+
+307
+00:33:16,400 --> 00:33:22,500
+但我要在这里每一帧绑定它，所以我通常喜欢在做第一件事的时候绑定它
+but I'm just gonna bind it every frame over here, so I usually like to bind it as the first thing I do
+
+308
+00:33:22,800 --> 00:33:29,925
+这是因为在其他渲染接口中，比如DirectX，在创建顶点缓冲区之前，还必须有个着色器
+the reason for this is like in other renderer apis, like DirectX, you have to actually have a shader before you even create like a vertex buffer
+
+309
+00:33:29,925 --> 00:33:34,150
+因为布局必须相对应，OpenGL不会强制那样
+because the layout has to kind of correspond, OpenGL doesn't enforce that
+
+310
+00:33:34,300 --> 00:33:39,425
+不管在哪里绑定，只要在绘制之前，这行代码就是DrawCall
+so it doesn't matter where you bind this, as long as it's before you actually draw, this line here is DrawCall
+
+311
+00:33:40,566 --> 00:33:44,675
+但我将把它绑定为第一件事，因为在其他接口中，你们实际上必须这样做
+but I'm just going to just bind it as the first thing, because in other apis you actually have to
+
+312
+00:33:45,700 --> 00:33:51,500
+好了，很好，就那样，搞定，应该可以了，希望我没有犯任何错误，但我想我们会看到的
+all right, cool, so that's it, that's done, that should work, hopefully I didn't make any mistakes, but I guess we'll see
+
+313
+00:33:51,933 --> 00:33:59,625
+直接运行程序，希望得到个红色三角形，好了，正如你们看到的，这就是漂亮的红色三角形
+let's just run the program, and hopefully we get a red triangle, alright, and as you can see there is our beautiful red triangle
+
+314
+00:34:00,009 --> 00:34:03,575
+现在我想向你们展示的一件事是它显然可以为我们设置任何你们想要的颜色
+now one thing I just want to show you guys as well is that obviously can set us to whatever color you want
+
+315
+00:34:03,866 --> 00:34:06,250
+但是有了这个gl_Position，你们可以做任何事情
+but with this glPosition, like you can really do anything
+
+316
+00:34:06,366 --> 00:34:15,325
+所以如果我把这个移动0.5，对吧，这将会做的是在每个轴上的位置平移0.5
+so if I kind of just move this by 0.5, right, what this is going to do is translate that that position by 0.5 in every axis
+
+317
+00:34:15,675 --> 00:34:20,500
+在这种情况下，1.5不是一个好主意
+so instead of being actually 1.5 is a bad thing to do in this case
+
+318
+00:34:21,533 --> 00:34:24,700
+因为它最终会把它移到屏幕外
+just because it's going to actually end up moving it outside of our screen
+
+319
+00:34:24,700 --> 00:34:32,150
+因为它会向上移动实际上不，0.5，应该没问题，是1，向上移动，实际上就是平移所有东西
+because it'll move it up actually no 0.5, should be fine, sorry 1, we'll move it up, what this will do is actually translate everything
+
+320
+00:34:32,266 --> 00:34:39,550
+所以它会移动所有这些我们输入的顶点0.5，所以这个会变成1 -1，这个1是
+so it'll move all of these vertices that we're kind of inputting here by 0.5, so this will become 1 -1, this 1 will be
+
+321
+00:34:39,866 --> 00:34:46,650
+不好意思，这个1会变成0，这个1也会变成0，所以它会居中，基本上会向右向上移动
+sorry, this 1 will become 0, this 1 will become 0, so it'll be kind of centered, it'll basically move it right and up
+
+322
+00:34:46,800 --> 00:34:52,250
+好了，所以我们应该能看到它在屏幕的右上方，我们可以通过0.5来实现那个
+okay, so we should kind of see it into the top right of our screen, and we can just do that by doing 0.5
+
+323
+00:34:53,333 --> 00:34:58,250
+如你们所见，就是这个，希望这个能告诉你们，它的作用是什么
+and as you can see, here it is, right, so hopefully that kind of shows you what that is actually responsible for
+
+324
+00:34:58,250 --> 00:35:03,675
+它负责布局顶点，而这个负责绘制颜色
+it's responsible for literally laying out our vertices, whereas this is responsible for doing the colors
+
+325
+00:35:04,200 --> 00:35:12,037
+因为我想给你们看一些很酷的东西，我们现在要做的是我们要访问这里的这个位置
+now because I want to show you something cool, I will, what we're gonna do now is we're gonna actually access this position in here
+
+326
+00:35:12,325 --> 00:35:18,450
+首先，我们知道它在-1和1之间，这已经很好了
+now we know first of all that this is between -1 and 1, which is already great
+
+327
+00:35:18,450 --> 00:35:26,500
+在这个例子中，颜色需要在0到1之间，对吧，在-1到1之间，但没关系，继续写些代码
+colors need to be between 0 and 1 in this case, right, this is between -1 and 1, but that's fine, let's go ahead and actually write some code that
+
+328
+00:35:26,500 --> 00:35:34,466
+让我们在这里访问这个位置变量，我们可以看看是否可以输出颜色，比如关于位置的颜色
+lets us access this a position variable in here, and we can see if we can output the color, like with regards to the position, right
+
+329
+00:35:34,466 --> 00:35:39,825
+颜色会基于实际像素的位置，所以我们写的很简单
+so the color will be based on the position of the actual pixel, so what we'll write is pretty simple
+
+330
+00:35:39,825 --> 00:35:48,625
+我们就写out vec3 v_Position，这些在着色器之间传输的变量叫做可变变量
+we'll just write out vec3 v_Position, these kind of variables that we transmit between shaders are called varying variables
+
+331
+00:35:48,625 --> 00:35:50,875
+那就是它们过去的叫法，我已经习惯了
+that's what they used to be called, so I'm kind of used to that
+
+332
+00:35:51,166 --> 00:36:00,821
+那就是为什么我给它一个v_，但叫什么并不重要，在这里把vPosition设为a_Position，对吧
+and that's why I kind of give it a v_, but it doesn't matter what you call it at all, we'll set vPosition here to be a_Position, right
+
+333
+00:36:01,366 --> 00:36:05,825
+然后在这里，我们需要有完全相同的代码和完全相同的变量名
+and then over here, we need to have exactly the same code right with exactly the same variable name
+
+334
+00:36:05,825 --> 00:36:09,750
+因为那就是它的匹配方式，但out需要改成in，好了
+because that's how it matches it, but instead of out we write in, okay
+
+335
+00:36:09,966 --> 00:36:15,050
+你们也可以传输整个缓冲器，可以做结构来代替
+and you can transmit like entire like buffers as well, and you can make like structures and do that instead
+
+336
+00:36:15,425 --> 00:36:21,900
+但这里我们只做单个变量，然后我们要做的是输出v_Position而不是color
+but here we're just doing individual variables, and then what we'll do is we'll just output v_Position instead of color
+
+337
+00:36:22,066 --> 00:36:27,825
+希望我们能得到一些好东西，现在已经很酷了，你们可以看到，我们得到了绿色和红色
+and hopefully we get something nice, now that is pretty cool, you can see that we get like green up there and red
+
+338
+00:36:27,825 --> 00:36:32,475
+但我们在这里得到了这种黑色的东西，这种黑色的空洞，我不是很喜欢
+but we get this kind of black thing here, which this black kind of void here, which I'm not really a big fan of
+
+339
+00:36:32,475 --> 00:36:40,050
+让我们来讨论一下为什么我们会得到那个，0,0在中间，对吧，任何小于0的东西
+let's just discuss why we actually get that, so 0, 0 is in the middle, right, anything below 0
+
+340
+00:36:40,050 --> 00:36:48,700
+任何低于0的颜色值，比如-0.5就是0，因为颜色在0到1之间，它们被固定在那个范围内
+any color values below 0, like -0.5 are just 0, right, because colors are between 0 and 1, they kind of get clamped to that range
+
+341
+00:36:49,066 --> 00:36:54,050
+因为它们被固定在那个范围内，如果值小于0，它就是黑色的
+and because they get clamped to that range, if we have anything below 0, it's just black
+
+342
+00:36:54,300 --> 00:36:59,625
+对吧，因为它变成了0，现在你们可以清楚地看到在这里移动到一个绿色的梯度
+right, because it becomes 0, now clearly you can see that we kind of move to a green gradient here
+
+343
+00:36:59,800 --> 00:37:09,100
+这是因为当y轴接近1时，y轴是什么，颜色向量的y分量是什么
+the reason that's happening is because as we get closer to 1 on the y axis, what is the y axis, what is the y component of our color vector
+
+344
+00:37:09,400 --> 00:37:17,950
+这是绿色通道，因为它是RGBA，所以xyz是RGB，x就是红色，对吧
+it's the green channel, because it goes RGBA, so xyz is RGB, with x, as you can see being red, right
+
+345
+00:37:18,266 --> 00:37:26,750
+我想做的是把它移到一个和我们现在所处的环境更友好的地方，对吧
+what I want to do is actually move this into a space that is a little bit more friendly with kind of the space that we're in right now, right
+
+346
+00:37:27,066 --> 00:37:36,550
+-1到1是顶点的当前布局，但颜色是0到1，我要做的是用我们在这里接收的颜色
+so -1 to 1 is the current layout of our vertices, but the colors are 0 to 1, so what I'm going to do is with this color that we actually accept here
+
+347
+00:37:36,900 --> 00:37:44,075
+我要乘以0.5再加上0.5，所以我在这里做的是因为所有的都乘了0.5
+I'm going to multiply by 0.5 and add 0.5, so what I've done here is since everything gets multiplied by 0.5
+
+348
+00:37:44,075 --> 00:37:50,700
+它减半了，然后加上0.5，它就变到了0到1的范围
+it gets halved, and then I'm adding 0.5, which moves it into the 0 to 1 range
+
+349
+00:37:50,966 --> 00:38:03,075
+现在从0到1.0，这意味着，如果你们举个例子，这个-0.5就变成0.25，对吧
+so now it's from 0 to 1.0, okay, which means that you know, if you take an example from this right -0.5 becomes 0.25, right
+
+350
+00:38:03,075 --> 00:38:10,725
+因为它被减半为-0.25，然后加上0.25，所以如果它原来在-1和1之间
+because it gets halved to a -0.25, and then added to 0.25, so if this used to be between -1 and 1
+
+351
+00:38:11,133 --> 00:38:17,575
+原来是1/4，现在在0到1之间，还是1/4，因为是0.25
+it used to be 1/4 of the way, right, now it's between 0 and 1, and still quarter of the way, because it's 0.25
+
+352
+00:38:18,733 --> 00:38:25,767
+这意味着，我们根本不会得到任何黑色，除非真的在左下角，所以如果再运行一次
+what this means is that we shouldn't get any black at all, unless we're actually at the very very bottom left edge, so if we run this again
+
+353
+00:38:26,133 --> 00:38:31,900
+你们可以看到，我们得到了一些更好的，可以看到，当移动到这里，所有红色都变成了蓝色
+you can see, we get something a little bit nicer, and we can actually see that as we move over here, we kind of blues all of our red
+
+354
+00:38:32,266 --> 00:38:38,725
+我们失去了绿色，那就是为什么它变成了蓝色，因为蓝色总是0，在这种情况下就是0.5
+and we lose all of our green, and that's why it kind of just goes into blue, because blue is always gonna be 0, which in this case is 0.5
+
+355
+00:38:39,733 --> 00:38:48,389
+因为那个变换，好了，如果我们把这个移到上面，它会更接近真正的绿色
+because of that transformation, okay, and if we were to move this up to the top, it would be closer to actual full green
+
+356
+00:38:48,733 --> 00:38:52,125
+然后如果我们把它移到右边，它会它会变得更红
+and then if we move it like to the right edge, it would be it would just become more red
+
+357
+00:38:52,533 --> 00:39:02,850
+我们可以通过到这里来尝试添加0.5，我们也需要在v_Position中添加0.5
+we can actually try that by going over here and actually like adding 0.5, we'll have to add the 0.5 over here to v_Position as well
+
+358
+00:39:03,300 --> 00:39:09,250
+但现在我们应该在三角形的最右边变成红色，正如你们看到的，我们在这里做的
+but now we should actually get full red on the very right side of the triangle, and as you can see we do here
+
+359
+00:39:10,200 --> 00:39:18,800
+因为我们还加入了绿色，虽然它比本来的颜色要浅一些，但是你们可以看到它是如何运行的
+because we've also added green, though it becomes a bit lighter than it would otherwise be, but yeah you can see kind of how all that works
+
+360
+00:39:19,700 --> 00:39:24,950
+在两个着色器之间移动数据是非常容易的，希望这能给你们一点理解
+it's very easy to kind of move data between the 2 shaders, and hopefully this gives you a bit of an understanding
+
+361
+00:39:25,225 --> 00:39:30,399
+至于这个gl_Position和这个输出color是什么，现在人们可能会有另一个大问题
+as to what this gl_Position and what this output color is, now the other big question that people might have
+
+362
+00:39:30,400 --> 00:39:36,000
+不习惯图形接口的是，为什么它不像，为什么，这个插值是从哪里来的
+that are not used to graphics apis is, why is it not like why, where is this interpolation coming from
+
+363
+00:39:36,466 --> 00:39:42,875
+对吧，你们可以看到，它非常流畅，这与图形接口的运行方式有关，这是渲染器的运行方式
+right, you can see, it's very smooth, and that just has to do with how the graphics api works, that's how renderer works
+
+364
+00:39:43,225 --> 00:39:50,450
+它实际上做的是在这些值之间进行插值，除非你们明确告诉它不能这样做
+what it actually does is it interpolates as it shades pixels between these values, unless you explicitly tell it not to which you can do
+
+365
+00:39:51,500 --> 00:39:58,100
+它会根据你们给出的值，在两个位置之间平滑地线性插值
+it actually will smoothly linearly interpolate between the 2 positions, based on the value that you actually give
+
+366
+00:39:58,333 --> 00:40:06,850
+因为发送了个向量，这个向量是每个顶点，当它给像素着色时，它就像是两个顶点的中间值
+okay, so because we're sending a vector, and the vector is per vertex, when it shades a pixel, that is like halfway between the 2 vertices
+
+367
+00:40:07,000 --> 00:40:13,700
+它会线性插值你们已经设置的数据，已经从顶点着色器发送到程序着色器的数据
+it will linearly interpolate that data you've set, you've sent from the vertex shader to the program shader to be kind of halfway through
+
+368
+00:40:14,100 --> 00:40:16,950
+好了，所以那就是着色器的运行原理
+alright, so anyway that is how shaders work
+
+369
+00:40:16,950 --> 00:40:21,100
+这是一期非常特别的节目，我知道我错过了上周的节目，对此我真的很抱歉
+this is like a very special episode, I know I missed out last week, and I'm really sorry about that
+
+370
+00:40:21,733 --> 00:40:27,999
+原因只是因为我的录音在中途坏掉了麦克风，我不得不重录这期
+the reason for that was just because my audio recording kind of failed halfway through in the microphone cutout, and I had to rerecord the episode
+
+371
+00:40:28,000 --> 00:40:34,599
+所以我想我应该给你们一些特别的东西，当我上周录制这段视频的时候，它一点都不全面
+so I thought I'd give you guys a bit of a special last week, when I recorded this, it was not as comprehensive at all
+
+372
+00:40:34,600 --> 00:40:38,725
+它只是一种着色器，让我们把三角形变成红色，好吧，我大概是这期的一半长度
+it was just kind of shaders, let's just make the triangle red done, right, I was like half a length of this one
+
+373
+00:40:38,966 --> 00:40:46,375
+所以希望你们能原谅我，就像你们知道的我，试图在这期中付出额外的努力
+so hopefully you guys can forgive me, and like just you know me, trying to put some extra work into this episode
+
+374
+00:40:46,766 --> 00:40:50,925
+希望你们喜欢，让我知道你们对我们今天所做的一切有什么想法，希望你们真的很兴奋
+hope you guys enjoyed this, let me know what you think about everything we've done today, hopefully you're really excited
+
+375
+00:40:50,925 --> 00:40:55,950
+但无论是着色器还是基于物理渲染的东西，我已经从Hazel开发分支展示了
+but both shaders and by the kind of physically based rendering stuff that I've shown from the Hazel development branch
+
+376
+00:40:56,175 --> 00:41:01,025
+我真的需要你们的帮助来制作这个系列，patreon.com/thecherno就是支持我的站点
+I really do need your help to make this series, patreon.com/thecherno is the place to support this
+
+377
+00:41:01,025 --> 00:41:02,766
+如果你们喜欢我在YouTube上做的视频
+if you like what I'm doing here on YouTube
+
+378
+00:41:02,766 --> 00:41:09,000
+我尝试着教授这类游戏引擎开发，并尝试着让你们能够独立解释所有内容是如何运行的
+trying to teach this kind of game engine development, and trying to get you guys kind of independent explanations of how everything works
+
+379
+00:41:09,325 --> 00:41:11,100
+我们正在一起构建这个Hazel引擎
+and that we're building this kind of Hazel engine together
+
+380
+00:41:11,366 --> 00:41:17,050
+你们的支持真的很重要，即使是很小的支持，但对我来说能够做到这一点真的很重要
+your support is really important, even if it's like small, it really is important for me to actually be able to kind of do this
+
+381
+00:41:17,766 --> 00:41:21,425
+显然我想花尽可能多的时间来做这些事情
+and obviously I want to spend as much time as possible doing this stuff
+
+382
+00:41:21,425 --> 00:41:25,121
+因为我非常喜欢教学，非常喜欢开发这类东西
+because I absolutely love teaching, I absolutely love developing this kind of stuff
+
+383
+00:41:26,333 --> 00:41:34,100
+希望你们能看到我是谁，以及我所有赞助人的支持是这一切成为可能的首要原因
+and hopefully you guys can kind of see that by just who I am, and the support of all of my patrons is what makes this possible in the first place
+
+384
+00:41:34,100 --> 00:41:36,275
+所以非常感谢大家
+so huge thank you to everyone
+
+385
+00:41:36,925 --> 00:41:44,550
+下次我想做的一件事是，我真的想做更多的OpenGL系列视频，涵盖很多这个东西的原理
+next time one thing that I want to do is, I really want to actually make more OpenGL series videos covering a lot of how this stuff works
+
+386
+00:41:45,425 --> 00:41:50,566
+但我想下次，就像我们现在有了这个三角形，最重要的一步实际上是
+but I think next time like once we've got this triangle now, the most important step is actually
+
+387
+00:41:50,700 --> 00:41:58,950
+我们有顶点缓冲区，索引缓冲区，着色器，我们需要把这个移到接口特定的类中
+we've got a vertex buffer, we've got an index buffer, we've got a shader, we need to move this into kind of api specific classes
+
+388
+00:41:58,950 --> 00:42:03,199
+对吧，它都是OpenGL特定的代码，它目前在我们的Application.h文件中设置
+right, it's all OpenGL specific code, it's currently setting in our Application.h file
+
+389
+00:42:03,200 --> 00:42:10,950
+也就是跨平台和跨渲染器接口，我们需要做的是从所有这些中创建实际的类
+which is cross platform and cross renderer api, so what we need to do is create actual classes out of all of this
+
+390
+00:42:10,950 --> 00:42:16,425
+在OpenGL平台层中，我们讲了渲染接口
+that lie in that OpenGL platform kind of layer, right, so we talked about the renderer api
+
+391
+00:42:16,533 --> 00:42:22,225
+那将如何成为抽象成对应的接口，现在我们实际上需要写那个CPP代码来实现它
+and how that's going to kind of be abstracted pair api, now we actually have to write that CPP code to make that happen
+
+392
+00:42:22,533 --> 00:42:29,250
+所以我想那就是我们下期要讲的内容，很好，这期真精彩，下期见，拜
+so I think that's what we're gonna move on to next time, cool, what an episode, I'll see you next time, goodbye
+

@@ -1,0 +1,1295 @@
+﻿1
+00:00:00,100 --> 00:00:03,000
+嘿，你们好，我是TheCherno，欢迎回到我的游戏引擎
+hey, what's up guys, my name is TheCherno, welcome back to my game engine in the series
+
+2
+00:00:03,166 --> 00:00:08,350
+那么上期我们看了整个上下文，在OpenGL中创建图形上下文
+so last time we take a look a whole context thing, creating a graphics context specifically in OpenGL
+
+3
+00:00:08,350 --> 00:00:14,850
+那么我们就可以做些渲染，并且探索了它在不同的渲染接口中是如何不同的
+so that we can actually do some rendering, and we kind of explored how it will be different across all different rendering apis
+
+4
+00:00:14,850 --> 00:00:20,225
+如果你们还没看过那期视频，一定要去看看哦，今天我们要做的是
+definitely check out that latest video, if you haven't already, and today what we're gonna do is kind of
+
+5
+00:00:21,166 --> 00:00:26,400
+这将是接下来几期的介绍，所以接下来几期，在接下来几期中
+this is gonna kind of gonna be an intro to the next few episodes, so the next few episodes, over the next few episodes
+
+6
+00:00:26,400 --> 00:00:33,389
+我们会构建一些渲染器接口，我原本打算做一些实际的渲染器类
+we're going to be building up some sort of renderer api, I was originally going to do some kind of actual renderer class
+
+7
+00:00:33,425 --> 00:00:38,800
+但我觉得没必要，这期也会很无聊，我真的不想做那个
+but I don't think that's quite necessary, now it's kind of gonna be a boring episode as well, I didn't really want to do that
+
+8
+00:00:39,066 --> 00:00:45,100
+上次我们几乎有了一丝渲染这个三角形的希望
+we haven't kind of, last time we kind of almost had this glimpse of hope that, we're gonna render this triangle
+
+9
+00:00:45,100 --> 00:00:48,375
+但我们一直没能做到，说实话，我整个星期都感觉很糟糕
+and we never kind of got there, and I've been kind of feeling bad all week to be honest
+
+10
+00:00:48,700 --> 00:00:53,125
+所以我们今天要做的是在屏幕上渲染一个三角形，而不是使用glBegin和glEnd
+so what we're gonna do today is actually render a triangle on the screen, not using glBegin glEnd
+
+11
+00:00:53,766 --> 00:01:00,700
+别担心，我们会做得很好，然后从那开始，至于原因，我觉得放在这期会是个好主意
+don't worry, we're gonna do it properly, and then from there, like the reason, I kind of thought that would be a good idea to do in this kind of episode
+
+12
+00:01:00,700 --> 00:01:06,700
+因为那将为我们接下来两期的内容奠定基础
+is because that's gonna kind of lay the foundation of what we're gonna do the next two episode
+
+13
+00:01:06,700 --> 00:01:13,475
+对于那些对图形不太熟悉的人，我们会有更多的背景知识，看看我做了什么
+so that you guys who aren't kind of familiar with graphics already, we'll have a little bit more context, see what I did
+
+14
+00:01:13,475 --> 00:01:20,627
+图形上下文就像上期视频一样，看那期，不管怎样，你们会了解上下文的更多知识
+the graphics context laid like last video, watch that, anyway, you would have a little bit more context as to
+
+15
+00:01:20,627 --> 00:01:26,875
+为什么我们要为各种渲染元件创建类
+why we're going to be creating the classes kind of for various kind of rendering primitives
+
+16
+00:01:27,125 --> 00:01:32,800
+比如顶点缓冲，索引缓冲，顶点数组，着色器，纹理这类东西
+like vertex buffers, index buffers, vertex arrays, you know, shaders textures that kind of stuff
+
+17
+00:01:32,800 --> 00:01:36,500
+因为那就是我们未来的方向，对吧，我们需要构建某种接口
+because that's where this is heading, right, we need to build up some kind of api
+
+18
+00:01:36,875 --> 00:01:42,950
+下周，我会为你们准备一期视频，就在下周，你们可要坚持住啊
+and then next week, I've got quite the video for you guys, next week, you gotta hang on there
+
+19
+00:01:43,400 --> 00:01:48,175
+但下周我们将会把事情做得更有趣一些
+but next week we're actually going to be taking things a little bit, we're going to make things more exciting
+
+20
+00:01:48,175 --> 00:01:52,255
+有一个更令人兴奋的目标去努力，那么那就是我的想法
+and have a more exciting goal to actually work towards, so that's kind of the idea
+
+21
+00:01:52,533 --> 00:01:56,543
+我想也许我们可以在这期构建一些非常简单的东西，只是方式可能有点直接
+I thought that maybe we could build something, really simple, in this episode, just kind of straight
+
+22
+00:01:56,543 --> 00:02:00,075
+就像在我们的Application类中直接写的原始OpenGL调用
+like kind of raw OpenGL calls write in and out write in our application class
+
+23
+00:02:00,075 --> 00:02:05,100
+为了展示我们需要的所有东西然后移动和抽象到类
+to show everything that we need to then take and move and abstract into kind of classes
+
+24
+00:02:05,100 --> 00:02:09,933
+这样一来，我们就不用花三期的时间来建立类，甚至连三角形都还没搞出来
+so that that way, instead of just spending 3 episodes building classes, and not even having a triangle
+
+25
+00:02:09,933 --> 00:02:16,075
+直到最后我们才把它整合到一起，我们马上就有了它，然后把所有的事情都整理好
+and then only having it come together in the end, we kind of have it immediately, and then we kind of sort everything out as we go
+
+26
+00:02:16,800 --> 00:02:23,350
+在开始之前，我想借此机会感谢所有支持本系列的观众，网址是patreon.com/thecherno
+before we jump in, I just wanna take this moment to thank all the patrons who made this series possible, patreon.com/thecherno
+
+27
+00:02:23,725 --> 00:02:28,133
+这是支持本系列的好地方，你们可以提前获得许多好处，比如提前看到视频
+great place to actually support this series, you get many benefits such as videos early
+
+28
+00:02:28,133 --> 00:02:32,999
+我想之前的视频下周会继续，因为我还在度蜜月的恢复期
+I think the videos earlier things probably gonna resume next week, because I'm still kind of recovering from my honeymoon
+
+29
+00:02:33,000 --> 00:02:37,533
+我说的恢复是指我还在试图理清一切
+and by recovering, I mean I'm still kind of trying to like sort everything out
+
+30
+00:02:37,533 --> 00:02:43,125
+我的意思是，我刚刚搬进了整修过的公寓，所以正因为如此，我需要一点时间
+I mean I've just moved into my kind of renovated apartment and all of that stuff, and so because of that, I need to kind of
+
+31
+00:02:43,566 --> 00:02:48,650
+所以我也在整理工作上的事情，还有很多事情要做，但下周我想应该会回来
+so kind of sorting everything out with work as well, and there's so much stuff going on, but next week I think that should be back
+
+32
+00:02:49,333 --> 00:02:54,550
+然后你们还可以访问Hazel开发分支，它就像是我的私人开发分支
+and then also you'll get access to the Hazel development branch, which is like kind of my private dev branch
+
+33
+00:02:54,550 --> 00:03:00,275
+我只是很频繁地推送代码，那就是你们会看到这个引擎更高级的地方
+where I just push code like pretty pretty often, and that's kind of where you'll see this engine a lot more advanced
+
+34
+00:03:00,275 --> 00:03:03,725
+比如渲染指令队列，那些都已经实现了
+for things like render command queue, and all that stuff already kind of implemented
+
+35
+00:03:03,725 --> 00:03:08,900
+事实上，因为开发分支上的很多东西实际上要高级得多
+and in fact because a lot of the stuff on that development branch is actually a lot more advanced
+
+36
+00:03:09,800 --> 00:03:17,825
+有些东西不会出现在系列中，可能要几个月，或者一年，因为我们要讲的东西太多了
+some of that stuff won't make it into the series, for like months, if not like a year maybe, because we've got so much more to cover
+
+37
+00:03:18,025 --> 00:03:23,400
+就像Hazel开发分支是我在玩不同的开发想法用的
+like it's almost like the Hazel dev branch is me just having fun playing around with different development kind of ideas
+
+38
+00:03:23,400 --> 00:03:29,075
+就像我作为一个软件工程师会做的那样，实际上只是人为干扰，而这更像是一个教育系列
+and actually just jamming and everything as I would as a software engineer, whereas this is more of like an educational series
+
+39
+00:03:29,075 --> 00:03:33,425
+那是一个不同的方向，显然最后，它们应该是相同的
+that kind of goes a little bit of a different direction, obviously in the end, they should be identical
+
+40
+00:03:33,733 --> 00:03:38,425
+但这两个部分很不一样，如果你们感兴趣的话，一定要去看看
+but it's like the parts are very different, so definitely check that out, if you're interested
+
+41
+00:03:38,766 --> 00:03:44,325
+好了，回到这里，所以那就是我们要做的，我要加入一些OpenGL代码
+alright, back to this, so that's kind of what we're gonna do, I'm just gonna jump in right some OpenGL code
+
+42
+00:03:44,666 --> 00:03:48,400
+从头到尾，我没有任何参考，但我很擅长OpenGL
+off the top of my head to yarn, I've got no reference at all, but I'm pretty good with OpenGL
+
+43
+00:03:48,400 --> 00:03:53,850
+希望我们能得到一个三角形，并以一种狡猾的方式运行，那可能不适用于所有图形驱动程序
+so hopefully we'll get a triangle up and running in kind of a dodgy way, that may not work on all graphics drivers
+
+44
+00:03:53,850 --> 00:04:01,166
+那就是为什么你们知道这个视频会很激动人心，但希望我真的很感兴趣，让你们去尝试一下，看看它是否有效
+that's how you know this video is gonna be exciting but hopefully like I'm really interested in you guys to actually try this out and see if it works
+
+45
+00:04:01,166 --> 00:04:04,650
+请在下面的评论中告诉我，不管怎样，让我们直接开始，看看我们有什么
+and let me know in the comments below, anyway, let's just jump in, and take a look at what we have here
+
+46
+00:04:05,366 --> 00:04:11,800
+好了，这是Hazel，我们一直在开发的小游戏引擎，如果运行它，你们会看到有这种粉色
+alright, so this is Hazel, little game engine we've been working on, if I just launch it, you'll see we have kind of this pink
+
+47
+00:04:13,450 --> 00:04:20,875
+这种粉色，就是这里的ClearColor，那是我想要改变的第一点，把它改成黑色，因为事实上
+this kind of pink, ClearColor here, that's the first thing I kind of want to change, let's make that maybe black, because or in fact
+
+48
+00:04:21,425 --> 00:04:27,666
+顺便说一下，那很奇怪，但让我们把它设置为0.2或类似的，像那种深灰色
+and that's wire by the way, but let's make it maybe like 0.2 or something like that, like really kind of dark gray
+
+49
+00:04:27,666 --> 00:04:34,900
+它可能没那么暗，我们可以用深一点的颜色，因为粉色开始让我厌烦了
+it's probably not that dark, just so that we can have something a little bit darker, because that pink's beginning to annoy me
+
+50
+00:04:35,166 --> 00:04:41,275
+是的，类似的颜色，甚至可能是0.1，我要在这上耗费太多时间，但确实想要比较暗的颜色
+yeah something like that maybe even 0.1, I'm gonna waste too much time on this, but I do want something fairly dark
+
+51
+00:04:42,800 --> 00:04:48,225
+然后这就会让它变得更有变数，我们继续，好了，很好
+and then so this just kind of will make this a little bit more variable I think, there we go, that's pretty good
+
+52
+00:04:48,533 --> 00:04:53,075
+现在我要做的是在中间绘制一个三角形，所以如果我们把这个ImGui窗口移出去
+and now what I want to do is kind of draw a triangle in the middle, so if we kind of move this ImGui down out of the way
+
+53
+00:04:53,366 --> 00:05:01,100
+我只想在中间有个三角形，要实现那个，我实际上需要的是，如果你们考虑OpenGL的话
+I just want a triangle kind of in the middle here, right, and so to do that, what I actually need, if you think about OpenGL
+
+54
+00:05:01,100 --> 00:05:07,575
+思考下真正需要的是什么，顺便说下，这是个很好的让你们去看看OpenGL系列的时间
+and think about what we actually need, this is, by the way, is a great time for you guys to actually check out the OpenGL series
+
+55
+00:05:07,850 --> 00:05:14,150
+我有一个完整的视频播放列表叫做OpenGL系列，我就是在那里单独教OpenGL的
+I have this entire like playlist of video as this called the OpenGL series, it's where I actually teach kind of OpenGL by itself
+
+56
+00:05:14,150 --> 00:05:18,175
+不一定是在游戏引擎中，也就是如何使用OpenGL渲染图像
+not necessarily in a game engine, which is how to actually use OpenGL to render graphics
+
+57
+00:05:18,566 --> 00:05:23,300
+顺便说一下，那个系列，我知道，已经很久没有上传视频了，但我马上要返回那个系列了
+by the way, that series, I know, I haven't uploaded a video on so long, but I'm about to jump back on that train
+
+58
+00:05:23,300 --> 00:05:29,025
+因为我们实际上是在Hazel中做渲染的东西，所以那期视频，不要想那么多，就像
+since we are actually doing rendering stuff in Hazel, now so that video that don't think about series is like
+
+59
+00:05:29,025 --> 00:05:34,700
+看，你们知道，那是过去的系列，现在Hazel接管了，那系列仍然是个独立的好系列
+oh yeah, watch, you know, that was the thing of the past, now Hazel's taking over no that series still has a standalone good series
+
+60
+00:05:34,700 --> 00:05:39,425
+我解释了渲染和OpenGL是如何运行的，一定要去看看
+where I actually explain how rendering and how OpenGL works, so definitely check that out
+
+61
+00:05:39,425 --> 00:05:45,766
+因为我要解释清楚我现在要解释的内容，这一系列之间会有一些重叠
+because I will help clear this up what I'm about to explain now, there's gonna be a bit of overlap between the series
+
+62
+00:05:45,766 --> 00:05:49,334
+在本系列中，我不打算深入研究图形
+I'm not gonna dive in too deeply into graphics in this series specifically
+
+63
+00:05:49,600 --> 00:05:54,475
+因为这是关于一般的游戏管理而不一定是图像系列
+just because of course this is about kind of general game management and not necessarily graphics series
+
+64
+00:05:54,475 --> 00:06:01,600
+虽然我不能只谈论渲染，而不是真正地谈论它，但我要说的是，很多这些东西
+although I can't just talk about rendering, and not actually talk about it, but what I'm saying is that a lot of these things
+
+65
+00:06:01,600 --> 00:06:04,425
+如果你们不是很熟悉图形，而你们想要更多的信息
+if you're not very familiar with graphics, and you want more information
+
+66
+00:06:04,425 --> 00:06:11,200
+你们甚至可以开始为这个写自己的代码而不是等待每周的这些视频播出
+and you want to even maybe start writing your own code for this outside of just waiting for these episodes to come out every week
+
+67
+00:06:11,200 --> 00:06:16,325
+你们一定要看看那个系列，因为里面有太多好东西了，我很快会继续往里面加
+you have to check out that series, because it's just there's so much good stuff in there, and I'm gonna keep adding to it very soon
+
+68
+00:06:17,100 --> 00:06:22,325
+好了，不管怎样，你们已经知道的是有很多组件来渲染一个三角形，对吧
+alright, anyway, so what you would already know is that there's many components kind of rendering a triangle, right
+
+69
+00:06:22,325 --> 00:06:28,162
+我的意思是，我们本质上需要，不能直接用，所以本质上需要个叫做顶点数组的东西
+I mean we essentially need, I just can't jump these down, so we essentially need something called a vertex array
+
+70
+00:06:28,466 --> 00:06:37,175
+那需要核心模式，可能是3.0版本？太不确定，我们需要一个叫做顶点缓冲的东西
+that's required for the core OpenGL profile for microversion 3 points arming Ohio, I'm not sure, we need something called a vertex buffer
+
+71
+00:06:37,175 --> 00:06:44,675
+我们需要索引缓冲区，需要着色器，说实话，我想大概就是那些了
+we need something called an index buffer, we need something called a shader, I think that's probably about it, to be honest
+
+72
+00:06:45,466 --> 00:06:52,419
+这是我们绝对需要的四样东西中的三样，但我们实际上可以做的是
+these are kind of the 3 things that we app of the 4 things that we absolutely need, right, but what we can actually do is
+
+73
+00:06:52,933 --> 00:06:59,475
+因为如果你们想下代码数量，我们需要写所有这些，这三个不多，但这个比较多，对吧
+because if you think about the amount of code, we need to write all of these, this is these 3, not much, this a lot, right
+
+74
+00:06:59,733 --> 00:07:06,175
+我们需要写个顶点着色器和片段着色器和所有的代码来编译那个着色器，那是很多的工作
+we need to write a vertex shader and a fragment shader and all the code to actually compile that shader, that's a lot of work
+
+75
+00:07:06,566 --> 00:07:10,650
+真不想搞那个，好了，实际上我们不需要那个
+don't really want to do that right now, okay, we actually don't need that
+
+76
+00:07:10,750 --> 00:07:17,150
+因为GPU驱动程序通常会提供一种默认的着色器，如果你们什么都没做的话，它们会启用它
+because GPU drivers typically supply kind of a default shader that they will actually activate, if you haven't done anything at all
+
+77
+00:07:17,600 --> 00:07:23,875
+不是每个显卡驱动都会实现这个，但很多都会，事实上就我这台笔记本上
+so not every graphics driver will do this, but a lot of them will, and in fact I'm on this laptop right here
+
+78
+00:07:23,875 --> 00:07:28,875
+它有一个NVIDIA显卡和一个Intel显卡，它们似乎都提供了这些
+and that's got both an NVIDIA GPU and an Intel GPU, and they both seem to actually supplied these
+
+79
+00:07:28,925 --> 00:07:35,100
+所以在这期视频的最后，一定要试试我要给你们的代码，以及我要这儿写的代码
+so definitely at the end of this video, try out this code I want to give you, and the code that I'm going to write here
+
+80
+00:07:35,400 --> 00:07:40,075
+你们甚至可以克隆Hazel存储库自己看看，告诉我你们运行的是哪种GPU
+you can even just clone the Hazel repository and see for yourself, and just let me know kind of what GPU you're running
+
+81
+00:07:40,333 --> 00:07:46,325
+如果它成功了，我们甚至可能会写些代码，显示GPU供应商，这样我们就能检查那个
+and if it worked on out, we might even put some code into actually get the actual GPU vendor out, so that we can check that
+
+82
+00:07:46,825 --> 00:07:50,533
+好了，无论如何，顶点数组，顶点缓冲区，索引缓冲区
+alright, anyway, vertex array, vertex buffer, index buffer
+
+83
+00:07:50,533 --> 00:07:56,125
+那是我们为了在屏幕上得到一个三角形渲染需要创建的3个东西
+those are the 3 things that we need to create in order to actually get a triangle rendering on the screen
+
+84
+00:07:56,125 --> 00:08:01,357
+我们不需要任何着色器，我们不需要任何数学运算，但这就是我们需要的，让我们开始吧
+we don't need any shaders, we don't need any maths, but this is this kind of what we need, so let's just get started
+
+85
+00:08:02,533 --> 00:08:09,800
+我要做的是打开Application，我要创建3个无符号整数
+what I'll do is I'll go at the application file here, and I'm gonna create basically 3 unsigned integers
+
+86
+00:08:10,200 --> 00:08:20,450
+因为它们是Id，也就是m_VertexArray，m_VertexBuffer和m_IndexBuffer
+because they're gonna be the ids, right, so we're gonna have our VertexArray, our VertexBuffer, and our IndexBuffer
+
+87
+00:08:22,466 --> 00:08:28,300
+好了，让我把这个输出移开，然后我要做的是在这里，创建它们
+all right, let me just move this output out of the way, and then what I'm gonna do is over here, just gonna create all of them
+
+88
+00:08:28,300 --> 00:08:33,775
+去掉这个，顺便说一下，这是Application的构造函数，我肯定是在创建窗口之后做这个
+so we'll get rid of this, this is the constructor for application, by the way, I'm definitely doing this after I create the window
+
+89
+00:08:33,775 --> 00:08:42,475
+因为那当然是我们上期创建OpenGLContext的地方，所以继续输入glGenVertexArrays
+because that's where of course we create that OpenGL context that we did last episode, so we'll go ahead and type in glGenVertexArrays
+
+90
+00:08:42,900 --> 00:08:52,125
+我们要生成一个顶点数组，然后把它放到这里，那会绑定它，只需要绑定顶点数组
+we want to generate one vertex array, and then put that into there, that will bind it, so we'll just bind vertex array
+
+91
+00:08:53,764 --> 00:09:02,900
+然后我们会对我们的顶点缓冲区做同样的事情，我们会生成一个顶点缓冲区并绑定它
+then we're gonna do the same thing with our vertex buffer, so we'll go ahead and generate a vertex buffer and bind it as well
+
+92
+00:09:02,900 --> 00:09:07,764
+所以就是glBindBuffer，GL_ARRAY_BUFFER是目标类型
+so glBindBuffer, GL_ARRAY_BUFFER is the target type
+
+93
+00:09:08,425 --> 00:09:12,966
+然后是m_VertexBuffer，好了，现在我们需要用一些数据填充它
+and then VertexBuffer, alright, and now we need to actually populate it with some data
+
+94
+00:09:13,066 --> 00:09:18,499
+我们需要创建一些顶点，我创建这个顶点，就是float vertices[3*3]
+so we need to create some vertices, so I'll create this float or a called vertices we'll say 3x3
+
+95
+00:09:18,666 --> 00:09:22,675
+我们将使用3个三维坐标，我们将有3个
+so we're going to use 3 kind of 3 dimensional coordinates, and we're going to have 3 of them
+
+96
+00:09:23,166 --> 00:09:35,566
+这里有3个顶点位置，我们有-0.5f -0.5f和0f，所以这是一个顶点，对吧，作为三维向量
+so 3 vertex positions over here, so we'll have -0.5f -0.5f and 0.0f, so this is kind of one vertex, right, as a 3 component vector
+
+97
+00:09:35,566 --> 00:09:40,000
+基本上它就像一个三维空间，一个三维空间坐标
+basically it's like a 3 dimensional, like a 3 dimensional coordinate in space
+
+98
+00:09:40,966 --> 00:09:48,975
+默认情况下，如果你们没有任何类型的投影矩阵，你们基本上不会用任何东西变换顶点
+now by default, if you don't have any kind of projection matrix, you're basically not transforming your vertices by anything
+
+99
+00:09:48,975 --> 00:09:56,400
+对吧，你们有OpenGL处理的默认裁剪空间，基本上在每个轴上都是-1:1
+right, you have kind of the default clip space that OpenGL deals with, which is basically -1:1 in every axis
+
+100
+00:09:56,400 --> 00:10:03,725
+所以xyz都是-1到1，那就是你们要处理的渲染空间
+so -1:1 x, -1:1 y, -1 to 1 z, that's kind of the rendering kind of space that you're dealing with
+
+101
+00:10:03,725 --> 00:10:11,300
+每个点最终都会转换成那个，显然当你们处理3D模型时，可能会有一些不同的比例
+every point eventually gets caught converted to that, obviously when you have 3D models, there might be some kind of different scale
+
+102
+00:10:11,300 --> 00:10:16,475
+完全不同的空间，你们可能有坐标200之类的顶点，对吧
+completely different space, you might have vertices that are 200 or something like that, right
+
+103
+00:10:17,025 --> 00:10:23,300
+那是因为它经过了一个矩阵的投影，不管怎样，最终变成了-1:1
+that's because it goes through something called a projection of matrix, which eventually like converts it into -1:1, anyway
+
+104
+00:10:23,576 --> 00:10:31,300
+因为我们没有做任何数学运算，基本上已经在那个空间了，这就是为什么屏幕边缘是-1:1
+since we're not doing any kind of maths, basically are in that space already, which is why the edges of the screen are basically -1:1
+
+105
+00:10:31,300 --> 00:10:37,325
+好了，-0.5大概是屏幕左边的1/4，对吧
+okay, so -0.5 is kind of 1/4 of the way from the left side of the screen, right
+
+106
+00:10:37,325 --> 00:10:43,799
+你们会看到这个画出了三角形，所以我们按照逆时针，对吧
+and you'll kind of see this one actually draw the triangle, so we're going to counterclockwise, right
+
+107
+00:10:43,800 --> 00:10:49,925
+在这里用我们的线圈顺时针转动，因为这是默认的线圈，所以这是0.5f
+and to clockwise here with our winding, because that's kind of the default winding, so this is going to be 0.5f
+
+108
+00:10:49,925 --> 00:10:55,525
+这是在屏幕的另一边，我们画了一些点，如果我在这里打开paint来展示给你们看
+so this is on the other side of the screen, we're kind of drawing a few points, if I just open on paint here to kind of show you
+
+109
+00:10:55,525 --> 00:11:02,805
+这是在假设，这个白色画布是我们的屏幕，本质上我们要处理的是我们要画的3个点
+this is kind of pretend that, this white canvas is our screen, right, essentially what we're dealing with is 3 points that we're drawing
+
+110
+00:11:03,066 --> 00:11:08,000
+我们已经在这里画了一个，对，我们要在这里再画一个，这是第二个坐标
+we've just drawn one about here, right, we're gonna draw one more here, that's the second kind of coordinate
+
+111
+00:11:08,000 --> 00:11:13,825
+然后我们在这里画一个，然后很明显，当我们渲染它时，它会感觉所有这些都在里面
+and then we're gonna draw one here, okay, and then obviously when we render it, it's kind of kind of feel all of that in
+
+112
+00:11:13,825 --> 00:11:21,489
+我们会在屏幕上得到一个三角形，所以这里的0.5就意味着是-0.5
+and we're going to get a triangle on the screen, okay, so this is 0.5 meaning that, it's kind of this is -0.5
+
+113
+00:11:21,600 --> 00:11:30,050
+我不应该逃避为你们直播搞这个，那是-0.5x，那是0.5x，那是0x，对吧
+I'm not going to pretend to kind of do this stuff life for you guys, but that's -0.5x, that's 0.5x, and that's going to be 0x, right
+
+114
+00:11:30,050 --> 00:11:37,648
+因为在正中间，记住这条边是-1，这条边在x轴上是1
+because right in the middle, and remember this is kind of this edge is a -1, this edge is 1 in the x axis
+
+115
+00:11:37,766 --> 00:11:47,200
+y也是一样，对吧，下面这条边是-1，这条边是1，然后对于z我们让它们都是0，好了
+same thing with y, right, this edge on the bottom is -1, this edge is 1, okay, and then for z we're leaving all of them just at 0, allright
+
+116
+00:11:48,075 --> 00:11:57,696
+0.5或-0.5也可以，没有区别，我们用0.5f，我们再用-0.5f
+0.5 or -0.5 will work as well, no difference, so we'll do 0.5f, we'll do -0.5f again
+
+117
+00:11:57,696 --> 00:12:10,500
+因为第二个点的y和第一个点是一样的，最后一个点是0.0f，然后是0.5f
+because the y of course at that second point is the same as the first one, and then finally we'll do 0.0f and then 0.5 f
+
+118
+00:12:12,066 --> 00:12:18,100
+所以这是我们渲染的最上面的点，好了，那么我们继续
+so this is kind of that topmost point over here that we're rendering all right, so there we go
+
+119
+00:12:18,966 --> 00:12:24,300
+现在我们需要上传这些数据到GPU，因为显然现在它存在于CPU中
+now we need to actually upload this data to the GPU, because obviously right now it exists in the CPU
+
+120
+00:12:24,766 --> 00:12:34,000
+为了实现那个，只需要输入glBufferData，同样GL_ARRAY_BUFFER是种类型，数组缓冲区
+so to do that, we'll just type in glBufferData, again GL_ARRAY_BUFFER is kind of the type of buffer, that this is array buffer
+
+121
+00:12:34,000 --> 00:12:38,575
+VertexBuffer的意思是，我不知道，ArrayBuffer是一个有趣的单词组合
+VertexBuffer basically just means, I don't know, ArrayBuffer is an interesting combination of words
+
+122
+00:12:38,575 --> 00:12:46,399
+但本质上就是顶点缓冲区在这种情况下就是数据的缓冲区，size就是sizeof(vertices)(字节)
+but essentially just means vertex buffer in this case just a buffer of data, size will be the sizeof vertices
+
+123
+00:12:46,800 --> 00:12:53,475
+这基本上要求数据的大小以byte为单位，可以用sizeof(float)*9，或者其他你们想要的
+this basically requires the size of this data in bytes, okay, so you could do sizeof float times 9, or whatever if you want
+
+124
+00:12:53,500 --> 00:13:00,575
+sizeof(vertices)也会给你们同样的字节量，同样的大小，因为这只是个栈，好了
+sizeof(vertices) will also give you that, same amount of bytes, right, that same size, because this is just a stack, alright
+
+125
+00:13:01,400 --> 00:13:06,900
+实际数据，还是vertices，还有usage，对于usage，我们会输入GL_STATIC_DRAW
+the actual data, which is vertices, and the usage, so for the usage, we'll type in GL_STATIC_DRAW
+
+126
+00:13:07,366 --> 00:13:11,966
+也就是说我们不会不断地用新数据刷新数组
+which basically just means that we're not gonna be continually like refreshing that array with new data
+
+127
+00:13:11,966 --> 00:13:17,200
+我们不会每帧都上传越来越多的数据，你们知道的，然后替换这些数据
+we're not gonna continue kind of uploading more and more data every frame, and kind of you know replacing that data
+
+128
+00:13:17,550 --> 00:13:23,225
+我们不会对它进行流处理，我们只会在构造函数中设置一次，就那样，所以这是静态数据
+we're not gonna be streaming it or anything, we're gonna set this up once in the constructor, and that's kind of it, so it's static data
+
+129
+00:13:24,375 --> 00:13:30,025
+好了，酷，最后我们需要做的是告诉OpenGL这个缓冲区的布局是什么
+um okay, cool, and then the last thing we need to do is actually tell OpenGL what the layout of this buffer is
+
+130
+00:13:30,025 --> 00:13:37,075
+因为你们知道，我的意思是，我们能看到那个，显然是三组不同浮点数的三维向量，对吧
+because you know, I mean it's great that we can see that, it's clearly 3 different kind of float kind of 3 component float vectors, right
+
+131
+00:13:38,125 --> 00:13:45,350
+比如OpenGL就不知道三维向量，只把它看作一堆字节，所以我们需要告诉它发生了什么
+like 3 vectories essentially OpenGL doesn't know that, it just sees it as a bunch of bytes, so we need to tell it what's up
+
+132
+00:13:45,825 --> 00:13:56,945
+所以我们要做的第一个就是glEnableVertexAttribArray，意思是我们要启用数据的索引0
+so the first thing we'll do is glEnableVertexAttribArray, basically says we're going to enable kind of index 0 of our data
+
+133
+00:13:56,945 --> 00:14:07,950
+你们马上就会看到这是怎么回事，然后VertexAttribPointer，我总是忘记，应该是Attrib
+you'll kind of see where this goes in a minute, and then VertexAttrPointer, I always forget this, what is it Attrib
+
+134
+00:14:09,175 --> 00:14:15,450
+没问题，得到了，这是在测试我的OpenGL技能，索引0，对，我们有点
+that's good I got it, right, this is testing my OpenGL skill, so index 0, right, so we're kind of
+
+135
+00:14:15,733 --> 00:14:22,200
+我们基本上为着色器提供了个顶点属性，这样它就能读取这些数据，基本上启用了索引0
+we're basically providing a vertex attribute for the shader, so that it can read this data, and we basically enabled index 0
+
+136
+00:14:22,200 --> 00:14:30,000
+这是什么，这是索引0，所以就是索引0处的数据，所以有3个float，所以我们写3个浮点数
+and what this is, this is index 0, so we're describing the data at index 0, so there's 3 floats essentially, so we write 3 floats
+
+137
+00:14:31,466 --> 00:14:38,325
+它们不会被归一化，因为虽然它们是浮点数，但归一化是为了我们以后会讲到的其他东西
+they're not going to be normalized, because while their floats, normalization is for something else that we'll talk about later
+
+138
+00:14:40,100 --> 00:14:47,700
+这里的size，不好意思，这里的stride是顶点之间的字节数，所以每个都是顶点
+the size here, or sorry the stride here is going to be basically the amount of bytes between vertices, so each one of these is a vertex
+
+139
+00:14:47,975 --> 00:14:52,025
+现在很明显我们得到了一个顶点位置，在这个例子中，我们得到了一个位置
+now clearly we've just got a vertex position, in this case, we've just got a position
+
+140
+00:14:52,575 --> 00:15:01,475
+那是整个顶点，所以我们有3个float，3x4，本质上12个字节，所以就是3*sizeof(float)
+that's our entire vertex, so we just have 3 floats, 3x4, essentially we're just 12 bytes, so we'll write 3*sizeof(float)
+
+141
+00:15:02,666 --> 00:15:07,550
+那就是stride，那是不同顶点之间的字节量
+that's how stride, so that's kind of the amount of bytes between different vertices
+
+142
+00:15:08,366 --> 00:15:17,350
+最后对于它说的指针，我们把空指针放进去，这本质上是那种属性的偏移量
+and then finally for it says pointer, we just put null pointer in, this is essentially the offset of, that kind of attribute specifically
+
+143
+00:15:17,350 --> 00:15:24,025
+现在我们只有一个属性，偏移量总是0，基本上这意味着当我到达下一个顶点时
+now we only have one attribute, the offset's always gonna be 0, basically that just means that when I get to the next vertex
+
+144
+00:15:24,266 --> 00:15:30,650
+这个属性从哪里开始，以0开始，因为那就是顶点的开始
+where does this attribute begin, it begins it by 0, because we only, that's just the beginning of the vertex
+
+145
+00:15:30,650 --> 00:15:36,150
+那就是我们所有的数据只有位置，好了，我想就那些了，那就是所有的
+that's all the data we have just the position, okay, I think that's it, so that's all of
+
+146
+00:15:36,400 --> 00:15:41,733
+那就是我们要为顶点缓冲做的，基本上就是创建了3个顶点位置
+that's what we have to do for our kind of vertex buffer, so we've basically created 3 vertex positions
+
+147
+00:15:41,733 --> 00:15:46,225
+然后它也会向OpenGL描述它们，它也会上传它们到这里的GPU
+and then it kind of describe them to OpenGL as well, it's also uploaded them to the GPU here
+
+148
+00:15:46,900 --> 00:15:59,153
+好了，现在我们需要创建索引缓冲区，用glGenBuffers，让我们看看，生成一个索引缓冲区
+all right, now we need to create that index buffer, so we'll do glGenBuffers um, let's see, so we'll generate it one index buffer
+
+149
+00:16:01,000 --> 00:16:04,700
+我们要做的是绑定缓冲区，这就是GL_ELEMENT_ARRAY_BUFFER
+we'll do bind buffer, now this time is gonna be GL_ELEMENT_ARRAY_BUFFER
+
+150
+00:16:04,700 --> 00:16:08,975
+元素数组，我把这些叫做索引缓冲区
+element array, so I call these index buffers, really there
+
+151
+00:16:09,166 --> 00:16:15,450
+技术上来说，如果你们比如用纯粹的OpenGL，可能叫它们元素缓冲区而不是索引缓冲区
+I guess technically, if you were being like all purist OpenGL, you call them element buffers not index buffers
+
+152
+00:16:16,266 --> 00:16:21,225
+元素缓冲区和索引缓冲区是一回事，大多数人都称它们为索引缓冲区
+an element buffer and an index buffer is the same thing, most people call them index buffers
+
+153
+00:16:21,225 --> 00:16:27,325
+在DirectX中，它们被称为索引缓冲区，但OpenGL称它们为元素缓冲区，我不知道为什么
+in DirectX, they're called index buffers, but you know OpenGL called them element buffers, I don't know why
+
+154
+00:16:28,550 --> 00:16:34,200
+他们只是想与众不同或者其他什么，我甚至不确定这段历史，我不确定，不知道是谁
+they just wanted to be different or whatever, I'm not even sure the history of this, I'm not sure I'm not gonna say who
+
+155
+00:16:34,200 --> 00:16:39,750
+正确的说法是什么，但是大多数行业都称它们为索引缓冲区，那就是为什么我也那样叫它们
+like what's the correct way of saying it, but most of the industry refers to them as index buffers, so that's why I called them as well
+
+156
+00:16:40,100 --> 00:16:45,675
+这是我习惯的，我们会绑定那个缓冲区，基本上它只是一个顶点的缓冲区
+it's what I'm used to, so we'll bind that buffer, basically it's just a buffer of like vertex
+
+157
+00:16:45,675 --> 00:16:52,700
+就像它是一个索引的缓冲区，基本上索引更小，它就像顶点缓冲区的一个索引
+like it's a buffer of indices, which basically r indices are less, it's like an index into this vertex buffer
+
+158
+00:16:52,700 --> 00:16:59,825
+它告诉你如何绘制这些顶点来填满这个三角形，很明显，如果我们回头看下这个
+so it tells you kind of what order to kind of draw these vertices into fill this triangle, so clearly if we go back to this for a second
+
+159
+00:17:00,200 --> 00:17:06,625
+我们显然想首先绘制这个顶点，对吧，然后是这个，最后是这个顶点
+we clearly kind of want to draw this one first, right, and then this one second, and then this one third
+
+160
+00:17:06,625 --> 00:17:14,775
+你们可以看到它有点像数组的下标，在这儿，我们看到我们想首先绘制索引0顶点
+so you can see kind of it's like an index into array into an array, we kind of go over here, we see we want to draw this one first with index 0
+
+161
+00:17:14,775 --> 00:17:18,167
+然后1，然后2，对吧，如果有另一个三角形，我们继续
+then 1, then 2, right, if we had another triangle, we'd keep going
+
+162
+00:17:18,650 --> 00:17:22,503
+你们也可以复用顶点，所以如果我有，如果我想画一个正方形
+you can also reuse vertices, so if I had, if I wanted to draw a square
+
+163
+00:17:22,900 --> 00:17:28,075
+我想要的是，这是我正方形的其余部分，这是索引比如3
+and I wanted to have kind of, this was like the rest of my square, and this was index like 3
+
+164
+00:17:29,050 --> 00:17:36,375
+那么实际上我可以用0 1 2来绘制这个三角形，然后是0 1 3，不过可能会用0 3 1
+then essentially what I could have is 0 1 2 to draw that triangle, and then 0 1 3, except I'd probably do 0 3 1
+
+165
+00:17:36,375 --> 00:17:45,700
+因为是逆时针绘制的，如果我在顶点缓冲区中有这些索引，只需要这4个顶点
+because it's anticlockwise to draw that, okay, and if I kind of had those indices in my vertex buffer, I would only need these 4 points
+
+166
+00:17:46,200 --> 00:17:54,850
+但我可以绘制正方形，因为可以复用顶点，后面会讲更多，所以在这里unsigned int indices
+but I could draw a square, okay, because I can reuse vertices, but more on that later, so over here, we'll create unsigned int indices
+
+167
+00:17:55,500 --> 00:17:59,150
+你们可以使用短整型或类似的东西，通常是int，这是很好的方法
+you can use shorts or anything like that usually int, so pretty much the way to go there
+
+168
+00:18:01,133 --> 00:18:07,325
+因为在这种情况下，你们可能永远不会用完索引，我们有3个，那就是0 1 2
+because you'll probably never run out of indices in that sense, we'll have 3 of them, and that'll just be 0 1 2
+
+169
+00:18:07,533 --> 00:18:18,200
+因为三角形中只有3个点，就是那样，调用glBufferData，就像对顶点缓冲区做的一样
+okay, because we just have 3 points in our triangle, that's it, we'll do glBufferData same thing as we did with our vertex buffer
+
+170
+00:18:18,200 --> 00:18:26,950
+只不过这次，它将是glElementArrayBuffer，而不是那个，size就是sizeof(indices)
+except this time, it will be glElementArrayBuffer, not that, size is going to be sizeof(indices)
+
+171
+00:18:27,825 --> 00:18:35,625
+然后是indices，usage是GL_STATIC_STREAM，好了，差不多就是那样
+that is going to be indices, and usage, again static draw, alright sweet, so that's pretty much it
+
+172
+00:18:36,333 --> 00:18:41,175
+我只是在想我是否漏了什么，我想是的，我的意思是看看这个是否有效，我们会调试它
+I'm just trying to think if I've missed anything, I think so, I mean we'll see if this works and we'll debug it
+
+173
+00:18:42,166 --> 00:18:47,575
+因为很明显我还没有真正测试过这个，但这应该很好，所以如果往下看，实际上每帧都要做
+because obviously I haven't really tested this, but that should be good, so if we go down to what we actually have to do every frame now
+
+174
+00:18:47,825 --> 00:18:59,725
+我们要做的就是绑定那个顶点数组，也就是m_VertexArray，然后调用glDrawElements
+really all we have to do is bind that vertex array, which is m_VertexArray, and then we just call glDrawElements
+
+175
+00:19:00,133 --> 00:19:08,775
+它被称为DrawElements，因为元素是我们的索引，在DirectX中，它被称为DrawIndexed
+so again it's called DrawElements, because elements are our indexes, right, so in DirectX this is, it would be called DrawIndexed
+
+176
+00:19:09,766 --> 00:19:17,050
+但在OpenGL中叫做DrawElements，因为它们就叫元素，那么GL_TRIANGLES就是模式
+but in OpenGL called DrawElements, because they call hendeces elements, allright, so we have GL_TRAIANGLES is our mode
+
+177
+00:19:17,600 --> 00:19:24,575
+要怎么绘制这些索引, 至于count，就是要绘制多少个，3个，type就是GL_UNSIGNED_INT
+kind of how we want to draw these indexes, count, how many we want to draw 3, the type is going to be GL_UNSIGNED_INT
+
+178
+00:19:25,600 --> 00:19:28,800
+然后是索引，这是指定给它们的，我们会使用nullpointer
+and then the indices, this is appointed to them, we're going to go with an nullpointer
+
+179
+00:19:29,166 --> 00:19:37,350
+原因是我们没有提供显式的索引缓冲区，也就是附加在顶点数组上的那个，应该是这个
+the reason is we're not providing an explicit index buffer, the one that is attached to our vertex array, which should be this one, right
+
+180
+00:19:37,350 --> 00:19:44,525
+因为有顶点数组的绑定，当我们创建并绑定这种索引缓冲区时，顶点数组会保留那个状态
+because we have the vertex array bound, when we created and bound this kind of index buffer, vertex array is kind of retain that state
+
+181
+00:19:44,600 --> 00:19:49,400
+那么应该没什么问题，现在如果我们运行这个，我们会在屏幕上看到一个三角形
+so we should be fine, so now if we just run this, we should see a triangle on the screen
+
+182
+00:19:49,400 --> 00:19:54,760
+让我们看看这里发生了什么，好了，看看这个，我们在屏幕上有一个三角形，那很酷
+let's just see what happens here alright check this out, so we have a triangle on the screen, that's pretty cool
+
+183
+00:19:54,760 --> 00:20:01,250
+正如你们所看到的我所描述的和我绘制的，我的小图表和你们在屏幕上看到的差不多
+and as you kind of saw what I kind of described and what I drew in this, little diagram of mine is pretty much what you see on screen
+
+184
+00:20:01,533 --> 00:20:11,950
+这是关于x的-0.5 0.5和0，好了，很好，我们在Hazel中绘制出了第一个三角形
+where this is a kind of -0.5, 0.5 and 0 as far as x is concerned, and there you are, wonderful, we've drawn our first triangle in Hazel
+
+185
+00:20:11,950 --> 00:20:16,675
+那很令人兴奋，我不想提那个，我们实际上不需要这个绑定顶点数组
+that's pretty exciting, now I didn't want to mention that, like we don't actually need this bind vertex array
+
+186
+00:20:16,675 --> 00:20:22,350
+因为很明显我们在这里已经绑定了，就让它保留在那儿，但我只是想更特殊一点
+because clearly we've bounded kind of here, and we've left it bound, but I just wanted to be a little bit more spliced
+
+187
+00:20:23,950 --> 00:20:28,450
+是的，我的意思是希望这是有意义的，你们可以再次看到我们不需要着色器
+yeah I mean hopefully this made sense, again you can see that we don't need a shader
+
+188
+00:20:28,450 --> 00:20:32,875
+默认情况下，它会给我们一个白色三角形，这与普遍观点相反
+it's just gonna give us a white triangle by default, contrary to popular belief
+
+189
+00:20:33,525 --> 00:20:39,325
+我们不需要现代OpenGL中的着色器，顺便说一下，我们正在使用核心模式
+you don't actually need shaders around us stuff in modern OpenGL, and we are dealing with a core profile by the way
+
+190
+00:20:39,600 --> 00:20:42,650
+这应该与几乎所有的图形驱动程序工作，如果它没有运行，请及时告诉我
+and this should work with pretty much all graphics drivers, if it doesn't, let me know
+
+191
+00:20:43,200 --> 00:20:49,625
+我没有任何AMD的硬件来进行实际测试，但我不确定那是否会有问题
+I don't have any AMD hardware to actually test on, but I'm not sure if that that may be problematic
+
+192
+00:20:51,600 --> 00:20:56,750
+不管怎样，当你们用完这些东西后，显然想从GPU中删除它们
+anyway you obviously want to ideally delete these things from the GPU, when you're done with them
+
+193
+00:20:57,800 --> 00:21:02,766
+有很多，你们知道，我的意思是这不是，这不是代码，我真的会发布，但那不是重点
+and there's a lot of them, you know, I mean this is not, this is not code, I would really ship, but that's not the point
+
+194
+00:21:02,766 --> 00:21:07,275
+重点是在Hazel中绘制一个三角形，然后你们就知道我们需要做什么了
+the point is just to draw a triangle in Hazel, and then now you kind of see what we need to do
+
+195
+00:21:07,675 --> 00:21:13,225
+顶点数组需要移动到类中，这是所有的缓冲区，我们需要从中创建一个接口
+vertex arrays need to be kind of moved into classes, so there's all, this kind of buffer, we need to create an api out of it
+
+196
+00:21:13,225 --> 00:21:19,625
+这样我们才能更好地完成这些工作，索引缓冲区也需要被移到它自己的类中
+so that we can do all this stuff in a better way, gen you know the index buffers as well need to be moved into its own thing
+
+197
+00:21:20,575 --> 00:21:26,329
+渲染器会处理清除颜色，和实际的清除，虽然你们知道清除和清除颜色
+the renderer would handle things like clear color, and the actual clearing, although you know clear and clear color
+
+198
+00:21:26,329 --> 00:21:31,750
+这些东西最终会到达你们实际使用的渲染目标或帧缓冲区
+things that eventually would make themselves to the actual render target or frame buffer that you were actually using
+
+199
+00:21:32,075 --> 00:21:36,175
+然后再绘制元素是你们在渲染器上做的事，你们告诉渲染器
+and then draw elements again is something that you do with the renderer, so you tell the renderer
+
+200
+00:21:36,600 --> 00:21:43,375
+我提交这个绘制数据，请绘制它，然后渲染器本身会调用glDrawElements来绘制那个
+I am submitting this draw data, please draw it, and then the renderer itself would call glDrawElements to actually draw that stuff
+
+201
+00:21:43,866 --> 00:21:50,150
+所有这些东西最终都被抽象到自己的类中，但现在我们有了一个概览
+so this is all kind of stuff that eventually gets abstracted out into its own classes, but now we have an overview
+
+202
+00:21:50,150 --> 00:21:58,262
+这样我们就可以开始做了，这很酷，很明显我们有了一个测试平台，真正想做的是什么
+so that we can actually begin doing that, which is pretty cool, and and obviously we have like a test bed um of what we actually want to do
+
+203
+00:21:58,466 --> 00:22:02,450
+我的意思是，我们不只是创建类，然后在它的最后，哦，嘿，一个三角形
+what I mean by that is like instead of us just building classes, then at the end of it, oh hey a triangle
+
+204
+00:22:02,966 --> 00:22:06,050
+我们有一个三角形，我们可以下来搞，我很喜欢那样
+we kind of have a triangle, and we can work backwards, and I'm kind of a big fan of that
+
+205
+00:22:06,786 --> 00:22:11,550
+因为让东西快速运行起来总是一件很好的事情，看看它是否在第一时间起作用
+because getting stuff up and running quickly is always a good thing to see if it even works in the first place
+
+206
+00:22:12,466 --> 00:22:18,725
+而且这也更有动力，更好的方式是，我来看看三角形，随着时间的推移，我们也会做这个
+and also it's just kind of more motivating, and just better to kind of be like I'll look at triangle, and also as we do this over time
+
+207
+00:22:18,725 --> 00:22:23,250
+例如，我们会先移除顶点数组，然后是缓冲区，我不确定我们会以什么顺序来做
+youknow, we'll remove vertex arrays first for example, then buffers, I'm not sure which order we'll do it in
+
+208
+00:22:23,250 --> 00:22:29,000
+但假设那是我们依次做的顺序，然后继续检查和测试，这个三角形仍然在那里
+but suppose that was the order we do it one step at a time, and then we keep checking and testing, it's our triangle still there
+
+209
+00:22:29,000 --> 00:22:35,384
+我知道很明显我们犯了一个错误，所以这是另一种很好的工作方式，好，很好
+I know it's gotten clearly we've made a mistake, so it's another very kind of good way to actually work, okay, cool
+
+210
+00:22:36,600 --> 00:22:43,600
+嗯，我想做点别的，是的，我想向你们展示我们如何看到我们有哪些显卡
+um I wanted to do something else, yeah, so I wanted to actually show you guys how we can see what graphics driver we have
+
+211
+00:22:43,600 --> 00:22:50,200
+如果我们进入OpenGLContext类，我实际上要做的是当我们已经让context成为当前的
+so if we go into our OpenGLContext class, what I'm actually going to do is when we've actually made the context current
+
+212
+00:22:50,200 --> 00:22:58,025
+我们已经初始化了这些东西，我实际上想GL，我想应该是glGetString(GL_VENDOR)之类的
+and we've initialized this stuff I actually want to GL, I think it's GetString(GL_VENDOR) or something like that
+
+213
+00:22:58,600 --> 00:23:05,900
+我可能要讲一下这个，但本质上它应该做的是让我们知道，我们会用HZ_CORE_INFO之类的
+I might have to Google this, but essentially what this should do is actually let us know, and we'll do an HZ_CORE_INFO or something
+
+214
+00:23:06,333 --> 00:23:17,225
+这应该告诉我们，我可能会说OpenGL Renderer，这应该告诉我们我们使用的是什么GPU
+this should actually tell us, you know, I might say OpenGL, you know renderer, this should actually tell us what GPU we're using
+
+215
+00:23:17,875 --> 00:23:24,100
+基本上用的是什么驱动，如果运行这段代码，可能会有用，同样，这是完全不在内存中的
+basically what driver we're using, so if I just kind of run this code, maybe that will work, again this is completely off memory
+
+216
+00:23:24,100 --> 00:23:35,604
+运行起来了，我们会看到，控制台在哪里，这儿，就是OpenGL Renderer: Intel
+so if I'm run and run, but we'll see, where's our console, here it is, okay, so it just says OpenGL Renderer Intel
+
+217
+00:23:35,700 --> 00:23:39,125
+所以那不是很有用，我不确定是否有更好的方法来实现那个
+so that's not that useful, I'm not sure if there's a better way to do that
+
+218
+00:23:39,125 --> 00:23:45,450
+可能是一个实际的版本号，但我想那只是我请求的是供应商
+maybe by an actual version number usually says kind of what it is, but I guess that's just the vendor I've asked for
+
+219
+00:23:45,450 --> 00:23:53,050
+看看是否有，这是GL_RENDERER，GL_VERSION，那就是OpenGL Renderer，也许会写1
+let's see if there's this GL_RENDERER, there's GL_VERSION, so OpenGL renderer, maybe I'll do that and one
+
+220
+00:23:53,700 --> 00:24:00,800
+让我们看看这是怎么做的，我可能会把它移进去，我可能会把它格式化得更好一点
+so let's see what this does, I'll probably move this into it, I'll probably format this a bit nicer in a second
+
+221
+00:24:00,800 --> 00:24:07,350
+但我想我也想看渲染器，这只是为了使用控制台窗口，好了，我们继续
+but I guess I want to see the renderer as well, it's just for using that console window, okay, so there we go
+
+222
+00:24:07,350 --> 00:24:13,550
+然后是Intel(R) HD Graphics 530，好的，很酷，这看起来很好，我要做的是把它清理一下
+Intel and then Intel HD Graphics 530, okay, cool, so this looks pretty good, so what I'll do just to clean this up a little bit
+
+223
+00:24:13,550 --> 00:24:26,200
+是把OpenGL Renderer，然后可能用HZ_CORE_INFO，可能是2个空格，然后是Vendor
+is I'll kind of do OpenGL Renderer, and then I'll probably do HZ_CORE_INFO, you know, maybe like 2 spaces, and then Vendor
+
+224
+00:24:26,666 --> 00:24:37,250
+然后我们会写Vendor，Renderer，然后是Version，这样就能得到些基本的OpenGL信息
+and then we'll kind of do Vendor, Renderer, and then version, okay, just so that we get some basic OpenGL kind of info here
+
+225
+00:24:38,200 --> 00:24:47,475
+那么这里是Vendor，下面是Version，就是GL_VERSION
+so we'll do a Vendor over here, we'll do Version down here, GL_VERSION
+
+226
+00:24:48,800 --> 00:24:56,350
+然后你们知道Renderer，它也会移动，就是OpenGL Info之类的
+and then you know Renderer, it will move as well, OpenGL Info or something like that
+
+227
+00:24:58,300 --> 00:25:02,100
+好了，很好，这是一种快速的查询方法
+okay, cool, and this is kind of just a quick curd way of doing it 
+
+228
+00:25:02,100 --> 00:25:08,150
+但是它会以一种非常快速简单的方式告诉你们所有需要知道的东西
+but it should give you pretty much everything you need to know in just a really quick kind of easy way
+
+229
+00:25:08,500 --> 00:25:17,150
+让我们再运行一遍，手动编译这些，就像，看这个，VS已经有点困难了
+so let's just run this again, man these compile times already, like look at this, visual studio already kind of odds
+
+230
+00:25:17,150 --> 00:25:26,425
+因为我已经选中了，好了，那么继续，有Vendor Intel，Renderder，然后Version 4.4
+because I've got that I'm selected, okay, so there we go, okay, I put jelly first, we have vendor Intel renderer, and then version 4.4
+
+231
+00:25:26,700 --> 00:25:31,325
+很好，那就是我们得到的东西，以及它能做什么
+awesome, okay, so that's the kind of stuff that we get with that, and then what it can do
+
+232
+00:25:31,325 --> 00:25:35,699
+你们应该做的是进入NVIDIA的控制面板
+and what you guys probably should do is if you go into your NVIDIA control panel
+
+233
+00:25:35,700 --> 00:25:42,450
+在桌面上右键点击，然后点击NVIDIA控制面板，如果选择管理3个设置，然后是程序设置
+you can just right click on your desktop, and then hit NVIDIA control panel, and if you go to manage 3 settings, then program settings
+
+234
+00:25:42,450 --> 00:25:51,199
+你们可以在这里添加Hazel程序，所以添加它，然后要确保它使用高性能和视频处理器
+you can add that kind of Hazel thing here, so I'll add that, and then I'll just make sure that it uses the high performance and video processor
+
+235
+00:25:51,200 --> 00:25:59,850
+举个例子，我点击应用，一旦它真的应用了，如果再次运行它，它就会使用NVIDIA GPU
+for example I'll hit apply on that, and then once that actually does apply, if I run it again, it should actually use my NVIDIA GPU instead
+
+236
+00:26:01,075 --> 00:26:10,650
+如果再次运行这个，回到这，你们可以看到，NVIDIA公司，使用的版本是4.6而不是4.4
+so if I run this again, we go back to this, you can see that, now it says in a NVIDIA corporation, we're using a period of 4.6 instead of 4.4
+
+237
+00:26:10,966 --> 00:26:15,562
+你们还可以看到它使用的是什么显卡，如果这对你们不起作用
+and you can see kind of what card it's using as well, okay, so if this does not work for you
+
+238
+00:26:15,800 --> 00:26:21,306
+现在你们在context类中有了这些额外的代码，基本上就到这里来
+then now that you have this extra code in your context class, just basically come over here
+
+239
+00:26:22,100 --> 00:26:27,550
+复制这个，然后粘贴到评论中，我们会看到驱动程序有什么问题
+and just you know copy this, and just paste it in a comment, and we'll see kind of what drivers are problematic with this
+
+240
+00:26:27,550 --> 00:26:33,850
+但据我所知，这在现代硬件中应该是相当可靠的，所以如果你们用的是10年前的硬件的话
+but as far as I know this should be pretty solid in kind of modern ish hardware, so maybe if you're using hardware from 10 years ago
+
+241
+00:26:33,850 --> 00:26:38,890
+但是，我认为这种例子应该适用于大多数人
+something but um, I think that this kind of example should work for most people
+
+242
+00:26:39,250 --> 00:26:42,775
+不管怎样，我希望你们喜欢这个视频，如果喜欢的话，就为它点赞吧
+anyway, I hope you guys enjoyed this video, if you did, you're gonna hit that like button
+
+243
+00:26:42,775 --> 00:26:46,727
+你们也可以通过访问patreon.com/thecherno来帮助支持本系列
+you can also help support this series by going over to patreon.com/thecherno
+
+244
+00:26:46,850 --> 00:26:50,450
+正如我在视频开始时所说的，这是支持这个系列的一个很好的方式
+as I said in the beginning of this video, it's a really great way to support this series
+
+245
+00:26:50,450 --> 00:26:58,100
+我非常感谢所有让这成为可能的人，如果你们想要比这更高级的代码
+I'm super thankful to all the people who actually do make this possible, and yeah like if you want kind of more advanced code than this
+
+246
+00:26:58,100 --> 00:27:06,075
+不想一周一周等，因为这个系列越来越多，我在那里做了更多的东西，嗯，酷，令人兴奋
+and you don't want to wait week to week as the series grows, then I've done a lot more stuff there, um cool, this is pretty exciting
+
+247
+00:27:06,166 --> 00:27:12,725
+我们在Hazel已经有了第一个三角形，我会把代码上传github，就像在每期的最后做的那样
+our first triangle in Hazel is now live, I will upload this code to github, as I do kind of at the end of every episode
+
+248
+00:27:12,725 --> 00:27:16,550
+所以你们可以切出它，并在你们的电脑上运行它，就像我说的，这是看它是否运行
+so you can check it out, and run it on your computer, and as I said, it's kind of see if it works
+
+249
+00:27:17,400 --> 00:27:20,525
+下期我们会开始，我们下期可以做两件事
+next time we're gonna kind of start, well there's 2 things that we can do next time
+
+250
+00:27:20,800 --> 00:27:27,400
+因为这周我不会为观众提前做一期节目，我可以问你们，我可以问你们，看看你们想要什么
+and since I'm not making an episode early for patrons this week, I can just ask you, I can just ask you guys and see what you want
+
+251
+00:27:27,766 --> 00:27:33,600
+所以我们可以创建一个着色器，给它添加一个着色器，让三角形变成红色或类似的东西
+so we could either create a shader and just add a shader to this, and make the triangle like red or something like that
+
+252
+00:27:33,600 --> 00:27:41,675
+看看我们如何添加一个着色器，或者直接把它抽象出来，添加着色器应该没什么问题
+and kind of go through how we're gonna add a shader to that, or we can just start abstracting the stuff out, adding a shader would be nice
+
+253
+00:27:41,675 --> 00:27:47,800
+因为这意味着我们可以对要抽象的东西有一个全面的了解，然后我们可以做更多很酷的事情
+because it just means that we can kind of have a full picture of what to abstract, and then we can do a lot more kind of cool things
+
+254
+00:27:47,800 --> 00:27:52,925
+我想是这样，但如果你们不想看那个，如果你们希望我们更快地进行抽象
+I guess with that, but if you guys don't want to see that, if you guys would rather we get to the abstraction faster
+
+255
+00:27:52,925 --> 00:27:56,557
+我们会尽快创建那个渲染并建立那个渲染接口
+and kind of just create that render and build up that rendering api as soon as we can
+
+256
+00:27:56,900 --> 00:28:01,733
+然后我们也可以这样做，听你们的，我可能会做个YouTube，因为那是关键，对吧
+then we can also do that, choice as yours, I might do a YouTube pole actually, because that's the thing, right
+
+257
+00:28:01,733 --> 00:28:05,966
+我不确定它是否仍然是一个东西，要么可以这样做，或者只是在下面留下评论
+I'm not sure if it's still a thing might either do that, or just kind of leave a comment below
+
+258
+00:28:05,966 --> 00:28:11,075
+上传你们想要表达的东西的评论，你们知道，我过几天会读它们
+and just upload comments that are saying the thing that you want, and you know, I'll kind of read them in a couple days 
+
+259
+00:28:11,075 --> 00:28:15,667
+看看我们需要做什么，好了，感谢收看，下次见，拜
+and see what we need to do, alright, thanks for watching, I'll see you guys next time, goodbye
+

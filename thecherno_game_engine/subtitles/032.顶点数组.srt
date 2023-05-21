@@ -1,0 +1,1840 @@
+﻿1
+00:00:00,133 --> 00:00:03,466
+嘿，你们好，我是TheCherno，欢迎回到我的游戏引擎系列
+hey, what's up guys, my name is TheCherno, welcome back to my game engine series
+
+2
+00:00:03,466 --> 00:00:11,175
+那么上期，我们看了顶点缓冲区布局，并且优雅地设计了一个处理所有那些东西的类
+so last time we do a look at vertex buffer layouts, and we designed a class that could handle all of that stuff kind of for us and elegantly
+
+3
+00:00:11,175 --> 00:00:15,600
+因此它看起来很棒，一定要去看看那期视频哦，因为它确实包含了很多
+so that it look nice, definitely make sure that you check out that video, because it's really informative
+
+4
+00:00:15,600 --> 00:00:21,025
+我想很多人也喜欢它，但它绝对不是，抱歉，因为我们接下来要讲的东西
+I think a lot of people liked it as well, and it's definitely not, sorry, for kind of what we're moving on with next
+
+5
+00:00:21,025 --> 00:00:29,900
+也就是顶点数组，那就是我们今天这期视频要做的，顶点数组本质上是，在OpenGL中
+which is gonna be talking about vertex arrays, and that's what we're gonna do in this video today, so vertex arrays are essentially, in OpenGL
+
+6
+00:00:29,900 --> 00:00:35,950
+它们被定义为，我的意思是，它们有点奇怪，老实说，我真的认为它应该存在
+they're kind of defined as, I mean, they're a bit weird, to be honest, if I'm being completely honest with you, I really think that should exist
+
+7
+00:00:36,800 --> 00:00:42,800
+在OpenGL系列中确实做过，包含了顶点数组，看看吧，就像这个系列之前的视频一样
+I do have a video, covering vertex arrays in the OpenGL series, check that out, again just like with the previous video in this series
+
+8
+00:00:42,800 --> 00:00:50,066
+我不想只解释很多过去已经解释过的，所以如果你们想了解更多细节，可以看看那期视频
+I don't want to just explain a lot of stuff that I've already explained in the past, so check out that video, if you want more details
+
+9
+00:00:50,066 --> 00:00:59,775
+但本质上顶点数组是一种包含状态的实体，对吧，所以它们实际上不包含任何实际数据
+but essentially vertex arrays are a kind of state containing entity, right, so what they don't actually contain any real data
+
+10
+00:00:59,775 --> 00:01:04,766
+就像顶点缓冲区，包含了顶点，索引缓冲区包含了索引
+like your vertex buffer, is what contains your vertices, your index buffer is what contains the indeces
+
+11
+00:01:04,766 --> 00:01:12,025
+这两个缓冲区是你们的实际缓冲区，它们的内存缓冲区中有你们的实际数据
+those 2 pieces of kind of like, those 2 buffers are your actual buffers, their memory buffers, they have your actual data
+
+12
+00:01:12,375 --> 00:01:19,225
+顶点数组实际上包含的只是对顶点缓冲区和索引缓冲区的引用
+what the vertex array actually contains is just references essentially to a vertex buffer and to an index buffer
+
+13
+00:01:19,600 --> 00:01:24,900
+还有一种叫做布局的东西，这当然是我们在上一期讨论过的
+and also to something called a layout, which is of course what we talked about in the last episode
+
+14
+00:01:25,866 --> 00:01:31,225
+所以基本上就是你们创建了一个顶点数组，然后可以绑定一个顶点缓冲区到它上面
+so basically what happens is you create a vertex array, and then you can bind a vertex buffer to it
+
+15
+00:01:31,700 --> 00:01:39,737
+顶点缓冲区和它的索引缓冲区，这两个东西，都在顶点数组中
+and a vertex, I'm sorry and an index buffer to it, and those 2 kind of things, right, live inside that vertex array
+
+16
+00:01:40,800 --> 00:01:47,766
+现在需要注意的是，当我说它们生存在里面时，并不是说它们的字面副本存活在里面
+now it's important to note that when I say they live inside it, it doesn't mean that like literal copies of them kind of live inside
+
+17
+00:01:47,766 --> 00:01:50,200
+并不是那种在里面的生存，我真正想说的是
+it's not that kind of living inside, what I'm actually talking about is
+
+18
+00:01:50,566 --> 00:01:57,432
+顶点数组与这两个相关联与顶点缓冲区和索引缓冲区相关联，但实际上不像
+the vertex array is associated with those 2 kind of with the vertex buffer and the index buffer, but it's not actually like
+
+19
+00:01:57,800 --> 00:02:05,250
+它不能控制它的生存期，如果你们想修改顶点缓冲区本身
+it doesn't control its lifetime, right, and you know, if you if you like modify the vertex buffer itself
+
+20
+00:02:05,250 --> 00:02:10,178
+它会修改顶点数组里的那个，因为顶点数组只有链接
+it's going to modify the same one, that's inside the vertex array, because the vertex array just has links
+
+21
+00:02:10,566 --> 00:02:15,775
+那有点像指针，对吧，它们有指向现有顶点缓冲区和现有索引缓冲区的指针
+that's kind like pointers, right, they just have pointers to an existing vertex buffer and to an existing index buffer
+
+22
+00:02:15,966 --> 00:02:23,100
+它们实际上不包含自己的，它们不拥有顶点缓冲区和索引缓冲区，只是引用它们，对吧
+they don't actually contain their own, they don't own the vertex buffer and the index buffer, they just kind of reference them, right
+
+23
+00:02:23,400 --> 00:02:29,628
+然后它拥有的另一个东西本质上是VertexBuffer的所有布局信息
+and then the other thing that it has is essentially all of the layout kind of information of our VertexBuffer
+
+24
+00:02:29,866 --> 00:02:34,675
+就像上期，我们讲了如何使用顶点属性指针
+so just like in the last episode, we talked about how we had to use, like you know, vertex attribute pointers
+
+25
+00:02:34,675 --> 00:02:41,375
+我们设置了一个BufferLayout类和所有这些东西，那是朝向我说过的每个VertexBuffer
+and we set up a BufferLayout class and all of that kind of stuff, right, that is toward kind of per VertexBuffer as I said
+
+26
+00:02:41,375 --> 00:02:48,275
+但是这个状态会存储在数组中，在VertexArray中，意味着，当重新绑定个VertexBuffer
+but what happens is that state is stored in your array, in your VertexArray, which means that, when you rebind a VertexBuffer
+
+27
+00:02:48,275 --> 00:02:55,025
+你们不需要重新定义它的层，除非它被改变了，对吧，对于多个VertexBuffer来说有点不同
+you don't need to redefine its layer, unless it's changed, right, and this works a little bit differently for multiple VertexBuffers
+
+28
+00:02:55,025 --> 00:02:59,617
+因为能做的是，你们实际上可以有一个VertexArray，然后有几个VertexBuffer
+because what you can do is, you can actually have a VertexArray, and then have like several VertexBuffers
+
+29
+00:02:59,966 --> 00:03:06,150
+包含不同的信息，比如你们可能有个用于位置，用于法线，一个用于骨骼
+containing different information, like you might have one for like positions, one for normals, one for bones
+
+30
+00:03:06,150 --> 00:03:13,299
+一个是你们正在处理的，对吧，在这方面，它们仍然在VertexArray中
+one for whatever it is that you're dealing with, right, and in that regard, they're still in the VertexArray
+
+31
+00:03:13,300 --> 00:03:19,725
+但你们要做的是绑定VertexArray，绑定VertexBuffer，设置VertexBuffer的布局
+but what you do is you actually bind the VertexArray, bind the VertexBuffer, set the layout for the VertexBuffer
+
+32
+00:03:20,100 --> 00:03:25,175
+然后你们绑定下个VertexBuffer，用VertexArray设置它的层，仍然是一种绑定，对吧
+then you bind your next VertexBuffer, set its layer up with the VertexArray, still kind of bound, right
+
+33
+00:03:25,175 --> 00:03:29,075
+所以你们可以那样做，但那不是我们今天要讲的内容
+so you kind of just do it that way, but that's not something that we're really gonna touch on today
+
+34
+00:03:29,075 --> 00:03:33,566
+因为使用多个VertexBuffer，不是什么，这是非常常见的，无论如何
+because using multiple VertexBuffers isn't something, that's very commonly done, anyway
+
+35
+00:03:33,566 --> 00:03:38,275
+因为通常更好的做法是把数据放在一个VertexBuffer中，这就是我们一直在做的
+because it's usually better to just inter level of your data in a single VertexBuffer, which is what we've been doing
+
+36
+00:03:39,266 --> 00:03:44,867
+但那是它运行的要点，在IndexBuffer中也是，VertexArray会把它绑定在一起
+but that's kind of the gist of how it works, and with an IndexBuffer as well, a VertexArray does actually tie that in
+
+37
+00:03:46,166 --> 00:03:51,651
+这意味着它也引用那个，所以它不只是VertexBuffers，它们是对应的布局
+which means basically that it also references that, so it's not just for VertexBuffers, and they're corresponding layouts
+
+38
+00:03:52,100 --> 00:03:59,666
+对于IndexBuffer或者元素缓冲区也是这样，对吧，我想提的另一件事是
+it's also the case for IndexBuffers, right, for element buffers, one other thing I want to mention is that
+
+39
+00:03:59,666 --> 00:04:06,180
+在OpenGL 4.5中有一些新函数，也许不确定，我可能会做一个OpenGL系列
+there are some new functions in OpenGL 4.5, maybe not sure, I'll probably make an OpenGL series
+
+40
+00:04:06,366 --> 00:04:13,575
+不管如何，就像这些视频一样，但是有新的函数让它更清晰地联系在一起
+like episodes positively about this, anyway, but there are new functions to make this, tying together a little bit more clear
+
+41
+00:04:13,575 --> 00:04:20,025
+因为它完全，只是很混乱，对吧，OpenGL的接口一般来说并不是很好
+because it's completely, just it's messy, right, OpenGL's api in general is not that great
+
+42
+00:04:20,700 --> 00:04:26,075
+引入这些新函数后，它肯定会更好，但基本上它只是意味着
+it definitely is a lot better with introduction of these new functions, but basically it just means that
+
+43
+00:04:26,075 --> 00:04:31,750
+你们可以将VertexBuffer, layout, IndexBuffer或任何东西绑定到VertexArray中
+you can tie together like a VertexBuffer or a layout or an IndexBuffer or anything into a VertexArray
+
+44
+00:04:32,050 --> 00:04:37,450
+不需要绑定一堆状态，你们只需要指定数组的id, 也就是VertexBuffer的id
+without having to bind a bunch of state, you actually just specify the id of the array, the id of the VertexBuffer
+
+45
+00:04:37,450 --> 00:04:42,162
+它只是把它们联系在一起，这更有意义，这是我们未来可能会探索的东西
+it just kind of ties them together that way, which it makes a lot more sense, something that we might explore in the future
+
+46
+00:04:42,566 --> 00:04:50,994
+但我并不想把这个东西限制在OpenGL 4.5，它很大，而且我自己还没有探索过
+but I don't really want to restrict this stuff to I guess OpenGL 4.5, so it's big and it's not really something that I've explored myself yet
+
+47
+00:04:51,666 --> 00:04:56,178
+但我可能会做一期关于OpenGL的视频，因为我认为那值得探索
+but I will probably make an OpenGL episode about that, because I think that's worth kind of exploring
+
+48
+00:04:56,306 --> 00:04:59,762
+不管怎样，让我们开始，看一下如何构建一个VertexArray类
+anyway, let's jump in and take a look at how we can set up a VertexArray class
+
+49
+00:05:00,066 --> 00:05:07,900
+在这之前，我还想说一件事，在VertexArray中通常不是DirectX中真正存在的东西
+before we do that one more thing that I want to say is that, in VertexArray in general are not something that really exists in like DirectX
+
+50
+00:05:07,900 --> 00:05:16,825
+所以我们在这里要做的选择是，我们如何以一种抽象的方式来构建它，正如我所说的
+so the kind of, the choice that we have to make here is, how do we set this up in an abstract way, right, and as I said
+
+51
+00:05:16,825 --> 00:05:24,100
+现在这个引擎专注于OpenGL，可能有一段时间了，对吧，因为我宁愿像你们知道的那样
+right now this engine is focusing on OpenGL, probably for quite a while, right, because I would much rather get like you know
+
+52
+00:05:24,100 --> 00:05:31,175
+一个完整的游戏引擎，首先使用OpenGL运行，对吧，然后开始在其他api中过滤
+a full game engine kind of up and running using OpenGL first, right, and then start filtering in the other apis
+
+53
+00:05:31,175 --> 00:05:34,825
+因为这将是，这将是最后一次，这样会更好
+because this is gonna be, this is gonna take last time, it's gonna just work better
+
+54
+00:05:34,825 --> 00:05:40,375
+我们会有一个实际的产品来展示比我们一次做所有的api要快得多
+and we're gonna have an actual product to show a lot quicker than if we kind of try and just do all the apis at once
+
+55
+00:05:40,533 --> 00:05:44,525
+所以那就是为什么现在，即使它有点伤害我的内心
+so that's why for now, even though it kind of hurts me inside a little bit
+
+56
+00:05:44,766 --> 00:05:52,066
+我将忽略DirectX以及DirectX是如何处理的，我的意思是，对吧，如果这是一个简单的改变
+I'm going to ignore DirectX and how DirectX deals with things, I mean to a point, right, if it's an easy change
+
+57
+00:05:52,066 --> 00:05:55,000
+那我肯定能挺过去，但这种事不容易
+then I'm obviously gonna make it, but something like this is not easy
+
+58
+00:05:55,600 --> 00:06:00,575
+因为它需要改变很多渲染器API架构
+because it requires changing kind of a lot of the renderer api architecture
+
+59
+00:06:00,575 --> 00:06:08,200
+因为很明显，如果我们强制那样，你们必须创建VertexArrays，然后在其中创建VertexBuffer
+because it's like obviously, if we mandate that, you have to create VertexArrays, and then a VertexBuffer for example in your array
+
+60
+00:06:08,200 --> 00:06:13,551
+这不是DirectX所拥有或需要的，那就需要一些重构来吸引玩家
+and that's not something DirectX has or needs, that's going to require some rearchitecture to take players
+
+61
+00:06:13,871 --> 00:06:18,900
+通常一个快速修复只是基本上有顶点数组，只是在DirectX中什么都不做，对吧
+usually a quick fix is just basically having vertex arrays, just do nothing in DirectX, right
+
+62
+00:06:19,266 --> 00:06:27,225
+所以你们仍然可以在渲染接口不可知的接口中创建个VertexArray，对，这基本上意味着
+so you can still create a VertexArray in your kind of api in your render api agnostic api, right, which basically means that
+
+63
+00:06:28,066 --> 00:06:35,299
+在我们Hazel渲染接口中，仍可以创建VertexArray，在OpenGL中，将创建实际的VertexArray
+in our kind of Hazel render api, we can still create a VertexBuffer, sorry, VertexArray, in OpenGL, it will create an actual VertexArray
+
+64
+00:06:35,300 --> 00:06:41,556
+在DirectX中，实际上什么也做不了，所以这是可以做的一件事，也许是我们现在要做的
+in DirectX, they can literally do nothing, so that's one thing that you can do, and probably what we're gonna do right now
+
+65
+00:06:41,700 --> 00:06:47,350
+因为我们需要让OpenGL运行，不管怎样，让我们深入看看，好吧，上次我们有这个三角形
+because we need to get OpenGL to work, anyway, let's dive in and take a look, okay, so last time we had this triangle
+
+66
+00:06:48,650 --> 00:06:55,286
+我们通过在这里创建这个布局来定义它，对，所以我们在这里定位了颜色
+we defined it by just kind of creating this layout here, right, so we had positioned in color over here
+
+67
+00:06:55,866 --> 00:07:01,700
+但是对我们来说真正令人讨厌的一件事是，这种VertexArray的东西并没有抽象出来，对吧
+but the one thing that really kind of sucked for us was this kind of VertexArray stuff was not abstracted whatsoever, right
+
+68
+00:07:02,366 --> 00:07:08,550
+这也不是布局的东西，所以那就是我们现在要尝试做的，我们要创建一个VertexArray
+and neither was this layout stuff, so that's kind of what we're gonna try and do right now, we're gonna create a VertexArray
+
+69
+00:07:08,933 --> 00:07:15,302
+因此，在Renderer中，我要创建一个新项目，它将是一个VertexArray
+so over here in Renderer, I'm gonna make a new item, it's gonna be a VertexArray
+
+70
+00:07:18,966 --> 00:07:27,125
+然后namespace Hazel，这将是一种，它将遵循相同的方式，我总是很想将其放入缓冲区
+and then you know, namespace Hazel, this is gonna be kind of, it's gonna kind of follow the same, I'm always tempted to put it into buffer
+
+71
+00:07:27,125 --> 00:07:33,799
+或者我没有把它放入缓冲区的原因，因为想把它作为独立文件，在这里有个独立文件
+or the reason I didn't put it into buffer, for the reason why I wanted it as a separate had a file here, and like a separate
+
+72
+00:07:33,933 --> 00:07:39,000
+就像它是一个单独的文件，只是因为当我们复制VertexBuffer时，它会有所不同
+like it's a separate file, it's just because it's gonna be a little bit different, when we just copy VertexBuffer
+
+73
+00:07:39,000 --> 00:07:43,933
+但会有一点不同，因为我甚至不确定我是否想长期保持它，或者也许可以称之为别的东西
+but it's gonna be a little bit different, because I'm not even sure if I want to keep it long term, or maybe we can call it something else
+
+74
+00:07:43,933 --> 00:07:50,381
+所以我现在真的不想没有商量，我想，我甚至不知道我包含什么，可能有点多
+so I don't really want to kind of deal without I guess for now, I don't even know what I'm including, probably do I need much
+
+75
+00:07:51,133 --> 00:07:59,275
+我想我将包括缓冲区，Renderer/Buffer.h，所以现在我只是将其分开
+I guess I'll include Buffer, Renderer/Buffer.h, so for now I'm kind of just keeping it separated
+
+76
+00:07:59,275 --> 00:08:07,533
+因为我不确定，但是它的未来会是什么，所以有个VertexArray，我们将有个析构函数
+because I'm not sure but what its future is gonna be, so we have a VertexArray, we'll have a destructor
+
+77
+00:08:07,533 --> 00:08:14,900
+这又是一种平台，与渲染api无关的接口，就创建而言
+this is again the kind of platform, the render api agnostic, like interface, in terms of creation
+
+78
+00:08:17,075 --> 00:08:22,733
+我认为可以像那样创建它，实际上不需要任何参数，SetLayout不会成为一件事
+I think just you can just create it like that, doesn't really need any parameters, SetLayout not gonna be a thing
+
+79
+00:08:22,733 --> 00:08:30,600
+我们能做的就是给它添加一个缓冲区，所以补充一下，我只是在想最好的方法，我们会有
+what we can do is actually add a buffer to it, so Add, I'm just thinking the best way to do this, we'll have we'll have
+
+80
+00:08:30,766 --> 00:08:38,000
+将有个VertexBuffer，所以virtual void AddVertexBuffer，
+we'll have um a VertexBuffer, so virtual void AddVertexBuffer
+
+81
+00:08:38,000 --> 00:08:43,775
+然后只接收VertexBuffer，好了，所以我们不
+and then this will just take in a VertexBuffer, okay, so we don't
+
+82
+00:08:43,775 --> 00:08:52,335
+我们真正想要的是一个引用，我将来可能会谈论这个，现在我们只需要一个共享指针
+what we actually want to take in is a ref, I might talk about this in the future, for now we're just going to take in a shared pointer
+
+83
+00:08:52,966 --> 00:09:00,000
+资源在Hazel内部的工作方式基本上是一切，每一种资源相关的东西
+the way that resources are going to work inside Hazel is there basically everything, every resource kind of related thing
+
+84
+00:09:00,166 --> 00:09:06,175
+就像VertexBuffer和IndexBuffer，纹理，着色器一样，所有这些东西都将被引用计数，对吧
+like a VertexBuffer and IndexBuffer, a Texture, a Shader, all that kind of stuff is going to be referenced counted, right
+
+85
+00:09:06,175 --> 00:09:12,200
+所以它们基本上是共享指针，现在如果我真的像学究的，非常具体的性能和所有这些
+so they're basically going to be shared pointers, now if I was really like pedantic and really specific about performance and all of that
+
+86
+00:09:12,200 --> 00:09:21,650
+我可能想创建一个侵入性的引用计数系统，但我不喜欢，我实际上不认为共享指针
+I'd probably want to create an intrusive reference counting system, but I don't like, I don't actually think shared pointer
+
+87
+00:09:21,650 --> 00:09:28,325
+特别是如果实际的引用计数块在内存中排成一行，我实际上并不认为它的性能会更差
+especially if the actual reference count block is in line in memory, I don't actually think that it's gonna perform worse
+
+88
+00:09:28,666 --> 00:09:36,675
+所以现在，只需要处理这个问题，但是只需要const std::shared_ptr VertexBuffer
+so for now, we're just gonna deal with that, right, but what we're gonna just take a  const shared_ptr VertexBuffer
+
+89
+00:09:36,675 --> 00:09:43,933
+我们就称之为，我想vertexBuffer，好吧，将来我们可能会做的只是
+and we'll just call this, I guess vertexBuffer, okay, and in the future what we might do is just kind of
+
+90
+00:09:43,933 --> 00:09:48,700
+因为实现可能会更改，并且我们不想在任何地方更改代码，所以我通常喜欢更改
+because the implementation might change, and we don't want to change our code anywhere, I usually like changing
+
+91
+00:09:48,700 --> 00:09:54,799
+就像基本上将实际的类型名称更改为其他名称一样，但是我们将在另一期中讨论
+like basically changing the actual type name to be something else, but we will talk about that in another episode
+
+92
+00:09:54,800 --> 00:10:03,300
+所以我们会有AddVertexBuffer，我们会有，我们会有今天他们有，我们也会有索引缓冲区
+so we'll have AddVertexBuffer,  we'll have, we'll have kind of in today they have had, we'll have an IndexBuffer as well
+
+93
+00:10:03,300 --> 00:10:11,796
+AddIndexBuffer，它将接收IndexBuffer，我们实际上可能会拥有，并且我们将摆脱常量
+AddIndexBuffer, which will take in an IndexBuffer, we'll actually probably have, and we'll get rid of constant
+
+94
+00:10:12,000 --> 00:10:19,725
+我们可能会有某种所有权实际发生，我们将有Bind和Unbind，现在在前面的类中
+we'll probably have some kind of ownership actually taking place, we'll have Bind and Unbind, now in the previous classes
+
+95
+00:10:19,725 --> 00:10:26,400
+我们也有Bind和Unbind，这不是必需的，但是对于VertexArray，实际上确实想解绑它们
+we also have bind and unbind, it's not that necessary, but for VertexArrays, you actually kind of do want to unbind them potentially
+
+96
+00:10:27,200 --> 00:10:33,125
+除非你们喜欢，否则就像我说的那样，这对测试有好处，我可以告诉你们我的意思
+unless you like, it's again as I said it's good for testing, and I can, I can kind of show you what I mean by that
+
+97
+00:10:33,466 --> 00:10:38,350
+也许在另一期视频中，如果你们感兴趣，关于为什么我在任何地方都写Unbind
+maybe in another video, if you're interested, as to why on earth I write unbind everywhere
+
+98
+00:10:38,475 --> 00:10:40,099
+我的意思是我不在我的代码中写它，我的意思是
+I mean I don't write it in my code I mean
+
+99
+00:10:40,100 --> 00:10:47,338
+好吧，但是为什么api支持它，但这可能是我们稍后讨论的内容，我们也必须包含memory
+well but why the api supports it, but that might be something that we talk about later, we'll have to include memory as well
+
+100
+00:10:47,750 --> 00:10:51,900
+那是共享指针，好了，酷，所以我们有VertexArray
+that's the shared pointer, okay, cool, so there we have VertexArray
+
+101
+00:10:52,500 --> 00:11:01,550
+让我们复制这个文件，让我们为它创建一个cpp文件，VertexArray.cpp
+let's grab this file, let's make a cpp file for it, VertexArray.cpp
+
+102
+00:11:01,550 --> 00:11:09,466
+当然，我犯了一个输入错误，那不是我的错，我发誓字母r没有打两次，我们将包含hzpch
+and of course I made a type error, that's not my fault, I swear the letter r didn't punch in twice, we'll include hzpch
+
+103
+00:11:09,766 --> 00:11:16,325
+和VertexArray.h，namespace Hazel，然后我们真的只有Create函数，当然我会复制并粘贴
+and VertexArray.h, namespace Hazel, and then we really just have the Create function, of course I'll copy and paste that
+
+104
+00:11:16,800 --> 00:11:27,061
+我们将从Buffer.cpp复制并粘贴此实现，因此现在这里的典型情况
+and we will copy and paste the implementation of this from Buffer.cpp, so typical scenario here now
+
+105
+00:11:27,566 --> 00:11:34,050
+到目前为止，我一直在使用指针，好了，因此可以在此处返回共享指针，并且可以处理引用
+I have been using pointers up until now, okay, so we could return a shared pointer here, and we could deal with refs
+
+106
+00:11:34,466 --> 00:11:41,725
+但是显然，你们也可以返回像这样的原始指针，然后将其捕获到共享指针或唯一指针中
+but obviously you can also return a raw pointer like this, and then capture it into either a either a shared pointer or or a unique pointer
+
+107
+00:11:42,333 --> 00:11:49,166
+那就是为什么在我们可能像我说的那样切换到更多的引用系统之前，因为这就是我们要
+so that's why for now before we maybe switched to more of a ref system as I said, because that's what we're gonna
+
+108
+00:11:49,166 --> 00:11:53,000
+那就是我们的方向，如果你们想自己去做，对吧，现在你们绝对可以
+that's kind of where we're heading towards, if you want to do that yourself, right, now you absolutely can
+
+109
+00:11:53,766 --> 00:12:00,744
+但是因为那是我们以后的方向，所以我不想打扰我想现在的改变
+but because that's where we're heading towards, I'm not gonna bother kind of changing that I guess now
+
+110
+00:12:01,525 --> 00:12:09,775
+所以这将返回一个OpenGLVertexArray，那对我来说看起来相当不错
+so this will return an OpenGLVertexArray, and that looks pretty good to me I think
+
+111
+00:12:09,966 --> 00:12:15,425
+所以现在在Platform，Platform/OpenGL在这里
+so now in Platform, Platform/OpenGL over here
+
+112
+00:12:15,875 --> 00:12:27,050
+我要添加OpenGLVertexArray.h和OpenGLVertexArray.cpp
+I'm going to add OpenGLVertexArray.h and OpenGLVertexArray.cpp
+
+113
+00:12:28,566 --> 00:12:33,002
+包含hzpch，而不是handed_coordinate_space
+this will include hzpch, not the handed_coordinate_space
+
+114
+00:12:36,000 --> 00:12:42,766
+以及OpenGLVertexArray.h，namespace Hazel
+and the OpenGLVertexArray header file, namespace Hazel
+
+115
+00:12:44,800 --> 00:13:02,466
+那么包含Hazel/Renderer/VertexArray.h，然后为什么它现在在输入那个，不是那么好
+okay, so include Hazel, oops, Hazel/Renderer/Vertex array.h, and then why it's typing right now, it's not that great
+
+116
+00:13:02,733 --> 00:13:14,125
+所以当早上试着做这种事情的时候会发生什么，所以去VertexArray，几乎复制了大部分
+so what happens when you try and do this kind of stuff in the morning, so let's go to our VertexArray I guess, pretty much copy most of this
+
+117
+00:13:14,125 --> 00:13:22,166
+我将复制整个类来询问，所以将会有一个OpenGLVertexArray，它将是一个VertexArray
+I'll just copy the whole class to be asked, so there's gonna be an OpenGLVertexArray, which will be a VertexArray
+
+118
+00:13:23,333 --> 00:13:35,250
+所以我们要做的是，把它放进去，让我们看看，所以我们会改变它来看到所有的覆盖
+so what we're gonna do is, so just pop that in, let's see, so we'll change this to see override for all of them
+
+119
+00:13:36,866 --> 00:13:41,733
+然后我们仍然有我们的Bind和Unbind，这很好，好的，很酷，然后我们不需要Create
+and then we've still got our Bind and Unbind, which is good, okay, cool, and then we don't need to Create obviously
+
+120
+00:13:41,800 --> 00:13:48,150
+所以就我们实际保存的东西而言，我们确实想要有某种列表
+so in terms of stuff that we're actually keeping, so we do actually want to have some kind of list I guess
+
+121
+00:13:48,150 --> 00:13:59,466
+shared_ptr VertexBuffer的向量，好了，所以实际上包含了对放入的每个VertexBuffer的引用
+so vector of shared_ptr VertexBuffer, okay, so we actually contain references to every VertexBuffer that we actually put in
+
+122
+00:13:59,466 --> 00:14:05,975
+所以就像OpenGL在内部做的一样，我们在这里模仿在CPU上镜像
+so just like the just like OpenGL is doing internally, we're kind of mimicking on mirroring that on the CPU here
+
+123
+00:14:05,975 --> 00:14:11,943
+通过拥有所有VertexBuffers和IndexBuffers的列表，不要相信可以有多个IndexBuffer
+by just having a list of all VertexBuffers and IndexBuffers, don't believe you can have more than one IndexBuffer
+
+124
+00:14:11,943 --> 00:14:20,050
+老实说，我认为我以前从未这样做过，所以我可能会将其更改为SetIndexBuffer，我可能错了
+to be honest, I don't think I've ever done that before, so I might change this to SetIndexBuffer, I might be wrong
+
+125
+00:14:21,138 --> 00:14:24,978
+也许这是可能的，但老实说，我以前从未见过，我以前从未做过
+maybe it's possible somehow, but to be honest, I've never seen it before, I've never done it before
+
+126
+00:14:25,200 --> 00:14:29,154
+所以现在，我们只调用这个SetIndexBuffer，我们就有一个
+so for now, we'll just call this SetIndexBuffer, and we'll just have one
+
+127
+00:14:30,666 --> 00:14:36,566
+所以我向你们描述的这种行为是如何运行的，你们可以看到我们现在在代码中重新创建它
+so that behavior that I kind of described to you guys on how this works, you can see that we're kind of recreating it in code now
+
+128
+00:14:36,966 --> 00:14:42,050
+这是所有这一切的目标，所以让我们看看我们在这里有什么，什么都没有，这很好
+which is kind of the goal of all of this, so let's see what we have here, nothing, which is good
+
+129
+00:14:42,466 --> 00:14:47,999
+我将在这里使用visual assist来创建所有方法实现，在这里我们拥有一切
+I'm going to use visual assist here to just create all the method implementations, and here we have everything
+
+130
+00:14:48,000 --> 00:15:01,799
+所以我们显然也需要一个构造函数，所以创建构造函数，接下来是什么，所以在构造函数中
+so we obviously need to have a constructor as well, so let's just have a constructor, and what's next, so in the constructor
+
+131
+00:15:01,800 --> 00:15:09,784
+我们想创建一切，如果看Buffer，可以看到，对不起，VertexBuffer，哦，对不起GLBuffer
+we want to officer create everything, if I look at just Buffer, you can see that we, sorry, VertexBuffer, oh sorry GL OpenGLBuffer
+
+132
+00:15:10,800 --> 00:15:15,400
+可以看到我们只是在这里创建所有的东西，对吧，我会用VertexArray做同样的事情
+you can see that we simply just create everything kind of here, right, I'm gonna do the same thing with VertexArrays
+
+133
+00:15:15,766 --> 00:15:25,166
+所以在这里，在VertexArray中，调用glCreateVertexArrays，然后输入1，m_RendererID
+so over here, in my VertexArray, I'm just gonna call glCreateVertexArrays, and then I guess I'll tape in one, and then m_RendererID
+
+134
+00:15:26,766 --> 00:15:34,100
+对m_RendererID使用什么，因为总是忘记，它只是无符号int，所以正如我所说，可能会像
+and what do we use for m_RendererID, because I always forget, it's just a unsigned int, so as I said, we probably will end up like
+
+135
+00:15:34,100 --> 00:15:41,325
+把它打成别的东西，最后就是那样，现在我似乎弄错了，也许
+type daffing that into something else, the final is just that, now that I seem to have gotten this wrong maybe
+
+136
+00:15:41,533 --> 00:15:52,199
+所以让我们来看看这个，没错，也许那只是不起作用，因为我没包含glad之类的东西
+so let's take a look at this, that's right, maybe that's just not working, because of me not including glad or something like that
+
+137
+00:15:52,466 --> 00:16:02,333
+可以创建VertexArray，就是那样，对于绑定，只绑定VertexArray，所以glBindVertexArray
+yep okay, cool, so we can create a VertexArray, and that's pretty much it, for binding, we just bind a VertexArray, so glBindVertexArray
+
+138
+00:16:02,333 --> 00:16:10,300
+对吧，它只是m_RendererID，对于Unbind，我们再次为VertexBuffer绑定0
+right, and it's just m_RendererID, for Unbind, again we just bind 0 for a VertexBuffer
+
+139
+00:16:11,200 --> 00:16:15,866
+所以我们需要做的实际上是确保数组绑定，现在我想有人问了
+so what we need to do is actually make sure the arrays bound, now I think someone asked the question of
+
+140
+00:16:15,866 --> 00:16:23,612
+为什么我不这样在这里调用Bind，我不这样做的原因是因为我，我通常不喜欢
+why I don't just call Bind here like this, the reason I don't do that is because I, I don't generally like to
+
+141
+00:16:24,075 --> 00:16:28,750
+就像将OpenGL调用与我自己的调用混合一样，显然在某些情况下
+like mix OpenGL calls with just my own calls, obviously in some situations
+
+142
+00:16:28,750 --> 00:16:31,824
+如果你们正在做非常复杂的事情，这是必要的
+it's necessary, if you're doing really complex stuff
+
+143
+00:16:31,933 --> 00:16:36,425
+但是，如果只是这样的一行，我宁愿把它写在这里
+but if it's just one line like this, I would much rather have it actually just be written here
+
+144
+00:16:37,466 --> 00:16:41,675
+这样做的原因是，就像将来一样，我们可能会添加要绑定的东西，对吧
+and the reason for that is that a lot like in the future, we might add stuff to bind, right
+
+145
+00:16:41,675 --> 00:16:47,600
+我们可能会添加一些东西来解绑，或者像你们知道的那样，本质上跟踪或者分析目的
+we might add stuff to unbind or whatever for like you know, tracking essentially or profiling purposes
+
+146
+00:16:48,300 --> 00:16:54,550
+我不一定希望它将自己注册为实际绑定，就好像它是由游戏或渲染器调用的一样
+I don't necessarily want this to register itself as an actual bind, as if it's been called by the game or by the renderer
+
+147
+00:16:54,766 --> 00:17:01,254
+因为这是api内部的东西，对吧，所以因为这是api内部的东西，你们知道，这完全可以调用
+because this is kind of api internal things, right, so because this is api internal things, you know, this is totally fine to call
+
+148
+00:17:02,066 --> 00:17:07,199
+而且我绝对不希望此函数不必要地开始分支到一堆其他函数中
+and I definitely don't want this function to start branching out into a bunch of other functions needlessly
+
+149
+00:17:07,200 --> 00:17:14,775
+如果有必要确定，对吧，就像我有一个名为AddVertexAndIndexBuffer的函数，对吧
+if it's necessary for sure, right, like if I had a function called AddVertexAndIndexBuffer, right
+
+150
+00:17:14,933 --> 00:17:19,533
+它两者都做了，我肯定称之为，我不会写，也不会复制和粘贴整个OpenGL代码
+and it just did both, I definitely call this, and this I wouldn't write, I wouldn't copy and paste the whole OpenGL code
+
+151
+00:17:19,533 --> 00:17:26,599
+但是在这种情况下，它只是一个简单的绑定，不需要，只是将其转移到不同的函数中
+there but in this situation, it's just a simple bind, no need to just divert it into a different function
+
+152
+00:17:27,333 --> 00:17:33,675
+通过这样做使事情变得复杂，嗯，好吧，那么一旦我们绑定了VertexArray
+and just complicate things by doing that essentially, um okay, so then once we bound our VertexArray
+
+153
+00:17:34,066 --> 00:17:39,499
+实际上想要做的是绑定VertexBuffer，所以在这种情况下，当然会调用vertexBuffer->Bind()
+what we actually want to do is bind our VertexBuffer, so in this case of course, I will call vertexBuffer->Bind()
+
+154
+00:17:39,566 --> 00:17:45,200
+因为你们知道，这是在处理一个实际的api对象，它不是在处理，它是在一种类上
+because you know, this is dealing with an actual api object here, it's not dealing with, it's on a kind of class
+
+155
+00:17:45,200 --> 00:17:51,650
+我绝对不会做任何像glBindVertexBuffer这样的，然后再vertexBuffer->GetRendererID
+I'm definitely not gonna do anything like glBindVertexBuffer, and then vertexBuffer GetRendererId or something disgusting like that
+
+156
+00:17:52,000 --> 00:17:56,025
+所以我们肯定会绑定它，现在我需要做的是，一旦我限制了
+so we're definitely gonna bind it, now what I need to do, once I've bounded
+
+157
+00:17:56,466 --> 00:18:02,300
+如果我们回到Application，我基本上需要做所有这些事情，所以很容易做到
+if we go back to Application is I need to basically do all of this stuff, so pretty easy to do
+
+158
+00:18:02,500 --> 00:18:11,925
+我可以复制此代码并将其粘贴到此处，因为那是一种想法，VertexBuffers布局在这更改
+I can just copy this code and paste it into here, right, because that's kind of the idea, and VertexBuffers a layout is going to get changed here
+
+159
+00:18:11,925 --> 00:18:19,375
+现在，这个着色器类型现在再次，复制它，我们最终可能会生存在某种OpenGL中
+now this shader type again at the moment, we're going to grab it and we're going to eventually might live inside some kind of OpenGL
+
+160
+00:18:19,375 --> 00:18:25,631
+就像Shader类一样，但是现在我们将它放在这里的VertexArray的顶部，好了
+like Shader class, but for now we're just going to put it into the top our VertexArray over here, okay
+
+161
+00:18:26,466 --> 00:18:33,699
+现在确保这是空格，好了，就那样，那就是我们要做的一切
+now make sure that's tabs across, all right, and that's it, that's literally all that we have to do
+
+162
+00:18:33,725 --> 00:18:38,200
+显然，我还想实际将VertexBuffer添加到我们的VertexBuffers列表中
+obviously I also want to actually add the VertexBuffer to our list of VertexBuffers
+
+163
+00:18:38,200 --> 00:18:44,675
+因此我将输入m_VertexBuffers.push_back(vertexBuffer)，好了
+so I'll type in m_VertexBuffers.push_back(vertexBuffer), okay
+
+164
+00:18:45,400 --> 00:18:51,425
+现在我们将它添加到VertexBuffers列表中，但就那样，对吧，如果突然决定这样，那很好
+and now we'll just add it to our list of VertexBuffers, but that's it, right, if we suddenly decide that like that's, that's fine
+
+165
+00:18:51,425 --> 00:18:58,400
+我们想用不同的布局添加另一个像VertexBuffer之类的，完全没问题，它会运行，好了
+we want to add another like VertexBuffer or something to this with a different layout, that's totally fine, and it will work, okay
+
+166
+00:18:58,750 --> 00:19:07,400
+就因为我们是这样做的，好吧，酷，最后，没有必要解绑任何东西
+just because we're doing it kind of this way, okay, cool, and then at the end of this, it's not really necessary to unbind anything
+
+167
+00:19:07,766 --> 00:19:11,875
+我现在只是在想这个，我不认为我们需要，没有什么会出错
+I'm just thinking about this now, I don't think that we need to, nothing's going to go wrong
+
+168
+00:19:12,733 --> 00:19:19,750
+如果在解绑之前绑定了另个VertexArray，我不认为，我认为是将其绑定在一起的实际绑定
+if you bind another VertexArray before unbinding this, I don't think, I think it's the actual binding that ties it together
+
+169
+00:19:19,875 --> 00:19:24,825
+这就是为什么api很糟糕，那就是为什么改变了它，但我认为它应该是安全的，我不认为
+see, this is why the api is terrible, and that's why they changed it, but so I think it should be safe, I don't think
+
+170
+00:19:24,825 --> 00:19:30,575
+突然，它将属于一个不同的VertexArray之类，在这里，我们将再次复制这个
+suddenly it's going to belong to a different VertexArray or anything like that, here again we're going to copy this
+
+171
+00:19:31,000 --> 00:19:37,975
+这真的很简单，基本上只是复制这个，对吧，所以我们会复制那个
+this is really easy, it's basically just copying this, right, so we'll copy yep that
+
+172
+00:19:37,975 --> 00:19:42,150
+然后，我们正在做indexBuffer->Bind()，而不是vertexBuffer->Bind()，对吧
+and then instead of vertexBuffer->Bind(), we're doing indexBuffer->Bind(), right
+
+173
+00:19:43,200 --> 00:19:46,425
+然后实际上就是那样，对，就是那样
+and then that's actually it, right, that's that's it
+
+174
+00:19:47,066 --> 00:19:52,925
+我们不需要做任何其他事情，就像显然会把它添加到，我们会在IndexBuffer中设置它
+we don't need to do anything else, like obviously we'll add it to our, we'll set it in our IndexBuffer
+
+175
+00:19:52,925 --> 00:20:02,325
+不知道为什么被称为IndexBuffers，通常情况下，vector会将其改为IndexBuffer，但仅此而已
+I don't know why it's called IndexBuffers, because it usually, vector will change that to IndexBuffer, but that's it, right
+
+176
+00:20:02,450 --> 00:20:06,450
+这个单独绑定它，然后只是绑定VertexArray
+this alone binding it, and then just binding the VertexArray
+
+177
+00:20:06,450 --> 00:20:09,500
+然后绑定一个关联到VertexArray的IndexBuffer
+then binding an IndexBuffer associated to the VertexArray
+
+178
+00:20:09,500 --> 00:20:11,950
+我知道这很疯狂，我讨厌它，所以几乎所有人都这么做
+I know it's crazy, I hate it, so it's pretty much everyone else
+
+179
+00:20:11,950 --> 00:20:13,575
+那就是为什么他们改变了它，或者试图创建它
+that's why they kind of changed it or try to make it
+
+180
+00:20:13,575 --> 00:20:19,450
+他们没有改变它，但是他们做了额外的api，这样你们就可以写代码了，这样会更有可读性
+they didn't change it, but they made additional api, so that you could write that code instead, that would be more readable
+
+181
+00:20:19,450 --> 00:20:27,650
+这个以后会讲到，但那就是OpenGL传统的运行方式，好了，很有趣，我想应该是那样吧
+which we will explore as I said in the future, but that's how OpenGL traditionally works, so there you go, fun times, I think that should be it
+
+182
+00:20:29,200 --> 00:20:38,400
+现在看下在实际的Application类中能做什么，这个这个现在没有了，我们会保留这段代码
+so now let's take a look at what we can do inside our actual Application class, so and this this is now gone, right, we'll keep this code
+
+183
+00:20:38,400 --> 00:20:48,325
+因为已经设置好了，这个去掉，我想在Application中也有个绑定VertexArray，在Update中
+because we're setting that up, this should be gone, right, and I think we also have a bind VertexArray up in the Application, sorry in the Update
+
+184
+00:20:48,666 --> 00:20:56,333
+或者渲染任何在运行循环中调用的函数，在Run中，我们要做的是到这里，我们要创建一个
+or Render whatever function is called in the run loop, in the Run function, so what we'll do is go over here, we'll create a
+
+185
+00:20:56,800 --> 00:21:02,986
+我说过，我们会习惯创建共享指针，但在我们正确设置之前
+and as I said, we're gonna kind of get used to creating shared pointers, but until we have that properly set up
+
+186
+00:21:03,500 --> 00:21:09,901
+我想坚持这里的内容，我们创建一个VertexArray，我把它放在这里
+I kind of want to just stick with what we have here, so we'll create a VertexArray, I'll put it up here
+
+187
+00:21:10,400 --> 00:21:15,850
+因为它是这两个的父结点，我们有一个VertexArray，这是一个唯一指针，就像其他指针一样
+because it's kind of the parent of these 2, so we have a VertexArray, which is a unique point of just like everything else
+
+188
+00:21:16,650 --> 00:21:40,725
+我们会包含那个，然后m_VertexArray.reset()，那就是简单创建它，可以写Create
+we'll include that, and then we'll do m_VertexArray.reset(), and that's us simply creating it, I can write the world create
+
+189
+00:21:41,666 --> 00:21:46,600
+所以我们已经创建了它，搞定，对吧，现在我们要做的是，并不重要
+so we've created it, that's done, right, now what we need to do is again, doesn't really matter
+
+190
+00:21:46,600 --> 00:21:49,625
+我们可以创建任何我们想要的东西，我们可以用任何东西，任何我们想要的东西
+we can create anything we want, we can by anything, anything we want
+
+191
+00:21:49,901 --> 00:21:54,799
+现在这是危险的，这是我有点喜欢解绑的地方
+now this is dangerous, and this is where I some somewhat like unbinding
+
+192
+00:21:54,933 --> 00:22:01,240
+因为如果你们离开这个边界，绑定其他东西，这显然发生在我们创建VertexBuffer时
+because if you leave this bound and you bind something else, which happens obviously, when we create the VertexBuffer
+
+193
+00:22:01,566 --> 00:22:08,450
+它们突然联系在一起，有点危险，因为你们知道，就像我说的
+they're suddenly associated together, that's a little bit dangerous, okay, because you know, as I said
+
+194
+00:22:08,450 --> 00:22:12,700
+关联在一起只是绑定另一个VertexBuffer，同时绑定一个VertexArray
+the thing that association together is just binding another VertexBuffer, while a VertexArray bound
+
+195
+00:22:12,966 --> 00:22:19,400
+那有点危险，我不喜欢那样，因为就像我们说的，你们知道，有这样的感觉很好
+that's kind of dangerous, I don't like that, because as we said, you know, it's nice to just have, you know
+
+196
+00:22:19,400 --> 00:22:22,975
+我们有一个特定的函数，我们想要调用它，基本上就是那样
+we have a specific function here that we want to call, which is basically just saying that
+
+197
+00:22:22,975 --> 00:22:26,900
+我们想要添加一个VertexBuffer到一个VertexArray，对吧
+we want to add a VertexBuffer to a VertexArray, right
+
+198
+00:22:27,668 --> 00:22:32,366
+目前是可以的，我们要把所有东西都改成共享指针
+and it's currently okay, we will have to change everything to shared points
+
+199
+00:22:32,366 --> 00:22:38,200
+它也会运行，非常干净，所以这是一个很好的时机，这就变成了共享指针
+as well as it's gonna work, very cleanly, so this could be a good time to do that, so this just becomes shared pointer
+
+200
+00:22:38,400 --> 00:22:47,599
+没有什么改变，顺便说一下，这个变成了共享指针，那就是改变的结束，那么我刚才说的是
+nothing really changes, by the way, this just becomes shared pointer, and that's the end of the change really, so what was I saying yeah
+
+201
+00:22:47,600 --> 00:22:57,750
+如果添加VertexBuffer，在这一点上，它会找到VertexArray和VertexBuffer，然后那样
+so if we do add, if we add the VertexBuffer, right, at this point, it finds the VertexArray and the VertexBuffer, and then thus that
+
+202
+00:22:57,900 --> 00:23:03,450
+访问布局，并将它们链接在一起，但那实际上已经发生了，为什么，因为有VertexArray
+you know access layout and links them together, but that's actually already happened, why, because we've credited a VertexArray
+
+203
+00:23:04,575 --> 00:23:10,599
+很明显，VertexArray的Create函数，你们可以看到，已经绑定了它，对吧，完成了
+and obviously the Create function for VertexArray, as you can see, has bound it, right, it's done
+
+204
+00:23:10,600 --> 00:23:14,200
+实际上，它没有，因为我们没有调用Bind，很有趣，那可能会拯救我们
+actually no, it hasn't, because we haven't called bind, that's interesting, so that might actually save us
+
+205
+00:23:14,575 --> 00:23:24,550
+不管怎样，它对VertexBuffer是这样，如果看这，因为要上传数据，那就是原因，除非解绑
+but anyway, it does for VertexBuffer, obviously if we look in this, right, because we have to upload the data, that's why, so unless we unbind this
+
+206
+00:23:25,200 --> 00:23:31,933
+它会把自己绑定到VertexArray，那就是我们最终会遇到的情况
+it's going to kind of bind itself to the VertexArray, so that's kind of the situation that we're kind of that we end up with
+
+207
+00:23:31,933 --> 00:23:36,399
+有点烦人，因为OpenGL，但不管怎样，我不担心那些
+which is a little bit annoying, because of OpenGL, but anyway, I'm going to not worry about any of that
+
+208
+00:23:36,400 --> 00:23:39,366
+因为我不认为，它真的会阻止任何运行
+because I didn't think that, it's going to actually stop anything from working
+
+209
+00:23:39,366 --> 00:23:44,750
+我想我们可能会有点困惑，并以调试应用程序的状态结束
+I think that we might just be somewhat confused, and end up kind of debugging, the state of our application
+
+210
+00:23:44,750 --> 00:23:49,525
+比我们预期的要多一点，否则，如果API更好，也意味着人们可能会误用它
+a bit more than we would, otherwise, if the api was better, also means people might misuse this
+
+211
+00:23:50,166 --> 00:23:55,325
+这对我来说很难尝试和预测，老人会滥用它，所以我会让它保持原样，看看会发生什么
+it's hard for me to try and anticipate, old people misusing this, so I'll kind of leave it as is, and see what happens
+
+212
+00:23:55,700 --> 00:24:01,750
+基于这种API在我们引擎中的使用，在未来我们可能会开始解绑
+and based on the usage of this kind of api inside our engine, in the future we may start unbinding things
+
+213
+00:24:01,750 --> 00:24:07,550
+或者处理一些不同的方式，总之，我们创建了VertexArray
+or dealing with some kind of different way of doing things, anyway, so VertexArray, we create the VertexArray
+
+214
+00:24:07,966 --> 00:24:10,550
+没关系，我们在这里做，顺便说一下，可以在任何地方
+doesn't matter that, we're doing it here, by the way, can be anywhere
+
+215
+00:24:11,500 --> 00:24:14,766
+我们在后面添加VertexBuffer到VertexArray
+we add the VertexBuffer to the VertexArray after
+
+216
+00:24:15,100 --> 00:24:21,200
+在它被创建之后，在我们设置了布局之后，那很重要，我们会去掉那个作用域
+after it's been created, and after we've set a layout, okay, so that's important, and we'll kind of get rid of that scope
+
+217
+00:24:21,200 --> 00:24:28,150
+我认为那很重要，在布局设置之后做这个，因为如果在布局设置之前做，它什么都不会做
+I think that's important, that we do this after the layout has been set, because if we do it before it's not gonna do anything, right
+
+218
+00:24:28,150 --> 00:24:37,606
+因为你们可以在这里看到，它实际上执行了这段代码，这取决于布局，所以那很重要
+because you can see that here, it actually does this code, which depends on the layout, so that's important
+
+219
+00:24:38,333 --> 00:24:43,250
+如果它没有布局或图层为空，你们可以在这里断言，就像什么都没有一样
+if it has no layout or layer as empty, where you could assert over here, and say that like there's nothing
+
+220
+00:24:43,250 --> 00:24:50,300
+布局中没有元素，实际上这可能是我想要做的，因此我们写入HZ_CORE_ASSERT
+there's no elements in the layout, in fact that's probably something that I actually do want to do, so we'll say I just HZ_CORE_ASSERT
+
+221
+00:24:50,900 --> 00:25:01,800
+我们写入vertexBuffer->GetLayout().GetElements().size()，对吧
+and we'll say basically the vertexBuffer->GetLayout().GetElements().size(), right
+
+222
+00:25:02,733 --> 00:25:12,774
+所以基本上元素的大小不能为0，否则你们就可以说VertexBuffer没有布局
+so basically the size of the elements has to not be 0, right, otherwise well you could say that the VertexBuffer has no layout
+
+223
+00:25:12,875 --> 00:25:18,748
+所以我们就会说VertexBuffer没有布局，我们会把它放在函数的最前面
+so we'll say VertexBuffer has no layout, okay, and we'll put that as the very first thing in the function
+
+224
+00:25:19,275 --> 00:25:24,850
+好了，那只是以防万一的一个小保护，我们可以在一分钟内测试一下以防你们不小心那样做
+alright, that's just a little guard in case, and we can test that out in a minute in case you accidentally do that
+
+225
+00:25:24,850 --> 00:25:29,750
+因为在那种情况下，这将不起作用，即使API看起来是可以的
+because in that case, this won't work, even though the api might seem like it does
+
+226
+00:25:31,066 --> 00:25:36,125
+好了，顺便说一下，要让它起作用，你们可以进入VertexBuffer
+okay, now again what you could do to make that work by the way is you could into the VertexBuffer
+
+227
+00:25:36,125 --> 00:25:39,575
+你们可以添加一个引用到VertexBuffer属于的VertexArray
+you could add a reference to the VertexArray, the VertexBuffer belongs to
+
+228
+00:25:39,875 --> 00:25:42,100
+我的意思是当你们添加一个VertexBuffer
+so what I mean by that is when you add a VertexBuffer
+
+229
+00:25:43,325 --> 00:25:49,800
+它只是在VertexBuffer本身中设置它的父类，所以这个函数会继续，说
+it just sets its parent essentially inside the VertexBuffer itself, so this function just goes ahead, and says you know
+
+230
+00:25:50,100 --> 00:25:56,199
+你们不会再给它传常数了，我猜函数会直接说VertexBuffer
+you wouldn't pass it by constant,  anymore I guess the function goes ahead and just says VertexBuffer
+
+231
+00:25:56,600 --> 00:26:04,150
+VertexArray或等于这个，这样它就有了那个链接，然后当你们更新VertexBuffer的布局时
+VertexArray or VertexArray or equals of this, and that way it's got that connection, and then when you update the VertexBuffer's layout
+
+232
+00:26:04,366 --> 00:26:09,600
+对吧，你们就可以更新VertexArray，它是它的一部分，如果它是多个的话
+right, you can update the VertexArray that, it's part of or VertexArrays that, it's part of if it's multiple
+
+233
+00:26:10,666 --> 00:26:16,566
+所以那是值得思考的，但不是我真正想做的，最后我们创建IndexBuffer
+so that's food for thought, but not something that I really want to do, and then finally we create our IndexBuffer
+
+234
+00:26:16,566 --> 00:26:28,675
+我还想把它加到这里，好了，酷，那么就是AddIndexBuffer(m_IndexBuffer)
+and I also want to add that into here, okay, cool, so AddIndexBuffer(m_IndexBuffer)
+
+235
+00:26:29,500 --> 00:26:36,533
+那完全不是一个东西，因为它叫set，好了，酷，继续，现在我们可以解绑了
+and that's totally not a thing, because it's called set, okay, cool, there we go, so now the idea is we can unbind everything
+
+236
+00:26:36,533 --> 00:26:43,066
+我们可以创建一大堆这样的东西，对吧，在这个例子中很难演示，我猜是因为它太简单了
+we can create a whole bunch of these, right, it's kind of hard to demonstrate in this one example, just because it is so easy I guess
+
+237
+00:26:43,066 --> 00:26:48,025
+从某种意义上说，这很简单我们只是创建了所有东西中的一个，但如果我们有多个
+alright, it is so simple in a sense that we're just creating one of everything, but if we had multiple
+
+238
+00:26:48,025 --> 00:26:51,900
+我们可以继续，继续授予所有其他的，假设我们正在加载一堆网格
+we could just go ahead, and keep granting all of our other ones, let's just say we're loading a bunch of meshes
+
+239
+00:26:52,460 --> 00:26:57,300
+我们可以在这里创建并加载所有的网格，然后当我们绑定它
+we could, you know, create and load all of our meshes here, and then when we bind it
+
+240
+00:26:57,300 --> 00:27:01,399
+那才是它真正开始发挥作用的时候，使用所有与它相关的状态
+that's when it's actually going to kick in and use all the state that we've associated with it
+
+241
+00:27:01,400 --> 00:27:10,875
+那么在这里，显然我们要做m_VertexArray->Bind()，然后渲染，就使用glDrawElements
+now so over here, obviously we're going to do m_VertexArray->Bind(), right, and then we're just gonna render, using glDrawElements
+
+242
+00:27:10,875 --> 00:27:17,350
+就像我们有所有这些次数一样，使用IndexBuffer中的计数，我想差不多就是那样了
+just like we have all of this time, right, using the count from the IndexBuffer, I think that is pretty much it
+
+243
+00:27:17,500 --> 00:27:24,950
+所以应该能运行这段代码，希望它能编译，希望它能按预期运行，不，它甚至不能编译
+so we should be able to just run this code, and hopefully it compiles, and hopefully it runs as expected, no, it doesn't even compile
+
+244
+00:27:25,375 --> 00:27:32,500
+VertexArray重新定义，这是因为以前有个无符号int，叫做VertexArray，现在可以删掉
+okay, so VertexArray redefinition ya, that's because we used to have this unsigned int called VertexArray, we can delete that now
+
+245
+00:27:33,000 --> 00:27:42,625
+让我们继续再试一次，这里有另一个错误，好的，这个，是了，需要包含Hazel/Platform
+let's go ahead and try again, okay, here's another error on it, okay, this, yep we need to include Hazel/Platform
+
+246
+00:27:44,266 --> 00:27:48,929
+它不是在Hazel里面吗，它只是Platform，我想我上次也很惊讶
+is it not inside Hazel, it's just Platform, I think I was surprised by that last time as well
+
+247
+00:27:49,500 --> 00:28:00,175
+很好，在哪里知道你们自己的代码显示，呃，f5，我们应该会看到和上次结果完全一样
+great, where to know your own code based shown er, f5, and well we should see is exactly the same result as last time her play yep
+
+248
+00:28:00,466 --> 00:28:08,300
+很酷，一切看起来都很正常，我们可以继续创建另一个版本，我想看看它是如何运行的
+cool, everything looks like it works, we could go ahead and just create another version, I guess and see how that works
+
+249
+00:28:09,566 --> 00:28:14,444
+我想我会快速地做一下，所以我们会试着创造一些完全不同的东西
+I guess I will go ahead and do that just quickly, so we'll try and create something completely different
+
+250
+00:28:14,444 --> 00:28:22,625
+为了测试，我说过我也会测试断言，所以让我们在实际设置布局之前尝试添加VertexBuffer
+I guess to test us out, I said I would also test out the asset, so let's try and add the VertexBuffer before we actually set the layout
+
+251
+00:28:22,866 --> 00:28:29,425
+如果它让我们没有抱怨，因为他没有，它说，上面没有布局，对吧
+so if it lets us without complaining, and because he doesn't, it says that, that above has no layout, right
+
+252
+00:28:29,425 --> 00:28:35,200
+所以它断言，然后我们就像，哦，我们一定还没有为VertexBuffer设置布局，好了，很好
+so it asserts, and then we're like, oh, we must not have set a layout yet for our VertexBuffer, okay, great
+
+253
+00:28:35,466 --> 00:28:45,550
+让我们继续创建一个正方形，我基本上需要这三个，现在那在技术上是不正确的
+so let's go ahead and create maybe a square, so I'll basically need all three of these, right, now that's not technically true
+
+254
+00:28:45,550 --> 00:28:54,275
+现在需要计数，因为需要知道计数，IndexBuffers计数，这是可以添到VertexArrays的东西
+now I need the count, right, because I need to know the count, the IndexBuffers count, right, that is something we could add to VertexArrays
+
+255
+00:28:55,100 --> 00:28:59,250
+对吧，它故意像VertexArray，因为我们没有api来获取
+right, right, it like, it's deliberately like to the VertexArray, alright, because we don't have an api to retrieve
+
+256
+00:28:59,600 --> 00:29:02,562
+它现在存储了什么，我将继续添加它
+what it stores at the moment, I'm going to go ahead and add that though
+
+257
+00:29:02,866 --> 00:29:16,625
+所以我们会说virtual const std::vector<std::shared_ptr<VertexBuffer>>&
+so we'll say virtual std::vector, std::shared_ptr, VertexBuffer, all right, there's gonna be a const and a const reference
+
+258
+00:29:16,625 --> 00:29:26,600
+GetVertexBuffers() const = 0，我们会有相同的东西，但不是向量，那将用于IndexBuffer
+GetVertexBuffers const equals 0, all right, and we'll have the same thing, but not the vector, and that will be for our IndexBuffer
+
+259
+00:29:26,733 --> 00:29:40,700
+所以是IndexBuffer，GetIndexBuffer，我们会复制这个，我们会进入OpenGLVertexArray
+so IndexBuffer, GetIndexBuffer, right, and we'll copy this, and we'll go into our OpenGLVertexArray
+
+260
+00:29:41,566 --> 00:29:49,900
+我们再来创建这些，我把这个移开，这将是一个，这将返回VertexBuffer
+and we'll just make these again, let me just move this out of the way, and this will just be a, this will just return VertexBuffer
+
+261
+00:29:49,900 --> 00:29:55,350
+对吧，我们在这里得到了整个集合，这将返回IndexBuffer，好了，酷
+right, so we get the whole collection here, and this will return IndexBuffer, okay, cool
+
+262
+00:29:55,350 --> 00:29:59,475
+现在我们的api能够做到这一点，这很重要，因为我们现在要用到它
+so now our api's capable of that, which is important, because we're gonna use it now
+
+263
+00:29:59,800 --> 00:30:06,800
+那么在这里，我们不需要创建这三个，我们只需要VertexArray，对吧
+so over here, instead of creating like all three of these, we can just say we want the VertexArray, right
+
+264
+00:30:07,150 --> 00:30:15,566
+我将它命名为m_SquareVertexArray，因为它是，这个叫做squareVA, squareVertex，对吧
+I'll call this something like m_SquareVertexArray, because it is our, this is called squareVA, square vertex, right, right
+
+265
+00:30:15,566 --> 00:30:20,875
+这将是，我们要在这里绘制一个正方形而不是三角形，所以我们要做的是，我们要在这里
+this is gonna be, we're gonna make a square instead of a triangle here, so what we'll do is we'll kind of go over here
+
+266
+00:30:21,000 --> 00:30:24,025
+我们已经有了着色器，在着色器之前，我来创建这个，对吧
+we've got the shader, maybe before the shader, I'll create this, right
+
+267
+00:30:24,375 --> 00:30:30,625
+就是reset，然后VertexArray::Create()
+so .reset, and then VertexArray::Create()
+
+268
+00:30:32,133 --> 00:30:34,475
+我必须创建一个VertexBuffer，所以我们会看到
+I'll have to create a VertexBuffer, so we'll see
+
+269
+00:30:35,150 --> 00:30:48,399
+std::shared_ptr<VertexBuffer> squareVB = std::make_shared<VertexBuffer>()
+std::shared_ptr<VertexBuffer> squareVB = std::make_shared<VertexBuffer>()
+
+270
+00:30:48,600 --> 00:30:52,125
+然后我们要把顶点绘制进去，我们复制粘贴这些顶点
+and then we'll have to take in the vertices, so we'll copy and paste these vertices
+
+271
+00:30:52,466 --> 00:30:56,050
+这里我要做的和之前有点不同，因为那是测试的重点
+and what I want to do here is a little bit different than before, because that's kind of the point of testing this
+
+272
+00:30:56,366 --> 00:31:02,099
+这个实际上不会有任何顶点颜色，这有点争议
+this is actually not going to have any vertex colors at all, now this is going to be a little bit controversial
+
+273
+00:31:02,100 --> 00:31:10,150
+因为着色器实际上需要顶点，它需要那个颜色，你们必须使用不同的着色器
+because the shader actually expects vertex, it needs that color, right, you have to either use a different shader or whatever
+
+274
+00:31:10,150 --> 00:31:16,599
+因为，否则它就不能运行，我们要做的就是快速创建一个新的着色器
+because it's, otherwise it's just not gonna work, so what we might do is just quickly create a new shader
+
+275
+00:31:16,600 --> 00:31:24,850
+或者我们可以直接去看看，我想如果已经设置好了，可能不太好，可以添加个统一变量
+or we can just go ahead and check to see, I guess if that's been set or not, which might not be great though, we could add a uniform
+
+276
+00:31:25,025 --> 00:31:30,625
+我们可以做一些事情，但我们会看看，如果不提供顶点数据，它会渲染一个黑色正方形
+there's a few things we could do, but we'll just see if it may be, renders a black square for us, if we don't supply that vertex data
+
+277
+00:31:30,625 --> 00:31:35,533
+但它有点，有点脏，你们不应该这样做，所以我可能会快速复制粘贴，创建新的着色器
+but it's a bit, it's a bit dirty, you shouldn't be doing things like that, so maybe I'll just quickly copy in paste making new shader
+
+278
+00:31:35,533 --> 00:31:41,125
+我可能会这样做，我们粘贴复制以便快速分享，还有vertexSrc
+I'll probably will do that actually, let's copy in paste to share it quickly, and vertexSrc
+
+279
+00:31:43,933 --> 00:31:51,000
+你们知道两个，因为我很有想象力，而且我想让它继续，它就会这样，它就会这样
+you know two, because I'm that imaginative, and also I just want to get this going, and this will just do that, and it will just have that
+
+280
+00:31:51,000 --> 00:31:55,350
+那就是唯一的区别，我们去掉了v_Color，对吧，它就只有属性位置
+that's the only difference really, so we've got rid of v_Color, right, it's just got the attribute position
+
+281
+00:31:55,350 --> 00:32:03,800
+然后颜色会被设置为，我想是这个，但我们可以设置一个平面颜色，如果我们想，让我们的
+and then the color is just gonna be set to the, I guess this, but we could set a flat color, if we wanted to, let's make our
+
+282
+00:32:04,733 --> 00:32:12,200
+我们把它设为蓝色，好吧，这就把它设为蓝色，我们也把它去掉
+let's make it like blue I guess, okay, so this just sets it to blue, and we'll get rid of that as well
+
+283
+00:32:12,333 --> 00:32:20,225
+好了，酷，然后这就是第二个着色器，m_Shader2，我和你们一样讨厌这个命名，别担心
+okay, cool, and then this will be ours our second shader, m_Shader2, I hate this naming as much as you do, don't worry
+
+284
+00:32:22,466 --> 00:32:32,375
+我们复制这个，就叫m_Shader2，不行，不好意思，叫它blueShader，因为我不能这样叫它
+we'll copy this m_Shader2, I can't, I just can't, I'm sorry, we're gonna call it blueShader, because I can't just call it that
+
+285
+00:32:36,700 --> 00:32:41,875
+blueShaderVertexSrc，我只记得我必须把这个推到github
+blueShaderVertexSrc, I just remember that I have to push this to github
+
+286
+00:32:42,025 --> 00:32:50,475
+所以我不可能用这么糟糕的命名来写代码，更有描述性，如果必要的话，使用更长的变量名
+so there's no way that I'm doing code with such bad naming, be more descriptive, use longer variable names, if you have to
+
+287
+00:32:50,475 --> 00:32:56,925
+相信我，这是最好的方法，好了，现在有两个不同的东西，所以就像我说的一个正方形
+trust me, it's the best way to go, okay, so now we have 2 different things here as well, so this is just going to be as I said a square
+
+288
+00:32:57,100 --> 00:33:03,425
+所以我们不做这些，在0.5处也有这个，只调整这些顶点，所以我们处理的是一个正方形
+so instead of doing all of this, we also have this at 0.5, we'll just adjust these vertices, so that we're dealing with a square
+
+289
+00:33:03,425 --> 00:33:09,325
+这是3x4，这是负的x，对我来说，那是一个正方形
+there's gonna be 3x4, and this will be negative on the x, okay, that looks like a square to me
+
+290
+00:33:09,800 --> 00:33:17,625
+很好，现在我们要创建那个VertexBuffer，就像我们做的那样，我们不能这样做
+good, now we're going to create that VertexBuffer, and just like we did with, oh we can't actually make it this way
+
+291
+00:33:17,625 --> 00:33:25,925
+顺便说一下，因为它没有构造函数，所以我们可以，我们可以就这样留着它，然后重置它
+by the way, because it doesn't have a constructor, so we can, we can just, we can either just leave it like that, and then reset it
+
+292
+00:33:26,066 --> 00:33:30,933
+或者我们可以使用VertexBuffer::Create()来创建共享
+or we can probably do make shared maybe with VertexBuffer::Create()
+
+293
+00:33:31,800 --> 00:33:45,750
+然后要输入顶点，也就是squareVertices，然后进行sizeof，也就是sizeof(squareVertices)
+and then we'll have to put in the vertices, which are our squareVertices and in the sizeof them, so sizeof squareVertices
+
+294
+00:33:46,466 --> 00:33:54,750
+好了，那应该没问题，然后我们需要创建一个布局并设置它
+okay, and that should be okay, great, so then we need to set, we need to create a layout and set it
+
+295
+00:33:54,750 --> 00:34:01,250
+并将它添加到VertexBuffer中，作为关键变量，VertexArray就像这里，squareVBLayout
+and add it to the VertexBuffer, as fatality, the VertexArray is like here, so we'll say squareVBLayout
+
+296
+00:34:02,100 --> 00:34:08,275
+对吧，我的意思是你们可以把它放在这里，顺便说一下，如果真的想，可以像这样写代码
+right, I mean you could just put this right in here, by the way, if you really wanted to, you could just write code like this
+
+297
+00:34:09,375 --> 00:34:15,000
+对吧，那是可行的，为什么要这么做，只是为了好玩，这样你们就能看到，两种不同的方法
+right, and that would work, why we might just do that, just for fun, so that you guys can see, two different ways of doing it
+
+298
+00:34:15,000 --> 00:34:23,100
+我们可以把布局设置成那样，这也会让它看起来很酷，那么这就是我们的布局
+but yeah we can just set the layout to be that, which is also kind of makes it look really nice, cool, and so there's our layout
+
+299
+00:34:23,466 --> 00:34:29,900
+然后我们把它加到squareVA中，对吧，我们要做的是squareVB，好了
+and then we're adding it to the squareVA, right, and what we're doing is squareVB, okay
+
+300
+00:34:31,100 --> 00:34:35,350
+很好，现在我们基本上已经把所有权转移到这个VertexBuffer，因为它是个共享指针
+cool, so now we've basically transferred our ownership into this VertexBuffer, because it's a shared pointer
+
+301
+00:34:36,333 --> 00:34:43,825
+这个作用域实际上会过期，但作用域中的这个变量显然会在作用域结束时结束
+and and this scope will actually expire, but this variable rather in the scope will obviously end, when the scope ends
+
+302
+00:34:44,333 --> 00:34:56,033
+但它仍然存在于VertexBuffer中，索引，复制这个，放到这里，我们称它为squareIndices
+but it still lives on inside our VertexBuffer, indices, so copy this, put it here, we'll call this squareIndices
+
+303
+00:34:56,933 --> 00:35:09,175
+我们将创建6个，0 1 2 2 3 0，IndexBuffer将是，我们将创建一个新的，这将和这个一样
+we'll make 6 of them, 0 1 2 2 3 0, IndexBuffer is gonna be, we're just gonna make a new one, right, so this is gonna be the same as this
+
+304
+00:35:09,866 --> 00:35:22,425
+除了IB和IndexBuffer，我们可以继续，我猜，你们也可以像他们说的那样进行重置
+except IB and IndexBuffer, we can just go ahead and do make sure I guess, you can also do reset as they said
+
+305
+00:35:22,425 --> 00:35:30,800
+但那需要2行代码，所以我想我们就这样，调用IndexBuffer::Create()，这将是squareIndices
+but that requires 2 lines of code, so I guess we'll just do this, and we do IndexBuffer::Create(), this is going to be our squareIndices
+
+306
+00:35:31,533 --> 00:35:38,966
+当然那看起来很好，我们可能在另一个括号中有一个，这需要是一个IndexBuffer
+of course that looks pretty good, we might have one in another parentheses, this needs to be an IndexBuffer
+
+307
+00:35:40,600 --> 00:35:47,850
+很好，然后我们将IndexBuffer设置为VertexArray，显然是squareVA，好了，就是那样
+okay, cool, and then we just set the IndexBuffer into our VertexArray, obviously being the squareVA, okay, that's it
+
+308
+00:35:48,400 --> 00:35:50,300
+如果我们向下滚动这里，我们可以看到它是如何运行的
+if we scroll down here, we can see how this works
+
+309
+00:35:50,650 --> 00:35:54,175
+仍然绑定着色器，可以一次绘制两个，可能有点奇怪
+so we'll still bind our shader, we can actually draw 2 at once, might be weird
+
+310
+00:35:54,175 --> 00:36:02,275
+也许要把三角形绘制在正方形的上面，所以先绘制正方形，执行m_SquareVA->Bind()，对吧
+maybe we'll draw the triangle on top of the square, so I'll might draw the square first, so we'll say, m_SquareVA->Bind(), right
+
+311
+00:36:03,300 --> 00:36:09,000
+我们也会绑定m_SquareShader或者m_BlueShader->Bind()，对吧
+we'll bind m_SquareShader as well or m_BlueShader->Bind(), right
+
+312
+00:36:09,850 --> 00:36:13,275
+然后我们会调用glDrawElements，绘制三角形
+and then we'll do glDrawElements, we'll draw tart triangles
+
+313
+00:36:13,666 --> 00:36:20,500
+这将是m_SquareVA, IndexBuffer, GetIndexBuffer->GetCount()，好了
+this will be m_SquareVA, IndexBuffer, GetIndexBuffer()->GetCount(), okay
+
+314
+00:36:20,750 --> 00:36:22,800
+然后我们用VertexArray绑定着色器，然后我们
+then we bind the shader with VertexArray, and then we just
+
+315
+00:36:23,333 --> 00:36:28,125
+三角形，让我们看看会发生什么，希望一切都能顺利
+you know do the our triangle, so let's just see what happens here, hopefully everything's gonna work
+
+316
+00:36:28,125 --> 00:36:39,025
+做的有点仓促，我想有个语法错误，是的，我不知道为什么，但是我的王子们要离开我了
+I did kind of rush through this, um okay, we got a syntax error I guess, yep I don't know why, but my princes are just leaving me
+
+317
+00:36:41,425 --> 00:36:45,825
+那是关于抽象类的一个环节，好吧，我有点想到会发生这种情况
+that is about a kind of session in abstract class, yeah okay, I kind of thought that would happen
+
+318
+00:36:46,200 --> 00:36:54,400
+说实话，这是因为这仍然是一个构造函数，所以我想我们可以直接设置它
+to be completely honest, it's because this is still a constructor, so I guess we can either set it directly
+
+319
+00:36:55,500 --> 00:37:03,925
+如果我们这样做的话，这应该是可行的，尽管我认为可能不是，是的，这变得有点
+which should actually work, if we just do that, although I think maybe not, yeah this becomes a little bit
+
+320
+00:37:03,925 --> 00:37:11,600
+我们最终会返回，我想确保我能运行，但我现在不想处理它
+we will eventually return a, I would've thought to make sure I would have worked, but I didn't want to deal with it right now
+
+321
+00:37:12,000 --> 00:37:19,125
+我只是想这样做，最终我们会返回共享指针，而不是返回原始指针，所以这很好
+so I just want to do it this way, eventually we'll return shared pointers, instead of returning raw points, so it'll be fine
+
+322
+00:37:20,166 --> 00:37:32,949
+但是，我们现在只需要重置，很好，f5，很好，我们有，看起来它仍然在绘制3个顶点
+but yeah we'll just do reset for now, okay, cool, f5, all right, cool, so we have, it looks like it's still drawing 3 vertices
+
+323
+00:37:32,949 --> 00:37:38,400
+但它看起来像在绘制两个东西，用不同的着色器，这很好，为什么它要绘制三个顶点
+but it does look like it's drawing 2 things and with different shaders, which is nice, now why is it drawing three vertices
+
+324
+00:37:39,866 --> 00:37:50,225
+这看起来显然应该多于3，就像我们设置的squareIndices一样，这是6，因为这里有6个
+this definitely looks like it should have more than three, like as in we're setting squareIndices, like that's 6, right, because there's 6 in here
+
+325
+00:37:51,333 --> 00:37:58,875
+然后在这里，我以为我们得到了这个的计数，所以我怀疑我们的IndexBuffer
+and then over here, we, I thought we were getting the count out of this, so I'm suspicious now about our IndexBuffer
+
+326
+00:38:00,066 --> 00:38:11,425
+如果我们看一下Buffer，我们有来自GLIndexBuffer的GetCount, GetCount只返回m_Count
+so if we look at Buffer, right, we have GetCount from GLIndexBuffer, GLBuffer, GetCount just returns m_Count
+
+327
+00:38:11,425 --> 00:38:19,000
+我想我们正在设置它，为什么不呢，m_Count被设置为count，那很奇怪
+and I guess we're setting that, right, why wouldn't we be, m_Count is being set to count, that is quite strange
+
+328
+00:38:19,000 --> 00:38:27,725
+我想知道为什么只绘制了那个，很多快速检查的方法就通过直接调用6来确保真的绘制6个
+I wonder why we're only drawing that, many quick way to check is just to make sure that we actually draw 6 by just calling 6 directly
+
+329
+00:38:28,333 --> 00:38:36,650
+我可能要禁用其他东西，因为这可能不起作用，这可能是我们的布局，实际上是错误的
+and I might have to disable the other stuff, because this might not be working, yep okay, cool, so it's probably our layout, that's actually wrong
+
+330
+00:38:36,866 --> 00:38:42,875
+不幸的是，因为我希望，那只是小菜一碟，但话虽如此，我确实匆匆完成了
+unfortunately, because I was hoping that, that would just be a piece of cake, but that being said, I did rush through this
+
+331
+00:38:43,200 --> 00:38:52,050
+谁知道我写了什么样的代码，这就是问题所在，把IndexBuffer设置为squareVertexArray
+so who knows what kind of code I really wrote, and there's the problem, so we have IndexBuffer being set into our squareVertexArray
+
+332
+00:38:52,050 --> 00:38:53,425
+那实际上就是m_IndexBuffer
+that's actually the m_IndexBuffer
+
+333
+00:38:53,425 --> 00:38:58,250
+也就是IndexBuffer，有3个顶点，确保我们设置了squareIB，对吧
+which is the IndexBuffer, which is 3 vertices, so make sure that we set the squareIB, right
+
+334
+00:38:58,250 --> 00:39:10,325
+然后我们可以往下，把它改成顶点是squareVA->GetIndexBuffer()->GetCount()
+and then we can go down, and actually change this back to being vertex was squareVA->GetIndexBuffer()->GetCount()
+
+335
+00:39:10,466 --> 00:39:16,300
+好了，f5，现在我们可以看到背景中的正方形，以及前景中的三角形
+okay, f5 and now we should see both the square in the background, and then the triangle in the foreground
+
+336
+00:39:16,466 --> 00:39:18,600
+正如你们所看到的，那就是我们得到的结果，它们的大小是一样的
+and as you can see, that's what we get here, so they're the same size
+
+337
+00:39:18,600 --> 00:39:19,825
+那就是为什么你们看到它是这样的
+ which is why you see it like this
+
+338
+00:39:20,166 --> 00:39:28,450
+让它更有趣一点，把这个设为0.75而不是0.5，这样我们就有了它作为背景
+let's make it a little bit more interesting, and just make this maybe 75 instead of 5, just so that we kind of have it as a background
+
+339
+00:39:28,800 --> 00:39:34,000
+我们在前面有三角形渲染，稍微小一点，继续，好了，很酷
+and we have the triangle rendering in front, and a little bit smaller, there we go, okay, pretty cool
+
+340
+00:39:34,266 --> 00:39:42,176
+我们现在有了这两个东西，在我们结束之前，我还想做一件事，今天只是清理下代码
+we have both of these things now rendering, let's one more thing that I want to do before we finish, today is just clean up the code a bit
+
+341
+00:39:42,525 --> 00:39:47,450
+你们会注意到，我们实际上不再需要VertexBuffer或IndexBuffer
+you'll notice that, we don't actually need to have VertexBuffer or IndexBuffer here anymore
+
+342
+00:39:47,533 --> 00:39:51,300
+所以我要把这两个都删掉，这样我们就只有这个和那个了
+so I'm just gonna delete both of these, right, so we kind of just have this and that
+
+343
+00:39:52,675 --> 00:39:58,148
+那就意味着，我们要做和这里类似的事情，在这里我们创建了这些东西
+that's just going to mean that, we're going to have to do a similar thing to what we did here, where we kind of created this stuff
+
+344
+00:39:59,300 --> 00:40:05,050
+首先，我们将它命名为VertexBuffer，我想这只是个例子
+first, so we'll do, we'll just call this VertexBuffer, so I'll just be kind of out playing example I guess
+
+345
+00:40:05,966 --> 00:40:11,375
+所以我们要完全替换这个，然后至于这个，我们在这里做同样的操作
+so we'll just completely replace this, and then this, we'll do the same thing for here
+
+346
+00:40:11,375 --> 00:40:16,750
+也就是IndexBuffer，我们叫它IndexBuffer
+which will just be IndexBuffer, we'll call it IndexBuffer
+
+347
+00:40:18,700 --> 00:40:21,866
+我们像往常一样做IndexBuffer->reset()，还有SetBuffer
+we'll do IndexBuffer->reset() as usual and SetBuffer
+
+348
+00:40:21,866 --> 00:40:25,075
+好了，继续，f5，希望这一切都可以
+okay, there we go, f5, hopefully this all works
+
+349
+00:40:25,350 --> 00:40:29,075
+实际上这里有一些错误，让我们看看，哦，是的，我们在这里使用它
+and we actually have some errors here, let's see, and oh yeah we use it here
+
+350
+00:40:29,333 --> 00:40:39,200
+很明显这就变成了m_VertexArray->GetIndexBuffer()->GetCount()，我想应该就是那样
+so this so obviously now just becomes m_VertexArray->GetIndexBuffer()->GetCount(), and I think that should be it
+
+351
+00:40:39,400 --> 00:40:46,250
+看看得到了什么，你们可以看到，它在运行，很好，我要做的最后一件事是清理这个
+so let's just see what we get here, you can see, it's working, which is great, last thing I'll do to clean this up as well is
+
+352
+00:40:46,700 --> 00:40:51,575
+我们需要删除VertexArray，我没有添加析构函数，因为这里只有这个东西
+we need to actually delete our VertexArray, so I didn't add a destructor, because I just had this thing here
+
+353
+00:40:52,025 --> 00:40:59,075
+那么我们就复制这个到构造函数下面，使它成为一个函数
+so we will just copy this go below the constructor, make this a function
+
+354
+00:40:59,600 --> 00:41:12,000
+只需要调用glDeleteVertexArrays，好了，然后就是m_RendererID
+and just call glDeleteVertexArrays, okay, and this will be one, and m_Vertex, m_RendererID, and RendererID
+
+355
+00:41:12,000 --> 00:41:16,725
+好了，酷，只要确保一切正常，我想就差不多了
+okay, cool, just make sure that everything still works, and I think that's pretty much it
+
+356
+00:41:16,900 --> 00:41:21,275
+希望这能帮助你们理解VertexArray是如何运行的，以及我们将如何使用它们
+so hopefully this kind of helps you guys understand how VertexArray work, and how we're gonna use them
+
+357
+00:41:21,700 --> 00:41:29,050
+现在我们已经有了足够多的代码，我们可以不用写OpenGL代码来实现这些东西
+and now we kind of have almost almost enough code, where we can actually not write OpenGL code to make any of this stuff happen
+
+358
+00:41:29,050 --> 00:41:32,099
+我们可以把这个移到Sandbox到SandboxApp
+and we can actually move this into Sandbox into the SandboxApp
+
+359
+00:41:32,100 --> 00:41:37,275
+而不是把它放在Application中，最后一部分实际上就是这个glDrawElements
+instead of actually having it inside Application, the last piece of the puzzle is literally this glDrawElements
+
+360
+00:41:37,275 --> 00:41:42,166
+我们将在下期讨论这个问题，好了，所以我希望你们喜欢这期视频
+and we're going to talk about that in the next episode, okay, so I hope you guys enjoyed this episode
+
+361
+00:41:42,166 --> 00:41:46,875
+如果喜欢的话，就为它点赞吧，也可以通过访问patreon.com/thecherno来支持这个系列
+if you did, you can hit the like button, you can also have support the series by going over the patreon.com/thecherno
+
+362
+00:41:46,875 --> 00:41:54,025
+非常感谢所有支持这个系列的粉丝，如果你们支持这个系列，就会得到奖励
+huge thank you as always to all the patreons that make this series possible, if you support the series, you'll get rewarded by just
+
+363
+00:41:54,025 --> 00:41:59,666
+你们会得到一定的奖励，比如可以访问我的Hazel私人开发库的源代码
+you get certain rewards, such as getting access to the source code of my kind of private development repository of Hazel
+
+364
+00:41:59,666 --> 00:42:04,250
+我们就得到了类似于PBR的渲染，就像一个完整的3个场景和很多非常酷的东西
+where we've got like PBR rendering, and just like a full 3 scene and a lot of really cool stuff
+
+365
+00:42:05,000 --> 00:42:10,666
+这里还在开发中，下期，我说过，我想谈谈渲染器，以及它是如何发挥作用的
+there's kind of in development there, next time as I said, I want to talk about the renderer, and how that plays the role
+
+366
+00:42:10,666 --> 00:42:15,525
+以及绘制元素，因为那是我们实际的比如draw命令，那是我们实际的DrawCall
+and where that chill draw elements is going, because that's our actual like draw command, that's our actual DrawCall
+
+367
+00:42:16,933 --> 00:42:22,750
+是的，我们会继续搞这个，可能会开始构建，把一个真正漂亮的场景组合在一起
+and yeah, we'll kind of move on with this, and probably start kind of building, putting together like an actual pretty scene
+
+368
+00:42:23,100 --> 00:42:24,300
+再见，那么，拜
+I'll see you guys, then goodbye
+
