@@ -1,0 +1,2030 @@
+﻿1
+00:00:00,133 --> 00:00:00,966
+嘿, 你们好
+hey, what's up guys
+
+2
+00:00:00,966 --> 00:00:04,133
+我是Cherno, 欢迎回到我的OpenGL系列教程, 那么上期
+my name is Cherno, welcome back to my OpenGL series, so last time
+
+3
+00:00:04,333 --> 00:00:08,866
+实际上, 在前几期, 我们把所有的OpenGL代码都提取到类中了
+and in fact over the last few episodes, we've been extracting all of our OpenGL code away into classes
+
+4
+00:00:08,866 --> 00:00:11,400
+这样我们处理它们就会更容易一点
+so that we can deal with them a little bit more easily
+
+5
+00:00:11,533 --> 00:00:14,466
+当真正需要编写真正的图形代码的时候
+when it actually comes time to writing real graphics code
+
+6
+00:00:14,525 --> 00:00:16,533
+我们今天还是继续抽象着色器吧
+and today we're going to continue that journey with shaders
+
+7
+00:00:16,533 --> 00:00:19,066
+那么我们已经做完了的, 比如顶点缓冲区和顶点数组
+so we've done like vertex buffers and vertex arrays
+
+8
+00:00:19,066 --> 00:00:21,666
+以及像顶点缓冲区布局之类的
+and like vertex buffer layout and all that kind of stuff
+
+9
+00:00:22,100 --> 00:00:24,233
+并且现在, 下一步就是着色器
+and now, the next step is going to be shaders
+
+10
+00:00:24,266 --> 00:00:26,275
+那么我们来看看, 我们实际要如何来抽象着色器
+so let's take a look at, how we can actually abstract shader
+
+11
+00:00:26,275 --> 00:00:28,675
+好吧, 首先, 让我们来说说, 那么
+well, first of all, let's just talk about it, so
+
+12
+00:00:29,433 --> 00:00:32,867
+我马上要抽象这个的方法是比较简单的
+the way that I'm going to abstract this right now is in a simple way
+
+13
+00:00:32,867 --> 00:00:35,366
+因为着色器, 当处理着色器的时候
+because shaders, when it comes to shaders
+
+14
+00:00:35,933 --> 00:00:37,833
+顺便说一下, 如果你们不知道着色器是什么
+and if you guys don't know what a shader is, by the way
+
+15
+00:00:37,833 --> 00:00:39,933
+一定要去看看我制作的关于着色器的视频
+definitely check out the video that I made about shader
+
+16
+00:00:40,333 --> 00:00:45,300
+但是着色器是一个非常复杂的主题
+but shader are an incredibly complex topic
+
+17
+00:00:45,400 --> 00:00:50,833
+对于图形编程或任意的渲染操作, 着色器都是非常非常重要的
+and shaders are very very important to graphics programming or any kind of rendering
+
+18
+00:00:50,933 --> 00:00:54,000
+对吧, 因此, 这比较倾向于
+right, and so because of that, there tends to be
+
+19
+00:00:54,450 --> 00:00:59,133
+就像倾向于创建一个相当复杂的系统
+like a tendency to actually make a rather complicated system
+
+20
+00:00:59,533 --> 00:01:07,166
+这不仅易于使用, 而且在游戏和游戏引擎中也非常强大
+that is both easy to use, but also extremely powerful in games and game engines typically
+
+21
+00:01:07,333 --> 00:01:10,200
+有一种自定义的着色语言是非常常见的
+it's very common to have a custom shading language
+
+22
+00:01:10,366 --> 00:01:16,366
+然后为每种渲染接口或平台编译成着色器代码
+which then compiles into shader code for each kind of rendering api or platform
+
+23
+00:01:16,766 --> 00:01:22,700
+在运行时, 它也是通过代码来控制和扩展的, 这意味着
+and also is somewhat kind of controllable and extensible through the code at runtime, meaning that
+
+24
+00:01:22,766 --> 00:01:27,366
+实际生成新的着色器对于游戏非常常见, 然后
+it's very common for games to actually generate new shaders, and then
+
+25
+00:01:27,600 --> 00:01:31,033
+让它们用于渲染, 当游戏实际运行的时候
+have them be used for rendering while the game is actually running
+
+26
+00:01:31,033 --> 00:01:34,166
+或者在游戏正在加载之类的时候, 对吧
+or while the game is loading or something like that, right
+
+27
+00:01:34,433 --> 00:01:38,400
+着色器生成和这种动态创建是非常非常常见的
+shader generation and shader kind of creation on the fly is something that's very very common
+
+28
+00:01:38,400 --> 00:01:42,150
+并且总的来说, 整个就像兔子洞一样
+and in general, the whole like rabbit hole of
+
+29
+00:01:42,150 --> 00:01:47,133
+让我们为我们的引擎编写一个着色器系统, 这是一个非常庞大的主题
+let's write a shader system for our engine, like tends to be such a massive topic
+
+30
+00:01:47,133 --> 00:01:48,366
+并且我们肯定不会
+and we're definitely not
+
+31
+00:01:48,366 --> 00:01:52,625
+甚至在今天或整个OpenGL系列中, 我们都只涉及到皮毛
+even going to scratch the surface today or in this entire OpenGL series 
+
+32
+00:01:52,625 --> 00:01:57,233
+因为, 坦白地说吧, 这与OpenGL渲染无关
+because it's irrelevant, quite frankly to actually OpenGL rendering
+
+33
+00:01:57,266 --> 00:02:01,266
+当我们认为着色器是OpenGL部分的时候, 就像没有任何东西
+when we think about shader is an OpenGL, like there's nothing to it
+
+34
+00:02:01,266 --> 00:02:03,933
+只需要将文本写入文件或作为一个字符串
+you just write text in a file or as a string
+
+35
+00:02:03,933 --> 00:02:08,833
+就完事了, 就好像我刚才描述的那些东西都没有真正的需要
+and you're done, like there's no real need for any of the stuff that I just described
+
+36
+00:02:08,933 --> 00:02:12,133
+那些东西通常在真正的游戏引擎会用到, 对吧
+that kind of stuff is typically used by an actual game engine, right
+
+37
+00:02:12,133 --> 00:02:16,033
+我们不会在这个只关于OpenGL的系列中讨论那个
+and we're not talking about that in this series, this is just about OpenGL
+
+38
+00:02:16,333 --> 00:02:18,366
+之后, 当我制作游戏引擎系列时
+later on, when I make the game engine series
+
+39
+00:02:18,500 --> 00:02:19,950
+我们肯定就会讨论那个东西
+we will definitely talk about that stuff
+
+40
+00:02:19,950 --> 00:02:24,100
+我们肯定会实现一种更复杂的着色器和材质系统之类的
+we'll definitely implement a way more complicated shader and material system and all of that
+
+41
+00:02:24,366 --> 00:02:25,220
+在那个系列中
+in that series
+
+42
+00:02:25,220 --> 00:02:28,166
+所以我只想和在这儿的各位保持一致
+so I just want to just want to be on the same page as everyone else here
+
+43
+00:02:28,300 --> 00:02:30,400
+对于我们今天真正想要达到的目标
+as to what we're actually trying to achieve today
+
+44
+00:02:30,475 --> 00:02:35,666
+因为我绝不会试着去写一个疯狂的着色器系统或类似的东西
+because by no means am I trying to rate trying to write a crazy shader system or anything like that
+
+45
+00:02:35,666 --> 00:02:37,900
+对吧, 我今天在这儿要做的就是
+right, here all I'm doing today is
+
+46
+00:02:37,900 --> 00:02:41,325
+我想要把我们写过的所有OpenGL着色器代码
+I want to basically take all of the OpenGL shader code that we've written 
+
+47
+00:02:41,325 --> 00:02:45,300
+从接口里面抽象出来, 这很容易使用, 明白吧
+abstract that out behind an api, that's really easy to use, understand
+
+48
+00:02:45,300 --> 00:02:49,450
+并保持我们的实际用户或客户端代码非常简洁
+and keeps our actual kind of user or client side code really concise
+
+49
+00:02:49,450 --> 00:02:55,300
+这样在这个系列中, 当涉及到用图形做一些非常疯狂的事情的时候
+so that when it comes time to and do really crazy things with graphics in this series
+
+50
+00:02:55,700 --> 00:02:58,400
+实际上, 对你来说, 阅读代码就会很容易
+it's actually going to be easy for you to read the actual code
+
+51
+00:02:58,400 --> 00:03:00,866
+因为这将是一个高层次的相对的概念
+because it's going to be high level and fairly conceptual
+
+52
+00:03:00,866 --> 00:03:04,200
+并不像你知道的, 统一变量, 矩阵和4fv
+and not like you know, gl_uniform, matrix, 4fv
+
+53
+00:03:04,433 --> 00:03:06,700
+或者不管函数名可能是什么, 对吧
+or whatever the function names might be, right
+
+54
+00:03:06,700 --> 00:03:08,333
+这处理起来就会很简单
+it's going to be very simple to deal with
+
+55
+00:03:08,333 --> 00:03:11,400
+希望至少这是我的目标, 所以说
+hopefully at least that's my goal for this, so that being said
+
+56
+00:03:11,466 --> 00:03:14,366
+我们需要在着色器代码中抽象什么
+what is it that we actually need to need to abstract in our shader code
+
+57
+00:03:14,366 --> 00:03:15,733
+对吧, 或者它是什么
+right, or what it is
+
+58
+00:03:16,266 --> 00:03:18,166
+我们并没有做什么特别疯狂的事
+we haven't done anything particularly too crazy
+
+59
+00:03:18,166 --> 00:03:19,733
+我的意思是我们正在从一个文件中加载一个着色器
+I mean we're loading a shader from a file
+
+60
+00:03:19,733 --> 00:03:21,333
+根据我现在读到的源代码
+based on the source code that I'm reading right now
+
+61
+00:03:23,066 --> 00:03:24,233
+然后渲染它
+and we're rendering it
+
+62
+00:03:24,233 --> 00:03:27,133
+我认为它可能有一个设置的类似统一变量的一些东西
+and I think it might have a uniform something like that that we're setting
+
+63
+00:03:27,766 --> 00:03:31,000
+是的, 我们要给那个颜色的fa设置一个统一变量
+yeah, we're setting a uniform for fa with the color
+
+64
+00:03:31,333 --> 00:03:35,533
+我认为我们的, 对, 矩形或正方形的颜色
+I think of our, yes, with the color of our rectangle or our square
+
+65
+00:03:35,533 --> 00:03:36,633
+这就是我们所做的
+that's all that we're doing
+
+66
+00:03:36,766 --> 00:03:39,333
+但是一般来说, 着色器需要什么, 首先
+but in general, what does the shaders is need, well first of all
+
+67
+00:03:39,366 --> 00:03:42,166
+我们基本上希望能够传递一个文件或一个字符串
+we want to be able to basically pass in a file or a string
+
+68
+00:03:42,166 --> 00:03:45,266
+把它作为着色器来编译, 所以那就是第一步
+and have that be compiled as a shader, so that's kind of step one
+
+69
+00:03:45,566 --> 00:03:49,400
+我们希望能够绑定和解绑定着色器, 这是第二步
+we want to be able to bind and unbind the shader, step two and
+
+70
+00:03:49,400 --> 00:03:51,466
+第三步就是我们需要能够设置
+step three is we want to be able to set
+
+71
+00:03:51,466 --> 00:03:55,366
+着色器中各种不同的统一变量, 对吧
+the uniforms all of the different uniforms for the shader, okay
+
+72
+00:03:56,333 --> 00:04:00,100
+这可能就是我们现在正在研究的东西
+that's probably it for something that we're looking at right now
+
+73
+00:04:00,100 --> 00:04:04,866
+我的意思是, 就像读取属性
+I mean, like reading back attributes, reading back
+
+74
+00:04:04,866 --> 00:04:07,833
+就像能够在一个着色器中载入, 然后询问着色器
+like being able to load in a shader, and then ask the shader
+
+75
+00:04:07,833 --> 00:04:09,633
+嘿, 你实际有什么统一变量
+hey, what uniforms do you actually have
+
+76
+00:04:10,233 --> 00:04:15,000
+它们是什么类型, 所有那些都是非常有用的东西
+and what types are they, and all of that is something that would be incredibly useful
+
+77
+00:04:15,333 --> 00:04:19,833
+但那可能更多地属于游戏引擎的着色器系统
+but again that probably falls more into a shader system for a game engine
+
+78
+00:04:19,833 --> 00:04:22,725
+那实际上需要暂停着色器源代码等等
+and that would actually require pausing the shader source code and all that
+
+79
+00:04:22,725 --> 00:04:24,666
+这样超出作用域会花很长时间
+this way out of the scopes can take way too long
+
+80
+00:04:24,766 --> 00:04:27,000
+反正我现在也不感兴趣
+and not something I'm interested in right now anyway
+
+81
+00:04:27,800 --> 00:04:28,933
+我的意思是, 对于这个系列
+for this series, I mean
+
+82
+00:04:29,266 --> 00:04:33,066
+但是, 我的意思是, 我们只想能够创建着色器, 绑定它们, 拿来使用
+but yeah, I mean we just want to be able to create shader, bind them, for use
+
+83
+00:04:33,400 --> 00:04:37,133
+也设置统一变量, 就这些
+and also set uniforms, that's it
+
+84
+00:04:37,200 --> 00:04:39,766
+那么, 让我们开始深入并开始重构源码吧
+so let's dive in and start refactoring the source code
+
+85
+00:04:39,766 --> 00:04:40,933
+因此我们可以做所有这些
+so that we can do all of that
+
+86
+00:04:41,100 --> 00:04:44,633
+好了, 所以第一步, 在src目录下, 添加一个新项
+okay, so step one, under src, let's add a new item
+
+87
+00:04:45,333 --> 00:04:47,533
+添加一个头文件, 就叫Shader
+I'm gonna add a header file, it's gonna be called Shader
+
+88
+00:04:48,333 --> 00:04:54,633
+也创建一个cpp文件Shader, 好了
+and I'm going to do the same thing for a cpp file, okay
+
+89
+00:04:54,633 --> 00:04:57,100
+cpp文件当然会包含头文件
+cpp file of course is going to include the header file
+
+90
+00:04:58,166 --> 00:05:01,900
+让我们返回头文件开始编辑它, 那么就是class Shader
+and let's go back to the header file and start editing it, so class Shader
+
+91
+00:05:03,400 --> 00:05:06,166
+我们将会有一些私有和公共的东西
+we're just going to have a few pop private and public things here
+
+92
+00:05:06,200 --> 00:05:10,225
+有一个构造方法, 接收一个const std::string& filename
+we'll have a constructor, which takes in a const std::string& filename
+
+93
+00:05:10,225 --> 00:05:12,400
+我上次做了什么, 或上次没做什么
+now what I did do last time or not last time
+
+94
+00:05:12,400 --> 00:05:17,133
+但在实际的着色器那期, 我最终是在Application文件中做的
+but in the actual shader episode, what I actually ended up doing was inside Application
+
+95
+00:05:17,266 --> 00:05:20,600
+我确实做了它, 这样我们就可以在一个文件中写我们的着色器
+I did actually make it, so that we could write our shader in one file
+
+96
+00:05:20,633 --> 00:05:22,700
+因为我觉得要处理两个文件很烦人
+because I find it very annoying having to do with two files
+
+97
+00:05:22,700 --> 00:05:24,900
+所以你可以看到这里, 我们实际上有
+so you can see that over here, we actually have
+
+98
+00:05:24,900 --> 00:05:28,600
+一个独立文件中有两种类型的节点, 片段着色器和顶点着色器
+a single file with two kind of sections, shader of fragment and shader of vertex
+
+99
+00:05:28,725 --> 00:05:29,566
+那非常重要
+that's very important
+
+100
+00:05:29,566 --> 00:05:32,833
+那也意味着我们不需要接收
+that also means that we don't need to be able to take in kind of well
+
+101
+00:05:32,833 --> 00:05:35,133
+我们不需要接收两个不同的文件
+we don't need to take in two different files
+
+102
+00:05:35,133 --> 00:05:37,533
+我们只需要输入文件路径, 一切就都好了
+we can just take in the file path, and everything will be okay
+
+103
+00:05:37,966 --> 00:05:40,400
+那么就是filepath, 我们会有一个析构方法
+so filepath, we're going to have a destructor
+
+104
+00:05:41,333 --> 00:05:44,633
+我们将有Bind方法, 它将是一个常量方法
+we're going to have Bind, which is going to be a const function
+
+105
+00:05:45,033 --> 00:05:49,266
+还有Unbind方法, 当然, 在OpenGL中, 我们会绑定
+and Unbind, now of course with OpenGL, we kind of bind
+
+106
+00:05:49,366 --> 00:05:52,300
+顶点数组和顶点缓冲区, 我们也会绑定
+vertex arrays and we bind vertex buffers, and we bind
+
+107
+00:05:52,900 --> 00:05:55,566
+比如索引缓冲区纹理或者之类的东西
+like index buffers or textures or all that stuff
+
+108
+00:05:55,566 --> 00:05:59,200
+但在着色程序中, 它被称为glUseProgram
+but with shader programs, it's called glUseProgram
+
+109
+00:05:59,433 --> 00:06:01,866
+既然我们创建了这个接口
+now since we're making this api though
+
+110
+00:06:01,866 --> 00:06:05,266
+我们就需要保持一致, 我们会把它称为绑定, 对于一切 
+we're gonna be consistent, and we're gonna call it bind, for everything
+
+111
+00:06:05,400 --> 00:06:07,750
+所以这个就是Bind, 然后我们也有Unbind
+so this is gonna be Bind, and then we've gonna have Unbind 
+
+112
+00:06:07,750 --> 00:06:10,666
+就是那样, 当然, 那和顶点缓冲区是一致的
+and that is, of course, consistent with things like our vertex buffer
+
+113
+00:06:10,666 --> 00:06:12,233
+那个也有Bind和Unbind
+which also have a Bind and Unbind
+
+114
+00:06:12,233 --> 00:06:15,633
+好了, 最后我还需要设置统一变量
+all right, and then finally I want to be able to also set uniforms
+
+115
+00:06:15,633 --> 00:06:17,033
+现在这儿有许多这些
+now there are so many of these
+
+116
+00:06:17,033 --> 00:06:19,766
+再说一次, 我没有尝试创建一个复杂的着色器系统
+and again, I'm not trying to create a complicated shader system
+
+117
+00:06:20,100 --> 00:06:21,700
+所以我不需要创建
+so I don't want to make something
+
+118
+00:06:21,700 --> 00:06:25,700
+一些模板化的东西, 然后需要实际处理它自己的东西
+that's templated and then has to actually deal with its own kind of things
+
+119
+00:06:25,900 --> 00:06:30,700
+如果我把它写成我的引擎的代码或者类似的东西
+if I was writing this as actual kind of code for my engine or something like that
+
+120
+00:06:30,733 --> 00:06:35,400
+我肯定会有一个SetValue或SetUniform方法
+I would definitely just probably have a SetValue or SetUniform function
+
+121
+00:06:35,500 --> 00:06:38,366
+这是模板化的, 甚至不止模板化
+that was kind of templated and not even templated
+
+122
+00:06:38,366 --> 00:06:41,866
+但也像在一个更复杂的着色器系统中
+but also like in a more complicated shader system
+
+123
+00:06:41,866 --> 00:06:44,866
+实际上你可以直接传入着色器源码去计算出
+you would actually just pass the shader source code to work out
+
+124
+00:06:44,866 --> 00:06:46,833
+一个统一变量的类型是什么
+what type a uniform variable was
+
+125
+00:06:47,166 --> 00:06:52,775
+通过实现那个, 你就可以验证其中的内容, 也可以设计一个接口
+and by doing that, you can validate kind of what goes into it, and also design an api
+
+126
+00:06:52,775 --> 00:06:54,633
+这样你就有SetValue方法了
+so that you can just have SetValue
+
+127
+00:06:54,633 --> 00:06:56,233
+你所需要的只是名称和值
+and all you need is the name and the value
+
+128
+00:06:56,233 --> 00:06:58,766
+它会自动设置正确的数据等等
+and it will automatically set the right data and all of that
+
+129
+00:06:58,766 --> 00:07:00,766
+这是我想在游戏引擎系列中讨论的内容
+something worth everything I want to talk about in the game engine series
+
+130
+00:07:00,766 --> 00:07:04,366
+但我们暂时只是想让这段代码非常简单
+but for now we're just trying to keep this code really straightforward really simple
+
+131
+00:07:04,550 --> 00:07:08,333
+这样再说一次, 当我们在OpenGL中做东西时
+so that again, when we actually get into making things in OpenGL
+
+132
+00:07:08,333 --> 00:07:09,675
+读起来很容易
+it's gonna be easy to read 
+
+133
+00:07:09,675 --> 00:07:13,266
+人们不需要说, 哇, 这真是一个复杂的系统
+and people won't have to be like, wow, this is such a complicated system
+
+134
+00:07:13,300 --> 00:07:14,300
+为什么要构建那样的东西
+why built something like that
+
+135
+00:07:14,300 --> 00:07:15,466
+或者关于这个, 就没啥意义
+or I doesn't make any sense for this
+
+136
+00:07:15,466 --> 00:07:16,566
+所以记住那个就好
+so just keep that in mind
+
+137
+00:07:16,733 --> 00:07:21,000
+那么我们可能需要一个SetUniform4f之类的方法
+so we're gonna have like a SetUniform4f or something like that
+
+138
+00:07:21,000 --> 00:07:22,566
+这只是模仿我们之前的那个
+which is just going to mimic our initial one
+
+139
+00:07:22,566 --> 00:07:24,366
+随着我们继续深入还会添加其他的方法
+and it will add the other ones as we go along
+
+140
+00:07:24,533 --> 00:07:30,750
+那么这个, 当然不得不需要一个const std::string& name
+so this of course is going to have to have a const std::string& name
+
+141
+00:07:30,750 --> 00:07:32,200
+并且之后就是几个浮点数
+and then a float
+
+142
+00:07:32,200 --> 00:07:36,100
+就是值的四个浮点数, 就是v0, v1
+and then four floats for the value, so we'll just have v0, v1
+
+143
+00:07:36,100 --> 00:07:38,666
+如果我有一个需要接入的数学库
+if I had a math library which we need to get on to
+
+144
+00:07:38,933 --> 00:07:40,533
+可能就会在这儿使用那个了
+I would probably just use that here
+
+145
+00:07:41,033 --> 00:07:44,266
+我的意思是就像一个vec4, 好了, 那么我们继续
+like I mean like a vec4, okay, so there we go
+
+146
+00:07:45,100 --> 00:07:46,766
+我想差不多就这样了
+and then I think that's pretty much it
+
+147
+00:07:47,066 --> 00:07:48,400
+那么在私有属性方面
+so in terms of private
+
+148
+00:07:48,400 --> 00:07:51,966
+我们这儿需要的就是一个unsigned int m_RendererID
+what we need here is an unsigned int m_RendererID
+
+149
+00:07:52,400 --> 00:07:57,375
+然后我们马上还会有一些缓存统一变量的属性
+and then we're also going to have some kind of caching system in a minute for uniforms
+
+150
+00:07:57,375 --> 00:07:59,033
+并且你马上就会知道为什么了
+and you'll find out why in a minute
+
+151
+00:07:59,400 --> 00:08:01,700
+在这儿下面也会有一个私有方法
+I'll also have a private function down here
+
+152
+00:08:01,700 --> 00:08:05,966
+我想就是unsigned int GetUniformLocation()
+which is going to be an unsigned int I think GetUniformLocation
+
+153
+00:08:05,966 --> 00:08:08,675
+那个也需要接收一个参数const std::string& name
+and that's going to take in a const std::string& name as well
+
+154
+00:08:08,675 --> 00:08:12,033
+用来获取我们OpenGL的统一变量的位置
+that's going to be used to retrieve our OpenGL uniform locations
+
+155
+00:08:12,133 --> 00:08:14,766
+好了, 右键点击这里使用可视化辅助工具
+alright, right click here and then using visual assist
+
+156
+00:08:14,766 --> 00:08:16,633
+创建方法的实现
+I'll create method implementations
+
+157
+00:08:19,633 --> 00:08:21,166
+这儿也要包含string
+I'm also going to include string here
+
+158
+00:08:21,166 --> 00:08:23,400
+因为这让我有点难过
+because it's getting a little bit sad at me
+
+159
+00:08:23,833 --> 00:08:28,066
+很好, 回到这里, 让我们开始补充这些东西, 现在为了调试
+okay, cool, so back over here, let's start filling all this stuff out, now for debug purposes
+
+160
+00:08:28,066 --> 00:08:32,800
+实际上也要保存那个filepath, 这样我们就可以打印
+I am I am actually going to also save that filepath, just so that we can print out
+
+161
+00:08:32,800 --> 00:08:36,100
+比如着色器所属的文件是什么, 如果我们需要的话
+like what what file a shader belongs to, if we need to
+
+162
+00:08:36,500 --> 00:08:39,400
+那么我就在这儿设置那个吧, 就是m_FilePath(filepath)
+so I'll just set that up here, and m_FilePath(filepath)
+
+163
+00:08:39,566 --> 00:08:42,333
+也需要设置m_RendererID(0)
+I'm also going to assign m_RenererID to 0
+
+164
+00:08:42,333 --> 00:08:45,833
+然后我要创建一个叫CompileShader的方法
+and then I'm going to write a function called CompileShader and
+
+165
+00:08:45,833 --> 00:08:49,833
+这正是另一个私有方法, 就是void CompileShader()
+this is just going to be another private function here void CompileShader
+
+166
+00:08:50,566 --> 00:08:52,233
+我们可能需要返回false或其他类型
+we might want to return false or something
+
+167
+00:08:52,233 --> 00:08:56,133
+我可能实际把返回数据类型设置为bool, 然后才是CompileShader
+I might actually make this a boolean, and then CompileShader
+
+168
+00:08:56,866 --> 00:08:57,666
+让我们来看看这里
+let's go over here
+
+169
+00:08:57,666 --> 00:08:59,400
+就在析构方法下面创建它
+I'll make it just beneath the destructor
+
+170
+00:08:59,500 --> 00:09:02,366
+当然, 我就叫它CompileShader
+and I'll call it CompileShader, of course
+
+171
+00:09:03,300 --> 00:09:06,333
+Shader::, 它实际返回一个bool, 好了, 酷
+Shader, and it's actually a bool, all right, cool
+
+172
+00:09:06,566 --> 00:09:09,500
+那么就是CompileShader, 当我们返回Application文件中的代码
+so CompileShader, if we go back to our Application code
+
+173
+00:09:09,733 --> 00:09:11,766
+我们已经写了所有这些代码, 但它正在重构
+we've already written all this code, but it's refactoring it
+
+174
+00:09:11,933 --> 00:09:13,466
+所以这里就是CreateShader的代码
+so here's the CreateShader code
+
+175
+00:09:14,366 --> 00:09:16,200
+已经有了一个顶点着色器和一个片段着色器
+that already has a vertex shader and a fragment shader
+
+176
+00:09:16,200 --> 00:09:19,166
+这是很酷的, 我要用所有这些
+which is cool, I'm just going to take all of this
+
+177
+00:09:22,133 --> 00:09:25,033
+说实话, 就是复制这整个函数, 
+and in fact, this entire function, copy it
+
+178
+00:09:26,333 --> 00:09:28,500
+把它粘贴在这儿, 现在我会让它成为一个静态方法
+and when I put it here, now I could leave it a static
+
+179
+00:09:28,600 --> 00:09:29,766
+因为它真的不会改变
+because it's really not going to change
+
+180
+00:09:29,766 --> 00:09:33,333
+但我马上就会重构它成为一个实际的成员
+but I will reflect it in a minute to be an actual member
+
+181
+00:09:33,566 --> 00:09:36,266
+然后我想这个就是我们的CompileShader方法
+and then this I think is our CompileShader function
+
+182
+00:09:36,300 --> 00:09:37,733
+就我尝试在这儿创建的方法
+which I tried to make here
+
+183
+00:09:38,633 --> 00:09:40,866
+但明显的是, 我忘了那个实际在这儿创建的方法
+but obviously, I forgot that I actually had it here
+
+184
+00:09:41,200 --> 00:09:42,766
+然后这个就是我们的ParseShader
+and then this is our ParseShader
+
+185
+00:09:42,766 --> 00:09:44,166
+把这些都弄清楚
+which just figures that stuff out
+
+186
+00:09:44,166 --> 00:09:49,133
+所以我只是将Application文件中所有主要的内容复制到这里
+so really I'm just copying everything from our actual main Application file into here
+
+187
+00:09:49,600 --> 00:09:51,233
+然后我们也需要ShaderProgramSource
+and then we need ShaderProgramSource as well
+
+188
+00:09:51,233 --> 00:09:55,066
+ShaderProgramSource可能就是我实际在这儿创建的结构体
+ShaderProgramSource might just be a struct that I actually make up here
+
+189
+00:09:55,266 --> 00:09:57,533
+在这个类中, 而不是放在头文件
+in this class rather than have it in the header file
+
+190
+00:09:57,533 --> 00:09:59,233
+因为我只想在这儿访问它
+because I only want it accessible here
+
+191
+00:10:00,066 --> 00:10:00,866
+如果我们向上滚动
+if we scroll up
+
+192
+00:10:00,866 --> 00:10:04,066
+我们也要用到其中的一些包含
+we're going to have to steal some of these includes as well
+
+193
+00:10:04,166 --> 00:10:05,833
+所以让我们把它们放在这里
+so let's pop them down here
+
+194
+00:10:06,500 --> 00:10:09,267
+我们当然也需要Renderer
+and we definitely need the Renderer as well
+
+195
+00:10:10,125 --> 00:10:12,800
+好了, 酷, 看起来很不错
+okay, cool, so that looks pretty good
+
+196
+00:10:13,266 --> 00:10:14,766
+当然, 我们现在来清理一下
+of course, let's clean this up now
+
+197
+00:10:14,900 --> 00:10:18,266
+所以我们有ParseShader, 我要创建所有这些方法
+so we have ParseShader which I'm gonna make all of these methods
+
+198
+00:10:18,600 --> 00:10:20,133
+那么我们就有了ParseShader
+so we're gonna have ParseShader
+
+199
+00:10:21,500 --> 00:10:24,433
+我们不需要filepath, 因为在成员中已经有了
+we don't need the filepath, because we have that on the member
+
+200
+00:10:24,500 --> 00:10:26,600
+尽管我可能会把它传过去
+although I might pass that in anyway
+
+201
+00:10:28,600 --> 00:10:32,466
+关于CompileShader, 所以这不再需要是静态的, 看起来不错
+compile, so this does not need to be static anymore, that looks good
+
+202
+00:10:33,133 --> 00:10:35,833
+我们的CreateShader也不需要是静态的
+our CreateShader as well will not make that static
+
+203
+00:10:35,833 --> 00:10:39,933
+我们让它成为Shader类的成员方法, 就像那样
+and we'll make it a member Shader, like that
+
+204
+00:10:41,166 --> 00:10:43,666
+这个可能有点大, 让我把它调小一点
+and this is probably a bit big, let me make it a bit smaller
+
+205
+00:10:43,666 --> 00:10:45,033
+希望你们还能够看到
+hopefully you guys can still see
+
+206
+00:10:45,600 --> 00:10:51,300
+CompileShader也成为类的一个方法, 好了, 那看起来不错
+CompileShader becomes a member as well, okay, that looks pretty good
+
+207
+00:10:51,300 --> 00:10:53,766
+那么让我们开始创建这些实际的方法
+so let's start making these actual functions
+
+208
+00:10:54,200 --> 00:11:00,500
+那么我就把它们放在这里, 我猜是unsigned int CreateShader()
+so we have on my make them up here, I guess unsigned int CreateShader
+
+209
+00:11:01,400 --> 00:11:05,300
+然后我们还有CompileShader
+and then we also have CompileShader
+
+210
+00:11:05,333 --> 00:11:07,833
+这是我想做的, 但它返回一个int
+which is what I try to make, but that returns an int
+
+211
+00:11:08,666 --> 00:11:12,233
+所以我们来编辑一下, 好了, 实际上
+so let's edit that, yeah, in fact
+
+212
+00:11:12,233 --> 00:11:13,950
+我要回去看看我原来的计划
+I'm going back on my whole original plan here
+
+213
+00:11:13,950 --> 00:11:16,175
+实际上是在Application文件中匹配我之前有的
+and actually just making a match what I had an Application
+
+214
+00:11:16,175 --> 00:11:19,366
+因为我忘了, 我有一半的代码, 我们把它也复制一下
+because I forgot, I had half of that code, let's copy that as well
+
+215
+00:11:19,666 --> 00:11:22,133
+这个ParseShader, 我们去掉Shader
+for ParseShader, let's get rid of the shader thing
+
+216
+00:11:22,733 --> 00:11:26,133
+好了, 酷, 这就是我们现在的接口
+all right, cool, so that's what our api kind of looks like right now
+
+217
+00:11:28,466 --> 00:11:34,333
+我们把这个去掉, 这是, 好了, 我们要
+and let's get rid of this, and this is, okay, so we're going to
+
+218
+00:11:34,466 --> 00:11:37,100
+我猜是因为我们这儿有ShaderProgramSource
+I guess because we've actually got ShaderProgramSource here
+
+219
+00:11:38,666 --> 00:11:40,366
+我们确实需要那样做
+we kind of do need to have that there
+
+220
+00:11:40,366 --> 00:11:44,933
+我还是要保持简单, 把这个ShaderProgramSource移到这里
+so I'm just gonna again keep it simple, and move this ShaderProgramSource over here
+
+221
+00:11:45,600 --> 00:11:48,266
+酷, 好了, 那看起来挺不错的
+cool, alright, that looks pretty good
+
+222
+00:11:48,533 --> 00:11:50,966
+当然这里会有错误, 但这没关系
+and of course we're getting errors here, but that's fine, okay
+
+223
+00:11:50,966 --> 00:11:53,766
+现在我们已经把这个代码转换到这个文件中了
+so now we've actually converted this code to be inside this file
+
+224
+00:11:53,866 --> 00:11:56,833
+而不是在Application文件中, 那么让我们把它从Application文件中移除吧
+instead of inside Application, so let's remove it from Application
+
+225
+00:11:58,000 --> 00:12:01,266
+现在我们真正需要做的就是让它运行起来
+and now all we really need to do is actually make it work
+
+226
+00:12:01,866 --> 00:12:06,466
+那么我们需要做的第一件事是在Shader源码中
+so the first thing that we really need to do is inside our Shader source code
+
+227
+00:12:06,666 --> 00:12:13,433
+在构造方法中, 我们只需要设置m_RendererID为compile或者, 抱歉
+in the constructor, we're just going to set m_RendererID to be compile or, sorry
+
+228
+00:12:13,733 --> 00:12:15,800
+它是什么, 所以我们做的第一件事是传递着色器
+what is it, so the first thing we do is we pass the shader
+
+229
+00:12:15,800 --> 00:12:18,200
+让我们返回Application文件中, 看看它实际做了什么
+let's go back to Application, actually see what it's doing
+
+230
+00:12:18,700 --> 00:12:23,333
+所以当来到我们的着色器时, 我们基本上做了所有这些
+so when it comes to our shader, we're doing all of this basically
+
+231
+00:12:23,700 --> 00:12:25,366
+那么这两行代码就是我们需要的
+so these two lines are what we need
+
+232
+00:12:26,633 --> 00:12:29,933
+所以我们得到了source, 然后m_RendererID就是这个
+so we get the source, and then m_RendererID is what this is
+
+233
+00:12:30,000 --> 00:12:32,133
+这就变成了CreateShader, 好了
+and that becomes CreateShader, okay
+
+234
+00:12:32,433 --> 00:12:33,866
+当然, 除了这个
+and then of course instead of this
+
+235
+00:12:34,166 --> 00:12:36,566
+就是filepath, 我们有这样的filepath
+filepath, we're gonna have filepath like that
+
+236
+00:12:36,933 --> 00:12:39,200
+所以我们只是把这个filepath作为成员来维护
+so we're really just maintaining this filepath here as a member
+
+237
+00:12:39,200 --> 00:12:40,866
+但这只是为了调试
+but just for debugging purposes
+
+238
+00:12:41,100 --> 00:12:45,333
+好了, 在析构方法中, 我会调用GLCall(glDeleteProgram())
+okay, in the destructor, I'm gonna call GLCall(glDeleteProgram())
+
+239
+00:12:46,133 --> 00:12:49,833
+然后这就是我们的m_RendererID
+and then this is going to be our m_RendererID
+
+240
+00:12:50,066 --> 00:12:53,000
+现在这是真正相关的, 如果m_RendererID不是0的话
+now this is really only relevant, if the m_RendererID isn't 0
+
+241
+00:12:53,000 --> 00:12:55,000
+所以如果它真的成功地创建了它
+so if it's actually successful in creating it
+
+242
+00:12:55,600 --> 00:12:57,666
+这一切看起来都很好
+that all of this looks pretty good
+
+243
+00:12:58,309 --> 00:12:59,500
+我认为Bind和Unbind
+I think Bind and Unbind
+
+244
+00:12:59,500 --> 00:13:07,450
+当然就是GLCall(glUseProgram(m_RendererID))
+of course is just gonna be GLCall(glUseProgram(m_RendererID))
+
+245
+00:13:07,450 --> 00:13:10,100
+然后Unbind就使用0
+and then Unbind is going to use zero
+
+246
+00:13:11,233 --> 00:13:13,700
+就是glUseProgram(0), 然后就是SetUniform4f
+UseProgram zero, SetUniform4f
+
+247
+00:13:13,700 --> 00:13:15,666
+那么当我们回到我们的Application文件
+so if we go back to our Application
+
+248
+00:13:16,733 --> 00:13:20,066
+我们可以看到它是什么, 就是glUniform4f
+we can kind of, well, we can see what it is, glUniform4f
+
+249
+00:13:20,433 --> 00:13:24,366
+那么就是GLCall(glUniform4f())
+so GLCall(glUniform4f())
+
+250
+00:13:25,400 --> 00:13:28,666
+现在我们需要的是统一变量的位置
+now what we actually need here is the location of the uniform
+
+251
+00:13:28,666 --> 00:13:31,500
+所以我们需要找到统一变量的位置
+so we need a way to get the location of the uniform
+
+252
+00:13:31,666 --> 00:13:34,100
+然后就是v0 v1 v2 v3
+and then v0 v1 v2 v3
+
+253
+00:13:35,194 --> 00:13:39,266
+好了, 这就是GetUniformLocation的作用, 也就是这段代码
+okay, and that's where GetUniformLocation comes in, which is just this code here
+
+254
+00:13:39,700 --> 00:13:46,733
+那么就是GLCall(getUniformLocation(shader, name.c_str()))
+so GLCall getUniformLocation and then the name.c_str()
+
+255
+00:13:47,300 --> 00:13:52,066
+shader是像这样的m_RendererID
+and shader is m_RendererID just like that
+
+256
+00:13:52,300 --> 00:13:55,333
+很好, 酷, 我们实际需要做的是分配这个
+okay, cool, so what we need to do here is actually assign this
+
+257
+00:13:55,333 --> 00:14:01,633
+那么就是unsigned int location=glGetUniformLocation()
+so unsigned int location equals glGetUniformLocation
+
+258
+00:14:01,833 --> 00:14:05,233
+如果location等于-1, 这意味着我们实际上没有它
+if location equals -1, it means that we don't actually have it
+
+259
+00:14:05,233 --> 00:14:06,933
+现在我们可以给这段代码做个断言
+now we could just make this code assert here
+
+260
+00:14:06,933 --> 00:14:10,933
+但有时我们把-1作为一个着色器位置是很有效的
+but sometimes it's quite valid for us to actually have -1 as a shader location
+
+261
+00:14:11,133 --> 00:14:13,166
+例如, 如果我们在着色器中有一个统一变量
+so if we have a uniform in our shader for example
+
+262
+00:14:13,266 --> 00:14:15,766
+它在某些地方被使用, 但是我们注释掉了那一行
+and it's being used somewhere, but we comment that line out
+
+263
+00:14:15,766 --> 00:14:18,500
+或者我们声明了一个统一变量, 但我们只是还没有使用它
+or we declare a uniform, but we just don't use it yet
+
+264
+00:14:18,500 --> 00:14:19,925
+或者出于任何原因
+or for whatever reason
+
+265
+00:14:20,200 --> 00:14:22,433
+那就意味着它被剥离了
+then that's going to mean that it gets stripped
+
+266
+00:14:22,433 --> 00:14:25,200
+这意味着我们在着色器中根本没有统一变量
+which means that we don't have that uniform in the shader at all
+
+267
+00:14:25,200 --> 00:14:26,700
+结果是-1
+and this is going to give us -1
+
+268
+00:14:27,066 --> 00:14:30,733
+但我们可能仍然希望我们的着色器正常工作, 因为
+but that might like we still want our shader to work like normal, because
+
+269
+00:14:31,133 --> 00:14:34,166
+我们可能故意声明了一个统一变量, 但没有使用它
+we might have intentionally just declared a uniform, but not used it
+
+270
+00:14:34,500 --> 00:14:36,333
+这就是为什么我不想在这里断言
+so that's why I don't want to assert here
+
+271
+00:14:36,333 --> 00:14:39,600
+但我们可能想在这里打印一些信息, 比如
+but we may want to print some kind of message here, being like
+
+272
+00:14:41,233 --> 00:14:49,266
+你知道的, warning uniform, 然后是name, 接着是doesn't exist
+you know, warning uniform, and then name, doesn't exist
+
+273
+00:14:50,233 --> 00:14:51,833
+以防我们有一个渲染器错误
+just in case we have a redenerer error
+
+274
+00:14:51,833 --> 00:14:55,800
+这样我们就能看到那个, 然后我们也会返回那个location
+so that we can see that, and then we'll also return that location
+
+275
+00:14:56,666 --> 00:15:03,933
+这将变成GetUniformLocation(name)
+now this is going to become GetUniformLocation(name)
+
+276
+00:15:04,500 --> 00:15:07,266
+这是GetUniformLocation
+and this is so GetUniformLocation like that
+
+277
+00:15:07,266 --> 00:15:10,000
+所以我们的实际函数看起来很好
+so our actual function that looks pretty good
+
+278
+00:15:10,700 --> 00:15:14,266
+只要确保这是v2和v3, 而不是f
+just make sure you call this v2 and v3, and not f
+
+279
+00:15:14,266 --> 00:15:18,533
+出于某种原因, 我不知道我为什么中途换了
+for some reason, I don't know why I did that just switched halfway through
+
+280
+00:15:18,933 --> 00:15:21,633
+但在我们的例子中, 它们是正确的
+but they just answer value in our case
+
+281
+00:15:21,666 --> 00:15:23,133
+好了, 酷, 所以那看起来挺不错
+all right, cool, so that was pretty good
+
+282
+00:15:23,200 --> 00:15:25,833
+现在有一个问题等下会讨论
+now there is an issue that will address in a minute
+
+283
+00:15:25,833 --> 00:15:27,166
+就是GetUniformLocation这个方法
+with the GetUniformLocation thing
+
+284
+00:15:27,166 --> 00:15:29,966
+但除此之外, 我认为这是相当不错的, 我们的代码应该可以运行
+but otherwise, I think that's pretty decent, our code should work
+
+285
+00:15:29,966 --> 00:15:33,066
+那么让我们回到Application文件, 希望我们的代码能运行
+so let's actually go back to Application, and hopefully our code does work
+
+286
+00:15:33,066 --> 00:15:34,700
+我要把所有东西都关掉除了那个
+I'm actually gonna close everything but that
+
+287
+00:15:35,233 --> 00:15:37,400
+好了, 这个东西会变成
+okay, so this stuff is going to just become
+
+288
+00:15:37,566 --> 00:15:42,100
+我们先把Shader包含在顶部, 就是#include "Shader.h"
+let's actually include Shader at the top first of all, include Shader.h
+
+289
+00:15:43,133 --> 00:15:48,933
+然后下面这里, 就是Shader shader(), 我们会接收这个路径
+and then down over here, Shader shader, and we'll take in this path
+
+290
+00:15:50,766 --> 00:15:55,400
+然后我们会调用shader.Bind(), 我们可能就让它那样保持绑定
+and then we'll do shader.Bind(), then we can just leave it bound probably
+
+291
+00:15:56,466 --> 00:16:00,000
+而不是这个location, 以及我们试图设置的那个变量
+and then instead of this location, and whatever we're trying to set that variable
+
+292
+00:16:00,000 --> 00:16:05,866
+这个就变成了shader.SetUniform4f("u_Color")
+this just kind of becomes shader SetUniform4f the name which is u_Color
+
+293
+00:16:06,766 --> 00:16:09,333
+然后实际值就是这儿这个
+and then the actual values which is this thing here
+
+294
+00:16:09,933 --> 00:16:13,033
+然后我相信, 所以你可以看到减少了多少代码
+and then I believe, so you can see how much code that reduces
+
+295
+00:16:13,033 --> 00:16:14,249
+现在它很好很简单
+it's nice and simple now
+
+296
+00:16:14,249 --> 00:16:17,400
+UseProgram(0)就是shader.Unbind()
+UseProgram 0 is just shader.Unbind()
+
+297
+00:16:19,400 --> 00:16:22,600
+有了缓冲区之类的绑定, 我们也可以马上解决这个问题
+with bind like buffers, we could probably address that in a minute as well
+
+298
+00:16:22,600 --> 00:16:23,333
+我们实际上并不
+we don't actually
+
+299
+00:16:23,333 --> 00:16:25,433
+哦, 我们有下一个缓冲, 我们马上就可以做
+oh we do have a next buffer we can do that in a minute
+
+300
+00:16:26,100 --> 00:16:28,733
+glUseProgram(shader)当然就是shader.Bind()
+glUseProgram shader of course is just shader.Bind()
+
+301
+00:16:29,133 --> 00:16:35,177
+这个又是shader.SetUniform4f("u_Color")
+and this again which is shader.SetUniform4f("u_Color")
+
+302
+00:16:35,600 --> 00:16:37,633
+然后是那个
+and then that
+
+303
+00:16:38,650 --> 00:16:41,366
+好了, 所以你可以看到这简化了我们的代码
+okay, so you can see how much that simplified our code
+
+304
+00:16:41,400 --> 00:16:43,366
+最后, 我们根本不需要删除它
+and then finally we don't need to delete it at all
+
+305
+00:16:43,400 --> 00:16:45,133
+因为当我们到达作用域的尽头
+because when we actually reach the end of the scope
+
+306
+00:16:45,133 --> 00:16:47,800
+它将被shader的析构方法删除
+it will be deleted by the destructor of shader
+
+307
+00:16:47,800 --> 00:16:50,600
+好了, 那么有了这个, 我不知道为什么我还留着这个
+and yeah, so with this, I don't know why I've still got this
+
+308
+00:16:50,600 --> 00:16:54,533
+但对于glArrayBuffer, 那就是vb.Unbind()
+but glArrayBuffer, that's just vb.Unbind()
+
+309
+00:16:55,033 --> 00:16:58,933
+然后那个就是ib.Unbind(), 所以我们现在可能修复了那个问题
+and then that's just ib.Unbind(), so we might as well fix that now
+
+310
+00:16:59,333 --> 00:17:01,166
+基本上解除所有的绑定
+just unbinding everything basically
+
+311
+00:17:01,533 --> 00:17:05,900
+我可能就保持那样, 好了, 酷, 那么我们继续, 看起来很不错
+I might just leave that like that, okay, cool, so there we go, looks pretty good
+
+312
+00:17:05,900 --> 00:17:08,400
+让我们来运行一下这个, 看看会发生什么
+let's just hit f5 or run this and see what happens
+
+313
+00:17:08,400 --> 00:17:09,533
+好了, 那么看起来还不错
+okay, so it looks pretty good
+
+314
+00:17:09,533 --> 00:17:13,300
+我们得到了同样的矩形, 颜色也有, 所以一切正常
+we get the same kind of rectangle and the colors working, so everything looks fine
+
+315
+00:17:13,533 --> 00:17:15,366
+那么让我们来说说存在的这个小问题吧
+so let's talk about this little problem that we have
+
+316
+00:17:15,433 --> 00:17:17,900
+所以这并不是什么大问题
+so it's not really like a huge issue or anything
+
+317
+00:17:17,900 --> 00:17:19,200
+但就在Shader.cpp中
+but in Shader.cpp
+
+318
+00:17:19,200 --> 00:17:22,900
+我们这儿实际存在的问题就是在这个GetInformLocation中
+what we actually have here is inside this GetInformLocation
+
+319
+00:17:22,900 --> 00:17:24,666
+每次我们设置这个统一变量
+every time we set this uniform
+
+320
+00:17:25,233 --> 00:17:28,600
+我们实际上一次又一次地获取这个位置
+we actually retrieve the location again and again and again
+
+321
+00:17:28,833 --> 00:17:30,400
+那并不是特别快
+and that's not particularly fast
+
+322
+00:17:30,400 --> 00:17:33,000
+我们真正想做的是缓存它
+what we actually want to do with this is cache it
+
+323
+00:17:33,000 --> 00:17:35,600
+所以我们只能在它们第一次的时候获取到它
+so that we only really retrieve it the first time in them
+
+324
+00:17:35,600 --> 00:17:37,775
+就是这样, 我们完成了, 我们可以很容易地做到这一点
+that's it, we're done, and we can do that really really easily
+
+325
+00:17:37,775 --> 00:17:39,633
+当我们返回Shader.h文件
+if we just go back to Shader.h
+
+326
+00:17:39,933 --> 00:17:43,333
+我会包含unordered_map
+I will include something called unordered_map
+
+327
+00:17:43,633 --> 00:17:46,133
+这只是哈希映射或者哈希表
+which is really just a hash map or a hash table
+
+328
+00:17:46,133 --> 00:17:53,975
+然后我就会这样创建std::unordered_map, std::string, unsigned int
+and then I'm just going to make std::unordered_map std::string two unsigned int
+
+329
+00:17:53,975 --> 00:17:58,100
+就叫这个为m_LocationCache
+and then call this m_LocationCache
+
+330
+00:17:58,466 --> 00:18:01,466
+或者我应该说是m_UniformLocationCache
+or specifically m_UniformLocationCache I should say
+
+331
+00:18:03,600 --> 00:18:07,550
+接下来我要做的第一件事就是检查一下
+and then all I'm going to do here is the first thing I want to do is check to see
+
+332
+00:18:07,550 --> 00:18:11,033
+这个UniformLocationCache实际是否包含这个name
+if the UniformLocationCache actually contains the name
+
+333
+00:18:11,166 --> 00:18:14,766
+所以如果这个不等于m_UniformLocationCache.end()
+so if this doesn't equal m_UniformLocationCache.end()
+
+334
+00:18:15,200 --> 00:18:19,866
+我们就简单返回m_UniformLocationCache[name]
+we'll simply return an m_UniformLocationCache and then the name
+
+335
+00:18:19,866 --> 00:18:22,266
+否则我们就直接去获取这个位置
+otherwise we'll go ahead and retrieve the location
+
+336
+00:18:22,366 --> 00:18:26,566
+如果它不等于-1, 我们实际上就可以缓存它
+and if it actually doesn't equal -1, then we can actually cache it
+
+337
+00:18:27,766 --> 00:18:31,766
+我是说, 严格来说, 我们真的不需要
+I mean, technically speaking, we don't really need
+
+338
+00:18:31,766 --> 00:18:33,900
+就像我们可以缓存它, 即使它是-1
+like we could cache it even if it is -1
+
+339
+00:18:33,900 --> 00:18:37,133
+不像它不会改变, 不管统一变量是否存在
+it's not like it's going to change, whether or not uniform exists
+
+340
+00:18:37,133 --> 00:18:40,166
+直到我们用可能的新代码重新编译着色器
+until we actually recompile the shader with potentially new code
+
+341
+00:18:40,466 --> 00:18:42,400
+所以这个不需要是else
+so this doesn't really need to be an else
+
+342
+00:18:42,400 --> 00:18:45,166
+实际上, 我可以把它从else中移除, 然后无条件添加它
+in fact, I might remove this from else, and just add it regardless
+
+343
+00:18:45,166 --> 00:18:46,966
+所以我们实际上添加了那个position
+so we're actually adding that location there
+
+344
+00:18:47,133 --> 00:18:48,800
+这样的话, 如果我在这里放一个断点
+and that way if I just put a breakpoint here
+
+345
+00:18:48,800 --> 00:18:50,466
+这样我们就能验证它是否正常了
+so that we can verify that works properly
+
+346
+00:18:50,466 --> 00:18:52,233
+在第一次运行这段代码的时候
+in the first time that I run this code
+
+347
+00:18:52,266 --> 00:18:54,533
+我们这儿当然会导致缓存不命中
+we should of course result in a cache miss here
+
+348
+00:18:54,533 --> 00:18:56,266
+实际上会正确地获取位置
+and actually retrieve the location properly
+
+349
+00:18:56,266 --> 00:18:59,033
+您可以看到position为0, 这是一个有效的位置
+you can see the location in zero, which is a valid location
+
+350
+00:18:59,600 --> 00:19:02,333
+然后第二次, 如果我按f5, 我们实际上到这里
+and then the second time, if I hit f5, that we actually go here
+
+351
+00:19:02,566 --> 00:19:05,966
+我们应该只返回这个, 而不需要执行glUniformLocation
+we should just return this, without having to do the glUniformLocation
+
+352
+00:19:05,966 --> 00:19:10,166
+你可以看到那个运行了, 好了, 当然我们在视觉上不会看到任何不同
+you can see that that works, okay, so of course we shouldn't see any difference visually
+
+353
+00:19:10,400 --> 00:19:13,233
+但那应该会给我们提供一个很好的性能提升
+but that should provide us with a nice little performance boost
+
+354
+00:19:13,233 --> 00:19:15,933
+特别是当我们开始有很多统一变量在我们的着色器
+especially when we start having a lot of uniforms in our shaders
+
+355
+00:19:15,933 --> 00:19:17,433
+不管怎样, 我希望你们喜欢这个视频
+anyway, I hope you guys enjoyed this video
+
+356
+00:19:17,433 --> 00:19:19,533
+这就是它的全部内容, 和往常一样
+that's pretty much all there is to it, as always
+
+357
+00:19:19,533 --> 00:19:22,133
+你们可以通过patreon.com/TheCherno来帮助支持这个系列教程
+you can help support the series by going to patreon.com/TheCherno
+
+358
+00:19:22,133 --> 00:19:24,833
+你们会获得我今天在这儿写的所有源码
+and you'll get access to all the source code that I wrote here today
+
+359
+00:19:24,866 --> 00:19:28,233
+以及单独的源码, 一集一集的
+as well as kind of individual source code, episode per episode
+
+360
+00:19:28,233 --> 00:19:30,433
+所以一定要去那里帮助支持这个系列
+so definitely go help out support the series there
+
+361
+00:19:30,833 --> 00:19:32,466
+非常感谢所有支持我的人
+huge thank you to everyone who does that
+
+362
+00:19:32,500 --> 00:19:35,633
+因为没有你们, 我们就不会在这儿, 非常感谢大家
+because yeah we wouldn't be here without those people, so thank you so much
+
+363
+00:19:36,200 --> 00:19:37,800
+差不多就这些了
+that's pretty much all there is about like
+
+364
+00:19:38,333 --> 00:19:40,833
+这是一个基本的着色器系统
+that is a basic shader kind of system
+
+365
+00:19:41,100 --> 00:19:43,333
+你可以抽象出来, 我的意思是
+that you can abstract out, I mean
+
+366
+00:19:43,800 --> 00:19:48,300
+你可以把它变得非常非常复杂, 我们肯定会这么做
+you can go really really crazily complicated with this, and we will definitely do that
+
+367
+00:19:48,300 --> 00:19:50,200
+我保证在提到的游戏系列中
+I promise in the game mentioned series
+
+368
+00:19:50,200 --> 00:19:54,366
+但是现在, 对于这个系列来说, 它真就那样了
+but for for now, for this series, that's really it
+
+369
+00:19:54,433 --> 00:19:56,833
+我的意思是, 如果我们很快地回到我们的代码中
+I mean if we jump back into our code really quickly
+
+370
+00:19:57,066 --> 00:19:59,500
+这是我们可以做的, 也是我们必须要做的
+another thing we could do and what we'll have to do
+
+371
+00:19:59,600 --> 00:20:02,133
+实际上是在扩展整个统一变量
+is actually kind of extend this whole uniform thing
+
+372
+00:20:02,133 --> 00:20:05,433
+例如, 如果我们想要设置一个浮点数
+so for example, if we wanted to set a single float
+
+373
+00:20:05,600 --> 00:20:08,300
+那么就是1f, 然后我们要在这里写另一个函数
+so 1f, then we'd have to write another function here
+
+374
+00:20:08,466 --> 00:20:10,966
+它就像这样取我们的值
+that actually just takes in our value like this
+
+375
+00:20:12,533 --> 00:20:14,600
+我把这个函数复制过来
+I'll go over here copy this function
+
+376
+00:20:14,866 --> 00:20:16,333
+因为那就是Uniform1f
+cause that Uniform1f
+
+377
+00:20:17,600 --> 00:20:21,200
+去掉所有这些多余的, 这里也一样
+remove all of these extra ones and this here as well
+
+378
+00:20:22,266 --> 00:20:23,966
+你可以看到, 我们基本上就这样了
+and you can see that we basically just
+
+379
+00:20:24,366 --> 00:20:25,933
+就是这样, 这就是我们实现这些的方法
+that's it, that's how we implement this these
+
+380
+00:20:26,000 --> 00:20:28,733
+我可以逐一检查并实现每一个
+and I could go through and implement every single one
+
+381
+00:20:28,733 --> 00:20:32,300
+包括矩阵和整数, 以及所有这些东西
+including the ones for matrices and integers, and all that kind of stuff right now
+
+382
+00:20:32,400 --> 00:20:33,366
+但我不想让你们觉得无聊
+but I don't want to bore you guys
+
+383
+00:20:33,366 --> 00:20:34,933
+不管怎样你们都明白了
+you get the point anyway and
+
+384
+00:20:35,366 --> 00:20:37,900
+因为我们需要那些SetUniform函数
+as we require those SetUniform functions
+
+385
+00:20:38,200 --> 00:20:40,800
+因为当我们开始使用这些实际值时
+because as we start using those actual values
+
+386
+00:20:40,800 --> 00:20:43,266
+我们会在后面实现它们
+we'll have to kind of we'll just implement them as we go along
+
+387
+00:20:43,266 --> 00:20:44,966
+那样就会很简单
+and that way it'll be nice and easy
+
+388
+00:20:44,966 --> 00:20:49,100
+我们不用花一半的时间来写这些
+and we don't have to spend like half now now writing all the ones
+
+389
+00:20:49,100 --> 00:20:52,000
+因为那将会很无聊, 无论如何, 下次
+because that will be really boring, anyway, next time
+
+390
+00:20:52,700 --> 00:20:54,500
+我认为还有其他是需要抽象的
+I think what else is there really to abstract
+
+391
+00:20:54,500 --> 00:20:56,533
+在某种程度上, 我们必须处理我们的渲染器
+we have to deal with our renderer at some point
+
+392
+00:20:56,533 --> 00:20:58,766
+我不知道下次是不是一定会这样
+I don't know if that's necessarily gonna be next time
+
+393
+00:20:58,800 --> 00:21:02,333
+但是看起来, 其他的东西都被抽象了
+but it looks like everything else is pretty much abstracted away
+
+394
+00:21:02,333 --> 00:21:04,233
+这里我没有看到任何OpenGL代码
+I didn't see any OpenGL code here
+
+395
+00:21:04,400 --> 00:21:08,466
+除了我们实际的绘制调用, 这将由渲染器完成
+apart from our actual draw call which which will be done by the renderer
+
+396
+00:21:08,766 --> 00:21:10,233
+那么让我们下次实现那个吧
+so let's do that next time
+
+397
+00:21:10,400 --> 00:21:13,833
+让我们继续, 抽象我们的渲染, 并实际创建一个渲染类
+let's go ahead, and abstract our render, and actually create a render class
+
+398
+00:21:14,033 --> 00:21:16,933
+可以传递我们创建的所有这些对象
+into which we can kind of pass all these objects that we've created
+
+399
+00:21:17,100 --> 00:21:18,966
+希望它能帮我们渲染一些东西
+and hopefully then it will render something for us
+
+400
+00:21:20,000 --> 00:21:21,200
+并且然后我认为, 在那之后
+and then I think, after that
+
+401
+00:21:21,200 --> 00:21:24,700
+我们可能继续研究纹理和更有趣的东西
+we can probably move on to stuff like textures and more exciting things
+
+402
+00:21:24,800 --> 00:21:26,166
+那么不论如何, 我希望你们喜欢这个视频
+so anyway, I hope you guys enjoyed this video
+
+403
+00:21:26,400 --> 00:21:28,866
+如果你们喜欢的话, 就来点赞哟, 为了让我知道, 也可以留言
+if you did, you can hit that like button, to let me know, and leave a comment
+
+404
+00:21:28,866 --> 00:21:33,800
+比如, 这系列很棒, 或者很糟糕,  就这样或者其他你想写的
+being like, the series is awesome, or it's terrible, do this instead or whatever you want to write
+
+405
+00:21:33,800 --> 00:21:36,433
+那就是评论区的作用, 说出你的想法
+that's what the comment section is for, speak your mind
+
+406
+00:21:36,700 --> 00:21:38,533
+下次见, 拜
+I will see you next time, goodbye
+

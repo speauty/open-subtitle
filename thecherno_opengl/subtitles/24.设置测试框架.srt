@@ -1,0 +1,1195 @@
+﻿1
+00:00:00,133 --> 00:00:03,866
+嘿，你们好，我是TheCherno，欢迎回到我的OpenGL系列教程
+hey, what's up guys, my name is  TheCherno, and welcome back to my OpenGL series
+
+2
+00:00:04,166 --> 00:00:08,333
+那么我们已经在过去的几期中，过去的几周，过去的几个月里
+so we've been over the last few episodes, over the last few weeks, over the last few months
+
+3
+00:00:08,333 --> 00:00:11,700
+我们学过的所有这些OpenGL基本概念
+whatever we've been learning about all of these basic OpenGL concepts
+
+4
+00:00:12,066 --> 00:00:17,333
+现在我们真正拥有的是把这些概念放在一起的能力
+and now what we actually have is the ability to like put all those concepts together
+
+5
+00:00:17,333 --> 00:00:22,066
+做一些更复杂的事情，并且那就是我们以后要讲到的
+and actually do something a little bit more complicated, and that's where we're going to in the future
+
+6
+00:00:22,100 --> 00:00:28,400
+很快就会开始接触像批渲染和材质3D场景之类的东西
+very soon start getting into things like batch rendering and materials 3D scenes that kind of stuff
+
+7
+00:00:28,733 --> 00:00:30,133
+并且为了促进那一点
+and in order to facilitate that
+
+8
+00:00:30,133 --> 00:00:34,200
+我确实想花点时间，让它的应用变得有序
+I really want to spend some time, and to actually get its application in order
+
+9
+00:00:34,200 --> 00:00:37,250
+因为就我们现在有的OpenGL应用而言
+because what we have right now with our OpenGL application
+
+10
+00:00:37,250 --> 00:00:41,400
+它只是我们为这些东西创建了一堆接口类
+it's really just all of we've got a bunch of api kind of classes that we've created for things 
+
+11
+00:00:41,400 --> 00:00:45,933
+比如顶点缓冲区，顶点数组，索引缓冲区，纹理之类的东西
+like vertex buffers, vertex arrays, index buffers, textures that kind of stuff
+
+12
+00:00:46,300 --> 00:00:48,466
+然后我们就有了这个Application.cpp文件
+and then we've just got this Application.cpp file
+
+13
+00:00:48,466 --> 00:00:52,100
+也就是一些对OpenGL的调用
+which is just kind of a bunch of just calls to OpenGL stuff
+
+14
+00:00:52,100 --> 00:00:56,050
+但我真正想做的是让我们有能力进行不同的测试
+but what I really want to do is have the ability for us to have different tests
+
+15
+00:00:56,300 --> 00:01:00,166
+那么也就是说，不同的应用领域不同的场景
+so to speak so different kind of areas of applications different scenes
+
+16
+00:01:00,533 --> 00:01:04,666
+我们可以在每一个测试或场景中循环
+that we can actually cycle through and each one of those tests or scenes
+
+17
+00:01:04,666 --> 00:01:08,433
+是为了实际演示或者仅仅展示一个可行的概念
+is meant to actually demonstrate or just show one concept working
+
+18
+00:01:08,433 --> 00:01:12,866
+所以基本上我想说的是，我希望我们能够有，比如这样一个场景
+so basically what I'm saying is that I want us to be able to have, like a scene
+
+19
+00:01:12,866 --> 00:01:18,375
+只是一个批渲染的例子，这个场景只是一个非常非常简单的例子
+that is just an example of batch rendering, a scene that is just an example of a very very simple 
+
+20
+00:01:18,375 --> 00:01:21,766
+比如材质的使用或类似的东西，对吧
+like material being used or something like that, right
+
+21
+00:01:21,900 --> 00:01:24,266
+一个像复杂着色器之类的场景
+a scene that is like some complex shader or whatever
+
+22
+00:01:24,266 --> 00:01:27,200
+或者甚至只是一个简单的场景，就像，嘿
+or even something that is just a scene that is as simple as, hey
+
+23
+00:01:27,200 --> 00:01:29,366
+这就是你们如何改变OpenGL的清除颜色
+this is how you change the clear color at OpenGL
+
+24
+00:01:29,400 --> 00:01:32,133
+这就像一些我可以改变它的控制
+and this is like some I'm going controls for being able to change that
+
+25
+00:01:32,200 --> 00:01:33,433
+这里就是渲染，对吧
+here it is rendering, right
+
+26
+00:01:33,433 --> 00:01:37,800
+我想做的是创建一个不同概念的例子库
+what I want to do is create like a library of examples of all of these different concepts
+
+27
+00:01:37,866 --> 00:01:42,333
+我们首先需要做的是创建一个能做到这些的应用程序
+and what we need to kind of do first is to create an application that is capable of doing that
+
+28
+00:01:42,666 --> 00:01:44,766
+并且我们建立它的方法非常非常简单
+and the way that we're going to set that up is very very simple
+
+29
+00:01:44,766 --> 00:01:50,433
+我们只是在ImGui中有一个菜单，显示所有可用的场景或测试或示例
+we're just going to have a menu in ImGui, that shows all of the available scenes or tests or examples
+
+30
+00:01:50,600 --> 00:01:54,033
+并且我们将能够选择一个，当我们点击它时，它会打开相应的场景
+and we're just going to be able to pick one, when we click it, it opens the scene
+
+31
+00:01:54,133 --> 00:01:58,500
+我们可以看到场景和所有与场景相关的图像控制
+we can see the scene and all of the images controls that are associated with that scene there
+
+32
+00:01:58,733 --> 00:02:03,400
+然后我们可以点击返回按钮回到那个菜单，它基本上就会销毁那个场景
+then we can click the return button to go back to that menu, and it will basically just destroy that scene
+
+33
+00:02:03,533 --> 00:02:07,300
+所以每次我们进入一个新场景时，它都会加载该场景所需的所有内容
+so every time we go into a new scene, it loads everything required for that scene
+
+34
+00:02:07,300 --> 00:02:09,200
+并且当我们退出这个场景时，它会销毁一切东西
+and when we exit the scene, it destroyed everything
+
+35
+00:02:09,200 --> 00:02:13,400
+所以如果我们一直进入退出，它会重新加载所有内容
+so if we keep going back and forth, it reloads everything from scratch
+
+36
+00:02:13,433 --> 00:02:16,866
+并且那也表明所有的清理工作是没问题的
+and that's also shows that all of that cleanup is working correctly
+
+37
+00:02:17,700 --> 00:02:22,033
+诸如此类的事情，好了，所以那就是我们的计划
+and all of that kind of stuff, okay, so that's the plan
+
+38
+00:02:22,633 --> 00:02:28,166
+因为我真正想做的是，我得饮杯茶先
+because what I actually thought about doing, I'm just gonna have to drink some tea first
+
+39
+00:02:29,033 --> 00:02:32,100
+我想做的只是像我上次说的那样进入批渲染
+what I thought about doing was just getting into batch rendering like I said last time
+
+40
+00:02:32,100 --> 00:02:36,700
+和大多数人一样，我想，让你们选择材质或者批渲染
+and most people, I think, and give you guys the choice of materials or batch rendering
+
+41
+00:02:36,700 --> 00:02:39,266
+你们选择了批渲染，这无疑是正确的选择
+you went with batch rendering, which was the correct choice by the way
+
+42
+00:02:39,400 --> 00:02:42,866
+因为我本来也打算那做的，反正我必须坦白，不管如何
+because that's what I would have done anyway, I must confess, anyway
+
+43
+00:02:43,233 --> 00:02:46,633
+所以我今天想做的不是这样做
+so instead of doing that, which I would want to do that today
+
+44
+00:02:46,633 --> 00:02:51,033
+但我想，当我浏览这个主文件时，到处都是垃圾
+but I thought like I look through this main file and there's so much junk everywhere
+
+45
+00:02:51,166 --> 00:02:56,000
+我基本上需要一个批渲染的例子，比如说一个整洁的文件
+I want to basically have an example of batch rendering, a nice clean file
+
+46
+00:02:56,166 --> 00:03:01,333
+并且每一种文件都是一个类的实例
+and every kind of file that is an example will be like an instance of a class
+
+47
+00:03:01,333 --> 00:03:04,633
+它将是一个类的实例，它实际上是一个单独的类
+well it will be an instance of a class, it will literally be a separate class
+
+48
+00:03:04,766 --> 00:03:09,633
+它有onUpdate onRender onInit之类的函数
+which just has like onUpdate onRender onInit, that kind of those kind of functions
+
+49
+00:03:10,333 --> 00:03:16,466
+因此，向你们展示如何设置批渲染的实际代码是尽可能少的
+so that the actual code for showing you know how to set up batch rendering is as minimal as possible
+
+50
+00:03:16,466 --> 00:03:18,966
+并且那样的话，如果你们跟着做就会很简单
+and that way, it's going to be really easy if you guys follow along
+
+51
+00:03:19,150 --> 00:03:21,300
+首先，如果你们没有当前的代码
+first of all if you don't have the current code
+
+52
+00:03:21,300 --> 00:03:25,100
+你们可以在patreon.com/TheCherno上支持这个系列教程
+you can do that by supporting this series on patreon.com/TheCherno
+
+53
+00:03:25,225 --> 00:03:30,633
+每一期代码都是作为一个单独的代码提交的
+every single episode the code is committed as is committed as a separate commit to that
+
+54
+00:03:31,100 --> 00:03:36,033
+到github.com，比如TheCherno/OpenGL去访问获得那个
+to github.com like TheCherno/OpenGL to get access to that
+
+55
+00:03:36,166 --> 00:03:38,033
+你们需要成为一个赞助人
+you need to be a patron
+
+56
+00:03:38,633 --> 00:03:42,566
+这有助于支持这个系列，而且你们也可以获得每一集的提交
+it helps support the series and also you get access to every single episode commit by commit
+
+57
+00:03:42,700 --> 00:03:47,033
+这是非常有用的，所以我们要从那个代码中继续
+which is really useful, so that we're going to like continue on from that code
+
+58
+00:03:47,133 --> 00:03:49,233
+所以如果你们想继续下去而不需要把所有代码一个一个地敲
+so if you want to follow along without having to type everything out
+
+59
+00:03:49,233 --> 00:03:51,933
+或者你们还没看过其他视频，那就是最好的方法
+or you haven't watched the other episodes, that's the best way to do it
+
+60
+00:03:52,200 --> 00:03:55,000
+但我们要开始将这些代码重构到测试类中
+but we're just going to start refraction this code out into test classes
+
+61
+00:03:55,000 --> 00:03:57,575
+这样我们就可以建立一个测试框架
+so that we actually can set up a bit of a test framework
+
+62
+00:03:57,575 --> 00:04:00,400
+让所有这些都变得更容易，你们知道的
+and facilitate all of that kind of, you know
+
+63
+00:04:00,400 --> 00:04:05,966
+我们从这个系列中学习的每个OpenGL概念的单独例子
+separate examples of each OpenGL concept that we learn moving on from this series
+
+64
+00:04:06,000 --> 00:04:09,000
+让我们进入一些代码，讨论到此为止，看看我们能做些什么，好了
+let's just jump into some code, enough talking, and see what we can do, okay
+
+65
+00:04:09,000 --> 00:04:13,800
+那么看一下这个应用程序类，它非常大，如果我现在运行我的代码
+so looking through this application class, I mean it's pretty big, if I just run my code right now
+
+66
+00:04:13,800 --> 00:04:17,166
+这样我们就能看到我们让它开着的地方
+so that we can see where we actually left this thing on
+
+67
+00:04:17,466 --> 00:04:20,966
+你们可以看到我们基本上只有两种像这样渲染的ChernoLogo
+and you can see that we basically just have two kind of Cherno like this rendering
+
+68
+00:04:20,966 --> 00:04:24,000
+上一期我们讲了同时渲染多个东西
+that was last episode where we talked about rendering multiple things at once
+
+69
+00:04:24,100 --> 00:04:28,066
+这是一个很好的例子，同样，在测试中用到它会很好
+and we have all this is a great example, again, something that would be awesome to have in a test
+
+70
+00:04:28,066 --> 00:04:30,150
+但不是一些东西，我只是想在我们的主文件中
+but not something, I just want to have in our main file
+
+71
+00:04:30,150 --> 00:04:31,525
+因为这把所有东西都弄乱了
+because the clutters everything up
+
+72
+00:04:31,900 --> 00:04:35,400
+那么让我们开始考虑如何构建这个测试框架
+so let's start thinking about how we want to make this test framework
+
+73
+00:04:35,766 --> 00:04:38,750
+我要做的第一件事是在这个src文件夹中
+the first thing I want to do is inside this src folder
+
+74
+00:04:38,750 --> 00:04:44,533
+我要创建一个新项，实际上，我首先要创建一个新文件夹，就叫tests
+I'm just going to make a new item, in fact, I'm just going to make a new folder first called tests
+
+75
+00:04:44,966 --> 00:04:49,866
+然后在里面，我要创建一个名为Test.h的文件
+and then inside there, I'm gonna make a file called Test.h
+
+76
+00:04:50,033 --> 00:04:54,766
+我想，这将作为所有测试类的基类
+and this is just gonna serve as the kind of base class I guess for all the test stuff
+
+77
+00:04:54,866 --> 00:04:58,033
+我还会把它放到一个名为test的命名空间中
+I'm also gonna put it into a namespace called test
+
+78
+00:04:58,500 --> 00:05:02,966
+这样我们就能把它从实际的OpenGL中分离出来
+just so that we can kind of have that isolated from the actual OpenGL and all that kind of stuff
+
+79
+00:05:03,033 --> 00:05:07,566
+然后我将它命名为Test类，我们将有很多公开的东西
+and then I'm going to just call it class Test, and we're going to have a much public stuff
+
+80
+00:05:07,633 --> 00:05:11,600
+我不确定是否会有私有的东西，但基本上我们会有一个构造方法
+I'm not sure if we'll have private stuff, but basically we're going to have a constructor
+
+81
+00:05:11,733 --> 00:05:18,300
+我把它留空，就像这样一个虚拟的析构方法，就像那样
+which I'll just leave blank like this a virtual destruct over here, just like that
+
+82
+00:05:19,833 --> 00:05:24,400
+然后我将在这里创建一些虚函数，所以我们可能只需要OnUpdate
+and then I'm going to make some virtual functions here, so we'll probably just have OnUpdate
+
+83
+00:05:24,400 --> 00:05:30,300
+理想情况下，帧速率是固定的，甚至可能需要一个deltaTime
+which ideally would run at a fixed kind of frame rate, and maybe even take in a deltaTime here
+
+84
+00:05:31,633 --> 00:05:36,304
+然后我们还有一个OnRender，它是用来渲染的
+and then we'll also have a OnRender, which is kind of meant for rendering
+
+85
+00:05:36,304 --> 00:05:41,200
+然后我会再做一个OnImGuiRender虚函数
+and then I'm gonna actually make one more which is going to be and OnImGuiRender
+
+86
+00:05:41,200 --> 00:05:46,033
+所以这就是我们绘制ImGui东西的地方
+so this is going to be where we're going to draw our ImGui stuff
+
+87
+00:05:46,033 --> 00:05:48,266
+所以理想情况下，我们要让它尽可能的简单
+so ideally, we're going to make this as simple as possible
+
+88
+00:05:48,266 --> 00:05:51,100
+在这个函数中，我们重写了子类
+so that in this function that we override in our subclasses
+
+89
+00:05:51,100 --> 00:05:53,566
+我们可以放任何我要渲染的代码
+we can just put any kind of I'm going rendering code
+
+90
+00:05:53,933 --> 00:05:56,266
+它应该已经调用过了，就像我要开始了
+and it would have already called, like I'm going to begin
+
+91
+00:05:56,266 --> 00:06:00,466
+对我们来说就是这样的东西，所以我们可以尽可能多
+and that kind of stuff for us, so we can really just be as many as possible
+
+92
+00:06:00,933 --> 00:06:03,233
+我们不需要新建窗口之类的
+in terms of like we don't need to make a new window or anything like that
+
+93
+00:06:03,233 --> 00:06:06,900
+它已经为我们设置好了从这个函数被调用的地方开始
+it already be all set up for us from where this function actually gets called
+
+94
+00:06:06,966 --> 00:06:10,833
+所以那是基本的基础，现在我建立这个的方法是记住
+so that's basically the basis of this, now the way I've set this up is remember
+
+95
+00:06:10,866 --> 00:06:21,233
+因为我希望所有这些测试类在进入测试时，都能被初始化或创建
+because I actually want all these test classes to kind of be initialized or created, when we enter the test
+
+96
+00:06:21,233 --> 00:06:26,033
+然后销毁它，当我们退出测试时，实际的设置代码
+and then destroy it, when we exit the test the actual setup code
+
+97
+00:06:26,366 --> 00:06:30,700
+创建和销毁代码会在构造方法和析构方法中
+so the kind of creation and destruction code will be in the constructor and the destruct
+
+98
+00:06:31,066 --> 00:06:34,150
+这样我们就可以自由地使用任何类型的堆栈变量
+so that way we can freely have any kind of stack variables
+
+99
+00:06:34,150 --> 00:06:36,750
+它们与类的生命周期密切相关的
+that are kind of tied to the lifetime of our class
+
+100
+00:06:38,000 --> 00:06:40,233
+比如，如果我们想创建一个顶点缓冲区
+like for example, if we wanted to create a vertex buffer
+
+101
+00:06:40,233 --> 00:06:44,375
+我们可以把它创建为堆栈变量就像在我们实际的类作用域中
+we could just create that as a stack variable like in our actual class scope
+
+102
+00:06:44,375 --> 00:06:47,966
+并且那样的话，我们根本不需要担心手动处理内存管理
+and that way, we don't have to worry about manual memory management at all
+
+103
+00:06:48,000 --> 00:06:52,266
+因为一旦这个类超出作用域一旦这个类被删除
+because as soon as that class goes out of scope which as soon as that class gets deleted
+
+104
+00:06:52,600 --> 00:06:56,825
+堆栈上这个的顶点缓冲区会超出作用域
+that the vertex buffer for this on the stack will get go out of scope
+
+105
+00:06:56,825 --> 00:06:59,466
+然后自动销毁，所以我们不用担心那个
+and thus get destroyed automatically, so we don't have to worry about that
+
+106
+00:06:59,533 --> 00:07:04,200
+基本上，我想说的不是像onInit或OnDestroy这样的函数
+basically what I'm saying is instead of having like an onInit or OnDestroy function
+
+107
+00:07:04,366 --> 00:07:06,500
+我只是有构造方法和析构方法
+I'm just having construction and destruct
+
+108
+00:07:06,500 --> 00:07:10,766
+并且那样的话，类中所有对象的生存期实际上都绑定到类作用域
+and that way, lifetime of all of our objects in the class is actually tied to the class scope
+
+109
+00:07:10,766 --> 00:07:15,333
+好了，不管怎样，那就是我们现有的，现在我们可以开始做一个测试了
+okay, so anyway, that's basically what we have here, and now we can actually start making a test
+
+110
+00:07:15,533 --> 00:07:18,800
+那么举个例子，让我们来做一个我说过的清除颜色测试
+so as an example, let's make that clear color test that I talked about
+
+111
+00:07:19,133 --> 00:07:23,966
+所以我要创建一个头文件，叫做TestClearColor
+so I'm going to make a header file, which is just called TestClearColor
+
+112
+00:07:23,966 --> 00:07:28,733
+我将从单词Test开始，那样它们就井然有序了
+I'm going to start them with the word test, that way they're nicely kind of ordered
+
+113
+00:07:28,866 --> 00:07:32,866
+我们将直接点击添加，我将对cpp文件做同样的事情
+we'll head add, and I'll do the exact same thing for a cpp file
+
+114
+00:07:33,666 --> 00:07:40,733
+它叫做TestClearColor.cpp，它会包含我们的TestClearColor.h
+it's all called TestClearColor.cpp, it's going to include our TestClearColor.h
+
+115
+00:07:41,100 --> 00:07:47,833
+并且在首行中，我将包含Test.h，那么再说一下，就是这个基础Test
+and in the headline, I'm going to include just Test.h, so again next, base test
+
+116
+00:07:50,666 --> 00:07:57,400
+然后类TestClearColor，它会是，我们可能不需要
+and then class TestClearColor, and it's going to be, we probably don't need to
+
+117
+00:07:57,933 --> 00:08:00,833
+也许我会叫它TestClearColor，只是因为我想要这个类的名字很好
+maybe I will call a TestClearColor, just because I want the class as nicely named
+
+118
+00:08:00,833 --> 00:08:03,466
+但很明显，不管如何，这是一个测试
+but it's pretty obvious that it's a test anyway
+
+119
+00:08:05,166 --> 00:08:08,199
+然后在这里，我们基本上要重写所有的东西
+and then over here, we're going to basically override everything
+
+120
+00:08:08,433 --> 00:08:13,433
+我们会获取构造方法，有一个cpp文件，这里我不会实现任何东西
+so we'll grab the constructor, we do have a cpp files, I'm not gonna implement anything here
+
+121
+00:08:14,466 --> 00:08:18,600
+构造方法和析构方法，我不需要标记这是虚函数或类似的东西
+constructor and destructor like this, I don't need to mark this is virtual or anything like that
+
+122
+00:08:18,600 --> 00:08:22,000
+因为这个是基类，我们肯定不会发送这个类
+because the base class is, and we're certainly not going to be sending this class
+
+123
+00:08:22,566 --> 00:08:25,000
+这就是为什么我没有把这些方法标记为虚函数
+which is why I'm not marking these methods as virtual either
+
+124
+00:08:25,000 --> 00:08:28,600
+那么我们将有一个OnUpdate(float deltaTime) override
+so we'll have OnUpdate for deltaTime override
+
+125
+00:08:28,600 --> 00:08:37,000
+OnRender和OnImGuiRender，我喜欢那样，好了
+OnRender and OnImGuiRender around over, I like that, okay
+
+126
+00:08:37,366 --> 00:08:41,300
+很好，看起来不错，现在我要打开cpp文件了
+cool, looks pretty good to me, now I'm gonna pop over to my cpp file
+
+127
+00:08:41,300 --> 00:08:45,633
+确保我有那个命名空间test，然后如果我回去，使用VA
+make sure I get that namespace test in there, and then if I go back, using visual assist
+
+128
+00:08:45,633 --> 00:08:49,333
+我可以右键单击该类并创建方法实现
+I could just right click on the class and create the method implementations
+
+129
+00:08:49,733 --> 00:08:55,300
+这是我的cpp文件中最后一次记录，就那样，好了
+which is last the trade all been really quickly in my cpp file, just like that, okay
+
+130
+00:08:55,300 --> 00:08:57,800
+那么我们来建立这个测试，以及想想我们需要什么
+so let's actually set up this test and think about what we need
+
+131
+00:08:57,800 --> 00:09:02,933
+因为我们确实需要一些东西，实际的颜色需要以某种方式存储
+because we do need some things, the actual color needs to be stored somehow
+
+132
+00:09:03,200 --> 00:09:07,633
+所以我要存储这个，把它设为浮点数组
+so I am going to store this, I'm just gonna make it a float array
+
+133
+00:09:07,966 --> 00:09:12,866
+所以我将它命名为float m_Color，并且我知道我现在想要四个这样的
+so I'll just call it float m_Color and I know I want four of them like that now
+
+134
+00:09:12,933 --> 00:09:14,533
+所以4个浮点数就是我们的m_ClearColor
+so four floats are going to be our ClearColor
+
+135
+00:09:14,533 --> 00:09:17,500
+我实际上在构造函数中调用了clearColor
+and I actually call a clearColor in the constructor here
+
+136
+00:09:17,500 --> 00:09:21,900
+我要初始化它，所以clearColor是这样的
+I'm going to initialize that, so clearColor to something like
+
+137
+00:09:23,100 --> 00:09:27,500
+我想我们应该用黑色，但那太无聊了，所以我可以用洋红色之类的
+I guess we should probably do black, but that's boring, so I might just make it like magenta or something
+
+138
+00:09:27,875 --> 00:09:30,566
+所以就是1, 0，实际上就让我们把它写成漂亮的蓝色
+so 1 0 actually let's make it like a nice kind of blue
+
+139
+00:09:31,266 --> 00:09:36,766
+红色是0.2，绿色是0.3，蓝色是0.8，透明度是1
+0.2 for red, 0.3 for green, 0.8 for blue and we'll go with 1 for alpha
+
+140
+00:09:36,766 --> 00:09:41,300
+很好，这是渲染中设置的clearColor
+okay, cool, so there's our clearColor set up inside on render
+
+141
+00:09:41,300 --> 00:09:46,933
+我要使用GLCall glClearColor，它将那个clearColor设置为clearColor
+I want to do my GLCall glClearColor, which sets that clearColor to ClearColor
+
+142
+00:09:47,700 --> 00:09:54,833
+0, 1, 2, 3，就像你们想的那样
+zero one two and three as you might expect just like this
+
+143
+00:09:59,300 --> 00:10:04,300
+然后我们用GLCall(glClear(GL_COLOR_BUFFER_BIT))
+and then we'll call glClear with the GL_COLOR_BUFFER_BIT
+
+144
+00:10:04,300 --> 00:10:06,600
+我的意思是任何一种深度缓冲东西
+and I mean for any kind of depth buffer stuff here
+
+145
+00:10:06,866 --> 00:10:14,133
+实际上，我将包含GL/glew.h来获得所有原始的东西
+I will include GL/glew.h to get all the original stuff in in fact
+
+146
+00:10:14,133 --> 00:10:19,766
+也许我可以只包含Renderer.h，现在可能不需要包含它
+maybe I can just include the Renderer, probably don't need to include that now
+
+147
+00:10:19,766 --> 00:10:22,400
+我们的src目录实际上不在include目录中
+our src directory isn't actually in our include directory
+
+148
+00:10:22,400 --> 00:10:26,433
+那么让我们来设置一下，点击这里的属性
+so let's set that up, I'm gonna click on the properties over here
+
+149
+00:10:26,433 --> 00:10:31,600
+我将src作为包含目录添加到我的C/C++通用附加目录中
+I'm just gonna add src as an include directory into my C/C++ general additional
+
+150
+00:10:31,633 --> 00:10:34,833
+附加目录包括所有配置
+additional include directories like that for all configurations
+
+151
+00:10:35,000 --> 00:10:36,566
+这样我们就可以像这样包含Renderer了
+that way we can just include Renderer like this
+
+152
+00:10:36,566 --> 00:10:42,133
+一切都会好起来的，这就是我相信我们的
+and everything will be fine, that that's the kind of stuff that contains, I believe our
+
+153
+00:10:43,100 --> 00:10:47,633
+是的，这包含了两个glew，而且它应该有GLCall宏
+yeah that includes glues within two include glew, and also it should have the GLCall macros
+
+154
+00:10:47,933 --> 00:10:50,366
+很好，那么继续，这就是点击渲染
+okay, brilliant, so there we go, there's a click color rendering
+
+155
+00:10:50,733 --> 00:10:53,800
+差不多了，我的意思是我不需要销毁任何东西
+that's pretty much it, I mean I don't need to destroy anything
+
+156
+00:10:53,833 --> 00:10:58,566
+我们在这里分配的唯一的东西是一个数组，它还是在堆栈上
+with the only thing we actually allocated here was just an array that is again on the stack
+
+157
+00:10:58,566 --> 00:11:01,500
+所以我们不需要担心人工破坏它
+so we don't need to worry about destroying that manually
+
+158
+00:11:02,033 --> 00:11:03,333
+我觉得其他的都很好
+and everything else I think is fine
+
+159
+00:11:03,333 --> 00:11:08,233
+让我们折叠这些不需要的OnUpdate和OnImGuiRender，马上设置那个
+let's collapse these we don't need OnUpdate and OnImGuiRender, we'll set that up in a minute
+
+160
+00:11:08,233 --> 00:11:11,800
+因为实际上我想现在就把它设置好
+because I actually do want to it probably should set that up now 
+
+161
+00:11:11,800 --> 00:11:22,066
+所以如果我们包含ImGui，只要包含imgui/imgui.h
+so if we go to, if we include ImGui, just include imgui/imgui.h
+
+162
+00:11:22,933 --> 00:11:30,866
+然后我们可以做ImGui::Color4，那么是ColorEdit4或者ColorPicker4
+then we can just do ImGui, Color4, so ColorEdit4 or ColorPicker4
+
+163
+00:11:31,666 --> 00:11:34,800
+我不知道不同的是，ColorEdit的区别是什么
+I don't know what the difference is, what is the difference ColorEdit
+
+164
+00:11:37,266 --> 00:11:39,666
+ColorEdit功能有个预览颜色的小方块
+the ColorEdit functions have a little colored preview square
+
+165
+00:11:39,800 --> 00:11:42,700
+好了，ColorEdit可能是我们想要的，就是ColorEdit4
+okay, so ColorEdit is probably what we want, ColorEdit4
+
+166
+00:11:43,933 --> 00:11:48,966
+我们会使用clear color的标签，然后我们会传入m_ClearColor的指针
+and we'll just do clear color's label, and then we'll just pass in that m_ClearColor pointer
+
+167
+00:11:49,100 --> 00:11:51,533
+好了，那就是我们需要做的，非常非常简单的事情
+and there we go, that's what we need to do, really really simple stuff
+
+168
+00:11:51,833 --> 00:11:55,433
+现在我们应该可以看到清除颜色，也可以编辑，那是我的测试
+and now we should be able to see our clear color and also edited, that's my test
+
+169
+00:11:55,433 --> 00:11:57,400
+你们可以明白我所说的建立测试框架的意思
+you can see kind of what I mean by setting up a test framework
+
+170
+00:11:57,400 --> 00:12:00,900
+很容易看到初始化和析构过程中发生了什么
+it's so easy to see kind of what happens in the initialization, the destruction
+
+171
+00:12:01,133 --> 00:12:03,433
+然后真正的渲染它，它真的很干净
+and then actually rendering it, it's really clean
+
+172
+00:12:03,433 --> 00:12:06,833
+保持一切，孤立一切，除非我们测试一切
+keeps everything un isolated and separate unless us test everything
+
+173
+00:12:06,833 --> 00:12:12,333
+这是我们想要的很简单的方式，很好，现在我们来看一个应用
+really easily the way that we actually want to, okay, cool, so now if we go into an application
+
+174
+00:12:13,166 --> 00:12:15,466
+这些东西我已经不需要了
+there's all this stuff that I don't care about anymore
+
+175
+00:12:15,700 --> 00:12:18,033
+所以我要做的就是移除这些
+so what I'm actually going to do is just remove this
+
+176
+00:12:18,600 --> 00:12:20,900
+这是反向控制，所以我不需要担心
+it is inversion control, so I don't need to worry about
+
+177
+00:12:21,167 --> 00:12:23,275
+你们知道的，丢了代码，然后就还原不回来了
+you know, losing any code and then not getting it back
+
+178
+00:12:23,275 --> 00:12:26,133
+因此，如果我想要还原，我总是可以还原的
+therefore if I want it back, I can always get it back
+
+179
+00:12:26,133 --> 00:12:28,466
+那么就在这儿，让我们把这些代码都删除吧
+so let's just go over here and remove all of this code
+
+180
+00:12:29,766 --> 00:12:33,733
+在这里，我把注释也移除了
+almost going to go into here, and I'll drag this comment out as well
+
+181
+00:12:34,033 --> 00:12:36,233
+并且基本上就是去掉所有东西，好了，那么我们不知道要去掉哪些
+and basically just remove everything, okay, so we don't know
+
+182
+00:12:36,266 --> 00:12:40,733
+但我们肯定想保持像ImGui的初始化，渲染的初始化
+we definitely want to keep like the ImGui initialization, the render initialization
+
+183
+00:12:40,733 --> 00:12:43,633
+但其他类似这样的东西都可以去掉了
+but everything else like this stuff can just go away
+
+184
+00:12:44,033 --> 00:12:51,000
+我们也会继续启用混合，好了，很好，所以现在非常非常简单
+we'll keep blending on as well, and there we go, okay, cool, so really really simple now
+
+185
+00:12:51,433 --> 00:12:55,100
+我将去掉所有这些注释，因为这些东西的作用是很明显的，不管如何
+I'll get rid of all these comments, because it's pretty obvious what the stuff does, anyway
+
+186
+00:12:56,066 --> 00:13:01,933
+现在我们来设置一下测试，那么作为一个简单的例子，来测试一下
+and now let's set up our test, so as an easy example, just to test this out
+
+187
+00:13:02,100 --> 00:13:10,666
+我首先要去包含，让我们包含我们的测试，tests/TestClearColor.h
+I can include first of all, let's just include our test, tests/TestClearColor.h
+
+188
+00:13:11,933 --> 00:13:16,933
+如果我到下面这里，我将创建一个TestClearColor test
+and if I go down here, I'm just going to make a TestClearColor test
+
+189
+00:13:19,133 --> 00:13:22,233
+糟糕，我把它放在测试命名空间中了，像那样
+oops, I put that in the test namespace like that
+
+190
+00:13:22,400 --> 00:13:25,000
+我可以使用命名空间，但我现在不打算这么做
+I could using the namespace, but I'm not going to at this point
+
+191
+00:13:25,966 --> 00:13:31,866
+我们会渲染实际的测试，我们会在更新时暂时用0来做
+we're going to render the actual test that we'll do on update with delta time zero for now
+
+192
+00:13:31,866 --> 00:13:35,166
+因为没有任何设置，我们调用onRender
+because we don't have anything that set up, we'll do it onRender
+
+193
+00:13:35,400 --> 00:13:38,033
+然后一旦我们真正启动ImGui框架
+and then once we actually start the ImGui frame
+
+194
+00:13:38,600 --> 00:13:43,366
+我们就会像那样调用test.OnImGuiRender，好了
+we're going to do a test.OnImGuiRender like that, okay
+
+195
+00:13:44,766 --> 00:13:48,766
+看起来不错，按f5，看看会发生什么，好了，那么看看这个
+looks pretty good to me, let's just hit f5 and see what happens, okay, so check this out
+
+196
+00:13:48,766 --> 00:13:52,200
+我们这里有非常漂亮的蓝色，我们已经得到了ImGui的东西
+we have that really nice blue color here, we've got our ImGui stuff
+
+197
+00:13:52,500 --> 00:13:55,166
+我稍微调整一下大小，然后你们就可以看到这是我们的清除颜色
+I'm just gonna resize this a little bit, you can see that's our clear color
+
+198
+00:13:55,166 --> 00:13:57,600
+那就是它的设置，我可以通过这样来调整它
+that's what it's set to, I can adjust it just by doing this
+
+199
+00:13:57,600 --> 00:14:01,566
+我还可以用拾色器，把它变成我想要的任何颜色
+I can also bring up a color picker, and actually change it to any color I want
+
+200
+00:14:01,766 --> 00:14:05,100
+并且正如你们在这里看到的，实际上它改变了背景的颜色
+and as you can see here, it actually changes the color of the background
+
+201
+00:14:05,400 --> 00:14:10,300
+因为那就是我们设置的清除颜色，所以你们可以看到这有多酷，酷
+because that's what our clear color is set to, so you can see how cool that is, cool
+
+202
+00:14:10,300 --> 00:14:13,900
+所以不管怎样，那就是我建立这些测试框架的基础
+so anyway, that's the basis of how I want to set up all this test framework stuff
+
+203
+00:14:14,100 --> 00:14:17,800
+下期我要做的是，设置一个菜单
+now what I'm going to do next time, in the next episode is actually set up a menu
+
+204
+00:14:17,800 --> 00:14:20,000
+这样就不用直接打开一个测试了
+so that instead of opening a test straight away
+
+205
+00:14:20,500 --> 00:14:24,066
+我们也可以使用一些可能很暴力的命令行参数
+which we could also have the ability of doing potentially violent command, line argument
+
+206
+00:14:24,066 --> 00:14:27,466
+或者别的什么，但一般来说，不是清除颜色测试之类的
+or something but in general instead of opening just a clear color test or whatever
+
+207
+00:14:27,466 --> 00:14:31,933
+我实际上想要打开一个菜单，在其中我可以选择任何数量的测试
+straight away I actually want to open a menu in which I can select from any number of tests
+
+208
+00:14:31,966 --> 00:14:35,100
+然后当我点击一个测试，它实际上就会创建并打开它
+and then when I click on a test, it actually creates it and opens it
+
+209
+00:14:35,400 --> 00:14:38,300
+如果我毁了它，或者我从菜单上退出
+and if I destroy it, or if I go back from that menu
+
+210
+00:14:38,300 --> 00:14:40,766
+所以我们会添加一个返回按钮或返回按钮之类的
+so we'll add like a little back button or a return button or something
+
+211
+00:14:40,800 --> 00:14:45,666
+就像那样，这是个错误，如果我们点击那个在清除颜色测试中
+like that and just an error, if we click that and where in the clear color test
+
+212
+00:14:45,666 --> 00:14:50,100
+例如，它应该销毁它，比如完全删除那个对象上那个类的实例
+for example it should destroy that like completely delete that instance of that class on that object
+
+213
+00:14:50,568 --> 00:14:54,366
+回到我们的测试菜单，我们可以选择其他东西，那就是我们的计划
+and go back to our test menu, where we can pick something else, so that's the plan
+
+214
+00:14:54,500 --> 00:14:58,900
+现在我想让你们做的家庭作业是给你们布置一些家庭作业
+now what I want you guys to do for homework here we go is giving you guys a bit of a homework task
+
+215
+00:14:59,433 --> 00:15:05,033
+试着自己实现它，做一个测试菜单，不止一个测试
+try and implement that yourselves, go ahead and make a test menu, make more than just one test
+
+216
+00:15:05,033 --> 00:15:08,766
+我刚刚做了一个清除颜色测试，你们应该做的是回顾之前所有的
+I've just made a clear color test, what you should do is go back through all the episodes
+
+217
+00:15:08,766 --> 00:15:10,933
+看看你们能不能做一个类似纹理的测试
+and see if you can make a test for like textures
+
+218
+00:15:10,933 --> 00:15:14,566
+或者只是符合你们可以自定义的某个顶点颜色
+or just accord with a certain vertex color which you can customize
+
+219
+00:15:14,566 --> 00:15:17,133
+或者你们也可以定制一个统一变量
+or maybe accord with a uniform that you can customize as well
+
+220
+00:15:17,133 --> 00:15:21,466
+使用ImGui完成所有这些测试，并将它们添加到测试菜单中
+using ImGui make all of these tests, add them to a test menu
+
+221
+00:15:21,566 --> 00:15:25,125
+然后在下方评论或discord.com上分享你的解决方案
+and then share your solution in the comments below or on discord.com
+
+222
+00:15:25,125 --> 00:15:28,133
+如果你们访问TheCherno.com/discord，就可以加入我的discord服务
+so if you go to TheCherno.com/discord, you can join my discord server
+
+223
+00:15:28,133 --> 00:15:33,566
+有一个OpenGL，不，有一个图形频道，你们可以在那里讨论这些东西
+there's an OpenGL, no, there's a graphics channel, where you can talk about stuff like this
+
+224
+00:15:33,800 --> 00:15:39,000
+在那里分享你们的解决方案，是的，你们自己去尝试一下那个吧
+and share your solutions there, and yeah just have a go with doing that yourselves
+
+225
+00:15:39,066 --> 00:15:45,566
+下周我会给你们看我的解决方案，无论下一期会做什么
+and then I'll show you my solution next week on in whatever the next episode ends up coming out
+
+226
+00:15:45,566 --> 00:15:47,400
+所以不论如何，我希望你们喜欢这个视频
+so anyway anyway, I hope you guys enjoyed this video
+
+227
+00:15:47,400 --> 00:15:49,033
+如果你们确实喜欢的话，那就为这个视频点赞吧
+if you did do, you hit that like button
+
+228
+00:15:49,033 --> 00:15:52,000
+你们也可以通过访问patreon.com/TheCherno来支持这个系列教程
+you're gonna you can help support the series by going to patreon.com/TheCherno
+
+229
+00:15:52,000 --> 00:15:55,400
+和往常一样，所有的源代码都被上传到github存储库
+as always all of the source code is uploaded onto a github repository
+
+230
+00:15:55,400 --> 00:15:57,166
+如果你们支持这个系列，就可以去访问那个
+which you get access to, if you support the series
+
+231
+00:15:57,333 --> 00:16:00,533
+所以一定要去看看，并且你们也会得到一堆其他很酷的奖励
+so definitely check that out, and also you'll get a bunch of other cool rewards
+
+232
+00:16:00,933 --> 00:16:06,533
+和往常一样，非常感谢我所有可爱的支持者，让这个系列成为可能
+and as always huge thank you to all of my lovely supporters to make this series possible
+
+233
+00:16:07,366 --> 00:16:11,250
+从现在开始，我将优先考虑这个系列，而不是c++系列
+I'm going to prioritize this series from now on over the c++ series
+
+234
+00:16:11,250 --> 00:16:15,433
+因为已经在c++系列中涵盖了很多东西，而OpenGL系列则有所欠缺
+because we've covered a lot of stuff in the c++ series, and the OpenGL series is kind of lacking
+
+235
+00:16:15,633 --> 00:16:20,066
+那么下周我们会讲完这个测试的内容，然后再下一周或者再下一期
+so next week we're going to finish off this Test stuff, and then the week after that or the episode after that
+
+236
+00:16:20,066 --> 00:16:23,833
+也许我甚至会一周做好几期，谁知道呢，但愿我是这样希望的
+maybe I'll even do multiple episodes of week, who knows, hopefully I'm hoping
+
+237
+00:16:24,866 --> 00:16:27,366
+我们将继续做批渲染
+we will move on to doing the batch renderer 
+
+238
+00:16:27,533 --> 00:16:31,833
+最后是3D的东西，所以我对这个系列的未来感到非常兴奋
+and then 3D stuff eventually, so yeah, I'm really excited for the future of the series
+
+239
+00:16:31,933 --> 00:16:34,066
+希望大家喜欢这个视频，下次见，再见
+I hope you guys enjoyed the video, I'll see you next time, goodbye
+

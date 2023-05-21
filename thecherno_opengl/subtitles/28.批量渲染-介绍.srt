@@ -1,0 +1,945 @@
+﻿1
+00:00:00,100 --> 00:00:02,566
+最后制作一个批渲染的视频
+finally making a video on batch rendering
+
+2
+00:00:02,566 --> 00:00:05,733
+那么对于学习OpenGL或图形编程的人来说
+so for those of you learning OpenGL or graphics programming, in general
+
+3
+00:00:05,733 --> 00:00:09,300
+你们可能听说过所谓的批处理或批处理渲染
+you've probably heard of something called batching or batch rendering
+
+4
+00:00:09,433 --> 00:00:11,866
+如果还没听过的话，那么你们就来对地方了
+and if you haven't, well you've come to the right place
+
+5
+00:00:11,966 --> 00:00:14,666
+因为这是一种非常有用的渲染技术
+because it's an incredibly useful rendering technique
+
+6
+00:00:14,833 --> 00:00:20,766
+现在，批渲染本身很难精确地定义
+now batch rendering itself is kind of difficult to define precisely
+
+7
+00:00:20,766 --> 00:00:23,666
+因为它可以指很多不同的东西
+because it could refer to a number of different things
+
+8
+00:00:23,666 --> 00:00:26,450
+它的复杂程度从
+and it absolutely ranges in complexity from
+
+9
+00:00:26,450 --> 00:00:30,098
+非常简单，几分钟就能写完的东西
+something really simple that you could just write in a couple of minutes 
+
+10
+00:00:30,098 --> 00:00:33,775
+到一个更大的系统的一部分
+to something that is much and part of a larger system
+
+11
+00:00:33,775 --> 00:00:39,433
+我们今天要具体讨论的是，如何将几何图形批处理在一起
+what we're going to be talking about today is specifically, how we can batch geometry together
+
+12
+00:00:39,433 --> 00:00:44,975
+这意味着我们可以在一个独立的DrawCall中渲染多个几何图形
+meaning how we can render more than one piece of geometry in a single DrawCall
+
+13
+00:00:44,975 --> 00:00:49,600
+那就是批处理和批渲染对我的核心意义
+at its core that is what batching and batch rendering means to me
+
+14
+00:00:49,600 --> 00:00:51,466
+所以让我们把它分解一下吧
+so let's break that down a little bit
+
+15
+00:00:51,466 --> 00:00:56,800
+能够在单个DrawCall中渲染多个几何体是什么意思
+what does it mean to be able to render multiple pieces of geometry in a single DrawCall
+
+16
+00:00:56,800 --> 00:01:00,200
+为什么它有用，它是什么样子的
+why is that useful, and what does it even look like
+
+17
+00:01:00,200 --> 00:01:02,850
+而传统的说法是我们已经绘制了很多
+while traditionally speaking the way that we've been rendering pretty much
+
+18
+00:01:02,850 --> 00:01:09,600
+现在我们已经建立了一个顶点的顶点缓冲区，一个带索引的索引缓冲区
+anything right now has been we build up a vertex buffer of vertices, an index buffer with indices
+
+19
+00:01:09,600 --> 00:01:12,933
+然后我们用类似glDrawElements的东西来做渲染
+and then we render that together using something like glDrawElements
+
+20
+00:01:12,933 --> 00:01:16,233
+那是我们的绘制，那就是我们在屏幕上看到东西的方式
+and that is our drawer, that's how we get something on the screen
+
+21
+00:01:16,366 --> 00:01:21,733
+如果我们想要一个不同的对象，或者想要另一个矩形出现在屏幕上
+if we want a different object, or if we want another square or rectangle to appear on the screen
+
+22
+00:01:21,850 --> 00:01:23,850
+我们基本上重复这个过程
+we basically repeat this process
+
+23
+00:01:23,850 --> 00:01:27,075
+我们当然可以重用相同的顶点缓冲区和索引缓冲区
+we can of course reuse the same vertex buffer and index buffer 
+
+24
+00:01:27,075 --> 00:01:29,133
+如果我们的几何形状不变，比如
+if our geometry doesn't change, for example
+
+25
+00:01:29,133 --> 00:01:31,600
+如果我们只是想要一个不同形状的矩形
+if we just want a differently shaped rectangle
+
+26
+00:01:31,600 --> 00:01:34,500
+或者屏幕上另一个不同位置的矩形
+or another rectangle on the screen in a different position
+
+27
+00:01:34,500 --> 00:01:38,100
+然后我们在顶点着色器中使用统一变量矩阵
+and then we just use uniform matrixes in our vertex shader
+
+28
+00:01:38,133 --> 00:01:43,433
+能够真正定位和潜在地转换特定的几何图形，那是非常棒的
+to actually position and potentially transform that particular piece of geometry, that's great and all
+
+29
+00:01:43,433 --> 00:01:47,766
+但是如果我们想要渲染很多东西大量的几何图形
+but what happens if we want to render a lot of things a huge amount of geometry
+
+30
+00:01:47,766 --> 00:01:52,200
+在这个视频中，我们将把3D批处理，以及所有这些东西抛诸脑后
+now for this video, we're just gonna throw 3D batching, and all of that stuff out the window
+
+31
+00:01:52,200 --> 00:01:54,833
+这里我们只关注2D渲染
+we're just gonna focus on 2D rendering here
+
+32
+00:01:54,966 --> 00:02:00,566
+我们如何渲染大量的2D四边形或矩形，让我们从一些例子开始
+how do we render a large amount of 2D quads or rectangles, let's start off with some examples
+
+33
+00:02:00,566 --> 00:02:03,369
+这样我们就能理解我们要做的是什么
+so that we can kind of understand what it is we're trying to do
+
+34
+00:02:04,266 --> 00:02:06,200
+让我们看看，我们正在制作一款2D游戏
+let's see, we're making a 2D game
+
+35
+00:02:06,200 --> 00:02:09,366
+这是一款自上而下的2D-RPG游戏，我们在世界各地移动
+it's a 2D kind of top down RPG, and we move around the world
+
+36
+00:02:09,366 --> 00:02:12,100
+而世界本身是由不同的贴图组成的
+and the world itself is made up of different tiles
+
+37
+00:02:12,100 --> 00:02:17,900
+草贴图，水贴图等等许多小贴图，就像《harvest moon》风格的游戏
+grass tiles, water tiles, whatever a lot of tiny little tiles, something like a harvest moon style game
+
+38
+00:02:17,900 --> 00:02:20,133
+你们知道《Stardom Valley 》之类的
+you know Stardom Valley something like that
+
+39
+00:02:20,133 --> 00:02:24,866
+现在这些游戏在很多情况下确实显示了从上面看的视角
+now these games in a lot of cases do in fact show the view kind of from above
+
+40
+00:02:24,866 --> 00:02:26,766
+并且相机可能变得很远
+and the camera can actually get pretty far
+
+41
+00:02:26,766 --> 00:02:30,900
+在我们当前的策略下，屏幕上可能会出现许多不同的贴图
+and we might have a lot of different tiles on the screen with our current kind of strategy
+
+42
+00:02:30,900 --> 00:02:34,866
+如果我们决定将每个贴图渲染为带有纹理的独立四边形
+if we decide to render each tile as a separate quad with a texture
+
+43
+00:02:35,433 --> 00:02:37,466
+那有点困难
+that's going to be kind of difficult
+
+44
+00:02:37,466 --> 00:02:40,533
+它将会达到一个点，它将不会有很好的性能表现
+it's going to get to the point, where it's just not going to perform well
+
+45
+00:02:40,566 --> 00:02:43,466
+因为如果我们有成百上千的贴图
+because if we have like hundreds if not thousands of tiles
+
+46
+00:02:43,766 --> 00:02:48,233
+在我们的世界中，一个接一个的绘制，作为单独的DrawCall
+in our world just being drawn one by one as as separate draw calls
+
+47
+00:02:48,666 --> 00:02:51,066
+我们的GPU就跟不上了
+our GPU is not going to be able to keep up with that
+
+48
+00:02:51,066 --> 00:02:54,200
+现在在现代硬件上，我们绝对可以
+now these days on modern hardware, we can absolutely on
+
+49
+00:02:54,200 --> 00:02:56,900
+就像一台有专用显卡的台式电脑
+like a desktop computer with a dedicated graphics card
+
+50
+00:02:57,100 --> 00:03:00,766
+侥幸通过数千次DrawCall中，这并不是什么大问题
+get away with thousands of DrawCalls, it's not as big of a problem
+
+51
+00:03:01,066 --> 00:03:03,933
+比如像手机或老硬件那样
+as say on mobile or as it was in the past
+
+52
+00:03:03,933 --> 00:03:08,333
+所以我不想过分强调这个事实，这确实是个问题
+so I don't want to like over over emphasize the fact that this really is an issue
+
+53
+00:03:08,333 --> 00:03:12,950
+但它绝对不是理想的，尤其是对于像四边形这样简单的物体
+but it's absolutely not ideal, especially for something as simple as a quad
+
+54
+00:03:13,075 --> 00:03:18,066
+如果你们单独绘制每个四边形，那是很低效的
+if you're drawing each quad individually, that's just inefficient and furthermore of course
+
+55
+00:03:18,066 --> 00:03:21,450
+当我们添加更多的四边形时或者我们缩小相机
+as we do add more and more quads or maybe we zoom out the camera
+
+56
+00:03:21,450 --> 00:03:23,200
+我们可以看到更多的地图时
+and we see more of that map
+
+57
+00:03:23,833 --> 00:03:26,425
+我们的游戏可能会开始掉帧
+our game may actually start to drop frames
+
+58
+00:03:26,425 --> 00:03:30,850
+因为它跟不上要绘制成千上万个贴图的速度
+because it's just not gonna be able to keep up with the thousands of tiles that we're trying to render 
+
+59
+00:03:30,850 --> 00:03:32,933
+我们要展示的另一个很好的例子是粒子系统
+another great example is a particle system
+
+60
+00:03:32,933 --> 00:03:34,575
+现在我用hazel花了一个小时制作了一款游戏
+now I made a game in an hour using hazel
+
+61
+00:03:34,575 --> 00:03:37,050
+或者把视频链接在那里，以防你们还没看到
+or have the video linked up there in case you haven't seen it
+
+62
+00:03:37,050 --> 00:03:39,833
+在那款游戏中，我需要创造一些粒子系统
+and in that game, I needed to make some kind of particle system
+
+63
+00:03:39,833 --> 00:03:43,633
+这样我们就可以得到像燃烧的粒子和烟熏的粒子之类的东西
+so that we could have like fiery particles and smoked particles and all of that kind of stuff
+
+64
+00:03:43,633 --> 00:03:45,100
+现在我渲染这些粒子的方式
+now the way that I rendered those particles
+
+65
+00:03:45,100 --> 00:03:50,266
+仅仅是通过使用简单的变换单独的四边形
+there was just by using individual quads with transforms simple as that
+
+66
+00:03:50,300 --> 00:03:54,300
+但是如果我们有成千上万个这样的粒子又会发生什么
+but again what happens if we have thousands of these particles
+
+67
+00:03:54,300 --> 00:03:59,133
+因为这是一个巨大的粒子系统，如果我们的2D游戏中有粒子会怎么样
+because it's a huge particle system what if we have particles in our 2D game
+
+68
+00:03:59,500 --> 00:04:03,600
+那也有一个很大的时间应用，有很多我们需要渲染的四边形
+that also has a huge time app with many quads that we have to render
+
+69
+00:04:03,800 --> 00:04:07,366
+我们现在可能会看到1万个DrawCalls，为了添加那个
+we might be looking at 10,000 DrawCalls now and to add to that
+
+70
+00:04:07,366 --> 00:04:10,966
+另一个渲染矩形的非常流行的例子是UI渲染
+another very popular example of rendering rectangles is ui rendering
+
+71
+00:04:10,966 --> 00:04:15,766
+如果我们在屏幕上呈现文本，如果出现类似于任务的日志条目
+what if we're rendering text on our screen, what if there's like a quest kind of journal entry
+
+72
+00:04:15,866 --> 00:04:18,466
+它只有一段一段的文本
+that just has paragraphs and paragraphs of text
+
+73
+00:04:18,633 --> 00:04:23,866
+我们处理文本的方法通常是将每个字符渲染成一个单独的纹理四边形
+the way that we ran to text usually is by rendering each character as a separate textured quad
+
+74
+00:04:24,100 --> 00:04:28,766
+所以现在我们在屏幕上看到的可能是1k个文本字符
+so now we're looking at potentially 1000 like text characters on the screen
+
+75
+00:04:28,933 --> 00:04:30,733
+背景中是一个粒子系统
+a particle system going off in the background
+
+76
+00:04:30,733 --> 00:04:34,600
+并且所有这些都是基于屏幕上同时呈现1k个贴图的级别
+and all of this on top of a level with 1000 tiles on the screen at once
+
+77
+00:04:36,000 --> 00:04:38,866
+即使在现代的硬件上也很难渲染
+that's gonna be difficult to render even on modern hardware
+
+78
+00:04:38,866 --> 00:04:43,166
+但有一种简单的方法，或者说更有效的方法
+but there is an easy way or rather a more efficient way
+
+79
+00:04:43,166 --> 00:04:47,333
+那就是批处理或批处理渲染，简而言之
+and that is by batching or batch rendering, in a nutshell
+
+80
+00:04:47,500 --> 00:04:53,900
+批渲染意味将所有几何图形批处理到一个独立顶点缓冲区和索引缓冲区
+batching means we batch together all of this geometry into a single vertex buffer and index buffer
+
+81
+00:04:53,900 --> 00:04:58,133
+然后简单地绘制一次，所以用其他方法代替画一个正方形
+and then simply draw that once, so in other ways instead of drawing one square
+
+82
+00:04:58,266 --> 00:05:01,666
+然后是另一个正方形，然后是另一个正方形
+then another square, then another square all kind of individually
+
+83
+00:05:01,700 --> 00:05:06,333
+我们把所有东西放在一起，就好像它是一个几何图形
+we put everything in together as if it was one piece of geometry
+
+84
+00:05:06,433 --> 00:05:09,666
+然后我们只渲染一次，就那样了
+and then we just simply render that once, and that's it
+
+85
+00:05:09,666 --> 00:05:15,200
+就是我刚才描述的所有场景批量处理在性能上的提升
+the performance improvement with batching together all of the kind of scenarios that I just described
+
+86
+00:05:15,200 --> 00:05:21,033
+是非常大的，事实上，我真的想在将来做一个基准
+is absolutely huge, in fact, I really want to actually do a benchmark of this in the future
+
+87
+00:05:21,166 --> 00:05:24,600
+只是想让你们看看它到底有多大的影响，好了
+just to show you guys how much of an impact it actually has alright
+
+88
+00:05:24,600 --> 00:05:30,100
+现在我们知道了批渲染有多有用，它实际上是如何工作的
+so now that we know just how useful batch rendering is, how does it actually work
+
+89
+00:05:30,633 --> 00:05:40,066
+好吧，让我们来看看，到目前为止，一个四边形总使用一个DrawCall
+well, let's take a look, so up until now, one quad has always resulted in one DrawCall
+
+90
+00:05:40,066 --> 00:05:42,675
+这是一个问题，因为如果我们有1k个这样的
+which is an issue, because if we had 1000 of these
+
+91
+00:05:42,675 --> 00:05:45,200
+我们会得到1k个DrawCall，这将会很慢
+we'd get 1000 DrawCalls, which would be slow
+
+92
+00:05:45,200 --> 00:05:48,866
+实际上，1k个绘制调用在你们的硬件上可能并不慢
+now realistically 1000 probably isn't slow on your hardware
+
+93
+00:05:48,866 --> 00:05:54,466
+但重点是很多DrawCall都很慢，我们知道这很慢，并且非常糟糕
+but the point is a lot of draw calls is slow and we know that slow is quite unquote bad
+
+94
+00:05:55,366 --> 00:05:58,633
+让我们来分析一下如何渲染独立四边形
+let's break down how we would typically render a single quad
+
+95
+00:05:58,733 --> 00:06:01,500
+在OpenGL中，我们可以做顶点数组
+in OpenGL, we would do something called a vertex array
+
+96
+00:06:01,500 --> 00:06:06,400
+你们可以看到包含了顶点缓冲区和索引缓冲区，并且在那里面
+which you could see contains a vertex buffer and index buffer, and inside that
+
+97
+00:06:06,400 --> 00:06:10,733
+我们有四个顶点和六个索引，组成一个四边形
+we would have four vertices and six indices, which makes up one quad
+
+98
+00:06:10,900 --> 00:06:17,833
+四个顶点在这里，每个三角形的索引是0 1 2，然后是2 3 0
+the four vertices would be here, and then the indices of each triangle being 0 1 2, and then 2 3 0
+
+99
+00:06:18,233 --> 00:06:21,166
+那就是我们渲染单个四边形的典型设置
+that's our typical setup for rendering a single quad
+
+100
+00:06:21,566 --> 00:06:25,166
+如果这是我们的屏幕，一个四边形在这里，另一个在这里
+and if this is our screen with one quad here and then another quad here
+
+101
+00:06:25,500 --> 00:06:28,633
+我们实现这个的方法是，我们将渲染所有的东西两次
+the way that we would achieve this is we would render everything twice
+
+102
+00:06:28,633 --> 00:06:31,766
+我们用不同的变换来渲染这个顶点数组两次
+we'd render this vertex array twice with a different transform
+
+103
+00:06:31,966 --> 00:06:36,333
+所以我们上传一个统一变量矩阵到顶点着色器，也就是我们的变换
+so we'd upload a uniform matrix into our vertex shader, which is our transform
+
+104
+00:06:37,033 --> 00:06:39,866
+现在如果我们以某种方式取这两个四边形
+now what if we could somehow take these two quads
+
+105
+00:06:39,866 --> 00:06:43,075
+然后把它们放在一个单一的顶点和索引缓冲区中
+and then put them into a single vertex and index buffer
+
+106
+00:06:43,075 --> 00:06:45,075
+将它们合并到一个缓冲区中
+combine them into just one buffer
+
+107
+00:06:45,566 --> 00:06:49,933
+我们来试试，我们取这个顶点数组并扩展顶点缓冲区
+let's try that, let's take this vertex array and expand the vertex buffer
+
+108
+00:06:50,066 --> 00:06:54,666
+这样，它包含两个四边形，而不是一个，索引缓冲区也是这样做的
+so that it contains two quads instead of one with the same being done for the index buffer
+
+109
+00:06:55,100 --> 00:06:59,266
+所以如果我们把它拿下来，看看等价的我们实际上有两个这样的
+so if we bring this down and look at the equivalent what we actually have is two of these
+
+110
+00:06:59,900 --> 00:07:04,190
+索引缓冲区转换0 1 2 2 3 0为第一个四边形
+the index buffer translates into 0 1 2 2 3 0 for the first quad
+
+111
+00:07:04,190 --> 00:07:07,525
+然后转换4 5 6 6 7 4为第二个四边形
+and then 4 5 6 6 7 4 for the second quad
+
+112
+00:07:07,833 --> 00:07:12,066
+所以我们得到8个顶点，12个索引，总共是0 3 7
+so we end up with eight vertices and 12 indexes total 0 3 7
+
+113
+00:07:12,533 --> 00:07:16,933
+所以现在我们只渲染了一次，没有任何转换
+so what happens now is we rendered this just once, there are no transforms at all
+
+114
+00:07:17,133 --> 00:07:21,433
+我们在一次DrawCall中同时得到这两个方块，理论上更快
+and we get both of these squares in a single DrawCall, which theoretically is faster
+
+115
+00:07:21,666 --> 00:07:26,466
+这当然有一些限制，因为控制位置的东西
+this of course does come with a bunch of limitations, because what controls the position of this
+
+116
+00:07:26,600 --> 00:07:31,100
+我们如何设置这些四边形的位置，我们显然不能设置变换
+how do we set the position of these quads, we obviously can't set a transform
+
+117
+00:07:31,100 --> 00:07:32,633
+因为那是一个统一变量的矩阵
+because that would be a uniform matrix
+
+118
+00:07:32,633 --> 00:07:36,100
+我们只能在DrawCall之间改变而不是在DrawCall期间
+which we can only change between DrawCallls not during a DrawCall
+
+119
+00:07:36,350 --> 00:07:37,433
+所以实际上发生的是
+so what happens is
+
+120
+00:07:37,433 --> 00:07:43,000
+这个位置是从顶点缓冲区取来的，缓冲区有每个四边形的位置
+this position is taken from the vertex buffer, the buffer has the positions of each quad
+
+121
+00:07:43,233 --> 00:07:48,433
+如果你们喜欢，你们仍然可以用变换的形式将偏移量应用到整个东西上
+you can still apply an offset to the entire thing in the form of a transform if you like
+
+122
+00:07:48,433 --> 00:07:51,033
+这基本上就是我们对相机之类的东西所做的
+which is basically what we would do for something like a camera
+
+123
+00:07:51,166 --> 00:07:56,333
+但是每个四边形的位置是在顶点缓冲区内，作为另一个例子
+but the position of each quad is inside the vertex buffer, as another example
+
+124
+00:07:56,333 --> 00:07:58,566
+如果你们想设置每个四边形的颜色
+if you wanted to set the color of each quad
+
+125
+00:07:58,566 --> 00:08:01,733
+你们以前处理统一变量的时候可能做过的
+which is something you might have done in the form of a uniform before
+
+126
+00:08:01,733 --> 00:08:04,250
+你们还可以将这些数据放入顶点缓冲区
+you can also put this data into the vertex buffer
+
+127
+00:08:04,250 --> 00:08:06,775
+这样每个顶点都将包含一个颜色值
+so each vertex would contain a color value
+
+128
+00:08:06,966 --> 00:08:11,533
+然后你们可以在着色器中使用，我们会在以后的视频中探索更多
+which you could then use inside your shader, we'll explore this more in future videos
+
+129
+00:08:11,866 --> 00:08:14,600
+这对不断移动的四边形意味着什么呢
+so what does this mean for quads that are constantly moving
+
+130
+00:08:14,600 --> 00:08:19,700
+例如，在粒子系统中，这个顶点缓冲区必须是动态的
+for example, in a particle system, well this vertex buffer has to become dynamic
+
+131
+00:08:19,900 --> 00:08:24,100
+这意味着我们可以在每一帧中传输数据，这是非常重要的
+meaning that we can stream data in every frame, this is extremely important
+
+132
+00:08:24,133 --> 00:08:26,300
+因为如果你们处理的不是动态顶点缓冲区
+because if you're not dealing with a dynamic vertex buffer
+
+133
+00:08:26,300 --> 00:08:30,433
+那么所有的东西本质上都是静态几何，我们可能不希望那样
+then everything is essentially static geometry, and we might not want that
+
+134
+00:08:30,433 --> 00:08:33,900
+所以我可能会做一系列关于处理这个的视频
+so I'm probably going to end up making a series of videos that kind of deal with this
+
+135
+00:08:33,900 --> 00:08:35,650
+因为在这个视频中，我只想向你们展示
+because in this video, I just want to show you guys
+
+136
+00:08:35,650 --> 00:08:40,275
+一个很简单的例子，从我们刚学的理论到实际的实现
+a really simple example from the theory that we just learned about to an actual implementation that
+
+137
+00:08:40,275 --> 00:08:43,866
+我们将从一些非常简单的开始
+we're about to look at something really simple to kind of start off with
+
+138
+00:08:43,966 --> 00:08:48,300
+然后在将来，我们会不断添加功能直到我们可以做任何我们想做的事情
+and then in the future, we'll kind of keep adding features until we can really just do anything we want
+
+139
+00:08:48,333 --> 00:08:52,166
+但是在一个批处理中渲染所有的东西
+but with kind of rendering everything in a single batch
+
+140
+00:08:52,166 --> 00:08:55,300
+所以现在我们知道了这个理论，也知道了它的原理
+so now that we actually know this theory and we know how it works
+
+141
+00:08:55,300 --> 00:08:58,966
+让我们继续，把它转移到实践中，实际地看一些代码
+let's go ahead and transfer that over to practice and actually take a look at some code
+
+142
+00:08:59,000 --> 00:09:01,375
+这个例子中我用的是OpenGL库
+I'm using my OpenGL library here for this example
+
+143
+00:09:01,375 --> 00:09:03,733
+如果你们没看过我做的视频的话
+if you guys haven't seen the videos that I've made about that
+
+144
+00:09:03,733 --> 00:09:05,925
+然后一定要从右上角列表中点开看看
+then definitely check them out in the top right corner
+
+145
+00:09:06,500 --> 00:09:10,966
+首先，让我们看一个超级简单的例子，绘制一个单独的四边形
+to start off with, let's take a look at a super simple example of drawing a single quad
+
+146
+00:09:11,433 --> 00:09:14,666
+对于我们的初始化，我们在这里加载一个非常基本的着色器
+so for our initialization, we're loading a really basic shader here
+
+147
+00:09:14,666 --> 00:09:17,400
+那只是位置和着色器，一个平面颜色的四边形
+that just positions and shaders, the quad with a flat color
+
+148
+00:09:17,866 --> 00:09:21,700
+然后我们有这个浮点数组，它包含了这个四边形的顶点位置
+then we have this float array here, which contains the vertex positions of the quad
+
+149
+00:09:21,700 --> 00:09:24,166
+一个一个的四边形，以原点为中心
+just a one by one quad, that's centered at the origin
+
+150
+00:09:24,866 --> 00:09:28,900
+然后我们创建一个顶点数组和一个顶点缓冲区，其中包含这些顶点
+then we're creating a vertex array and a vertex buffer, which contains these vertices
+
+151
+00:09:28,933 --> 00:09:31,500
+以及在这里设置顶点属性指针
+as well as setting up the vertex attribute pointer here
+
+152
+00:09:31,500 --> 00:09:35,325
+这样我们就可以在着色器中正确地访问顶点缓冲区数据
+so that we can correctly access our vertex buffer data inside our shader
+
+153
+00:09:35,700 --> 00:09:42,300
+然后我们有索引和索引缓冲区，在每帧运行的OnUpdate函数中
+then we've got our indices and our index buffer, inside our OnUpdate function which runs every frame
+
+154
+00:09:42,366 --> 00:09:46,700
+我们正在更新相机控制器，清除屏幕并绑定着色器
+we're updating our camera controller clearing the screen and binding our shader
+
+155
+00:09:46,900 --> 00:09:48,733
+那我们就设置几个统一变量
+then we're setting a couple of uniforms here
+
+156
+00:09:48,733 --> 00:09:52,400
+相机视图投影矩阵，以及我们的四边形的变换矩阵
+the cameras view projection matrix, and a transform matrix for our quad
+
+157
+00:09:52,566 --> 00:09:56,600
+在这种情况下，平移为0，所以它根本不会变换四边形
+which in this case has a translation of zero, so it doesn't transform the quad at all
+
+158
+00:09:57,000 --> 00:10:01,300
+然后我们绑定顶点数组并画出组成四边形的六个索引
+then we're binding our vertex array and drawing the six indices that make up our quad
+
+159
+00:10:01,700 --> 00:10:05,433
+让我们看看它是什么样子的，很好，我们有这个白色的方块
+let's see what that looks like, okay cool, so we have this white square here
+
+160
+00:10:05,466 --> 00:10:07,375
+我们可以移动相机
+and we can move the camera around
+
+161
+00:10:07,675 --> 00:10:10,975
+所以我们使用我们习惯的方法通常如何渲染两个四边形
+so how would we normally render two quads using what we're used to
+
+162
+00:10:11,600 --> 00:10:14,200
+好吧，我们会简单地发出另一个DrawCall
+well we would simply issue another DrawCall
+
+163
+00:10:14,200 --> 00:10:18,300
+但是我们会为每个绘制设置不同的变换，使用我们的着色器统一变量
+but we would set different transforms for each drawer, using our shader uniforms
+
+164
+00:10:19,100 --> 00:10:23,933
+所以我们要做的是用不同的变换，两次渲染相同的几何图形
+so what we're doing is rendering the same geometry twice, but with different transforms
+
+165
+00:10:24,000 --> 00:10:27,066
+这样我们就得到了屏幕上不同位置的两个正方形
+and so we get two squares at different positions on our screen
+
+166
+00:10:27,233 --> 00:10:31,333
+但是我们怎么把这些聚成一个独立DrawCall中，就像我们说过的
+but how do we batch these together into a single DrawCall like we talked about
+
+167
+00:10:31,733 --> 00:10:36,700
+让我们来到这里的顶点缓冲区，我们需要做的是复制所有这些顶点
+let's come over here to the vertex buffer, what we need to do is duplicate all of these vertices
+
+168
+00:10:36,700 --> 00:10:41,466
+所以我们在顶点缓冲区中有两个正方形，然后应用我们做过的平移
+so that we've got two squares inside our vertex buffer, and then apply this translation that we've done
+
+169
+00:10:41,466 --> 00:10:45,533
+通过变换统一变量，直接转化成这些顶点的位置
+by the transform uniform, directly into these vertex positions
+
+170
+00:10:45,966 --> 00:10:49,666
+你们可以看到，这些就是我们得到的顶点位置，为了更清楚
+so you can see that, these are our resulting vertex positions, and just to be clear
+
+171
+00:10:49,933 --> 00:10:55,266
+现在我们有足够的顶点在这个独立顶点缓冲区中组成两个四边形
+now we have enough vertices to make up two quads inside this one single vertex buffer
+
+172
+00:10:55,433 --> 00:10:58,733
+现在我们需要来到索引缓冲区，基本上做同样的事情
+now we need to go down to our index buffer, and basically do the same thing
+
+173
+00:10:58,733 --> 00:11:03,833
+我们需要把组成第二个四边形的索引补上去，那么就是4 5 6 6 7 4
+we need to add the indices that make up this second quad, so 4 5 6 6 7 4
+
+174
+00:11:04,200 --> 00:11:08,066
+最后，我们可以回到渲染代码中，删除第二次DrawCall
+finally we can go down to our rendering code and get rid of our second DrawCall
+
+175
+00:11:08,200 --> 00:11:12,633
+然后把平移量重新设为0，不再绘制6个索引
+and reset our translation back to zero, and instead of drawing six indices
+
+176
+00:11:12,633 --> 00:11:16,300
+我们把这些都画出来，也就是12个，这是两个四边形，就那样
+we'll draw all, 12, which make up our two quads, and that's it
+
+177
+00:11:16,433 --> 00:11:20,500
+如果我现在启动它，你们可以看到我的两个四边形，渲染和以前一样
+if I launch this now, you can see that I've got my two quads, rendering as they did before
+
+178
+00:11:20,800 --> 00:11:24,133
+但这一次，在一个独立DrawCall中，它们被组合在一起了
+but this time, in a single DrawCall, they're batched together
+
+179
+00:11:24,300 --> 00:11:26,933
+差不多就那样，那就是批渲染的原理
+and that's pretty much it, that's how batch rendering works
+
+180
+00:11:26,933 --> 00:11:30,000
+我知道这是一个非常简单的例子，你们可能想看看
+I know that this is a really simple example, and you guys probably want to see
+
+181
+00:11:30,100 --> 00:11:33,766
+我们如何绘制不同的颜色，如何绘制纹理，如何实现所有这些东西
+well, how do we draw different colors, how do we draw textures, how do we do all of that stuff
+
+182
+00:11:33,966 --> 00:11:36,300
+并且在以后的视频中，正如我提到的，我们会讲到这个
+and in future videos, as I mentioned, we will get into this
+
+183
+00:11:36,300 --> 00:11:39,700
+我正在做这个小的批渲染的迷你系列，所以期待比如下一个视频
+I am doing this little kind of batch rendering mini series, so expect like another video
+
+184
+00:11:39,700 --> 00:11:44,333
+也许在一个星期左右，我将只是，我们将只是继续到批渲染的下一步
+maybe in a week or so, and I'll just, we'll just go on to the next step of batch rendering
+
+185
+00:11:44,333 --> 00:11:46,833
+你们有什么问题吗，请在下方评论区留言
+do you guys have any questions, please leave them in the comment section below
+
+186
+00:11:46,866 --> 00:11:49,200
+如果你们确实喜欢这个视频，不要忘了为它点赞哦
+don't forget to like the video, if you did like it
+
+187
+00:11:49,333 --> 00:11:52,100
+并且我也有一个patreon，也就是patreon.com/TheCherno
+and also I do have a patreon, patreon.com/TheCherno
+
+188
+00:11:52,100 --> 00:11:55,400
+请支持这个频道，如果你们喜欢这个视频，并且觉得它很有帮助的话
+please help support this channel, if you did enjoy this video, and you found it helpful
+
+189
+00:11:55,666 --> 00:11:57,766
+下次见，拜
+and I will see you guys next time, goodbye
+

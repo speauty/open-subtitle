@@ -1,0 +1,2805 @@
+﻿1
+00:00:00,066 --> 00:00:00,933
+嘿，你们好
+hey, what's up guys
+
+2
+00:00:00,966 --> 00:00:04,400
+我是Cherno，欢迎回到我的OpenGL系列教程
+my name is Cherno, and welcome back to my OpenGL series
+
+3
+00:00:04,766 --> 00:00:06,900
+把它和布景混在一起了
+mixing it up a little bit with the set
+
+4
+00:00:07,200 --> 00:00:08,300
+我的意思是上期
+I mean last one
+
+5
+00:00:08,825 --> 00:00:10,933
+你们肯定注意到了
+you guys were certainly noticing that
+
+6
+00:00:11,133 --> 00:00:12,933
+我只是我经常挥动我的手
+I was just I wave my hands around a lot
+
+7
+00:00:12,933 --> 00:00:16,700
+我偶尔差点撞到那棵仙人掌
+I was coming pretty close to hitting that cactus occasionally
+
+8
+00:00:16,700 --> 00:00:18,366
+并且我只是不想失去一只手
+and that was just I don't want to lose a hand
+
+9
+00:00:18,733 --> 00:00:19,966
+所以总的说来就是我们把它混在一起了
+so we're basically mixing it up
+
+10
+00:00:20,000 --> 00:00:20,700
+我们基本上改变了
+we're basically changed
+
+11
+00:00:20,700 --> 00:00:22,500
+我想我要做一个微妙的改变
+I thought I'd make a subtle kind of change
+
+12
+00:00:22,933 --> 00:00:25,166
+只是为了避免失去一只手的风险
+just to get rid of that whole risk of losing a hand
+
+13
+00:00:25,200 --> 00:00:27,000
+我可不想反应过度之类的
+I didn't want to overreact or anything like that
+
+14
+00:00:27,300 --> 00:00:29,933
+所以我稍微改变了一下布景
+so I changed the set slightly
+
+15
+00:00:31,066 --> 00:00:32,433
+差不多把仙人掌处理掉了
+kind of got rid of the cactus
+
+16
+00:00:33,066 --> 00:00:34,900
+不过它还在这个房间里, 但在很远的地方
+it's still in this room, but it's all the way over there
+
+17
+00:00:35,050 --> 00:00:37,866
+不管怎样, 希望你们喜欢这种新形式
+anyway, hope you guys like this new kind of format
+
+18
+00:00:37,866 --> 00:00:39,100
+这可能会更随意一些
+it's gonna be a lot more casual
+
+19
+00:00:39,300 --> 00:00:42,433
+因为我不喜欢表现得很专业
+because I'm not a big fan of being professional quite
+
+20
+00:00:42,700 --> 00:00:43,900
+跟你们说实话吧
+to be quite frank with you guys
+
+21
+00:00:43,900 --> 00:00:45,333
+并且希望这只是
+and hopefully this is just gonna be
+
+22
+00:00:45,600 --> 00:00:46,766
+会有一点
+gonna be a little bit
+
+23
+00:00:46,800 --> 00:00:49,633
+对你们来说, 看起来和听起来也容易一些
+a little bit easier for you guys to watch and listen to as well
+
+24
+00:00:50,033 --> 00:00:52,933
+不用像机器人一样把所有东西都看一遍
+without kind of me going through everything like a robot
+
+25
+00:00:52,933 --> 00:00:54,333
+并且很快的, 结束了
+and just quickly, kind of end up
+
+26
+00:00:54,333 --> 00:00:58,000
+每一个视频都要花一两个小时来制作
+having to spend like an hour or two editing every single video
+
+27
+00:00:58,000 --> 00:01:00,200
+所以不管如何, 欢迎回到我的OpenGL系列教程
+so anyway, welcome back to my OpenGL series
+
+28
+00:01:00,400 --> 00:01:02,333
+上一次, 我们讨论了着色器
+last time, we talked about shader stuff
+
+29
+00:01:02,333 --> 00:01:05,500
+并且事实上, 前两期, 我们讨论的都是着色器
+and in fact, the last two episodes, we've been kind of talking about shader stuff
+
+30
+00:01:07,300 --> 00:01:09,433
+我们具体讨论了什么是着色器
+specifically we talked about what shaders were
+
+31
+00:01:09,466 --> 00:01:12,833
+以及我们实际上不得不去写一个非常简单的顶点和片段着色器
+and we actually had to go writing a very simple vertex and fragment shader
+
+32
+00:01:12,866 --> 00:01:14,466
+那基本上就是让我们的三角形变成了红色
+that basically just made our triangle red
+
+33
+00:01:14,466 --> 00:01:16,033
+如果你们还没看过那一期
+if you guys haven't seen that episode yeah
+
+34
+00:01:16,066 --> 00:01:17,133
+一定要点击这里去看看
+definitely click up there
+
+35
+00:01:17,250 --> 00:01:19,533
+因为你需要看了那个视频才能看这个视频
+because you need to watch that in order to get this video
+
+36
+00:01:19,533 --> 00:01:21,366
+因为这个视频将
+because what this video is going to
+
+37
+00:01:21,500 --> 00:01:22,566
+将是关于
+is going to be about
+
+38
+00:01:22,966 --> 00:01:25,233
+基本上就是上期的延伸
+is just basically continuing on with that
+
+39
+00:01:25,933 --> 00:01:26,700
+并且更具体的是
+and more specifically
+
+40
+00:01:26,700 --> 00:01:29,033
+我将向你们展示, 我喜欢如何处理着色器
+I'm going to show you, how I like to deal with shaders
+
+41
+00:01:30,066 --> 00:01:32,433
+因为, 就像我们现在对代码所做的
+because, kind of what we've been doing right now with the code
+
+42
+00:01:32,833 --> 00:01:35,333
+基本上就是, 我的意思是, 如果我们看一下上次的代码
+is basically, I mean if we look at the code that we had last time
+
+43
+00:01:35,766 --> 00:01:37,700
+我们有这个创建着色器的函数
+we have this function where we can compile a shader
+
+44
+00:01:38,266 --> 00:01:39,866
+然后我们创建了, 并且所有这些
+and then we kind of created and all of that
+
+45
+00:01:39,866 --> 00:01:41,900
+但我们基本上还是不得不传入它
+but we still have to basically take it in
+
+46
+00:01:41,900 --> 00:01:43,966
+好吧, 现在我们这儿最大的问题
+well, the biggest problem here right now for us
+
+47
+00:01:44,266 --> 00:01:47,266
+就是我们还是需要把它(着色器)作为字符串传进去
+is that we still need to take it in kind of as strings
+
+48
+00:01:48,100 --> 00:01:49,933
+这是一个问题, 因为, 好吧
+that's a bit of an issue, because, well
+
+49
+00:01:49,966 --> 00:01:51,700
+首先, 看看这些字符串, 你可以看到
+first of all, looking at these strings, you can see
+
+50
+00:01:51,700 --> 00:01:54,133
+我们不得不在每处添加换行符和引号
+we have to add new line characters and quotes everywhere
+
+51
+00:01:54,166 --> 00:01:58,333
+在这一点上写着色器对我们来说不是很舒服
+it's just not very comfortable for us to write shader at this point in it
+
+52
+00:01:58,600 --> 00:02:01,100
+很容易漏掉一个换行符或类似的东西
+it's pretty easy to just miss a new line or something like that
+
+53
+00:02:01,100 --> 00:02:02,600
+并且最终得到的是一些漏洞
+and end up with some kind of bug
+
+54
+00:02:02,766 --> 00:02:04,100
+而且我真的不想那样写
+and I don't want to really do that
+
+55
+00:02:04,366 --> 00:02:05,950
+所以我们肯定会解决那个问题
+so we're definitely going to fix that up 
+
+56
+00:02:05,950 --> 00:02:09,575
+因此我们实际上可以专门从一个文件中传入我们的着色器
+so that we can actually take our shaders in from a file as specifically
+
+57
+00:02:09,575 --> 00:02:10,950
+我看许多人都这么做的
+what I see a lot of people doing
+
+58
+00:02:10,950 --> 00:02:13,233
+我的意思是, 这是完全合理的做法
+which is I mean, completely reasonable
+
+59
+00:02:13,233 --> 00:02:16,950
+因为OpenGL确实在一定程度上加强了它
+because OpenGL does kind of enforce it to a degree is that
+
+60
+00:02:16,950 --> 00:02:19,533
+实际上人们将创建两个不同的文件
+what people will actually do is create two different files
+
+61
+00:02:19,633 --> 00:02:22,200
+一个是顶点着色器, 一个是片段着色器
+one for the vertex shader, and one for the fragment shader
+
+62
+00:02:22,633 --> 00:02:24,425
+说实话, 我真的不喜欢那样
+I'm really not a fan of that, to be honest
+
+63
+00:02:24,425 --> 00:02:26,533
+我的意思是有两个不同的文件就像那啥
+I mean having two different files like why
+
+64
+00:02:26,766 --> 00:02:31,466
+我是说, 在某些情况下, 分散着色器会是有用的
+I mean, in some cases, it can be useful to divide shaders up
+
+65
+00:02:32,433 --> 00:02:34,625
+比如, 你可能有个顶点着色器
+for example, you might have a vertex shader 
+
+66
+00:02:34,625 --> 00:02:37,566
+它只接收像一定数量的参数
+which just takes in like a certain amount of parameters
+
+67
+00:02:37,566 --> 00:02:40,033
+一定数量的输入, 并且只输出位置
+certain amount of inputs, and just outputs the position
+
+68
+00:02:40,033 --> 00:02:43,433
+并且它将提供一些数据给片段着色器
+and that's it will provide some kind of data to the fragment shader
+
+69
+00:02:43,433 --> 00:02:45,466
+而它可能是一个非常简单的顶点着色器
+and it might be a really simple vertex shader
+
+70
+00:02:45,500 --> 00:02:48,466
+例如, 你可以用三个不同的片段着色器配对它
+which you can pair up with three different fragment shaders for example
+
+71
+00:02:48,466 --> 00:02:50,766
+并且在那种情况下, 你们可能会争论, 好了
+and in that case, you might argue well, okay
+
+72
+00:02:50,933 --> 00:02:52,266
+你知道我正在载入这个文件
+you know I'm loading this file
+
+73
+00:02:52,300 --> 00:02:55,066
+我不想必须把两个着色器绑在一起
+I don't want to necessarily tie the two shaders together
+
+74
+00:02:55,066 --> 00:02:56,866
+比如把顶点一起放在片段着色器中
+like the vertex in the fragment shader together
+
+75
+00:02:56,866 --> 00:02:58,200
+不一定想必须那么做
+don't necessarily want to do that
+
+76
+00:02:59,733 --> 00:03:00,933
+这是一个争论
+that's one argument
+
+77
+00:03:00,933 --> 00:03:02,100
+但我们已经有了同样的例子
+but we've got a like
+
+78
+00:03:02,100 --> 00:03:03,800
+我们一会儿也会遇到那种情况
+we'll deal with that as well in a minute here
+
+79
+00:03:04,433 --> 00:03:07,275
+但是, 重要的是, 我不喜欢必须, 就像
+but, the big thing is that I don't like having to, like 
+
+80
+00:03:07,275 --> 00:03:09,633
+为什么有两个不同的文件, 对吧
+why have two different files, right
+
+81
+00:03:09,633 --> 00:03:11,366
+那并没有实际的原因
+there's no actual reason for that
+
+82
+00:03:11,366 --> 00:03:12,466
+它其实有点烦人
+it's actually a little bit annoying
+
+83
+00:03:12,466 --> 00:03:13,633
+你不得不创建两个不同的文件
+you have to make two different files
+
+84
+00:03:13,633 --> 00:03:15,100
+你不得不从两个不同的文件读取
+you have to read in two different files
+
+85
+00:03:15,266 --> 00:03:16,066
+当你编辑它们的时候
+when you're editing them
+
+86
+00:03:16,066 --> 00:03:16,833
+你不得不, 就像
+you have to, like
+
+87
+00:03:16,833 --> 00:03:18,933
+在两个文件之间切换, 或者把它们并排打开
+switch between the two, or have them open the side by side
+
+88
+00:03:18,933 --> 00:03:20,866
+只是不太舒服
+it's just not very comfortable
+
+89
+00:03:20,950 --> 00:03:22,425
+而我只是关心冲突, 就像
+and I'm all about conflict, like
+
+90
+00:03:22,425 --> 00:03:25,600
+很明显我是坐在沙发上而不是椅子上, 和一张桌子
+clearly I'm sitting on a couch here instead of a chair, and a table 
+
+91
+00:03:25,600 --> 00:03:29,766
+所以我喜欢做的是将两个着色器合并到一个文件中, 明白吧
+so what I like to do is combine the two shaders into one file, right
+
+92
+00:03:29,766 --> 00:03:32,933
+只有一个有顶点和片段着色器的文件
+just have one file with a vertex and a fragment shader
+
+93
+00:03:33,025 --> 00:03:34,433
+当然, 在以后
+and of course, in the future
+
+94
+00:03:34,433 --> 00:03:38,033
+如果你需要用到有一大堆片段着色器的一个顶点着色器
+if you want to use one vertex shader with a bunch of fragment shaders
+
+95
+00:03:38,100 --> 00:03:40,200
+你仍可以那样做, 你仍然可以
+you can still do that, you can still
+
+96
+00:03:40,200 --> 00:03:42,900
+因为很明显, 当我们最后给OpenGL着色器时
+because obviously, when we give the shaders to OpenGL at the end
+
+97
+00:03:43,033 --> 00:03:45,400
+它们仍然需要有明确的划分, 对吧
+they still need to have that clear division, right
+
+98
+00:03:45,400 --> 00:03:49,366
+我们不能简化到只给OpenGL一个, 就像
+we can't just simply give OpenGL one, like
+
+99
+00:03:49,366 --> 00:03:51,600
+一串源码字符串, 然后它就可以处理它了
+one string of source code, and then it can deal with it
+
+100
+00:03:51,600 --> 00:03:53,100
+它还是需要知道
+it still needs to kind of know
+
+101
+00:03:53,566 --> 00:03:55,900
+它仍然需要那种区分在两者之间
+it still needs to kind of have that distinction between
+
+102
+00:03:55,900 --> 00:03:57,666
+这是我的顶点着色器源码
+this is my vertex shader source code
+
+103
+00:03:57,766 --> 00:03:59,366
+以及这是我的片段着色器源码
+and this is my fragment shader source code
+
+104
+00:03:59,366 --> 00:04:00,766
+因此我们仍然会给它提供那些
+and we're still going to provide it with that
+
+105
+00:04:01,166 --> 00:04:02,233
+这对我们有利
+it's just on our side
+
+106
+00:04:02,233 --> 00:04:04,166
+基本上对于用户和程序一样的
+basically as the user as the program
+
+107
+00:04:04,166 --> 00:04:06,266
+对开发人员写这样的代码也一样
+as the developer writing this kind of code
+
+108
+00:04:06,366 --> 00:04:07,925
+我们将把它全部写在一个文件中
+we're going to write it all in one file
+
+109
+00:04:07,925 --> 00:04:10,675
+而我马上就会告诉你, 我们是如何分成两个着色器的
+and I'll show you how we divided into two shaders in a minute
+
+110
+00:04:10,675 --> 00:04:12,500
+这很像DirectX
+this is very much like DirectX
+
+111
+00:04:12,600 --> 00:04:14,433
+你可能真的有点
+you might actually kind of
+
+112
+00:04:15,200 --> 00:04:16,025
+在这个系列中
+throughout this series
+
+113
+00:04:16,025 --> 00:04:21,200
+你将可能看到我特别喜欢引用Direct3D/11, 关于
+you'll probably see me reference Direct3D 11 specifically quite a lot with
+
+114
+00:04:21,200 --> 00:04:24,125
+如何组织我的OpenGL代码
+how I actually organized my OpenGL code 
+
+115
+00:04:24,125 --> 00:04:26,266
+因为当你在处理游戏引擎时
+because when you deal with game engines
+
+116
+00:04:26,266 --> 00:04:29,200
+你会使用多个接口, 多个图形接口
+you'll be using multiple apis, multiple graphics apis 
+
+117
+00:04:29,200 --> 00:04:31,466
+很可能是给它一个重要的引擎
+most likely give it a serious engine
+
+118
+00:04:32,333 --> 00:04:34,896
+并且你可能会
+and you kind of will probably
+
+119
+00:04:35,472 --> 00:04:37,533
+如果你的引擎支持Direct3D
+if your engine supports Direct3D
+
+120
+00:04:37,533 --> 00:04:40,266
+或者即使它不支持, 你也会发现自己
+or even if it doesn't, you'll probably find yourself
+
+121
+00:04:40,500 --> 00:04:42,925
+使OpenGL表现地更像DirectX
+making OpenGL behave more like DirectX
+
+122
+00:04:42,925 --> 00:04:45,466
+因为DirectX是一个更好的api
+because DirectX is just a better api
+
+123
+00:04:45,850 --> 00:04:47,933
+不管怎样, 让我们进入一些代码
+anyway, let's get into some code
+
+124
+00:04:47,933 --> 00:04:49,666
+然后我将给你们展示, 这一切的原理
+and I'll show you how all this is going to work
+
+125
+00:04:49,666 --> 00:04:51,500
+所以首先, 我们实际上要做的就是
+so the first thing, we're actually going to do is just
+
+126
+00:04:51,500 --> 00:04:53,475
+创建一个包含这两个着色器的文件
+create a file which contains these two shaders
+
+127
+00:04:53,475 --> 00:04:54,300
+以便我们了解
+so that we know
+
+128
+00:04:54,300 --> 00:04:55,900
+我们实际上是如何处理它们的
+how we're actually going to deal with them
+
+129
+00:04:56,266 --> 00:04:58,166
+所以, 这里, 在我的源目录中
+so, over here, in my kind of source directory
+
+130
+00:04:58,166 --> 00:04:59,966
+实际上我将右键点击OpenGL
+I'm actually going to right click on OpenGL
+
+131
+00:05:00,300 --> 00:05:02,300
+点击新建文件夹
+hit add and then new folder
+
+132
+00:05:02,333 --> 00:05:04,833
+我们就叫这res, 就是放置资源的文件夹
+we're going to call this res, which sets for resources
+
+133
+00:05:04,933 --> 00:05:06,300
+并且然后在那个res文件夹下
+and then under that res folder
+
+134
+00:05:06,300 --> 00:05:09,766
+我实际上会创建另一个叫shaders的文件夹
+I'm actually going to create another folder called shaders
+
+135
+00:05:10,300 --> 00:05:12,333
+而这是专门为了放着色器
+and this is specifically going to be for shaders
+
+136
+00:05:12,333 --> 00:05:15,833
+在以后, 我们将会有像纹理之类的其他资源
+we will have other resources like textures and stuff like that in the future
+
+137
+00:05:15,933 --> 00:05:18,333
+所以我要把所有这些都保持干净整洁
+so I just want to keep all of this really nice and tidy
+
+138
+00:05:18,525 --> 00:05:20,900
+我们右键点击shaders, 点击添加新项
+we'll right click on shaders, hit at new item
+
+139
+00:05:20,900 --> 00:05:23,025
+那么然后, 在这儿, 我添加一个文件
+and then, here, I'm just going to add a file
+
+140
+00:05:23,025 --> 00:05:24,766
+现在, 这儿你点什么都没关系
+now, doesn't matter what you click here
+
+141
+00:05:24,766 --> 00:05:26,533
+因为我们会改变扩展名
+because we're kind of going to change the extension
+
+142
+00:05:26,533 --> 00:05:30,550
+不论如何, 我们就叫这个为Shader.shader
+anyway, we're just going to call this Shader.shader
+
+143
+00:05:30,550 --> 00:05:33,233
+或者实际上我们可以把它重命名为
+or specifically we might rename this to something like
+
+144
+00:05:33,600 --> 00:05:35,933
+好吧, 我不知道, 它只是让那个三角形变成红色的
+well, I don't know, it just makes that triangle red
+
+145
+00:05:35,933 --> 00:05:37,575
+我们就叫它Basic.shader吧
+we're just gonna call it Basic.shader
+
+146
+00:05:37,575 --> 00:05:40,750
+因为这就像我们处理的基本着色器
+because this is just going to be like our basic shader that we deal with
+
+147
+00:05:40,750 --> 00:05:42,666
+点击添加, 那么现在我们有了一个着色器文本
+I'm gonna hit add, and now we have a shader
+
+148
+00:05:42,666 --> 00:05:45,266
+你可以看到它没有显示c++图标
+you can see that it's not showing up as like the c++ icon
+
+149
+00:05:45,266 --> 00:05:46,066
+这非常重要
+which is very important
+
+150
+00:05:46,066 --> 00:05:48,833
+我们不想意外地把它编译成c++代码
+we don't want to accidentally compile this as c++ code
+
+151
+00:05:48,833 --> 00:05:50,300
+因为当然它不能编译
+because of course it won't compile
+
+152
+00:05:50,800 --> 00:05:52,433
+让我们返回Application.cpp文件
+let's go back to Application.cpp
+
+153
+00:05:52,433 --> 00:05:55,166
+我来复制这整块代码
+I'm going to copy this entire kind of block of code
+
+154
+00:05:55,466 --> 00:05:57,033
+并且我需要把它粘贴到这个文件
+and I want to paste it into this file
+
+155
+00:05:57,100 --> 00:05:58,525
+现在我们需要清理一下
+now we need to clean this up a little bit
+
+156
+00:05:58,525 --> 00:06:01,800
+特别是, 我要把这两个字符串都去掉
+specifically I'm going to get rid of the string, of course from both of these
+
+157
+00:06:02,133 --> 00:06:04,000
+在这儿, 然后实际上去掉这个
+here, and then to actually clean this up
+
+158
+00:06:04,000 --> 00:06:05,633
+我们可以一行一行地看
+we could go through this kind of line by line
+
+159
+00:06:05,633 --> 00:06:06,666
+这有点难
+it's going to be a bit hard
+
+160
+00:06:06,666 --> 00:06:08,133
+所以我要给你们展示一个小技巧
+so I'll show you guys a bit of a trick
+
+161
+00:06:08,600 --> 00:06:09,700
+如果你按ctrl+h
+if you hit ctrl h
+
+162
+00:06:09,866 --> 00:06:12,000
+这将打开查找和替换对话框
+that will bring up the find and replace dialog
+
+163
+00:06:12,000 --> 00:06:13,000
+你们可以在这里看到
+which you can see over here
+
+164
+00:06:13,333 --> 00:06:16,333
+我们将抓取引号, 然后将它们替换为空
+we're going to grab quotes and replace them with nothing
+
+165
+00:06:16,333 --> 00:06:17,533
+如果你按alt+a
+if you hit alt a
+
+166
+00:06:17,533 --> 00:06:19,400
+或者我觉得这里有个可替换的按钮
+or I think there's a replaceable button here
+
+167
+00:06:19,766 --> 00:06:21,166
+alt+a, 我们就可以删除所有那些了
+alt a, we'll get rid of all that
+
+168
+00:06:21,166 --> 00:06:23,366
+并且然后, 最后, 我们还想去掉换行符
+and then, finally we want to get rid of the new lines as well
+
+169
+00:06:23,366 --> 00:06:26,500
+所以我也要把 替换成空, alt+a
+so I'll also replace backslap n with nothing, alt a
+
+170
+00:06:26,733 --> 00:06:27,766
+好了, 我们继续
+done, and there we go 
+
+171
+00:06:27,766 --> 00:06:28,966
+你可以看到那有多简单
+you can see how much easier that was
+
+172
+00:06:29,033 --> 00:06:30,366
+然后, 浏览一下这个代码
+then kind of just going through this code
+
+173
+00:06:30,366 --> 00:06:31,733
+手动清理所有东西
+cleaning everything up manually
+
+174
+00:06:32,066 --> 00:06:33,500
+太好了, 我们搞定了
+okay, fantastic, we've got this
+
+175
+00:06:33,700 --> 00:06:36,733
+很难区分顶点着色器和片段着色器
+kind of hard to tell the distinction between a vertex and a fragment shader 
+
+176
+00:06:36,866 --> 00:06:37,900
+所以我喜欢做的就是
+so what I like to do
+
+177
+00:06:38,600 --> 00:06:39,525
+你只需要来到这最上面
+you just come up here at the top 
+
+178
+00:06:39,525 --> 00:06:43,033
+然后我会输入 #shader vertex, 了解了吧
+and I'm going to hit hash shader and then vertex, okay
+
+179
+00:06:43,233 --> 00:06:44,533
+然后我要复制它
+and then I'm going to copy that 
+
+180
+00:06:44,866 --> 00:06:47,100
+并且就在片段着色器的上方, 叫这fragment吧
+and just above the fragment shader, call this fragment
+
+181
+00:06:47,400 --> 00:06:48,900
+所以当我们有了所有不同的着色器
+so when we have all of our different shaders
+
+182
+00:06:48,900 --> 00:06:51,275
+我们可能有其他的着色器类型, 比如细分曲面着色器
+we might have other shader types, like tessellation shaders
+
+183
+00:06:51,275 --> 00:06:52,800
+或者像那个几何着色器之类的一些着色器
+or something like that geometry shaders
+
+184
+00:06:53,333 --> 00:06:54,066
+诸如此类的东西
+that kind of stuff
+
+185
+00:06:54,066 --> 00:06:55,933
+我们也可以为它添加一个节点
+we can also probably add a section for that
+
+186
+00:06:55,933 --> 00:06:56,666
+但是对于现在
+but for now
+
+187
+00:06:56,666 --> 00:07:00,900
+你可以看到, 我已经很清楚地把它分成了片段着色器和顶点着色器
+you can see that I've clearly kind of divided this into my fragment shader and my vertex shader
+
+188
+00:07:00,900 --> 00:07:03,100
+不用太担心这里的语法高亮显示
+don't worry too much about the syntax highlighting here
+
+189
+00:07:03,500 --> 00:07:06,333
+因为我们实际上已经指定了不太明显的着色器扩展
+because we have actually specified the dull shader extension
+
+190
+00:07:06,700 --> 00:07:09,333
+VS可能会尝试突出显示它, 好像它是
+visual studio probably going to try and highlight this as if it was a
+
+191
+00:07:09,366 --> 00:07:11,533
+大提琴, 听起来像DirectX类型的着色器
+cello, sounds like a DirectX kind of shader
+
+192
+00:07:11,700 --> 00:07:14,500
+不管怎样, 那对我们还是有帮助的
+but anyway, that's still kind of sort of helpful for us
+
+193
+00:07:14,500 --> 00:07:16,366
+因为它高亮了一些事情, 就像数字
+because it highlights some things like numbers
+
+194
+00:07:16,966 --> 00:07:18,866
+这让它看起来更容易一些, 但是你可以看到
+and kind of makes that easier to see, but you can see
+
+195
+00:07:19,033 --> 00:07:21,366
+这是我布局着色器的策略
+this is kind of my strategy for laying out shader
+
+196
+00:07:21,366 --> 00:07:22,366
+它很容易
+it's very easy
+
+197
+00:07:22,433 --> 00:07:23,833
+你可以同时看到发生了什么
+you can see what's going on all at once
+
+198
+00:07:23,833 --> 00:07:25,566
+你不需要在两个不同的文件之间切换
+you don't need to flip between two different files
+
+199
+00:07:26,200 --> 00:07:30,033
+并且它真的很好, 很简单, 干净, 有条理
+and it's just yeah it's just really nice and easy, and clean, and organized
+
+200
+00:07:30,033 --> 00:07:31,933
+所以让我们回到我们的应用
+so let's go back to our application
+
+201
+00:07:32,433 --> 00:07:34,866
+我现在要移除这整块代码
+I'm going to get rid of this entire block here now
+
+202
+00:07:35,866 --> 00:07:38,400
+现在, 为了理解这里发生了什么
+now to kind of understand what's going on here
+
+203
+00:07:38,700 --> 00:07:40,250
+我们有CreateShader函数
+we have our CreateShader function
+
+204
+00:07:40,250 --> 00:07:42,633
+它接收两个源码字符串
+which takes in the two strings of source code
+
+205
+00:07:42,633 --> 00:07:46,475
+我们仍然需要为它提供两个不同的源码字符串
+we still need to provide it with two different strings of source code
+
+206
+00:07:46,475 --> 00:07:49,950
+所以现在我们的计划就是读取这个文件
+so now really our plan is just to take this file 
+
+207
+00:07:49,950 --> 00:07:53,700
+然后把它分成两块字符串, 对吧, 分成两个字符串
+and divide it up into two blocks of strings, right, into two strings
+
+208
+00:07:53,733 --> 00:07:55,066
+一个是我们的片段着色器源码
+our fragment shader source code
+
+209
+00:07:55,066 --> 00:07:56,833
+而另一个就是我们的顶点着色器源码
+and our vertex shader source code
+
+210
+00:07:56,933 --> 00:07:58,933
+让我们回到应用做那个吧
+let's go back to application and do that
+
+211
+00:07:59,166 --> 00:08:01,666
+我要向上滚动到这里, 向上滚动到最顶端
+I'm going to scroll up here, up here to the very top
+
+212
+00:08:01,800 --> 00:08:04,433
+尽量让这个函数在上面, 为什么不呢, static
+more to try this function at the top, why not, static
+
+213
+00:08:05,933 --> 00:08:07,133
+我们现在就让它返回void
+we'll make it void for now
+
+214
+00:08:07,833 --> 00:08:10,466
+然后我们就叫它ParseShader
+and we'll call this ParseShader
+
+215
+00:08:10,566 --> 00:08:13,800
+并且然后我们只让这个接收一个 const std::string&
+and then I'm going to just make this take in a const std string
+
+216
+00:08:14,933 --> 00:08:17,200
+而这个将是我们的文件
+and this will be a our file
+
+217
+00:08:18,333 --> 00:08:19,566
+我可能会叫这个filePath
+I might call this file path
+
+218
+00:08:19,566 --> 00:08:21,500
+而我们实际上去读取这个的方式就是, 当然
+and the way that we're actually going to read this in is, of course
+
+219
+00:08:21,500 --> 00:08:23,000
+首先, 我们需要去打开一个文件
+first of all, we need to open a file
+
+220
+00:08:23,000 --> 00:08:26,400
+并且我会使用一种现代c++的方式来实现这个
+and I'm going to do this in a bit of like a c++ modern c++ way
+
+221
+00:08:26,566 --> 00:08:29,633
+不一定是我个人在游戏引擎中读取文件的方式
+not necessarily the way that I would personally read files in a game engine
+
+222
+00:08:29,633 --> 00:08:34,500
+因为C++往往比C那种文件接口慢一点, 但是
+because c++ tends to be a little bit slower than the c kind of file api, but
+
+223
+00:08:34,500 --> 00:08:36,766
+因为这个系列显然是关于OpenGL的
+because this series is obviously just about OpenGL
+
+224
+00:08:36,933 --> 00:08:38,200
+我需要写一些代码
+I want to kind of write codes
+
+225
+00:08:38,200 --> 00:08:41,066
+它是那种更容易阅读, 更安全, 所有这些
+that's a lot easier to read and a lot safer and all of that
+
+226
+00:08:41,433 --> 00:08:44,400
+所以我将基本上包括一个叫做fstream的库
+so I'm just going to basically include something called fstream 
+
+227
+00:08:44,400 --> 00:08:45,866
+它表示文件流
+which says for file stream
+
+228
+00:08:46,133 --> 00:08:49,100
+并且然后在这里, 我会写 std::ifstream
+and then over here, I'm going to write std ifstream
+
+229
+00:08:49,100 --> 00:08:50,166
+我们就叫它stream
+we'll just call it stream
+
+230
+00:08:50,266 --> 00:08:52,133
+这从输入文件流开始
+this starts for input file stream
+
+231
+00:08:52,466 --> 00:08:54,333
+而然后我会给它那个filePath
+and then I'll kind of give it that filePath
+
+232
+00:08:54,366 --> 00:08:56,900
+那是我们尝试在这儿打开的实际文件
+that's the actual file that we're trying to open here
+
+233
+00:08:56,900 --> 00:08:58,233
+那已经打开了这个文件
+that already opens the file
+
+234
+00:08:58,533 --> 00:09:02,350
+所以现在我们需要做的就是一行一行地浏览那个文件
+so now what we need to do is actually go through that file line by line
+
+235
+00:09:02,425 --> 00:09:04,366
+然后只去检查, 嘿
+and just check to see, hey
+
+236
+00:09:04,500 --> 00:09:06,333
+这是我们指定地那个着色器类型吗
+are we specifying a certain shader type
+
+237
+00:09:06,333 --> 00:09:08,366
+因为我们只添加我们自己的句法规则, 对吧
+because we've kind of added our own syntax, right
+
+238
+00:09:08,533 --> 00:09:11,133
+我们在这里得到这个#shader vertex
+we've got this hash shader vertex thing here
+
+239
+00:09:11,133 --> 00:09:12,575
+基本上就是说, 嘿
+which basically says hey
+
+240
+00:09:12,575 --> 00:09:13,666
+这是一个新着色器节点
+this is a new shader section
+
+241
+00:09:13,666 --> 00:09:15,733
+并且这就是那个着色器的类型
+and this is the type of the shader that it is
+
+242
+00:09:15,966 --> 00:09:17,500
+所以我们需要去读取那个
+so we need to kind of read in that
+
+243
+00:09:17,866 --> 00:09:19,433
+然后我们会一行一行的浏览这个文件
+and we're going to go through the file line by line
+
+244
+00:09:19,433 --> 00:09:24,566
+并且我们实现那个的方法就是, 我们实际上会去循环 stream
+and the way we'll do that is we'll actually do while stream
+
+245
+00:09:25,766 --> 00:09:29,375
+我们会使用一个叫getLine的函数, 所以就是
+we'll use a function called getLine, so while getLine stream
+
+246
+00:09:29,375 --> 00:09:31,333
+然后我们会在这里创建一个叫做line的流
+and then we'll make a stream here called line
+
+247
+00:09:31,333 --> 00:09:33,033
+它将会包含我们实际的数据行
+which will contain our actual line
+
+248
+00:09:33,700 --> 00:09:35,600
+那基本上不会等于0
+while that doesn't equal zero basically
+
+249
+00:09:35,600 --> 00:09:38,925
+现在getLine是一个在string.h中的函数
+now getLine is a function that actually is inside the string header
+
+250
+00:09:38,925 --> 00:09:40,266
+所以我们需要包含string.h
+so we need to include string
+
+251
+00:09:40,966 --> 00:09:42,633
+所以当getLine仍然是有效的
+so while getLine is still kind of valid
+
+252
+00:09:42,633 --> 00:09:45,533
+这意味着文件中还有更多的数据行要读
+which means there are still more lines for us to read inside the file
+
+253
+00:09:45,533 --> 00:09:48,166
+我们要做的基本上就是查看数据行或查找
+we're going to just basically check to see line or find
+
+254
+00:09:48,500 --> 00:09:54,100
+实际的行是否包含我们的着色器在这里自定义句法结构的标记
+if that actual line contains our shader on a custom syntax token here
+
+255
+00:09:54,166 --> 00:09:57,425
+并且如果那个不等于std::string::npos
+and if that doesn't equal std string npos
+
+256
+00:09:57,425 --> 00:09:59,333
+基本上是一个无效的字符串位置
+which is basically an invalid string position
+
+257
+00:09:59,333 --> 00:10:01,500
+因为find会返回给我们实际的字符串位置
+because find will return us to the actual string position
+
+258
+00:10:01,500 --> 00:10:03,033
+你可以看到它返回一个size_t
+you can see it returns a size_t
+
+259
+00:10:03,133 --> 00:10:04,933
+它不返回布尔值或类似的东西
+it doesn't return a boolean or anything like that
+
+260
+00:10:04,966 --> 00:10:06,933
+不管它是否找到了我们的字符串
+whether or not it actually found our string
+
+261
+00:10:07,266 --> 00:10:09,766
+它实际上只是返回给我们它的位置
+it actually just returns to us the position of it
+
+262
+00:10:09,766 --> 00:10:11,500
+所以如果结果是正的, 说明它没有
+so if it's end positive, means it doesn't
+
+263
+00:10:11,500 --> 00:10:12,566
+它没有找到字符串
+it hasn't found it
+
+264
+00:10:12,700 --> 00:10:15,166
+所以如果它在这个数据行上找到了着色器
+so if it has found shader on that line
+
+265
+00:10:15,233 --> 00:10:16,766
+基本上我们需要找到
+we need to basically find
+
+266
+00:10:17,033 --> 00:10:18,366
+它是哪个着色器类型
+which type of shader it is
+
+267
+00:10:18,733 --> 00:10:20,700
+再一次, 我只使用line.find()
+and again, I'm just going to use line  find
+
+268
+00:10:22,000 --> 00:10:24,500
+如果它是一个顶点, 如果它找到一个vertex
+if it's going to be vertex, if it finds vertex
+
+269
+00:10:25,900 --> 00:10:30,000
+然后基本上我们需要设置模式为顶点
+then we're going to basically have to set the kind of mode to vertex
+
+270
+00:10:30,000 --> 00:10:31,100
+这是我们马上就要做的
+which we'll do in a minute
+
+271
+00:10:31,833 --> 00:10:33,100
+并且在另一个方面
+and otherwise though
+
+272
+00:10:33,700 --> 00:10:36,500
+如果它找到了fragment
+if it finds fragment
+
+273
+00:10:37,700 --> 00:10:40,833
+如果它不等于std::string::npos
+so if that doesn't equal std string npos
+
+274
+00:10:41,000 --> 00:10:43,666
+然后我们将把模式设置为fragment
+then we're going to set the mode to fragment
+
+275
+00:10:44,366 --> 00:10:46,100
+好了, 所以这就是它的工作原理
+okay, so that's kind of how this is going to work
+
+276
+00:10:47,266 --> 00:10:48,766
+我们只需要一行一行地浏览
+we're just going to go through a line by line
+
+277
+00:10:48,766 --> 00:10:52,200
+并且我们也会继续添加顶点
+and we're going to keep adding vertex well
+
+278
+00:10:52,433 --> 00:10:55,700
+如果类型设置为顶点, 我们会继续添加这些数据行
+if the type is set to vertex, we're going to keep adding these lines
+
+279
+00:10:55,700 --> 00:10:57,500
+基本上就是添加到我们的顶点着色器
+basically to our vertex shader string
+
+280
+00:10:57,766 --> 00:11:00,233
+如果是片段, 我们会把它们添加到片段着色器字符串中
+if it's fragment, we're going to add them to the fragment shader string
+
+281
+00:11:00,233 --> 00:11:01,033
+非常简单
+pretty simple
+
+282
+00:11:01,033 --> 00:11:03,150
+所以现在我们实际上需要添加这些字符串
+so now we actually need to add the strings
+
+283
+00:11:03,150 --> 00:11:04,300
+所以我们从这些数据行中读取出来的
+so we're reading out these lines
+
+284
+00:11:04,300 --> 00:11:06,600
+就是我们在写入某种缓冲
+that we're reading into some kind of buffer
+
+285
+00:11:06,833 --> 00:11:08,700
+我们可以一行行地堆在一起
+where we can just pile on line by line
+
+286
+00:11:08,866 --> 00:11:10,733
+就是顶点着色器和片段着色器
+what the vertex shader the fragment shader is
+
+287
+00:11:11,066 --> 00:11:11,566
+所以要做到这一点
+so to do that
+
+288
+00:11:11,566 --> 00:11:13,200
+我会使用到叫字符串流的东西
+I'm going to use something called string stream
+
+289
+00:11:13,700 --> 00:11:14,933
+所以我们不得不包含那个
+so we'll have to include that
+
+290
+00:11:15,233 --> 00:11:19,066
+那么那就是#include sstream
+and that'll be on the include sstream
+
+291
+00:11:19,733 --> 00:11:20,633
+如果我们向下滚动到这儿
+if we scroll down here
+
+292
+00:11:20,633 --> 00:11:23,066
+我就创建两个不同的字符串流
+I'm just going to make two different string streams
+
+293
+00:11:23,700 --> 00:11:25,900
+那么我们就叫它ss, 然后我实际上就会使用
+so we'll call this ss ,and I'm actually just gonna use
+
+294
+00:11:26,000 --> 00:11:28,666
+从栈上分配两个在这儿
+a kind of stack allocated right here to have two of them
+
+295
+00:11:29,233 --> 00:11:30,800
+一个是为了顶点着色器
+one of them's going to be for the vertex shader
+
+296
+00:11:30,800 --> 00:11:33,133
+当然另一个就是为了片段着色器
+of course one of them's going to be for the fragment shader
+
+297
+00:11:33,300 --> 00:11:34,200
+并且这个想法是
+and the idea is
+
+298
+00:11:35,433 --> 00:11:37,033
+我们也需要某种模式
+we need to have some kind of mode as well
+
+299
+00:11:37,033 --> 00:11:40,133
+所以我们现在是在读入一个顶点着色器或片段着色器
+so are we currently reading in a vertex shader or a fragment shader
+
+300
+00:11:40,933 --> 00:11:41,433
+为了做到那个
+to do that
+
+301
+00:11:41,433 --> 00:11:44,600
+我就要在这儿创建一个enum类, 叫做ShaderType
+I'm just going to create an enum class here called ShaderType
+
+302
+00:11:45,333 --> 00:11:47,200
+然后我们有一个NONE, 也就是- 1
+and then we're gonna to have none which is negative one
+
+303
+00:11:48,066 --> 00:11:50,433
+然后当然我们有一个VERTEX
+then we're going to have a vertex of course
+
+304
+00:11:50,433 --> 00:11:52,333
+就是0, 以及FRAGMENT就是1
+which is zero, and fragment which is one
+
+305
+00:11:52,333 --> 00:11:53,766
+我是显示指定数字的
+i'm being very explicit with these numbers
+
+306
+00:11:53,766 --> 00:11:55,066
+并且马上我会告诉你们为什么
+and i'll tell you why in a minute
+
+307
+00:11:55,066 --> 00:11:58,066
+我们还会存储我们正在当前读入的着色器类型
+we're also going to store the current shader type that we're reading in
+
+308
+00:11:58,066 --> 00:12:00,100
+所以我会把这个(type)默认设置为ShaderType::NULL
+so we'll set this equel to null by default
+
+309
+00:12:01,633 --> 00:12:02,900
+好了, 酷, 所以
+okay, cool, so
+
+310
+00:12:03,000 --> 00:12:06,166
+如果我们找到了vertex, 如果我们在一数据行上找到了顶点着色器
+if we find vertex, if we find shader of vertex on a line
+
+311
+00:12:06,166 --> 00:12:10,833
+我们需要把模式或类型实际上设置为ShaderType::VERTEX
+we need to set the mode or the type to actually be shader of type vertex
+
+312
+00:12:11,133 --> 00:12:13,500
+当然, 对于fragment, 我会把它设置为ShaderType::FRAGMENT
+and then of course, for fragment, we can set it equal to fragment
+
+313
+00:12:13,500 --> 00:12:14,700
+我只是随便设置一下
+I'm kind of setting this up loosely
+
+314
+00:12:14,700 --> 00:12:16,700
+我的代码可能会更干净一点
+I could be a little bit cleaner with my code
+
+315
+00:12:16,700 --> 00:12:18,766
+以及实际上有更多的函数, 就像
+and actually have some more functions and stuff like that
+
+316
+00:12:19,033 --> 00:12:21,225
+为了计算出一个字符串中的类型是什么
+to work out what the type is from a string 
+
+317
+00:12:21,225 --> 00:12:24,433
+但再说一次, 说实话, 这是一个非常简单的函数
+but again,it's stoical, this is a really simple function
+
+318
+00:12:24,600 --> 00:12:25,633
+所以当我完成了那个
+so once I've done that
+
+319
+00:12:25,633 --> 00:12:29,233
+如果我, 如果我们在一数据行上看见了#shader
+if I kind of, if we see hash shader on a line
+
+320
+00:12:29,233 --> 00:12:30,933
+我们就知道我们需要去设置一个类型
+we know that we need to set a type
+
+321
+00:12:31,100 --> 00:12:33,533
+否则, 如果它是其他的代码行
+otherwise, if it's any other kind of line of code
+
+322
+00:12:33,700 --> 00:12:34,600
+然后我们实际上就需要
+then we actually need to
+
+323
+00:12:34,600 --> 00:12:37,433
+把它添加到顶点或片段的着色器源码中
+add it to either the vertex or the fragment shader source code
+
+324
+00:12:37,700 --> 00:12:38,733
+并且我们实现那个的方法就是
+and the way we do that is
+
+325
+00:12:38,866 --> 00:12:39,700
+使用字符串流
+to the string stream
+
+326
+00:12:39,700 --> 00:12:40,966
+让我把这个多余的空格删掉吧
+let me just get rid of this extra space
+
+327
+00:12:40,966 --> 00:12:42,133
+对于字符串流
+to the string stream
+
+328
+00:12:42,366 --> 00:12:44,900
+我基本上就是把数据行推到它里面去
+I'm going to basically push the line into it
+
+329
+00:12:44,900 --> 00:12:46,566
+现在我也需要知道把哪个数据行推进去
+now I need to know which one to push too
+
+330
+00:12:46,800 --> 00:12:48,133
+而那就是为什么我们需要得到着色器类型
+and that's why we've got the shader type
+
+331
+00:12:48,133 --> 00:12:50,266
+所以我要拿到这个type, 并且直接把它转换成一个整型
+so I'm going to grab the type and just cast it to an int
+
+332
+00:12:50,266 --> 00:12:52,833
+然后把它作为这个数组的一个索引使用
+and use it as an index into this array
+
+333
+00:12:53,033 --> 00:12:54,933
+我们知道这个数组有两个元素
+we know that the array contains two elements
+
+334
+00:12:55,066 --> 00:12:58,000
+并且我们知道, 基本上, 那个数组的第一个元素会是顶点着色器
+and we know that basically the first element in that array is going to be vertex
+
+335
+00:12:58,000 --> 00:12:59,500
+而第二个元素就是片段着色器
+and the second one is going to be fragment
+
+336
+00:12:59,500 --> 00:13:00,833
+所以我在这里使用了数组
+so I'm kind of using arrays here
+
+337
+00:13:01,033 --> 00:13:03,300
+这是一种比较小机灵的方式, 实际上为了
+in a little bit of a clever way to actually
+
+338
+00:13:04,266 --> 00:13:05,800
+你知道的, 自动化程度更高一点
+you know automate this a little bit more
+
+339
+00:13:05,866 --> 00:13:07,500
+所以我不必有分支结构
+so I don't have to have a branch
+
+340
+00:13:07,733 --> 00:13:08,533
+我基本上就是说
+where I basically say
+
+341
+00:13:08,833 --> 00:13:09,633
+如果这个类型是
+if the type is
+
+342
+00:13:09,933 --> 00:13:12,000
+你知道的顶点着色器, 就把它添加到顶点着色器字符串流
+you know vertex, add it to the vertex string stream
+
+343
+00:13:12,000 --> 00:13:13,100
+如果这个类型是片段着色器
+if the type is fragment
+
+344
+00:13:13,200 --> 00:13:14,500
+就把它添加到片段着色器字符串流
+add it to the fragment string stream
+
+345
+00:13:14,500 --> 00:13:17,300
+我可以用这个类型作为数组的索引
+I can kind of just use the type as an index into the array
+
+346
+00:13:17,766 --> 00:13:20,066
+这基本上会好一点
+which is just going to be a little bit better basically
+
+347
+00:13:20,100 --> 00:13:23,966
+所以在这里, 我基本上就是添加这个数据行到那个字符串流
+so over here I'm going to basically add line into that string stream
+
+348
+00:13:23,966 --> 00:13:25,666
+后面补充一个换行符
+followed by a new line character
+
+349
+00:13:25,833 --> 00:13:27,533
+就这样, 差不多就是这样
+just like that, and that's pretty much it
+
+350
+00:13:27,533 --> 00:13:28,700
+我的意思是如果你看看这个代码
+I mean if you look at this code
+
+351
+00:13:28,700 --> 00:13:31,150
+这个应该把我们的着色器分离到两个不同的类型
+this should divide our shader into two different types
+
+352
+00:13:31,150 --> 00:13:32,933
+然后把它们添加到对应的字符串流
+and add them to the appropriate string stream
+
+353
+00:13:33,133 --> 00:13:34,533
+所以最后, 在结尾这里
+so finally, at the end here
+
+354
+00:13:34,533 --> 00:13:36,500
+我实际上需要返回我的代码
+I need to actually return my code
+
+355
+00:13:36,500 --> 00:13:38,250
+现在我们有一个小问题
+now we have a little bit of an issue
+
+356
+00:13:38,250 --> 00:13:41,333
+因为我们在尝试返回两个字符串, 并且当然
+because we are trying to return two strings, and of course
+
+357
+00:13:41,600 --> 00:13:42,900
+你可以只返回一个
+you can only return one
+
+358
+00:13:43,133 --> 00:13:45,733
+你可以在c++中返回一个变量
+kind of you can return one variable in c++
+
+359
+00:13:45,733 --> 00:13:47,300
+所以我们如何返回两个变量
+so how do we return two variables
+
+360
+00:13:47,433 --> 00:13:50,233
+现在我们可以使用一个叫做元组或对组的东西
+now we could use something called a tuple or a pair
+
+361
+00:13:51,366 --> 00:13:53,800
+事实上我对此有很多感觉
+I actually have a lot of feelings about that
+
+362
+00:13:53,966 --> 00:13:57,450
+实际上, 我这周也许可能制作了一期c++的视频
+actually I might make a c++ video this week maybe
+
+363
+00:13:57,750 --> 00:14:01,900
+那实际上是专门处理这种多个返回类型的事情
+that actually deals with this kind of multiple return type thing specifically 
+
+364
+00:14:01,900 --> 00:14:02,533
+我认为我会
+I think I will
+
+365
+00:14:02,533 --> 00:14:03,633
+实际上那可能是个不错的主意
+actually that's probably a good idea
+
+366
+00:14:04,300 --> 00:14:05,566
+但我不太喜欢用那种东西
+I don't like using that stuff
+
+367
+00:14:05,566 --> 00:14:07,166
+并且我会在c++系列视频中解释原因
+and I'll explain why in the c++ video
+
+368
+00:14:07,166 --> 00:14:08,366
+我不想让你们在这儿感到无聊
+I don't want to bore you guys here
+
+369
+00:14:08,500 --> 00:14:09,375
+但是我会怎么做
+but what I would do  
+
+370
+00:14:09,375 --> 00:14:11,366
+如果我需要在这里返回多个类型, 就是
+if I need to kind of return multiple types here is
+
+371
+00:14:11,366 --> 00:14:14,833
+我实际上会创建一个叫Shader的结构体
+I would actually make a struct called shader
+
+372
+00:14:15,066 --> 00:14:17,166
+不知道, ShaderSources, 或之类的一些名字吧
+I don't know, shader sources, or something like that
+
+373
+00:14:17,166 --> 00:14:20,533
+我们实际上可能会叫它ShaderProgramSource
+we might actually just call this shader program source
+
+374
+00:14:20,666 --> 00:14:23,100
+并且实际上这是包含我们的
+and this is actually going to contain our
+
+375
+00:14:23,300 --> 00:14:24,566
+我们就叫它VertexSource
+we'll call this vertex source
+
+376
+00:14:24,566 --> 00:14:26,100
+我有点喜欢首字母大写
+I kind of like to capitalize a bit
+
+377
+00:14:26,100 --> 00:14:28,575
+我几乎把这当成了c#的属性
+I'm kind of treating this almost like a c# property
+
+378
+00:14:28,575 --> 00:14:29,966
+那就是为什么我把这个首字母大写
+that's why I'm capitalizing this
+
+379
+00:14:29,966 --> 00:14:31,466
+因为它们在公开的领域
+because they are just public fields
+
+380
+00:14:31,966 --> 00:14:34,733
+所以我们就取VertexSource和FragmentSource
+so we're taking vertex source and fragment source
+
+381
+00:14:36,166 --> 00:14:37,450
+好的, 很酷, 非常基本的结构体
+okay, cool, very basic struct
+
+382
+00:14:37,450 --> 00:14:39,733
+那么我就返回那个结构体
+and I'm going to just return that struct
+
+383
+00:14:40,166 --> 00:14:41,933
+并且然后在我的函数的结尾这里
+and then at the end here of my function
+
+384
+00:14:41,933 --> 00:14:42,900
+当我有了这两个
+once I have the two
+
+385
+00:14:42,900 --> 00:14:43,800
+当我已经构建完了
+once I've built up
+
+386
+00:14:43,800 --> 00:14:45,866
+以及我已经读取了该文件中的所有源码
+and I've read all of the source code from that file
+
+387
+00:14:46,000 --> 00:14:47,233
+我就返回
+I'm just going to return
+
+388
+00:14:47,800 --> 00:14:50,500
+基本上是一个结构体, 就这个结构体, 对吧
+basically a struct, that this struct, right
+
+389
+00:14:50,500 --> 00:14:54,933
+所以我把VertexSource设置为ss[0].str()
+so I'm going to set the vertex source to be ss zero dot str
+
+390
+00:14:55,500 --> 00:14:58,075
+那么然后就是ss[1].str(), 好了
+and then ss one dot str, ok
+
+391
+00:14:58,075 --> 00:14:59,866
+这(.str())会给我们从字符串流返回的字符串
+which gives us the string back from the string stream
+
+392
+00:14:59,866 --> 00:15:01,533
+而那就是我们现在需要做的一切
+and that's all we need to do right now
+
+393
+00:15:01,700 --> 00:15:05,400
+所以这个代码应该给我们设置好了实际的着色器源码
+so this code should set us up with the actual shader source code
+
+394
+00:15:05,400 --> 00:15:07,500
+对于顶点和片段着色器
+for both the vertex and the fragment shader
+
+395
+00:15:07,700 --> 00:15:08,266
+漂亮
+awesome
+
+396
+00:15:08,266 --> 00:15:10,166
+所以现在, 让我们向下滚动, 实际测试一下
+so now, let's scroll down, and actually test this out
+
+397
+00:15:10,633 --> 00:15:12,900
+所以我将做的第一件事就是, 我会
+so the first thing I'll do is, I'll kind of
+
+398
+00:15:12,900 --> 00:15:14,466
+我们可能要删除我们的shader
+we might just get rid of our shader
+
+399
+00:15:15,300 --> 00:15:16,666
+至于现在, 就注释它好了
+for now, just by commenting it out
+
+400
+00:15:16,666 --> 00:15:19,400
+说实话, 我只是想先看看我的函数是否起作用
+I just really want to see if my function works first, to be honest
+
+401
+00:15:19,400 --> 00:15:23,925
+所以我们输入ShaderProgramSource source, 或之类的东西
+so we'll go shader program source source or something like that
+
+402
+00:15:23,925 --> 00:15:26,366
+等于ParseShader()
+equals ParseShader
+
+403
+00:15:26,400 --> 00:15:27,800
+而然后我们传入我们的文件路径
+and then we'll take in our file path
+
+404
+00:15:27,800 --> 00:15:31,866
+这就是res/Shaders/Basic.shader
+which is just going to be res/Shaders/Basic.shader
+
+405
+00:15:31,866 --> 00:15:32,700
+这是我们的文件
+which is our file
+
+406
+00:15:32,700 --> 00:15:36,100
+那么res/Shader/Basic.shader
+so res slash shaders slash basic dot shader
+
+407
+00:15:36,100 --> 00:15:37,900
+现在这是我们的第一个例子
+now this is kind of the first instance of us
+
+408
+00:15:37,900 --> 00:15:39,666
+实际上在c++中读取一个文件
+actually reading a file in c++
+
+409
+00:15:40,300 --> 00:15:41,333
+在这个系列中使用我的方式
+in the series on my channel
+
+410
+00:15:41,333 --> 00:15:44,666
+所以基本上你需要知道的是
+so basically what you need to know about this is that
+
+411
+00:15:44,966 --> 00:15:46,833
+如果你像那样指定一个相对路径
+if you specify a relative path like that
+
+412
+00:15:46,833 --> 00:15:48,600
+而不是一个绝对路径之类的一些东西
+so not something that is an absolute path
+
+413
+00:15:48,600 --> 00:15:51,466
+你知道像c:\users, 无论什么
+you know like c:\users, whatever
+
+414
+00:15:51,900 --> 00:15:53,733
+从c驱动开始的, 不管什么
+starting from the c drivers, whatever
+
+415
+00:15:53,800 --> 00:15:55,766
+由于我们指定了一个相对路径
+since we're specifying a relative path
+
+416
+00:15:55,800 --> 00:15:58,233
+相对部分始终来自工作目录
+relative parts are always from the working directory
+
+417
+00:15:58,533 --> 00:16:01,233
+现在, 如果你在VS之外运行可执行文件
+now if you run the executable outside of virtual studio
+
+418
+00:16:01,233 --> 00:16:03,033
+这个默认的工作目录就会使
+the default working directory is just going to be the
+
+419
+00:16:03,033 --> 00:16:04,933
+包含那个可执行文件的目录
+directory that contains that executable
+
+420
+00:16:05,066 --> 00:16:06,500
+所以一切都会相对于那个
+so everything will be relative to that
+
+421
+00:16:06,866 --> 00:16:09,433
+但是如果我们通过这个VS的调试器运行这个的话
+but if we're running this through the visual studio debugger
+
+422
+00:16:09,666 --> 00:16:11,500
+这个工作目录实际上就会设置成
+the working directory is actually set
+
+423
+00:16:11,533 --> 00:16:13,633
+我们VS调试器的那种属性
+by our visual studio debugging kind of property
+
+424
+00:16:13,633 --> 00:16:16,000
+所以如果我们右键打开这个OpenGL项目
+so if we right click on open on the OpenGL project
+
+425
+00:16:16,266 --> 00:16:17,133
+点击属性
+hit properties
+
+426
+00:16:18,233 --> 00:16:20,700
+你可以看到, 我们有一个叫做调试的选项卡在那儿
+you can see, over here we have a tab called debugging
+
+427
+00:16:21,100 --> 00:16:22,933
+对吧, 而在下面, 我们有个工作目录
+right, and under here, we have a working directory
+
+428
+00:16:22,933 --> 00:16:26,733
+你们可以看到这儿默认设置成了我们的项目目录, 所以
+you can see here that is set by default to our project directory, so
+
+429
+00:16:26,900 --> 00:16:30,433
+我们知道这个文件是相对于我们项目目录的
+we know that this file is relative to the project directory
+
+430
+00:16:30,433 --> 00:16:31,833
+那就是这个目录
+that is the directory
+
+431
+00:16:31,933 --> 00:16:34,000
+实际上包含我们的项目文件
+that actually contains our project file
+
+432
+00:16:34,000 --> 00:16:35,033
+在这个情况下就是
+which in this case is
+
+433
+00:16:35,033 --> 00:16:37,533
+有我们vcxproj的这个目录
+this directory which just has our vcxproj
+
+434
+00:16:37,566 --> 00:16:38,966
+所以你们可以看到它应该相对这个目录
+so you can see it should be relative to this
+
+435
+00:16:38,966 --> 00:16:40,400
+就是res/Shader
+so res slash shader
+
+436
+00:16:40,400 --> 00:16:41,766
+/Basic.shader
+slash Basic dot shader
+
+437
+00:16:41,766 --> 00:16:43,366
+并且那正是我刚在这里写的
+and that's exactly what I've written over here
+
+438
+00:16:43,800 --> 00:16:48,233
+既然我们已经得到了这个, 实际上那我们就写, std::cout << source.VertexSource
+now that we've got this, let's actually just std cout source VertexSource
+
+439
+00:16:48,533 --> 00:16:51,200
+并且我也会对FragmentSource做同样的处理
+and also I'll do the same for FragmentSource
+
+440
+00:16:52,633 --> 00:16:53,933
+现在为了把这个用某种方式区分以下
+now to divide this in some way
+
+441
+00:16:53,933 --> 00:16:55,033
+让它看起来更清楚一些
+just to make it extra clear
+
+442
+00:16:55,033 --> 00:16:58,833
+我也会在这儿复制两次这个, 并且写上
+I'm also going to copy this kind of twice here, and write
+
+443
+00:16:59,000 --> 00:17:00,666
+你知道像那样的VERTEX
+you know VERTEX like that
+
+444
+00:17:01,100 --> 00:17:03,625
+以及FRAGMENT, 因此我们真就可以看到
+and FRAGMENT, so that we can really see
+
+445
+00:17:05,066 --> 00:17:06,366
+我们有两个不同的着色器
+the two different shader we have
+
+446
+00:17:06,366 --> 00:17:07,800
+那么我就按f5, 好了
+and I'm just gonna hit f5, okay
+
+447
+00:17:07,800 --> 00:17:09,066
+我这里还有一个语法错误
+I've got one more syntax error here
+
+448
+00:17:09,066 --> 00:17:10,133
+当我们这样布局着色器时
+when we do GL to lay shader
+
+449
+00:17:10,133 --> 00:17:12,275
+顺便说一下, 来自上一期的这个代码是错的
+by the way, this code was wrong from the last episode
+
+450
+00:17:12,275 --> 00:17:13,466
+我添加了一点东西
+I added a little thing
+
+451
+00:17:13,800 --> 00:17:15,200
+有点像是在第一次的时候
+kind of just in permeate prime
+
+452
+00:17:15,800 --> 00:17:17,233
+像时在我的视频编辑软件中
+like in my video editing software
+
+453
+00:17:17,533 --> 00:17:18,733
+我只添加了一点小注释
+I just add a little kind of note
+
+454
+00:17:18,733 --> 00:17:20,066
+就像这个函数应该是
+being like this is what the function should be
+
+455
+00:17:20,066 --> 00:17:20,866
+它应该不是
+it should not be
+
+456
+00:17:20,866 --> 00:17:22,733
+glDeleteShader, 我不知道为什么会写那个
+glDeleteShader, don't know why I wrote that
+
+457
+00:17:22,833 --> 00:17:24,900
+它应该是glDeleteProgram
+it should be glDeleteProgram
+
+458
+00:17:25,033 --> 00:17:27,633
+好了, 因为着色器实际上只是一个着色器类型
+okay, because shader is actually just one shader type
+
+459
+00:17:27,766 --> 00:17:29,900
+我们的程序实际上会被删除, 我们的程序
+our program is to actually go to delete, our programs
+
+460
+00:17:29,900 --> 00:17:30,533
+应该是这样的
+that's what it should be
+
+461
+00:17:30,533 --> 00:17:32,533
+让我们取消那个的注释吧, 因为我们已经
+let's comment that out for now though, because we did
+
+462
+00:17:32,700 --> 00:17:34,200
+得到了那个着色器代码
+kind of come out that shader code
+
+463
+00:17:34,500 --> 00:17:36,033
+让我们按f5去运行这个程序
+let's hit f5 to run this program
+
+464
+00:17:36,033 --> 00:17:38,733
+希望我们可以看到我们的解析运行正常
+hopefully we can see our parsing working correctly
+
+465
+00:17:39,166 --> 00:17:40,500
+所以当我来到我的控制台
+so if I go to my console
+
+466
+00:17:40,766 --> 00:17:42,000
+你应该可以看到, 我们有
+you should see that we have
+
+467
+00:17:42,533 --> 00:17:45,033
+VERTEX, 然后就是顶点着色器, 接着FRAGMENT
+VERTEX, and then the vertex shader, and FRAGMENT
+
+468
+00:17:45,033 --> 00:17:45,966
+然后就说片段着色器
+and then the fragment shader
+
+469
+00:17:45,966 --> 00:17:47,200
+所以这看起来不错
+so it looks pretty good to me
+
+470
+00:17:47,333 --> 00:17:48,666
+它们看起来都是正确的着色器
+they look like there are correct shader
+
+471
+00:17:48,666 --> 00:17:50,133
+没有崩溃之类的事
+nothing crash or anything like that
+
+472
+00:17:50,666 --> 00:17:51,933
+我觉得很完美
+looks pretty perfect to me
+
+473
+00:17:51,933 --> 00:17:54,366
+让我们继续, 并实际导入到我们的源代码
+let's go ahead and actually pipe that into our source code
+
+474
+00:17:54,466 --> 00:17:56,466
+特别是在我们的着色器编译函数中
+was specifically into our shader compilation function
+
+475
+00:17:56,466 --> 00:17:57,533
+所以我把这个还原回来
+so I'll bring this back
+
+476
+00:17:58,700 --> 00:18:01,033
+并且我也将我的glDeleteProgram还原回来
+and I'll bring back my glDeleteProgram as well
+
+477
+00:18:01,500 --> 00:18:04,066
+而不是提供顶点着色器和片段着色器
+and then instead of kind of providing vertex shader and fragment shader
+
+478
+00:18:04,066 --> 00:18:05,066
+现在我们有了这个
+now we've got this
+
+479
+00:18:05,400 --> 00:18:11,750
+我们只提供source.vertexSource和source.fragmentSource
+we can just provide source.vertexSource and source.fragmentSource
+
+480
+00:18:11,750 --> 00:18:13,200
+就那样吧, 让我们按f5
+just like that, let's hit f5
+
+481
+00:18:13,400 --> 00:18:15,500
+然后你就可以看到, 我们得到了一个红色的三角形
+and you can see that we get a red triangle
+
+482
+00:18:15,500 --> 00:18:18,166
+如果我返回我的Basic.shader文件
+if I go back to my Basic.shader file
+
+483
+00:18:18,300 --> 00:18:20,300
+让我们直接去改变它, 让我们使它
+let's go ahead and change it, let's make it
+
+484
+00:18:20,300 --> 00:18:22,066
+不知道, 让我们把它做成一个漂亮的蓝色
+I don't know, let's just make it a nice little blue
+
+485
+00:18:22,066 --> 00:18:23,333
+所以, 我就改成0.2
+so I'll make a zero point two
+
+486
+00:18:23,566 --> 00:18:26,366
+0.3, 0.8, 那么然后按f5
+zero point three, zero point eight, and then hit f5
+
+487
+00:18:27,233 --> 00:18:29,333
+正如你所看到的, 我们得到了一个漂亮的蓝色三角形
+as you can see, we got a nice blue triangle
+
+488
+00:18:29,366 --> 00:18:31,433
+太棒了, 所以我希望你们喜欢这个视频
+awesome, so I hope you guys enjoyed this video
+
+489
+00:18:31,433 --> 00:18:33,166
+我们基本上只是利用了着色器
+we basically just took what we had with shaders
+
+490
+00:18:33,166 --> 00:18:34,300
+让它变得更好一点
+made it a little bit better
+
+491
+00:18:34,466 --> 00:18:35,966
+将所有内容合并到一个文件中
+combined it all into one file
+
+492
+00:18:36,100 --> 00:18:37,700
+并且现在我们可以在文件中创建着色器
+and now we can create shader from files
+
+493
+00:18:37,700 --> 00:18:39,700
+这会更酷和更容易一些
+which is pretty cool and gonna be way more easier
+
+494
+00:18:39,700 --> 00:18:41,666
+对我们来说, 这样做会容易得多
+it's gonna be way easier for us to actually do that
+
+495
+00:18:41,900 --> 00:18:43,800
+随着我们现在继续这个系列的学习
+as we progress on with this series now
+
+496
+00:18:43,800 --> 00:18:46,475
+以后, 我们会把这一切抽象到一个类中
+in the future, we will probably abstract all this into a class
+
+497
+00:18:46,475 --> 00:18:48,433
+随着基于持续绘图的代码
+as the code based kind of keeps drawing
+
+498
+00:18:48,600 --> 00:18:49,800
+现在, 我们不用担心它
+for now, we're not gonna worry about it
+
+499
+00:18:49,800 --> 00:18:50,733
+我们要继续前进
+we're just gonna move on
+
+500
+00:18:51,366 --> 00:18:53,300
+我们会讲顶点缓冲区和着色器
+we've covered vertex buffers and shaders
+
+501
+00:18:53,466 --> 00:18:55,200
+这就是我确实想讲的下一期
+the next step that I really want to cover
+
+502
+00:18:55,200 --> 00:18:57,233
+会是关于顶点缓冲区
+is going to be about index buffers
+
+503
+00:18:57,333 --> 00:19:00,625
+好了, 因为我们需要一种方法实际去渲染我们的三角形
+okay, because we need a way to actually render our triangle
+
+504
+00:19:00,625 --> 00:19:02,066
+就是使用一个叫索引缓冲区的东西
+using something called an index buffer
+
+505
+00:19:02,066 --> 00:19:03,066
+并且我们会讲关于
+and we'll talk about
+
+506
+00:19:03,166 --> 00:19:05,366
+为什么我们想要其中的一个, 这实际上是什么
+why we want one of those, what that actually is
+
+507
+00:19:05,366 --> 00:19:06,833
+以及之类的一切, 在下一期视频
+and all of that in the next video
+
+508
+00:19:07,566 --> 00:19:09,366
+因为它可能没有那么明显
+because it's probably not that apparent
+
+509
+00:19:09,700 --> 00:19:12,100
+对于三角形来说, 它的必要性可能并不那么明显
+the need for it probably isn't that apparent with a triangle
+
+510
+00:19:12,100 --> 00:19:15,166
+但是当我们得到更复杂的有价值的几何结构时
+but as we kind of get more complex value geometry
+
+511
+00:19:15,166 --> 00:19:18,766
+我的意思是, 即使我们尝试渲染一个非常复杂的正方形, 对吧
+I mean, even if we try and render a square which is pretty complex, right
+
+512
+00:19:19,466 --> 00:19:20,475
+这对我们有好处
+it's gonna benefit us
+
+513
+00:19:20,475 --> 00:19:24,133
+对我们来说, 使用索引缓冲区将是一个巨大的好处
+it's gonna be a huge benefit for us to use something called an index buffer
+
+514
+00:19:24,266 --> 00:19:25,433
+不管怎样, 我希望你们喜欢这个视频
+anyway, I hope you guys enjoyed this video
+
+515
+00:19:25,433 --> 00:19:26,800
+如果你喜欢的话, 你可以点击这个点赞按钮
+if you did, you can hit the like button
+
+516
+00:19:26,800 --> 00:19:29,225
+你可以通过访问patreon来帮助支持本系列
+you can help support this series by going over to patron comfortable
+
+517
+00:19:29,225 --> 00:19:30,233
+对于这种方式
+for such the channel
+
+518
+00:19:30,700 --> 00:19:31,833
+这儿有一些很酷的奖励
+there are some pretty cool rewards
+
+519
+00:19:31,833 --> 00:19:32,900
+我是说我不会说谎
+I mean I'm not gonna lie
+
+520
+00:19:34,000 --> 00:19:35,633
+我不会骗你们的, 对吧
+I would never lie to you guys, right
+
+521
+00:19:35,700 --> 00:19:37,666
+首先, 这一系列将是毫无意义的
+first of all, this series will be absolutely nothing
+
+522
+00:19:37,666 --> 00:19:38,766
+没有我patreon上的这些支持者
+without my patreon supporters
+
+523
+00:19:38,766 --> 00:19:39,566
+那肯定没门
+there's no way
+
+524
+00:19:39,900 --> 00:19:41,100
+我坐在这里
+that I would be sitting here
+
+525
+00:19:41,100 --> 00:19:43,966
+在沙发上花这么多时间为你们制作视频
+on a couch spending this much time making videos for you guys
+
+526
+00:19:44,266 --> 00:19:46,566
+除非我得到了支持, 所以这就是
+unless I was getting the support, so this is
+
+527
+00:19:46,600 --> 00:19:48,866
+首先非常感谢你们让我这么做
+thank you so much for letting me do this first of all
+
+528
+00:19:49,166 --> 00:19:49,933
+其次
+the second of all
+
+529
+00:19:49,933 --> 00:19:51,200
+你会很早收到视频
+you'll get videos early
+
+530
+00:19:51,200 --> 00:19:52,566
+你将获得所有源码
+you'll get access to all the source code
+
+531
+00:19:52,600 --> 00:19:54,433
+这个系列, 一期接一期的
+kind of episode by episode for this series
+
+532
+00:19:54,433 --> 00:19:56,000
+并且确实是我这个系列的所有源码
+and really for all of my series
+
+533
+00:19:56,200 --> 00:19:57,900
+还有一件很酷的事情, 基本上就是
+and there's this really cool thing where basically
+
+534
+00:19:57,900 --> 00:19:59,633
+如果你是置顶的支持者
+if you're a top tier kind of supporter
+
+535
+00:19:59,966 --> 00:20:01,900
+这是我们每月一次的聚会
+this is hang out that we do once a month
+
+536
+00:20:01,900 --> 00:20:04,000
+我们基本上是所有的支持者都参与其中
+we're basically all the supporters get into one
+
+537
+00:20:04,033 --> 00:20:05,966
+就像是在discord上的视频聊天
+like video chat thing on discord
+
+538
+00:20:06,100 --> 00:20:07,166
+并且我们只讨论
+and we just talk about
+
+539
+00:20:07,166 --> 00:20:08,300
+我们只是聚会一个小时
+we just hang out for an hour
+
+540
+00:20:08,300 --> 00:20:09,900
+基本上讨论一切东西
+basically just talk about whatever 
+
+541
+00:20:09,900 --> 00:20:11,433
+这真愉快, 一定要报名参加
+it's a really good time, definitely sign up for that
+
+542
+00:20:11,433 --> 00:20:13,000
+如果你们对帮助支持系列感兴趣
+if you're interested in help support a series
+
+543
+00:20:14,133 --> 00:20:16,366
+discord也是谈论这些东西的好地方
+discord is also a really good place to talk about this stuff
+
+544
+00:20:17,033 --> 00:20:18,433
+而不仅仅是在下面留下评论
+rather than just leaving a comment below
+
+545
+00:20:18,433 --> 00:20:19,600
+你也可以那样做
+which you could do as well
+
+546
+00:20:19,600 --> 00:20:21,533
+当然, 我会尽量回复我的所有评论
+of course, I try and respond to all my comments
+
+547
+00:20:21,566 --> 00:20:26,066
+你也可以直接去discord.com, 抱歉, 是TheCherno.com/discour
+you can also head on over to discord com, sorry TheCherno com slash discord
+
+548
+00:20:26,266 --> 00:20:28,033
+那儿基本上就是个社区
+where there's basically just a community
+
+549
+00:20:28,033 --> 00:20:30,833
+人们喜欢即时消息这种形式
+people like an instant messaging kind of format
+
+550
+00:20:31,533 --> 00:20:33,866
+多频道的事情, 我们可以谈谈
+thing with multiple channels, we can talk about
+
+551
+00:20:34,733 --> 00:20:36,933
+这个三角形, 这个OpenGL系列
+this triangle,the OpenGL series
+
+552
+00:20:36,933 --> 00:20:39,000
+C++, 不管你想谈论什么
+c++, whatever it is that you want to talk about
+
+553
+00:20:39,100 --> 00:20:40,300
+那里也有很多人
+a lot of people there as well
+
+554
+00:20:40,966 --> 00:20:42,500
+可以帮你解决所有的问题
+that can help you out with all your problems 
+
+555
+00:20:42,500 --> 00:20:45,766
+当然, 别忘了在Twitter和Instagram上关注我
+and of course, don't forget to follow me on Twitter and on Instagram
+
+556
+00:20:45,766 --> 00:20:46,900
+还有这个频道的会议
+the conference at the channel as well
+
+557
+00:20:46,900 --> 00:20:48,766
+推广一切东西
+just plugging absolutely everything
+
+558
+00:20:49,033 --> 00:20:50,466
+你也可以在这里买货物的
+also you can buy the merch at this
+
+559
+00:20:50,466 --> 00:20:51,766
+我开玩笑的, 我还没有那个链接
+I'm kidding, I don't have that link yet
+
+560
+00:20:51,766 --> 00:20:53,400
+但我一定会告诉你的
+but I'll get back to you with that surely
+
+561
+00:20:53,500 --> 00:20:57,266
+下次索引缓冲区就出来了, 再见
+and next time index buffers channel out, goodbye
+

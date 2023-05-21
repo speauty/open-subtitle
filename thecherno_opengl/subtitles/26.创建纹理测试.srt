@@ -1,0 +1,1535 @@
+﻿1
+00:00:00,133 --> 00:00:03,266
+嘿，你们好，我是TheCherno，欢迎回到我的OpenGL系列教程
+hey, what's up guys, my name is TheCherno, welcome back to my OpenGL series
+
+2
+00:00:03,300 --> 00:00:07,966
+那么上次，也就是很久以前了，我们讲了如何构建一个测试框架
+so last time which was quite a while ago, we talked about setting up a test framework
+
+3
+00:00:07,966 --> 00:00:11,366
+我们也确实构建了一个测试框架，实际上，实现了一个清除颜色的测试
+and we did set up a test framework, and we actually implemented a clear color test
+
+4
+00:00:11,500 --> 00:00:14,600
+如果你们还没看过那个，视频链接就在右上角哦
+if you guys haven't seen that, video is up there in the top right corner
+
+5
+00:00:14,800 --> 00:00:18,466
+我将重申一下，我们为什么要实现这个，以及这个系列接下来要做的
+I will reiterate a little bit about why we're doing this, and where this series is going
+
+6
+00:00:18,466 --> 00:00:22,766
+只是因为我觉得，实际上，距离上期分享差不多有三个月了吧
+just because I feel like it's been, I think actually has been like three months since last I can share episode
+
+7
+00:00:22,766 --> 00:00:26,166
+我很抱歉，从现在开始，努力保持更新
+and I am sorry about that, we're gonna try and be more consistent from now on
+
+8
+00:00:27,466 --> 00:00:31,033
+那么我们现在在OpenGL系列中要实现的目标是
+so the purpose of what we're doing right now in the OpenGL series is
+
+9
+00:00:31,200 --> 00:00:34,592
+并且我之所以在这个系列中深入研究来构建这个测试框架的原因
+and the reason why I kind of dive over the series to actually set up this test framework is
+
+10
+00:00:34,775 --> 00:00:39,466
+是因为当我们开始引入新的知识点时，虽然你们觉得已经知道了所有的基础知识
+is because as we start introducing new concepts, and you kind of you already know all the basics
+
+11
+00:00:39,500 --> 00:00:41,666
+我的意思是，我们还没有涵盖所有的知识点
+I mean we haven't covered absolutely every kind of
+
+12
+00:00:41,933 --> 00:00:48,266
+我认为OpenGL是一种基础性的东西，对吧
+what I would consider an OpenGL kind of foundational thing, right
+
+13
+00:00:48,266 --> 00:00:51,533
+就像你们知道的，我们讲过纹理，顶点缓冲，顶点索引
+like you know, we've covered textures, we've called vertex buffers, we've called vertex index
+
+14
+00:00:51,533 --> 00:00:55,733
+这儿还是有一些东西我们没有讲到，比如帧缓冲
+there's still some things we haven't covered like for example we haven't covered frame buffers yet
+
+15
+00:00:57,266 --> 00:01:00,700
+所以我们还没有完全涵盖OpenGL所有的基础知识
+so we haven't covered absolutely every kind of foundational OpenGL
+
+16
+00:01:01,300 --> 00:01:05,833
+我真的漏掉了一个词，核心，就叫它核心吧
+I'm really missing a word here, pillar, let's say pillar
+
+17
+00:01:06,550 --> 00:01:11,833
+我想，所有OpenGL提供给我们的工具都是为了实现一些渲染任务，对吧
+every kind of tool I guess that OpenGL gives us in order to actually achieve some kind of rendering task, right
+
+18
+00:01:12,066 --> 00:01:14,733
+我们还没有全部了解，但也差不多了解了大部分
+we haven't learned about all of them yet, but we have learned about most of them
+
+19
+00:01:14,733 --> 00:01:16,700
+并且根据我们目前学到的东西
+and with the stuff that we've learned so far
+
+20
+00:01:17,066 --> 00:01:19,500
+新人其实有很多事情可以做，对吧
+youth there is actually quite a lot of things you could do, right
+
+21
+00:01:19,500 --> 00:01:25,900
+我们构建了非常非常简单的接口足够做这么多事情了，对吧
+and even there's very very simple api that we've constructed is enough to do so many things, right
+
+22
+00:01:26,133 --> 00:01:30,257
+那么现在我们已经了解了所有这些我们可以实现的不同东西的基本原理
+so now that we've kind of learned about the basics of all of all of these different things that we can do
+
+23
+00:01:31,100 --> 00:01:35,700
+不过我想做的是，把学到的这些东西拆分成独立的测试，这样就可以在它们之间灵活切换了
+what I want to do is, separate everything that we've learned out into tests that we can kind of switch between
+
+24
+00:01:35,700 --> 00:01:38,000
+并且基本上关于什么是测试，再说一次
+and basically about what a test is again what
+
+25
+00:01:38,000 --> 00:01:40,000
+如果你们还没看过那期测试框架的视频，一定要去看看哦
+definitely watch the test framework video, if you have not already
+
+26
+00:01:40,233 --> 00:01:43,300
+但它实际上几乎就像是一个独立的应用
+but it's actually just like almost like an isolated application
+
+27
+00:01:43,733 --> 00:01:49,300
+而不是真正地创建一个应用或一个独立的项目，比如VS项目
+it's just that instead of actually making an application or a separate like visual studio projects 
+
+28
+00:01:49,300 --> 00:01:55,966
+为每个测试，为每种技术（如果你们愿意的话）分离出来一种可执行程序，那就是我们学到的
+to separate kind of executable program for each test, for each technique if you will that we've learned
+
+29
+00:01:57,033 --> 00:01:59,566
+因为把它们过一遍都很烦
+because that would be just really annoying to kind of go through all of them
+
+30
+00:01:59,566 --> 00:02:02,958
+你们每次都要启动不同的应用
+you'd have to launch, you would have to launch like separate applications every time
+
+31
+00:02:02,958 --> 00:02:04,183
+并且那很混乱，对吧
+and that's just a mess, right 
+
+32
+00:02:04,533 --> 00:02:11,900
+我只想有一个应用，它就像我们的沙盒，或者比如我们的测试应用，对吧
+I want to just have one application which is like our sandbox essentially, or our test like application, right
+
+33
+00:02:12,100 --> 00:02:13,475
+并且然后我想要在这儿有一个菜单
+and then I want to have a menu there
+
+34
+00:02:13,475 --> 00:02:17,450
+你们可以很容易地在我们做的所有测试之间切换
+where you can kind of just switch between all of the stuff that we've done really easily
+
+35
+00:02:17,975 --> 00:02:21,366
+对吧，那就是我们这个的目标，并且归根结底的说
+right, that's the whole goal of this, and at the end of the day
+
+36
+00:02:21,500 --> 00:02:26,100
+这样你们就可以打开一个独立的源文件，比如清除颜色
+it's so that you can open up a single source file, for like clear color
+
+37
+00:02:26,300 --> 00:02:28,033
+只是因为那是我们现在唯一完成的一个测试
+and because that's the only one we've done right now
+
+38
+00:02:28,300 --> 00:02:32,433
+然后就去看看你们实际上需要做些什么去实现它，对吧
+and just look at what you actually need to do to implement that, right
+
+39
+00:02:32,700 --> 00:02:37,066
+并且当然，当我们学习到更高级的技术，比如光照或阴影映射
+and of course when we do get into more advanced techniques like lighting or shadow mapping
+
+40
+00:02:37,066 --> 00:02:42,700
+或者类似的一些东西，或者如果你们需要渲染场景到纹理
+or something like that, you know, or like if you want to render your scene to a texture
+
+41
+00:02:42,700 --> 00:02:45,966
+并且接下来就显示它，或者对它进行后期处理，对吧
+and then display it, or do like post processing on it whatever, right
+
+42
+00:02:46,200 --> 00:02:52,100
+你们只需要打开后期效果测试之类的东西，然后看看代码，可能就会感觉到，好了
+you can just open up the post effects test or something, and just look at the code and you're like, okay
+
+43
+00:02:52,100 --> 00:02:57,433
+这就是我渲染纹理的方式，这就是我在纹理上应用模糊之类的方式，对吧
+this is how I render to a texture, and this is how I apply a blur pass over it or something like that, right
+
+44
+00:02:57,600 --> 00:03:02,200
+关键就是让所有的东西都变得简单易懂，因为归根结底，那就是我们想要的东西
+the idea is to make everything really simple to read, because at the end of the day, that's what we want
+
+45
+00:03:02,200 --> 00:03:06,552
+我们想要一个用最简单的方式来展示东西的技术库
+we want like a library of techniques that we can just show off in the simplest way possible
+
+46
+00:03:06,766 --> 00:03:10,133
+并且那就是为什么我构建了这个测试框架，好了，差不多了
+and that's why I've set up this test framework, okay, enough reiteration
+
+47
+00:03:10,333 --> 00:03:15,366
+实际上，我现在要做的是继续实现它
+what I'm going to do now is actually continue on with that and implement
+
+48
+00:03:16,525 --> 00:03:19,677
+因为我们实际上做的是把我们拥有的测试框架归功于它
+because what we actually did is when we credit this test framework we had
+
+49
+00:03:20,000 --> 00:03:22,500
+比如你们知道的，一些几何图形的渲染，比如TheCherno标志
+you know, some geometry rendering like with TheCherno logo
+
+50
+00:03:22,500 --> 00:03:25,225
+就像一个带有TheCherno标志的四边形
+just like basically a quad on the sprint with TheCherno logo
+
+51
+00:03:25,225 --> 00:03:29,925
+但是我们删除了那个所有的代码，因为我们想要清理Application.cpp文件
+but we deleted all of that code, because we wanted to clear our Application.cpp file 
+
+52
+00:03:29,925 --> 00:03:32,333
+并且实际上是为了测试
+and actually make it just about the tests
+
+53
+00:03:32,500 --> 00:03:35,433
+那么现在我们要写一个测试，它基本上展示了如何渲染纹理
+so now we're gonna write a test, which basically shows how to render a texture
+
+54
+00:03:36,266 --> 00:03:38,800
+并且这将会很快，因为我们之前已经写过那个代码了
+and it's gonna be pretty quick, because we've already written the code before
+
+55
+00:03:39,975 --> 00:03:41,104
+但那是我们今天要做的
+but that's what we're gonna do today
+
+56
+00:03:41,450 --> 00:03:44,733
+不过下次，我们希望能转到批量渲染那边
+and then next time, we're gonna hopefully move on to batch rendering
+
+57
+00:03:45,700 --> 00:03:49,433
+因为现在我们有了这个测试框架，感觉看起来很舒服，好了
+because now that we have this test framework, I feel comfortable enough to actually see, okay
+
+58
+00:03:49,433 --> 00:03:53,166
+我们会创建一个叫批量渲染的新测试，然后展示如何实际渲染
+we'll make a new test called batch rendering, and then I'll just show off how to actually render
+
+59
+00:03:53,900 --> 00:03:57,834
+比如你们知道的，同时渲染一堆四边形，好了，那么那就是这个计划，让我们接着看代码吧
+you know, a bunch of quads at once like in a batch, okay, so that's the plan, let's dive into the code
+
+60
+00:03:58,133 --> 00:04:01,500
+所以我们需要做的第一件事是，我在这里打开了TestClearColor
+so the first thing that we really need to do is, of course I've got TestClearColor open over here
+
+61
+00:04:01,500 --> 00:04:03,900
+我们有Test.h，这表明，比如你们知道的
+we have our Test.h, which shows kind of you know
+
+62
+00:04:03,900 --> 00:04:06,700
+我们需要知道的关于实际测试框架的一切
+and everything we need to know about the actual test framework here
+
+63
+00:04:07,500 --> 00:04:10,533
+但是如果我们看看TestClearColor，那就是我们的测试，那是我们最基本的测试
+but if we look at TestClearColor, that's really our test, that's our basic test
+
+64
+00:04:10,650 --> 00:04:12,525
+那么我们能做的就是复制粘贴那个
+so what we can do is actually copy and paste that
+
+65
+00:04:12,525 --> 00:04:16,125
+我做那个喜欢的方式就是打开一个包含这些东西的文件夹
+the way I like to do that is just to open a contained folder for this stuff
+
+66
+00:04:16,125 --> 00:04:18,725
+并且然后就是复制粘贴这两个文件
+and then just copy and paste both of these files
+
+67
+00:04:19,025 --> 00:04:24,700
+然后我就把TestClearColor重命名为TestTexture或类似的名字
+and then I'm just going to rename TestClearColor to TestTexture or something like that
+
+68
+00:04:28,050 --> 00:04:31,300
+是的，我想想，TestTexture，不如就TestTexture2D之类的吧
+yeah, I think TestTexture, maybe TestTexture2D or something like that
+
+69
+00:04:31,375 --> 00:04:34,700
+因为我们将来会有更高级的纹理测试
+because we will have more advanced texture tests in the future
+
+70
+00:04:34,733 --> 00:04:38,966
+并且然后来到这儿，点击tests文件夹，点击刷新按钮
+and then if I go over here, I can just click on the test folder, hit this little refresh button
+
+71
+00:04:39,166 --> 00:04:44,600
+然后把这两个都包含到我的项目中，就那么简单，在这个头文件中
+and then include both of these in my project as simple as that, in the header file
+
+72
+00:04:44,600 --> 00:04:53,266
+我要把这个TestClearColor改成TestTexture2D，当然，也要替换这些，挺好的
+I'm going to change TestClearColor to TestTexture2D, and of course I'll replace the this is great
+
+73
+00:04:53,533 --> 00:04:58,300
+我会用这个替换构造析构函数，我的意思是，我们不需要这个，点击所有私有的
+I'll replace the construction destructor with that, and I mean we don't need this, click all the private
+
+74
+00:04:58,300 --> 00:05:01,133
+那么我暂时先把它去掉
+so I will just get rid of that for now
+
+75
+00:05:01,733 --> 00:05:11,133
+然后如果我使用视觉辅助来切换到C++文件，把这个改为TestTexture2D
+and then if I alter into this using visual assist to get to the C++ file, I will change this to TestTexture2D
+
+76
+00:05:13,333 --> 00:05:16,633
+然后我们可以保留这些东西，然后我只要。如果我点control ash
+and then yeah we can keep this stuff, and then I'll just do a if I hit control ash
+
+77
+00:05:16,633 --> 00:05:22,400
+我们可以将TestClearColor替换为TestTexture2D
+we can do a find replace for TestClearColor into TestTexture2D
+
+78
+00:05:22,625 --> 00:05:27,966
+替换文档中的所有内容，很好，完成了，那么差不多就是那样
+and all oh to replace everything in this document, okay cool, done, so that's pretty much it
+
+79
+00:05:28,233 --> 00:05:33,566
+我想我们的测试是空白的
+we've got a blank canvas, I guess for actually riding our tests here
+
+80
+00:05:34,866 --> 00:05:41,533
+我可能会一直把清除颜色设置成黑色之类的
+I will probably keep setting the clear color to like you know black or something like that
+
+81
+00:05:43,933 --> 00:05:50,500
+我会在那里保持清除颜色，当然我还不需要ImGui的东西
+and I'll keep the clear in there and then of course I don't need anything for the ImGui stuff just yet
+
+82
+00:05:50,625 --> 00:05:53,933
+好了，我们有一个空白测试，它可能还不错
+okay, so there we go, we have a blank test, it's probably even nice
+
+83
+00:05:53,966 --> 00:05:57,533
+创建一个空白的测试类文件可能会更好
+it would probably even be nice to just create a blank test kind of file
+
+84
+00:05:58,100 --> 00:06:01,366
+甚至可以把我们的VS设置成一个模板或者类似的东西，如果你们想的话
+or you can even set our visual studio like a template or something like that, if you really want to
+
+85
+00:06:01,366 --> 00:06:03,233
+我从来没有做任何关于它的复制粘贴文件
+I never do anything about it as copying paste files
+
+86
+00:06:03,233 --> 00:06:07,400
+然后对它们进行重构，就像我刚才做的那样，对它们进行重命名，使用更好的地方
+and then kind of refactor them just rename stuff in them and using finer place like I just did then
+
+87
+00:06:07,600 --> 00:06:09,600
+但是现在我们有一个空白的文件来开始
+but essentially now we have a blank file to start off with
+
+88
+00:06:09,600 --> 00:06:12,666
+那么现在，让我们来写显示文本任务所需的代码
+so now let's write the code that we need to actually display a text job
+
+89
+00:06:13,866 --> 00:06:16,566
+现在我可以从头开始写所有的代码，这实际上非常简单
+now I could write all the code from scratch, it's actually pretty simple
+
+90
+00:06:16,566 --> 00:06:20,266
+但是有一个更简单的方法，当然我曾经写过
+but there's an even easier way, of course I did have it written at one point
+
+91
+00:06:20,266 --> 00:06:22,900
+如果我去到这个项目的github库
+so if I just go to the github repository for this project
+
+92
+00:06:23,266 --> 00:06:27,900
+顺便说一下，如果你们通过访问patreon.com/TheCherno成为赞助人，就可以访问那个代码仓库
+which by the way, you can access if you become a patron by going to patreon.com/TheCherno
+
+93
+00:06:28,066 --> 00:06:31,100
+它可以访问所有这些github源代码，这很好
+it'll get access to all of this kind of github source code, which is great
+
+94
+00:06:31,100 --> 00:06:35,766
+因为它是一期接一期的，并且也有助于支持这个系列
+because it goes kind of episode by episode, and also helps support this series as well
+
+95
+00:06:36,600 --> 00:06:41,066
+我们把每一期的所有提交合成一个单独的提交
+we have all the commits from this entire from each episode as separate commits
+
+96
+00:06:41,066 --> 00:06:46,733
+所以如果我点开这个，建立一个测试框架的地方，然后去查看那个特定的差异
+so if I just go to the one, where I set up a test framework, and just go to that specific diff for that
+
+97
+00:06:48,133 --> 00:06:51,933
+对于那个提交，我还可以浏览存储库，但这可能会更容易些
+for that commit, I could also browse the repository at that point, but this might be easier
+
+98
+00:06:52,433 --> 00:06:56,500
+如果浏览Application.cpp，我可以看到代码被删除了，这基本上是我们的纹理渲染测试
+if I look at Application, I can see what the code are removed, which was basically our texture rendering test
+
+99
+00:06:56,500 --> 00:07:01,266
+对吧，我可以复制粘贴这些东西到我的VS，它应该能工作
+right, so I can just copy and paste this stuff back into my visual studio, and it should work
+
+100
+00:07:01,566 --> 00:07:05,733
+那么让我们从这些positions和indices开始，实际上
+so let's start with all this kind of position and indices stuff and in fact
+
+101
+00:07:06,600 --> 00:07:10,433
+你们知道吗，我可能会把所有东西都弄成那样
+you know what I might just go and get pretty much everything just like that
+
+102
+00:07:11,866 --> 00:07:15,633
+我们必须，我们必须把一些东西改到成员中
+we will have to bring some, we will have to bring some things out into members
+
+103
+00:07:15,633 --> 00:07:19,400
+很明显，因为它们的生存期不仅仅在构造方法内
+because they need to survive more than just a construction scope obviously
+
+104
+00:07:19,400 --> 00:07:24,966
+但有些东西，比如这个float positions，作用域就在这个范围内
+but some of these things like float positions, don't need to actually exist for longer than this scope
+
+105
+00:07:24,966 --> 00:07:29,033
+因为只要我们把它们添加到实际的顶点缓存中，它们就完成了，好了
+because as soon as we add them to our actual vertex buffer like that's it, they're done, okay
+
+106
+00:07:29,900 --> 00:07:35,633
+那么就在这儿，在构造函数中，我要粘贴所有的代码
+so figure over here, in the constructor, I'm just going to paste in all of our code
+
+107
+00:07:36,600 --> 00:07:40,333
+让我们看看这里需要改变什么，那么positions就保留在那儿
+and let's take a look at what we need to change here, so positions can stay and actually controls there
+
+108
+00:07:40,333 --> 00:07:48,053
+这样就保持了格式，很好，好了，那么保留positions，比如你们知道的，还有indices
+just so it maintains the formatting, good, okay, so positions can stay, you know, indices can stay
+
+109
+00:07:49,300 --> 00:07:55,500
+混合之类的东西可以保持不变，我们应该有某种状态，客户端每次都会重置
+blend and stuff like that can stay, we should have some kind of state probably, the guest reset every time
+
+110
+00:07:55,500 --> 00:07:59,733
+因为显然这些测试中有一个需要启用混合，所以我们不想禁用混合
+because obviously one of these tests enables blending, we don't want to have to disable blending
+
+111
+00:08:01,766 --> 00:08:06,433
+比如你们知道的，在这个测试的最后，那可能是我们需要解决的问题
+you know like at the end of this test essentially, so that might be a problem we might need to solve
+
+112
+00:08:06,600 --> 00:08:09,366
+但无论如何，顶点已经在这儿了，我们一定要把它提出来
+but anyway, vertics are raised here, we'll definitely need to bring that out
+
+113
+00:08:09,600 --> 00:08:14,133
+顶点缓冲区也保留在那儿，我不知道为什么那是一个完整类型的错误
+vertex buffer as well lay up and stay, I don't know why that's an error lowering complete type
+
+114
+00:08:14,133 --> 00:08:20,000
+好了，我们当然需要包含这些东西，所以让我们包含，让我们看看
+okay, we need to include some of these things of course, so let's include, let's see
+
+115
+00:08:21,833 --> 00:08:31,075
+VertexBuffer，VertextLayout可能是它自己的东西，VertexBufferLayout，GLM
+VertexBuffer, that okay, VertexLayout is probably its own thing, VertexBufferLayout, glm
+
+116
+00:08:31,075 --> 00:08:34,600
+我不知道这里面包含了什么
+which I have no idea what the include for that is actually figure back to here
+
+117
+00:08:34,633 --> 00:08:40,700
+我想它应该在最上面，哎呀，那显然不是文件
+I think it would have been at the top, whoops, that's clearly not the file
+
+118
+00:08:41,066 --> 00:08:46,433
+我们在这里看到了，现在让我们把这个文件作为一个单独的东西打开
+and we see it here, now let's just open the file as a separate thing
+
+119
+00:08:47,300 --> 00:08:57,466
+它有一个打开的文件，很好，可以回到这里，打开这个提交
+okay, that has an open file, fantastic, free to go back here, and we go to this
+
+120
+00:08:58,100 --> 00:09:05,000
+我们可以看看这个文件，实际上那是在我删除所有东西之后，但无论如何，它应该还在这里
+we can look at the file, actually that's after I removed everything, but anyway, it should still be here
+
+121
+00:09:05,366 --> 00:09:11,600
+是的，它在这里，如果我们回到这里，我们可以只包含GLM
+yep there it is, and if we go back here, we can just include glm
+
+122
+00:09:13,766 --> 00:09:19,666
+是的，这差不多，除了纹理，它对纹理测试很重要
+and yeah that's like pretty much it except for texture, it's kind of important to the texture test
+
+123
+00:09:20,266 --> 00:09:26,800
+所以我们要放一个纹理，是的，然后我想这差不多了，所以我们已经有了我们需要的所有东西
+so we'll put a texture, yeah and then I think that's pretty much it, so we've got everything we need here
+
+124
+00:09:28,033 --> 00:09:31,075
+显然，我们需要为渲染设置一切
+obviously we need to set everything up for rendering
+
+125
+00:09:31,075 --> 00:09:35,833
+那么这就是我们渲染循环所需要的东西，如果仔细看这段代码
+so things that we actually would need for the rendering loop, if you look at this exact code here
+
+126
+00:09:36,400 --> 00:09:41,566
+我们有translation之类的东西，但我们真正需要的是
+and we had like translation and stuff like that as well set up, but what we really just need is
+
+127
+00:09:43,033 --> 00:09:49,250
+着色器，渲染器对象，当然，我认为这只是传递到渲染函数
+the shader, the renderer object which of course, I think is just passed into the render function
+
+128
+00:09:49,250 --> 00:09:55,100
+或者不，它实际上不是，所以我们需要从某处得到渲染，我认为这是我们真正需要的
+or no it's not actually, so we need to get that from somewhere render it get is what we really need I think
+
+129
+00:09:56,200 --> 00:10:01,633
+对，我们建立了这个，这就是为什么在视频之间我偶尔会忘记实际存在什么
+right, we did set that up, so this is why once a while between videos I forget what actually exists
+
+130
+00:10:01,666 --> 00:10:05,700
+不，我们没有，好吧，这很有趣，但我的意思是，它实际上是
+no, we don't have that, okay, so that's interesting, but I mean all it really is is
+
+131
+00:10:05,700 --> 00:10:10,725
+就像我们现在可以创建一个渲染器对象，并告诉它如果我们需要做什么
+it's like we can just create a renderer object for now, and tell it what to do if we need to 
+
+132
+00:10:10,725 --> 00:10:15,475
+因为它就像现在的渲染器，它不需要是静态的
+because it's just literally like the renderer right now, it's just doesn't need to be like static or anything 
+
+133
+00:10:15,475 --> 00:10:19,100
+它只是一组不适用于任何状态的命令
+it's just a set of commands that don't apply to any kind of state
+
+134
+00:10:19,866 --> 00:10:24,566
+我的意思是，渲染器没有任何成员变量或任何东西
+what I mean with that is like the renderer doesn't have like you know any kind of member variables or anything
+
+135
+00:10:24,566 --> 00:10:30,533
+所以你们基本上可以每帧创建一个渲染器实例，就像，挺自由的，对吧
+so you can just create a renderer instance per frame essentially, that'll be, like free, right
+
+136
+00:10:30,600 --> 00:10:35,533
+因为它只是一个没有大小的堆栈对象，它的大小是1，里面什么都没有
+because it's just a stack object that has no size, it's got the size of one, it's got nothing in it
+
+137
+00:10:35,900 --> 00:10:37,966
+然后你们可以调用draw指令
+and then you can just call the draw command
+
+138
+00:10:37,966 --> 00:10:41,333
+因为在这一点上画的就像一个自由浮动函数
+because really at this point draw is almost like a free floating function
+
+139
+00:10:41,333 --> 00:10:45,000
+它只是碰巧在渲染器类中，它可以只是静态的
+it just happens to be inside the renderer class, it could just be static
+
+140
+00:10:46,433 --> 00:10:53,233
+不管怎样，那么回到这里，我想我会复制大部分内容
+anyway, so back over here, yeah I guess I'll copy most of this
+
+141
+00:10:53,433 --> 00:10:57,625
+我们有所有这些滑块和之前的东西，还有帧速率
+we have all these sliders and stuff right on that we had before, and the frame rate
+
+142
+00:10:57,625 --> 00:11:00,766
+那么让我们从ImGui复制它，然后直接放进去
+so let's just copy that from ImGui, and then we can put it
+
+143
+00:11:01,800 --> 00:11:10,600
+然后我们可以把它放到OnImGuiRender中，就在这儿，然后是这个东西
+and then we can put it into OnImGuiRender, which is over here, and then as for this stuff
+
+144
+00:11:10,600 --> 00:11:13,333
+我不知道增量是什么，我想我们可能不需要这个，这是颜色
+I don't know what increment is, we probably don't need that I think, that's the color
+
+145
+00:11:14,333 --> 00:11:22,700
+我们会复制我们拥有的这个渲染代码，然后把它放到最后的OnRender中
+we'll grab this rendering code that we have, and just put it into OnRender at the end here
+
+146
+00:11:25,800 --> 00:11:34,433
+我想这差不多就是我们需要的了，是的，还有translation，很好
+and then I think that's pretty much all we need, yeah translations, okay, good
+
+147
+00:11:34,433 --> 00:11:38,233
+所以现在我们可以开始整理这些代码了，因为我想我们已经得到了所有的信息
+so now we can just start actually sorting this code out, because I think we've got all of it here now
+
+148
+00:11:39,400 --> 00:11:47,233
+那么translationA，translationB，这些就是这些，我们把它们放在哪里
+so translationA, translationB, those were just what even are those, where do we make them here
+
+149
+00:11:47,233 --> 00:11:49,066
+它们都是glm::vec3
+they are they're just glm::vec3
+
+150
+00:11:49,233 --> 00:11:59,366
+如果我们回到这里，我们把它们写在这里，那么就是m_TranslationA和m_TranslationB
+so if we get back to here, we'll make we'll make them here, so m_TranslationA and m_TranslationB
+
+151
+00:12:04,066 --> 00:12:13,700
+到这里，我们会在构造函数中建立它们，现在让我再次得到它们
+go to this, we'll set them up in a constructor, now let me get them again
+
+152
+00:12:15,566 --> 00:12:26,866
+那么我们可以看到，m_TranslationA(200, 200, 0)，和m_TranslationB(400, 200, 0)
+so we'll see m_TranslationA, it's 200,200 0, m_TranslationB, it's 104,200,0
+
+153
+00:12:27,766 --> 00:12:32,633
+好了，设置好了，这里还需要什么，那么还需要着色器
+okay, that set up, what else did we need in here, so we need our shader
+
+154
+00:12:32,633 --> 00:12:40,866
+当然这个变成m_TranslationA，这个变成m_TranslationB
+of course this becomes m_TranslationA, this becomes m_TranslationB
+
+155
+00:12:43,833 --> 00:12:48,750
+我们来设置着色器，我们可以像我说的那样把它做成这样
+and let's set up the shader, okay, so the renderer we can just as I said just to make it like this
+
+156
+00:12:48,750 --> 00:12:52,900
+好吧，我们只需要调用这个，就这样
+let's try to be fine, we had only needed to actually call this, and that's it
+
+157
+00:12:53,533 --> 00:12:57,000
+我们需要顶点数组，索引缓冲区和着色器
+so we need the vertex array, we need the index buffer and we need the shader
+
+158
+00:12:57,200 --> 00:13:04,366
+这应该很简单，让我们到上面这里，我们可能会包括这些东西
+so that should be pretty easy, let's actually go up here, and we might as well just include this stuff
+
+159
+00:13:05,766 --> 00:13:15,600
+我想在这里，我们还需要一个纹理，那么就是VertexArray m_VAO
+I think here, and we also need a texture, so VertexArray m_VAO
+
+160
+00:13:17,400 --> 00:13:26,433
+我们需要一个顶点缓冲区，但我们不需要这个缓冲区，我们肯定会索引我们真正需要的缓冲区
+we need a VertexBuffer, but we don't need the buffer well, we definitely IndexBuffer what do we actually need
+
+161
+00:13:28,700 --> 00:13:35,300
+好了，着色器，我们需要一个索引缓冲区，那么就是Indexbuffer m_IndexBuffer
+okay, shader here we are, we do need an index buffer, so IndexBuffer m_IBO or just m_IndexBuffer
+
+162
+00:13:36,766 --> 00:13:39,933
+不管那是什么，我们的索引缓冲区，我们需要着色器
+so whatever that's the rave but our index buffer, we need our shader
+
+163
+00:13:41,766 --> 00:13:51,533
+让我们回到这里，替换所有东西，shader变成这个
+and let's go back up here and replace everything, so shader it becomes that
+
+164
+00:13:52,266 --> 00:14:11,200
+那么我们来到上面，在这儿初始化它，shader是这个，index buffer是
+so let's just go up and initialize it here, so shader is this, index buffer is
+
+165
+00:14:15,600 --> 00:14:24,400
+这不是6，我们可以稍后初始化，我们可能需要创建这些
+and this isn't six, so we can initialize that later, we might need to actually make these
+
+166
+00:14:24,666 --> 00:14:28,433
+你们知道我做了什么让它们栈变量，但是我已经忘了这个
+you know what I did make them stack variables, but I'm forgetting this already
+
+167
+00:14:28,633 --> 00:14:33,266
+我们只需要做unique_ptr，然后就结束了
+we'll just make the unique pointers, and that will be the end of that
+
+168
+00:14:34,200 --> 00:14:40,866
+所以这可能是你们第一次看到TheCherno使用智能指针，但它是矢量型的
+so this is probably the first time you're seeing TheCherno use smartpointers, but it's vectory
+
+169
+00:14:41,300 --> 00:14:42,966
+因为在这种情况下，这样做是正确的
+because that's the right thing to do in this case
+
+170
+00:14:43,766 --> 00:14:46,566
+我们会包含内存，这样我们就能访问所有这些智能指针
+we'll include memory, so that we get access to all these smart pointers
+
+171
+00:14:47,200 --> 00:14:50,133
+所有这些指针都是唯一的
+and we will make all of these unique pointers
+
+172
+00:14:51,100 --> 00:14:54,200
+因为弄错了是没有必要的
+because having a mistake where it was it's kind of unnecessary
+
+173
+00:14:54,733 --> 00:14:58,566
+我们并不想那样做，好了，现在我们可以消去这个
+and we didn't really want to do it that way, okay, so now we can get rid of this
+
+174
+00:14:59,600 --> 00:15:05,666
+事实上，你可以。有几种方法可以使它独一无二，但你不必这样做
+and actually yeah you can there's a few ways you could just make unique but you don't have to
+
+175
+00:15:05,666 --> 00:15:11,433
+这只是为了与api保持一致，但我想我还是会用它
+that's just there to be consistent with the api, but I guess I will still use it
+
+176
+00:15:11,433 --> 00:15:28,366
+所以std::make_unqiue，然后我们对顶点数组做同样的事情，m_VAO=，这对我很有帮助
+so std make_unique and then we'll do the same thing for the vertex array, m_VAO equals, that is helping me
+
+177
+00:15:29,366 --> 00:15:39,800
+然后是索引缓冲区然后是索引缓冲区
+yep make enig and then index buffer as well and then for the index buffer which happened there
+
+178
+00:15:41,300 --> 00:15:46,200
+我们把它写在这里，然后把参数放到这里
+we will make it here and we'll take the arguments and put them in here
+
+179
+00:15:47,500 --> 00:15:55,566
+那个VertexBuffer就变成了m_VAO->AddBuffer()，当然着色器现在也不同了
+VertexBuffer becomes m_VAO our AddBuffer, shader of course is now different as well
+
+180
+00:15:55,566 --> 00:16:01,366
+我们已经做过了，还需要改一下shader->Bind()，shader->SetUniform
+and we've already made it, so we just have to do shader Bind shader SetUniform
+
+181
+00:16:04,400 --> 00:16:09,000
+我们需要在一分钟内拿出，我们真的不需要解绑定任何东西
+ texture as well we need to bring out in the minute and yeah we don't really need to unbind anything
+
+182
+00:16:10,175 --> 00:16:17,433
+好的，那么关于纹理，让我们拿出纹理，也就是std::unque_prt<Texture>
+okay, so texture, let's bring out texture as well, std::unque_prt<Texture>
+
+183
+00:16:19,733 --> 00:16:30,400
+然后我们会取纹理，让我们进去做一个纹理，我们还不需要绑定它
+and then we'll take the texture, let's get in make a texture, we don't need to bind it yet
+
+184
+00:16:31,366 --> 00:16:41,200
+我们需要在这里绑定它，我们会使用纹理绑定这个着色器绑定
+we do need to bind it here though, so we'll do texture bind this shader bind
+
+185
+00:16:42,600 --> 00:16:47,150
+所以我猜渲染器没有找到着色器，也许它找到了，它找到了
+so I guess the renderer doesn't find the shader, well maybe it does, it does
+
+186
+00:16:47,150 --> 00:16:50,766
+所以我们不需要找到着色器，因为我们需要设置统一变量
+so we don't need to find the shader, that's because we need to set the uniform
+
+187
+00:16:51,933 --> 00:16:57,333
+是啊，以防我们被留下来做统一变量
+yeah in case we was left to do that set uniform
+
+188
+00:16:59,566 --> 00:17:10,766
+项目视图不是这样的，让我们快速找到它们，这里，我们把它们放在这里
+yeah projan view is not a thing so let's find those quickly, here they are, we'll put them up here
+
+189
+00:17:12,466 --> 00:17:19,500
+投影矩阵你当然可以把它存储为不变的，所以我们把它作为一个元素来做
+projection matrix you could of course store as a that doesn't change, so let's do that as a member
+
+190
+00:17:20,500 --> 00:17:25,700
+实际上它们在这里，所以可能是的，我们为什么会有它们
+actually here they are here, so probably yeah why do we have them
+
+191
+00:17:26,166 --> 00:17:35,000
+这是原始代码，视图视图被设置为这个，很好
+oh that was the original code my bad okay so view view is set to that okay great
+
+192
+00:17:35,866 --> 00:17:43,700
+那么让我们把这些移除掉，改成glm::mat4 m_Proj, mView
+so let's actually move these out, glm::mat4 m_Proj, mView
+
+193
+00:17:45,200 --> 00:17:57,166
+如果我们向上滚动，我们可以去掉这个，叫它项目回顾
+so now if we scroll up we can just get rid of that and call that project review
+
+194
+00:17:57,466 --> 00:18:07,466
+然后在这里接近并查看mvr，我想我们需要做参考
+and then over here approach and view mvr which we I think we'll have to do reference
+
+195
+00:18:08,166 --> 00:18:12,100
+索引缓冲区也会做引用
+and index buffer which will also do reference
+
+196
+00:18:12,466 --> 00:18:18,625
+以及m_Shader，它也可以做参考，因为我认为它可以做参考
+and m_Shader, which will also do reference because this takes in reference as I think
+
+197
+00:18:18,625 --> 00:18:26,066
+好的，很好，这是相同的，项目和视图
+yes okay great um and then this is the same and project and view
+
+198
+00:18:29,200 --> 00:18:40,166
+Shader绑定，然后变成滑，变成m Shader，已经很长时间了
+shader bind and that becomes slips becomes m shader, it's been so long
+
+199
+00:18:41,066 --> 00:18:45,766
+我在这台笔记本上打字都快费劲了，因为我真的不习惯
+I'm almost struggling to type on this laptop, because I'm really not used to this
+
+200
+00:18:46,750 --> 00:18:52,550
+好了，好了，我认为这很完美，哦，当然还有m_TranslationA和m_TranslationB
+okay, there we go, I think that's perfect now, oh and of course the translationA B members now
+
+201
+00:18:53,433 --> 00:18:57,566
+所以我们这样做，哇，好吧，我觉得这很好
+so we do that, wow okay, I think that's good um
+
+202
+00:18:57,900 --> 00:19:04,033
+我应该看看这段代码，看看它是否工作，让我们把着色器带到它实际使用的地方
+I should look over this code and see if it works, let's maybe bring the shader down to where it's actually used
+
+203
+00:19:05,000 --> 00:19:08,933
+我应该检查一下，确保它能正常工作，但是我就这样放着它吧
+I should look through this going to make sure it works, but I'm just going to leave it like this
+
+204
+00:19:09,033 --> 00:19:18,433
+因为，是的，这个也是，我想我可以把它们画在这里
+because yes yeah with this as well I'm frozen view I guess I could make them up here
+
+205
+00:19:20,400 --> 00:19:24,066
+因为那样的话，它们就不需要初始化两次了
+because that way, they wouldn't need to be initialized twice
+
+206
+00:19:24,533 --> 00:19:39,100
+proj是这样的，view是这样的，我们肯定会把这些东西往下移动
+so proj is that, view is that, we'll definitely move this stuff down
+
+207
+00:19:40,533 --> 00:19:45,066
+好了，这就是全部，让我们构建所有东西并保存编译
+okay, there we go, so that's everything, let's build everything and save your compiles
+
+208
+00:19:45,600 --> 00:19:49,800
+我知道这集可能看起来有点无聊，或者就像你知道的那样
+I know this episode might seem a little bit boring or just like you know
+
+209
+00:19:49,800 --> 00:19:52,333
+只是在做一些事情，不喜欢谈论
+just doing stuff and not like talking about it maybe
+
+210
+00:19:52,366 --> 00:19:54,366
+但这只是工作需要做的事
+but like this is just work things to get done
+
+211
+00:19:54,366 --> 00:19:57,066
+我觉得这一集的结局可能会更像这样
+and I think the episode is probably gonna end up looking more like this anyway
+
+212
+00:19:57,700 --> 00:20:00,966
+因为当我们不再谈论这些东西，而是开始基于这些东西写代码
+because as we actually stop talking about stuff and start writing code based on stuff
+
+213
+00:20:00,966 --> 00:20:05,500
+我们已经知道这是一个很复杂的周一，所以不管怎样，就是这样
+we already know that can be quite a Monday in task so anyway it is what it is
+
+214
+00:20:05,933 --> 00:20:10,133
+好的，这个成功了，让我们看看这个是否可行，显然我们还没有使用这个测试
+okay, so this is succeeded, let's actually see if this works, obviously we haven't used the test anyway
+
+215
+00:20:10,133 --> 00:20:15,600
+我们首先需要做这个，如果我去应用程序，我们需要做的是
+so we definitely need to do that first, so if I go to application, all we really need to do is
+
+216
+00:20:16,833 --> 00:20:22,433
+我们创建了测试菜单，一旦我们有了测试菜单，我们就可以注册我们的测试
+we create our test menu and we just need to, once we have the test menu, we can register our test
+
+217
+00:20:22,433 --> 00:20:29,366
+我们有clear color作为测试，我要复制粘贴它，它变成测试纹理2d
+so we have clear color as a test here, I'm just going to copy and paste that, so that becomes test texture 2d
+
+218
+00:20:30,500 --> 00:20:41,566
+然后如果我到这里，这就变成了test texture2d，我说的是2d，纹理
+and then if I go here this this becomes test texture2d texture 2d well I'll say 2d texture
+
+219
+00:20:44,666 --> 00:20:46,366
+我认为这正是我们所需要的
+and I think that's actually what we need
+
+220
+00:20:46,366 --> 00:20:49,866
+在我们的测试框架中，这一行代码就足以完成所有的工作
+that one line of code in our test framework is enough to do everything
+
+221
+00:20:49,866 --> 00:20:52,100
+我们运行一下，看看这个能不能运行
+so let's just run and see, see if this runs
+
+222
+00:20:52,100 --> 00:20:56,433
+我很惊讶，如果它没有崩溃，老实说，因为2d纹理
+I'll be surprised, if this doesn't crash, to be honest, because yeah okay 2d texture
+
+223
+00:20:56,866 --> 00:21:01,766
+好了，崩溃了，很好，有些东西是空的，它在OpenGL中
+okay, there we go, we crashed, fantastic, something's null, I believe and it's in OpenGL
+
+224
+00:21:01,833 --> 00:21:06,633
+好的，这是。这可能是一个很难做到的错误，让我们回到
+okay, so this is this might be a hard error to do both, let's go back to
+
+225
+00:21:06,633 --> 00:21:11,766
+让我们把线程换成主线程，这样我们就能看到实际发生了什么，有些东西是空的
+let's change our thread to our main thread, so we can look at what's actually happen, so something's null
+
+226
+00:21:14,400 --> 00:21:19,933
+这很有趣，它对某些东西不满意，我想要和正确一样
+that's interesting, it's not happy with something well, I intended to have the same as correct
+
+227
+00:21:20,466 --> 00:21:25,533
+我们的断言可能是对的，但这确实很有趣
+and our maybe arbitics right is wrong, but yeah that's definitely interesting
+
+228
+00:21:25,533 --> 00:21:35,133
+所以这是在图形驱动内部抛出一个空指针异常，我相信一旦输出
+so this is throwing a null pointer exception inside the graphics driver I believe once the output
+
+229
+00:21:37,333 --> 00:21:48,533
+好的，太棒了，嗯，我想知道，让我们来看看今天的纹理测试
+yeah okay, so that's fantastic, hmm I wonder what, let's cause that, let's look at our texture today test
+
+230
+00:21:51,866 --> 00:22:02,100
+这就是我要展示的东西，它在哪里，所有这些东西
+that's what I'm showing up here, okay, where is it, so all this stuff
+
+231
+00:22:02,433 --> 00:22:11,533
+这是因为我们的顶点缓冲区被删除了
+okay, so it's just the of course it's because our vertex buffer has been deleted
+
+232
+00:22:11,933 --> 00:22:14,450
+我们存储顶点缓冲区的方式是这样的
+so the way that we store vertex buffers is that this
+
+233
+00:22:14,450 --> 00:22:17,900
+这个类的作用域是顶点缓冲区的作用域
+the scope of this actual class is the scope of the vertex buffer
+
+234
+00:22:18,233 --> 00:22:21,333
+因为你可以在析构函数中看到，我们删除了它，这就是所发生的
+because you can see in the destructor, we delete it, so that's what's happened
+
+235
+00:22:21,466 --> 00:22:26,033
+它试图从顶点缓冲区运行，但没有被删除，这就是为什么显卡驱动崩溃的原因
+it's trying to run from a vertex buffer, that's not deleted, that's why the graphics driver crashes
+
+236
+00:22:26,733 --> 00:22:29,650
+为了解决这个问题，我们需要在CPU端
+so to fix that, of course what we need to do is actually on the cpu side
+
+237
+00:22:29,650 --> 00:22:31,300
+维护我们的顶点缓冲区
+maintain our vertex buffer for some reason
+
+238
+00:22:31,300 --> 00:22:35,233
+我想一旦我们，当然还有另一个你可以做的设计
+I thought that once we, there is another design of course that you could have done
+
+239
+00:22:35,233 --> 00:22:40,650
+也就是说，你可以直接建立CPU站点，而不是这样做
+which is where instead of doing well this, you could just kind of have your cpu site
+
+240
+00:22:40,650 --> 00:22:44,000
+所有的顶点by for类就像一个说唱类
+and all your vertex by for class is just like a little kind of rapper class
+
+241
+00:22:44,000 --> 00:22:46,766
+这几乎只是向gpu发送数据，而这正是你所需要的
+almost that just sends data to the gpu, and that's what you needed for
+
+242
+00:22:46,766 --> 00:22:50,875
+然后你可以丢弃它，一旦数据在gpu上，但当然我们没有这样做
+and then you can discard it, once the data is on the gpu, but of course we haven't done it that way
+
+243
+00:22:50,875 --> 00:22:56,466
+因为这样做需要一个不同的处理维护系统，对吧
+because doing it that way requires a different handle maintenance kind of system, right
+
+244
+00:22:56,466 --> 00:22:58,766
+因为显然我们仍然需要保留渲染器句柄
+because obviously we still need to retain that renderer handle
+
+245
+00:22:58,900 --> 00:23:05,500
+我们基本上在CPU端对象和gpu端对象之间有一个一对一的映射
+so we basically have a one to one mapping between cpu side objects and gpu side objects
+
+246
+00:23:05,900 --> 00:23:09,333
+我的意思是，我在cpu上有我的顶点缓冲对象
+what I mean by that is that I have my vertice buffer object on the cpu
+
+247
+00:23:09,333 --> 00:23:14,645
+它是GPU上的一个镜像，对吧，一旦它被创建，GPU就会分配内存
+it is a mirror of what's on the GPU, right, once it gets created the gpu allocates memory
+
+248
+00:23:14,645 --> 00:23:21,000
+一旦它被删除，gpu d分配内存，这就是一对一的映射，所以如果我们这样做
+once it gets deleted the gpu d allocates memory, right, it's just one to one mapping, so if we do something like this
+
+249
+00:23:21,466 --> 00:23:26,600
+在构造函数的堆栈中，一旦到达作用域的末尾，它就会被删除
+where we make it on the stack inside the constructor, once we reach the end of the scope, it gets deleted
+
+250
+00:23:27,300 --> 00:23:30,566
+然后我们的顶点缓冲会从gpu内存中移除
+and then our vertes buffer actually gets removed from gpu memory
+
+251
+00:23:30,600 --> 00:23:34,366
+这很糟糕，如果我们试着去渲染的话，所以我其实挺高兴的，遇到这种错误
+which is bad, if we're trying to then render to it, so I'm actually kind of glad the error happened
+
+252
+00:23:34,900 --> 00:23:37,900
+因为这让我有机会谈论这件事，说实话，我甚至都没想过
+because it gave me a chance to talk about this, and I didn't even think about it to be honest
+
+253
+00:23:38,433 --> 00:23:52,033
+所以m_VertexBuffer等于这个，然后我们只需要到这里
+so m_VertexBuffer equals this, and then we just need to come over here
+
+254
+00:23:59,800 --> 00:24:09,832
+就这样吧，好吧，到底怎么了，我们需要知道吗，没啥问题啊
+and that should be it, okay, what is wrong with you, are we need to know, that's fine
+
+255
+00:24:10,275 --> 00:24:17,433
+对了，这有什么问题，我忘了，我忘了一个尖括号
+oh yeah what's wrong with that, I forgot the I forgot the angle of bracket
+
+256
+00:24:17,433 --> 00:24:22,900
+好的，那么AddBuffer这里，当然是一个m_VertexBuffer的引用了
+okay, so AddBuffer of course is m_VertexBuffer like that referenced
+
+257
+00:24:23,066 --> 00:24:30,233
+再次按f5，希望这能行得通，2D纹理，看这个
+and yeah let's hit f5 again and hopefully this will work, okay, so 2D texture, okay, look at that
+
+258
+00:24:30,233 --> 00:24:35,400
+我们的两个东西被渲染了很多次，这都很好
+and we've got our two things being rendered actually more at multiple times, and this is all good
+
+259
+00:24:35,800 --> 00:24:41,933
+它看起来像一个链接星在翻译ian v，是的，我做了什么
+it looks like these to a link star on a translation ian v yeah what have I done
+
+260
+00:24:42,600 --> 00:24:44,366
+让我们回到这里，这很有趣
+let's go back here, that's funny
+
+261
+00:24:45,633 --> 00:24:55,200
+我想我知道我做了什么，哦，这看起来不错，translation，我做了两次m_TranslationA
+I think I I think I know what I did,  so oh this looks good, yeah translate, I've got m_TranslationA twice
+
+262
+00:24:55,200 --> 00:25:01,600
+那就是问题所在，现在我们应该能够独立控制它们了
+that's what was wrong, okay, so now we should be able to control them independently
+
+263
+00:25:01,600 --> 00:25:05,800
+2D纹理，这是这个，这是这个，太棒了
+so 2D texture, and then here's this one, here's this one, yeah fantastic
+
+264
+00:25:06,000 --> 00:25:12,033
+很好，好了，我来测试一下，如果我们回去删除和清除所有东西
+okay cool, so there we go, that is, I'll test, if we go back and delete everything and clears everything
+
+265
+00:25:12,033 --> 00:25:14,666
+然后我们可以回到，清除颜色，我们可以回到，我们可以回到你们的纹理
+and then we can go back, and clear color, we can go back, we can go to your texture
+
+266
+00:25:14,666 --> 00:25:16,600
+我们可以返回去，你们可以看到每次都是什么样子
+we can go back, and you can see how like every time
+
+267
+00:25:16,600 --> 00:25:21,333
+本质上它会创建和销毁它们，我们现在有一个纹理测试
+essentially it will kind of create them and destroy them, and we actually have like a texture test now
+
+268
+00:25:22,000 --> 00:25:26,033
+还有渲染批量对象的测试，然后我们还有一个清除颜色的测试
+as well as like rendering multiple objects test, and then we have a clear color test as well
+
+269
+00:25:27,100 --> 00:25:31,133
+并且我想这一切的重点是，如果你们看这段代码，它是少于100行的
+and I guess the point of all this is that, if you look at this code, it's less than 100 lines
+
+270
+00:25:31,133 --> 00:25:35,400
+它非常简洁，就像里面有我们需要的一切
+and it's so like concise, right, like as in it's got like just everything we need
+
+271
+00:25:35,400 --> 00:25:38,700
+这就是创建着色器需要的所有东西
+really like this is everything you need to kind of, create the shader
+
+272
+00:25:38,733 --> 00:25:43,433
+创建顶点或对象，创建索引缓冲区，创建顶点布局的顶点缓冲区
+create the vertex or a object, create the index buffer, create the vertex buffer for the vertex layout
+
+273
+00:25:43,633 --> 00:25:48,033
+所有我需要设置的东西，这两个物体和纹理，等等
+everything that I need to set up, those two objects and the texture, obviously and everything like that
+
+274
+00:25:49,366 --> 00:25:53,466
+纹理在哪里，我们甚至可以把它分开一点让它更清晰
+where's the texture, we can even kind of divide this a bit to make it even more clear
+
+275
+00:25:54,333 --> 00:25:59,709
+我甚至可以像这样对这些东西进行分组，因为这是在创建顶点数组之类的东西
+so I might even group this kind of stuff like that, because it's kind of creating the vertex array and everything
+
+276
+00:26:00,466 --> 00:26:02,733
+然后我们有索引缓冲区和我们设置门的地方
+then we have our index buffer and where we actually set our gate
+
+277
+00:26:02,733 --> 00:26:06,766
+索引缓冲区在构造函数中被设置然后我们有了着色器
+the index buffer gets set in the constructor and then we have kind of the shader
+
+278
+00:26:06,766 --> 00:26:10,033
+然后纹理和所有的东西都是分组的，非常容易使用
+and then the texture and everything is kind of grouped, and really easy to use
+
+279
+00:26:10,433 --> 00:26:13,825
+因为它们都是惟一指针，它们会在作用域的末尾被销毁
+because they're all unique pointers, they will get destroyed at the end of the scope
+
+280
+00:26:13,825 --> 00:26:16,566
+我们甚至不需要写任何东西，因为我们已经
+so we don't even have to write anything in the disruptive, because we've
+
+281
+00:26:16,833 --> 00:26:19,900
+你知道，智能指针是正确的
+you know used to smart pointers kind of correctly
+
+282
+00:26:22,300 --> 00:26:25,975
+是的，我上周为C++做了一个关于安全的视频
+yeah I made a video last week for the C++ about safety
+
+283
+00:26:25,975 --> 00:26:29,500
+比如你是否应该使用智能指针，以及我对此的看法
+and like about whether or not you should use smartpointers and what my opinions are on that
+
+284
+00:26:29,733 --> 00:26:35,000
+以及它是如何进入c++教学的，如果你更感兴趣的话，可以看那个视频
+and and how that kind of comes into teaching C++, so watch that video, if you're more interested in
+
+285
+00:26:35,300 --> 00:26:37,666
+我说的这些东西是什么意思，因为我不知道怎么做
+what I mean by all of this stuff, because I don't know how
+
+286
+00:26:37,666 --> 00:26:43,366
+但我似乎建立了一种我不使用智能指针的名声，我用的只是我不这么认为
+but I seem to have built up some kind of a reputation that I don't use smart pointers I do it's just that I don't think that
+
+287
+00:26:43,600 --> 00:26:47,700
+我不认为原始指针应该被禁止，因为它们有很多用途
+I don't think that raw pointers should be banned, because there are a lot of uses for them
+
+288
+00:26:47,700 --> 00:26:52,533
+事实上，我在这个的测试菜单中使用过它们，但显然对于像这样的东西，当我有一个类时
+in fact, I've used them in the test menu of this, but obviously for something like this, when I have a class
+
+289
+00:26:52,733 --> 00:26:59,433
+我只需要堆分配的内存来在类的生存期中存活
+and I just need heap kind of allocated memory to survive for the duration of that class lifetime
+
+290
+00:27:00,033 --> 00:27:07,033
+当然，我将使用唯一指针，因为它们的成本为零，我们会说，基本上它们的成本为零
+then of course I'm going to use unique point as they add zero cost, basically they are zero costs we'll say
+
+291
+00:27:07,300 --> 00:27:11,400
+你们知道的，它们让编程变得简单多了
+and they're, you know, they're just, they're made programming so much easier
+
+292
+00:27:11,400 --> 00:27:15,633
+总之，他们会在稍后的OnUpdate中加入内容
+so anyway, but yeah they'll get to later romantically OnUpdate with immunity thing
+
+293
+00:27:15,633 --> 00:27:20,500
+如果我们想让东西动起来，我们可以在这里有那个，然后在OnRender，它会显示出来
+if we wanted to animate stuff, we could have that here, and then OnRender, you know, it just shows, okay
+
+294
+00:27:20,500 --> 00:27:22,400
+在这里我正在渲染一个，我将在其他对象周围滴
+here I am rendering one, I'll drip around in the other object
+
+295
+00:27:22,400 --> 00:27:26,600
+你可以用注释注释这个，然后我们有d bug pass
+you can annotate this with comments if you wanted to, and then we have kind of our d bug pass 
+
+296
+00:27:26,633 --> 00:27:31,633
+也就是我们可以渲染任何我们想要操作的UI的地方
+which is kind of just where we can render any kind of ui that we want to manipulate stuff
+
+297
+00:27:31,633 --> 00:27:34,766
+并且它非常干净，非常简单，那就是所有这些的重点
+and it's just so clean and so easy, so that's kind of the point of all this
+
+298
+00:27:35,266 --> 00:27:39,633
+当然，和往常一样，源码会放在github上，如果你们想看的话
+and of course as always, the source code will be on github, if you want to take a look at it
+
+299
+00:27:39,700 --> 00:27:42,475
+我希望你们喜欢这个视频，如果喜欢的话，就为它点赞吧，就像我说的
+I hope you guys enjoyed this video, if you did, hit that like button, as I said
+
+300
+00:27:42,475 --> 00:27:47,766
+访问源码，并且通过访问patreon.com/TheCherno来帮助支持我所做的这个系列
+access to source code and also helping to support the series me done by going to patreon.com/TheCherno
+
+301
+00:27:47,766 --> 00:27:51,866
+你们还会得到很多其他奖励，所以我每个月都会和你们一起玩
+and you'll get hips of other rewards as well, so just kind of monthly hangouts with me
+
+302
+00:27:53,274 --> 00:28:00,058
+并且就像，在赞助人在Discord上闲聊之类的
+and like access to, like a patron on the kind of chat on Discord, hips and stuff there
+
+303
+00:28:00,058 --> 00:28:00,066
+就像一个赞助人在那里谈论不和，臀部之类的东西
+and like access to, like a patron on the kind of chat on discord, hips and stuff there
+
+304
+00:28:00,066 --> 00:28:01,766
+并且它确实能支持这个系列
+and it really does have a support series
+
+305
+00:28:01,766 --> 00:28:04,633
+所以，和往常一样，感谢这些赞助人，让这一切成为可能
+so as always thank you so much those patrons for making it as possible
+
+306
+00:28:05,133 --> 00:28:08,300
+下次我们终于要进入批量渲染了，等不及了
+next time we're gonna finally get into the batch renderer, I can't wait
+
+307
+00:28:08,300 --> 00:28:12,233
+我已经教了好几个月了，下次见，再见
+I've been teaching to do that for months, I will see you next time, goodbye
+

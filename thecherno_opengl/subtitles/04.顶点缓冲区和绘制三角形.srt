@@ -1,0 +1,1525 @@
+﻿1
+00:00:00,075 --> 00:00:03,500
+嘿，大家好，我是TheCherno，欢迎回到我的OpenGL系列教程
+hey, what's up guys, my name is TheCherno and welcome back to my OpenGL series
+
+2
+00:00:03,621 --> 00:00:06,175
+现在，我很兴奋，终于有时间做这个系列了
+now, I'm so excited to finally get around to doing this series
+
+3
+00:00:06,300 --> 00:00:09,000
+所以，在过去的两期里，就是这个系列最初的两期
+so, over the last two episodes, which kind of the first two episodes of the series
+
+4
+00:00:09,233 --> 00:00:12,475
+事实上，我们只是在搞一些配置，比如配置OpenGL和GLEW
+we really just were setting things up, and we were setting up OpenGL and GLEW
+
+5
+00:00:12,475 --> 00:00:16,036
+基本上能够在OpenGL窗口中绘制图形我们需要的所有配置
+and basically everything we needed to be able to draw graphics in an OpenGL window
+
+6
+00:00:16,300 --> 00:00:19,566
+并且现在，它终于设置好了，所以我们可以开始运行一些OpenGL代码了
+and now, that's finally set up, so we can start running some OpenGL code
+
+7
+00:00:19,566 --> 00:00:22,000
+现在，我知道，不过我还是保持这样说，我只需要再次声明一下
+now, I know, I keep saying this, but I just want to say it one more time
+
+8
+00:00:22,300 --> 00:00:25,000
+我们没有在开发游戏引擎，这个系列，我们只是学习OpenGL
+we're not making a game engine, we're just learning OpenGL here
+
+9
+00:00:25,166 --> 00:00:29,100
+这就是为什么我不厌其烦地这样说
+which is why I'm not going to bother like doing this properly so to speak
+
+10
+00:00:29,200 --> 00:00:35,472
+我只是想让你们看看，实际上, 你们需要写什么样的OpenGL代码才会实现这些
+I'm just interested in showing you guys, what OpenGL code you actually need to write to make things happen
+
+11
+00:00:35,766 --> 00:00:41,975
+你们要如何抽象那些代码，比如把它们抽象到类里面去，并且所有这些都是你们要做的
+how you choose to abstract that, and kind of move it into like classes and all of that that's your business
+
+12
+00:00:42,200 --> 00:00:46,900
+当然，当游戏引擎系列出来时，很快就会出来了，对吧，我们会讲到那些的
+and certainly, when the game engine series comes out, it's gonna be very soon, wink, we're gonna cover that
+
+13
+00:00:46,900 --> 00:00:49,450
+所以，记住这一点，别指望
+anyway, so, just keep that in mind, don't expect
+
+14
+00:00:49,633 --> 00:00:53,600
+这是指导你们应该如何开发一个游戏引擎，或者应该如何使用OpenGL开发一款游戏
+this is how you should write a game engine, or how you should make a game using OpenGL
+
+15
+00:00:53,600 --> 00:00:58,825
+这只是教你们，在绘图时需要写什么样的OpenGL代码，以及它的原理
+this is just what OpenGL code you need to write to make graphics happen, and how it works
+
+16
+00:00:59,033 --> 00:01:04,733
+所以, 现代OpenGL比那种传统OpenGL更具有可编程性
+so the thing with modern OpenGL is that it's very programmable much more than the legacy kind of OpenGL
+
+17
+00:01:04,850 --> 00:01:09,566
+它的拓展性更好，也更加强大，你们能用它做许多事情，结果就是
+it's pretty extensive, it's fairly powerful, there's a lot you can do with it, and as a result
+
+18
+00:01:09,566 --> 00:01:14,475
+在屏幕上绘制一个三角形之前，你们实际上需要做很多设置
+there is quite a lot of setup you actually need to do before you can see a triangle on the screen
+
+19
+00:01:14,750 --> 00:01:20,350
+实际上，这是我们之前已经做了的，并且我认为就是在我们设置GLFW的第一期中
+now what we did in the last few episodes in fact, and I think the first episode where we set up GLFW is
+
+20
+00:01:20,350 --> 00:01:25,066
+我们就使用了传统OpenGL，只用了glBegin()和glEnd()在屏幕上绘制一个三角形
+we just used like legacy OpenGL, we just use glBegin() glEnd() to draw a triangle on the screen
+
+21
+00:01:25,066 --> 00:01:28,138
+因为就是那五行代码，而且你们已经做过了，这就是个三角形
+because that is like five lines of code and you're done, here's a triangle
+
+22
+00:01:28,600 --> 00:01:31,325
+传统OpenGL做起来很容易，并且不需要什么设置
+it's easy to just do and it requires no setup
+
+23
+00:01:31,700 --> 00:01:35,625
+然而，使用现代OpenGL去画一个三角形，需要做一些事情
+however, to draw a triangle using modern OpenGL, a few things need to happen
+
+24
+00:01:35,933 --> 00:01:41,000
+首先，我们需要能够创建一个顶点缓冲区，然后还要创建一个着色器
+primarily, we need to be able to create a vertex buffer, and we need to also be able to create a shader
+
+25
+00:01:41,133 --> 00:01:43,500
+现在, 我正在计划将来不久做一期视频
+now, I am planning to make a video soon in the future
+
+26
+00:01:43,533 --> 00:01:45,900
+讲一下图形渲染管线是如何运行的
+that's just going to cover kind of how graphics pipelines work
+
+27
+00:01:45,900 --> 00:01:50,350
+特别是OpenGL的图形渲染管线是如何运行的，所以我们现在不会讲太多
+and specifically how the OpenGL graphics pipeline works, so we're not going to get into that too much
+
+28
+00:01:50,600 --> 00:01:55,000
+所以，还是让我们先说说，现在需要什么东西才能用现代OpenGL绘制一个三角形
+but let's talk about, what we need now to draw a triangle in modern OpenGL
+
+29
+00:01:55,000 --> 00:02:00,450
+因为在电脑上渲染的图形都是从三角形开始的
+because every piece of graphics that we can possibly render on our computer begins with triangle
+
+30
+00:02:00,566 --> 00:02:03,175
+所以，下面就是我们所需要的两个东西，对吧
+so I mentioned two things that we really need here, right
+
+31
+00:02:03,433 --> 00:02:08,800
+我们需要顶点缓冲区和着色器，让我们快速地说一下这两个东西是什么吧
+we need a vertex buffer and we need something called a shader, let's talk about what that even is just quickly
+
+32
+00:02:08,800 --> 00:02:13,125
+那么，顶点缓冲区，它基本上就是去掉vertex这个单词
+so, a vertex buffer it's basically just just get rid of the word vertex
+
+33
+00:02:13,200 --> 00:02:16,733
+从它的名字里去掉vertex这个单词
+because it's just get rid of the…the word vertex from that
+
+34
+00:02:16,733 --> 00:02:22,966
+它只是一个缓冲区，一个内存缓冲区，一个内存字节数组，那是它的本质，只是个缓冲区
+it's just a buffer, it's a memory buffer, it's an array of bytes of memory, that's what it is, it's just a buffer
+
+35
+00:02:22,966 --> 00:02:24,775
+我的意思是从字面上来说
+and what I mean by that is it's literally like
+
+36
+00:02:24,775 --> 00:02:29,125
+它就是一块用来存字节的内存，存字节的，明白吗
+a blob of memory in which we can kind of push bytes, bytes into there, right
+
+37
+00:02:29,333 --> 00:02:32,266
+并且这个想法当然是因为它与OpenGL绑定
+and the idea is of course because it's tied with OpenGL
+
+38
+00:02:32,400 --> 00:02:37,200
+但顶点缓冲区跟C++中像字符数组的内存缓冲区不太一样
+it's not just a buffer of memory like as if I just created a char array or something in C++
+
+39
+00:02:37,200 --> 00:02:40,266
+并且你们也知道的，那只是内存上的缓冲区, 对吧
+ and you know, that's a that's a buffer of memory, right
+
+40
+00:02:40,966 --> 00:02:43,633
+区别在于, 它是OpenGL中的内存缓冲区
+the difference is that this is a buffer of memory in OpenGL
+
+41
+00:02:43,633 --> 00:02:47,450
+这意味着它实际上在显卡上，在我们的VRAM(显存)中，也就是Video RAM
+which means it's actually in our GPU, in our VRAM, our Video RAM
+
+42
+00:02:47,633 --> 00:02:54,366
+所以这里的基本思路就是，我要定义一些数据来表示三角形
+so the basic concept here is, I want to define a bunch of data which represents my triangle
+
+43
+00:02:54,500 --> 00:02:59,966
+我要把它放入显卡的VRAM中，然后还需要发出DrawCall指令
+I want to put it into my GPU's VRAM, and then I want to issue something called a DrawCall
+
+44
+00:02:59,966 --> 00:03:02,100
+这是一个绘制指令，就是说
+which is basically a draw command, which says
+
+45
+00:03:02,200 --> 00:03:06,166
+嘿，你的显存中有一堆数据
+hey, you know that bunch of that blob of data you've got there in your VRAM
+
+46
+00:03:06,225 --> 00:03:11,125
+读取它，并且把它绘制在屏幕上，实际上，我们还需要告诉显卡
+read from it, and draw it on the screen, and furthermore we actually need to tell our GPU
+
+47
+00:03:11,125 --> 00:03:15,797
+如何读取和解释这些数据，以及如何把它放到我们屏幕上
+how to read and interpret that data, and how to actually put it onto our screen
+
+48
+00:03:16,250 --> 00:03:19,125
+当我们在CPU这边做了所有的事情
+because, once we kind of do everything from the cpu side
+
+49
+00:03:19,125 --> 00:03:21,900
+我们用C++写的东西都是在CPU上运行的，对吧
+everything we write in C++ is just done on the CPU, right
+
+50
+00:03:22,333 --> 00:03:26,166
+当我们写完这些东西，还要用某种方法告诉显卡
+once we've written all of that stuff, we also need to somehow tell the graphics card
+
+51
+00:03:26,450 --> 00:03:30,582
+一旦从CPU发出了DrawCall指令，一旦我们发出那个指令
+once we issue that DrawCall which does come from the CPU, once we issue that DrawCall
+
+52
+00:03:30,582 --> 00:03:33,366
+我们就要告诉显卡，好了
+we need to actually tell the GPU, okay
+
+53
+00:03:33,766 --> 00:03:37,900
+一旦你从显卡读到了这些数据
+once you interpret, once you get access to that data on the GPU side
+
+54
+00:03:38,133 --> 00:03:42,425
+我要你像那样把它绘制出来，我希望你在屏幕上给我显示一个三角形
+I want you to lay it out like that, I want you to draw me and pasteurize me a triangle on the screen
+
+55
+00:03:43,066 --> 00:03:47,545
+所以我们需要告诉显卡它要做什么，所以需要对显卡编程，并且，那就是着色器
+so we need to tell the GPU what to do, so we need to program the GPU, and that's what a shader is
+
+56
+00:03:47,933 --> 00:03:53,680
+着色器是一个运行在显卡上的程序，是一堆我们可以编写的可以在显卡上运行的代码
+a shader is just a program that runs on the GPU, it's a bunch of code that we can write which runs on the GPU 
+
+57
+00:03:53,680 --> 00:03:57,966
+它可以在显卡上以一种非常特殊又非常强大的方式运行，这个我们以后再探究
+and in a very specific way and in a very powerful way which, which we can explore in the future
+
+58
+00:03:57,966 --> 00:03:59,866
+但那基本上是可以消化的，不要想太多
+but that's basically digestive, don't overthink it too much
+
+59
+00:03:59,866 --> 00:04:04,538
+我们有一堆可以指定的内存，对吧，一堆我要指定的数据
+we just basically have a bunch of memory that we can specify, right, a bunch of data that I can specify
+
+60
+00:04:04,800 --> 00:04:10,345
+告诉显卡，嘿，这是数据，然后显卡那边响应，好吧, 现在读取一下这些数据
+tell the GPU, hey, here's data, and then from the GPU side say, okay, now read this data
+
+61
+00:04:10,345 --> 00:04:15,150
+而且好像可以理解成是屏幕上的位置，然后把它们连成一个三角形
+and interpret it as like a bunch of positions on your screen maybe,  and join them up into a triangle
+
+62
+00:04:15,333 --> 00:04:17,966
+那就是这整个的原理，那就是
+that's kind of how this whole thing works, and that is the
+
+63
+00:04:18,425 --> 00:04:22,700
+我想这就是所有这些OpenGL渲染代码的基础功能吧
+I guess the foundation the basics of all of this kind of OpenGL rendering code
+
+64
+00:04:22,700 --> 00:04:26,933
+就像我刚才描述的那样，有一些数据，然后给我绘制出来
+it's just what I've just described there, have some data, then draw me something
+
+65
+00:04:27,536 --> 00:04:31,850
+有个很重要的点需要注意，OpenGL具体的操作就是一个状态机
+now it's it's really important to note that,  OpenGL specifically operates as a state machine
+
+66
+00:04:32,100 --> 00:04:37,166
+也就是说你们不需要把它看成对象或类似的东西
+what that means is that you don't necessarily treat it like an object or anything like that
+
+67
+00:04:37,166 --> 00:04:41,366
+你们所做的是设置一系列的状态，然后当你们说一些事情
+what you do instead is you set a series of states, and then when you say something
+
+68
+00:04:41,366 --> 00:04:44,500
+比如，给我绘制个三角形，那是与上下文相关的
+like hey draw me a triangle, that's very contextual
+
+69
+00:04:44,600 --> 00:04:47,866
+我的意思，不是我说“嘿，给我绘制个三角形”之后
+what I mean by that is instead of me just saying hey draw me a triangle
+
+70
+00:04:48,133 --> 00:04:51,000
+然后才传给OpenGL绘制三角形所需要的东西
+and then passing in everything that OpenGL needs to draw the triangle
+
+71
+00:04:51,000 --> 00:04:55,866
+实际上，它已经知道了它绘制三角形所需要的东西，因为那是状态的一部分
+it actually knows already what it needs to draw the triangle, because that's part of the state
+
+72
+00:04:55,966 --> 00:05:00,575
+所以换句话说，可以这么说，我想让你选择这个缓冲区
+so to put it another way, you basically say I want you to select this buffer
+
+73
+00:05:01,000 --> 00:05:05,075
+用这个着色器，然后给我绘制个三角形
+I want you to select this shader and then draw me a triangle
+
+74
+00:05:05,650 --> 00:05:09,466
+对吧，然后根据你选择的缓冲区和着色器
+right, and based on which buffer and which shader you've selected
+
+75
+00:05:10,000 --> 00:05:14,233
+决定绘制什么样的三角形，绘制在哪里等等
+that's what's going to determine what triangle gets drawn and where and all of that stuff
+
+76
+00:05:14,500 --> 00:05:16,933
+那就是OpenGL的原理，它是一个状态机
+that's how OpenGL works, it's a state machine
+
+77
+00:05:17,814 --> 00:05:23,025
+那样很烦，事实上，可能确实很烦人，但那就是它的运行方式
+that can be annoying, in fact it probably is annoying, but that's just how it operates
+
+78
+00:05:23,200 --> 00:05:27,616
+通常来说，学习和了解这些对OpenGL很重要，所以，记在心里
+learning that and just knowing that is just very important for OpenGL in general, so keep that in mind
+
+79
+00:05:27,616 --> 00:05:31,066
+说完这些要记住的东西后，我想让这个系列更多一些实践
+and so with all of that in mind, I do want to keep this series a little bit more practical
+
+80
+00:05:31,066 --> 00:05:35,500
+那么，让我们来写一些代码创建顶点缓冲区，看看我们能做些什么，好了
+so let's just write some code to create this vertex buffer, and see what we can do with that, okay
+
+81
+00:05:35,500 --> 00:05:38,333
+那么，这是我们在第一期中写的代码
+so what we have here is what we kind of wrote in the first episode
+
+82
+00:05:38,333 --> 00:05:42,666
+也就是通过指定三个顶点来画三角形，对吧
+which was this basic triangle that we drew by specifying three vertices, right
+
+83
+00:05:42,666 --> 00:05:46,100
+我们用的是比较简单的传统OpenGL
+and we did this by using legacy OpenGL which was very easy to do
+
+84
+00:05:46,375 --> 00:05:50,650
+我们想用现代OpenGL来画这个，那么就要创建顶点缓冲区
+What we now want to do to basically draw this, according to modern OpenGL is create vertex buffer
+
+85
+00:05:50,660 --> 00:05:54,375
+顶点缓冲区包含这些顶点的数据，就是这些数据
+which just contains, well, this data, there it is that's our data
+
+86
+00:05:54,575 --> 00:05:58,566
+我们把它放进一个缓冲区，传到OpenGL的VRAM
+We just want to actually put that into a buffer, send it to OpenGL's VRAM
+
+87
+00:05:58,566 --> 00:06:02,375
+然后，发出一个DrawCall指令，说，嘿，请根据缓冲区画出图形
+and then later, issue a DrawCall saying: hey, draw my buffer please
+
+88
+00:06:02,526 --> 00:06:07,566
+要做到这一点，我们肯定要到while循环的外面，这是gl循环，对吧
+So to do that, we're definitely going to want to go outside of our while loop, this is just our gl's loop, right
+
+89
+00:06:07,766 --> 00:06:09,466
+我们不想在每一帧都这样做
+we don't want to be doing this every single frame
+
+90
+00:06:09,466 --> 00:06:14,066
+我们可以先定义一个缓冲区，然后填入数据
+we can just define a buffer to begin with and then we can actually fill it with data
+
+91
+00:06:14,200 --> 00:06:18,525
+然后在gl渲染循环中，我们就可以说，嘿，绘制已经存在的数据
+and then inside gl's render loop, we can just say: hey, draw the data that already exists
+
+92
+00:06:18,700 --> 00:06:23,166
+如果出于某一些原因，我们需要改变数据帧或者其他东西
+if for some reason we would require to actually change that data framed frame or something like that
+
+93
+00:06:23,300 --> 00:06:26,650
+我们也可以通过更新缓冲区来做到这一点，那完全没问题
+we can do that as well by just updating the buffer, and that's totally fine
+
+94
+00:06:26,934 --> 00:06:29,130
+但是现在，因为我们没有改变这些数据
+but for now since of course we're not changing this data
+
+95
+00:06:29,133 --> 00:06:32,100
+你们可以看到我们的三角形没有变形成别的什么东西
+you can see that our triangle is not morphing into something else or anything
+
+96
+00:06:32,100 --> 00:06:36,550
+它只是一堆静态顶点，我们可以在这个gl循环之外做那个
+it's just a bunch of static vertexes, we can kind of do that outside of this gl loop
+
+97
+00:06:36,866 --> 00:06:40,833
+那么在这里，我要定义顶点缓冲区，这个过程很简单
+so over here, I'm going to define my vertex buffer, and the way that this works is pretty simple
+
+98
+00:06:40,833 --> 00:06:45,900
+你们只需要输入glGenBuffers()，好了，然后指定你们想要多少个缓冲区
+you just type in glGenBuffers(), Alright, then you specify how many buffers you would like
+
+99
+00:06:46,166 --> 00:06:50,866
+那么OpenGL可以一次生成一堆缓冲区，而我们只需要一个缓冲，所以就输入1
+so OpenGL can generate you a bunch at once, we just want one buffer so I'm gonna type in one
+
+100
+00:06:51,100 --> 00:06:53,890
+然后第二个参数需要一个无符号整型指针
+and then we need to give it a pointer at two, an unsigned int 
+
+101
+00:06:53,890 --> 00:06:56,533
+你们可以在这里看到，这个函数返回void
+you can kind of see here that this function returns void
+
+102
+00:06:56,733 --> 00:07:02,033
+所以函数不返回生成的缓冲区id，我们要给它提供一个整数（指针）
+so instead of returning the id of what we generated, we instead provide it with an actual integer
+
+103
+00:07:02,033 --> 00:07:05,800
+然后函数把id写入这个整数的内存，那就是为什么这里需要一个指针
+and it writes into that integer's memory, that's why this takes in a pointer
+
+104
+00:07:06,133 --> 00:07:10,233
+所以, 我要做的就是输入unsigned int，变量名为buffer
+so what I can do is just type in unsigned int, I'll just call it buffer
+
+105
+00:07:10,466 --> 00:07:17,700
+然后传入这个unsigned int的内存地址，现在, 这就是生成的缓冲区的id
+and then pass in the memory address of this unsigned int, now, what this is, is the id of the generated buffer
+
+106
+00:07:17,966 --> 00:07:23,200
+记住OpenGL作为一个状态机工作，这意味着，所有你们生成的……再说一次，这是与上下文相关的
+remember OpenGL works as a state machine which means, everything you generate, again this is contextual
+
+107
+00:07:23,333 --> 00:07:27,412
+所以，我的意思是，上下文会有自己的流，缓冲区会有自己的流
+so basically what I mean by that is, context will have kind of their own stream, buffers will have their own stream
+
+108
+00:07:27,666 --> 00:07:33,775
+但你们在OpenGL中生成的所有东西都会被分配一个唯一的标识符，它只是一个整数，比如0、1、2
+but what, everything you generated in OpenGL gets assigned a unique identifier, it's just an integer, 0, 1, 2
+
+109
+00:07:33,900 --> 00:07:37,052
+0通常是一种无效状态，但不都是
+0 is commonly kind of an invalid state, but not always
+
+110
+00:07:37,056 --> 00:07:39,800
+这也是你们以后需要学习的内容
+so again something you need to learn which all of cover in the future
+
+111
+00:07:39,933 --> 00:07:45,400
+但基本上你们会得到一个数字，比如1、2、3等等，那是你们实际对象的id
+but basically you get a number back like 1, 2, 3 whatever, and that's an id for your actual object
+
+112
+00:07:45,400 --> 00:07:50,975
+不管它是顶点缓冲区，顶点数组，纹理，着色器，或者其他任何东西
+whether that be a vertex buffer, a vertex array, a texture, a shader, anything
+
+113
+00:07:50,975 --> 00:07:55,625
+对吧，你们都会得到一个整数，代表某种着色器
+right, you get a number an integer back, which represents that specific shader
+
+114
+00:07:55,833 --> 00:08:00,100
+当你们想要使用这个对象的时候，就用这个数字，对吧
+and then you basically just use that number whenever you want to use that object, right
+
+115
+00:08:00,100 --> 00:08:03,366
+所以如果我想绑定或选择我的缓冲区
+so, if I want to bind or select my buffer
+
+116
+00:08:03,550 --> 00:08:08,175
+因为我要渲染我的三角形，并且需要说明用哪个缓冲区来渲染三角形
+because I'm just about to render my triangle, and I need to specify which buffer to use to render my triangle
+
+117
+00:08:08,600 --> 00:08:12,150
+我只需要传递这个整数，它就像，嘿，你能像二号缓冲区描述的那样渲染吗
+I just pass in that integer, it's like, hey, can you just like buffer No.2 please
+
+118
+00:08:12,475 --> 00:08:17,100
+那就是OpenGL的原理，所以，这就是这个，这里生成一个缓冲区，并返回它的id
+that's how OpenGL works, so that's what this is, this is generating a buffer and giving us back an id
+
+119
+00:08:17,100 --> 00:08:22,458
+现在我们有了一个id，一旦创建缓冲区后，我们现在就要选择那个缓冲区
+so now we have an id, once we've created an actual buffer we now need to select that buffer
+
+120
+00:08:22,458 --> 00:08:26,700
+并且选择(selecting)在OpenGL中称为绑定(binding)，所以我输入glBindBuffer()
+and selecting in OpenGL called binding, so I just type in glBindBuffer()
+
+121
+00:08:27,000 --> 00:08:31,100
+第一个参数是目标，所以我已经生成了一个缓冲区，但是我要如何使用它呢
+now this is the target, so I've generated a buffer, but how do I want to use it?
+
+122
+00:08:31,100 --> 00:08:35,266
+比如这些参数有什么意义，对我们来说，这只是一个内存缓冲区
+like what is the purpose of all this,  for us, we literally this is just a buffer of memory
+
+123
+00:08:35,266 --> 00:08:39,925
+所以我们要用GL_ARRAY_BUFFER，也就是说这只是一个数组
+so we're going to use GL_ARRAY_BUFFER,  which basically just says this is just an array
+
+124
+00:08:40,066 --> 00:08:44,666
+然后你们可能注意到了，我们传入了缓冲区的id，所以这个参数是我们要绑定的缓冲区
+and then you can notice that we do pass in the id of the buffer, so this is the buffer that we're binding
+
+125
+00:08:44,666 --> 00:08:48,133
+当然，它就是我们刚生成的那个，到目前为止很简单
+and of course it's the one that we've just generated, pretty simple so far
+
+126
+00:08:48,225 --> 00:08:52,475
+希望你们能坚持下去，所以下一步显然就是
+hope you guys are keeping along with this, and so the next logical step is obviously to actually,
+
+127
+00:08:52,766 --> 00:08:55,233
+把数据放入这个缓冲区
+well, put data into that buffer
+
+128
+00:08:55,325 --> 00:08:59,100
+你们可能已经注意到了，我没有具体说明这个缓冲区的大小
+you may have noticed, that I haven't actually specified how large this buffer is or anything like that
+
+129
+00:08:59,100 --> 00:09:03,500
+我刚只是创建了一个缓冲区，然后绑定它（意味着我要使用这个缓冲区）
+I've just created a buffer, and I've bound it, meaning that I'm just about to work on it
+
+130
+00:09:03,666 --> 00:09:07,975
+所以，实际上，下一步是指定数据，现在这儿有两种方式指定数据
+so the next step is going to be to actually specify the data, now there's two ways you can do this
+
+131
+00:09:08,325 --> 00:09:12,922
+你们不需要马上给它提供数据，只需要指定……
+you don't really have to provide it with data straight away, you just have to specify...
+
+132
+00:09:12,922 --> 00:09:16,700
+你们通常会在创建缓冲区时，指定它的大小
+when you create a buffer you usually specify how large you want it to actually be
+
+133
+00:09:16,700 --> 00:09:19,733
+那么举个例子，比如200字节或之类的东西
+so for example, I don't know, 200 bytes or something like that
+
+134
+00:09:19,933 --> 00:09:22,400
+然后你们可以直接给出数据
+and then you have the option of straight away giving a data
+
+135
+00:09:22,733 --> 00:09:27,175
+或者你们可以不给它，之后再更新数据，那也挺不错的
+or you can just give it nothing and then later update it with data, that's totally fine
+
+136
+00:09:27,600 --> 00:09:30,166
+由于我们明显地知道我们现在绘制的三角形
+since we obviously know the triangle that we're drawing right now
+
+137
+00:09:30,166 --> 00:09:34,775
+我们可能就直接给它提供数据，所以键入glBufferData()
+we might as well provide it with data straightaway, so I'm going to type in glBufferData()
+
+138
+00:09:34,866 --> 00:09:38,533
+然后，我们再次指定了目标GL_ARRAY_BUFFER
+and then again we specify the target which is GL_ARRAY_BUFFER
+
+139
+00:09:38,566 --> 00:09:42,866
+这个大小是指我们希望这个缓冲区有多大，或者我们的数据有多大
+the size meaning how big we want this buffer to actually be, or how big our data is
+
+140
+00:09:42,866 --> 00:09:46,500
+所以在这种情况下，我们来计算一下，这是所有的顶点
+so in this case, let's kind of calculate this, we have all of these vertices here
+
+141
+00:09:46,766 --> 00:09:50,266
+现在我们用别的东西来声明它们，它们只是一堆数
+let's actually declare them as something else, right now, they're just kind of numbers here
+
+142
+00:09:50,266 --> 00:09:52,725
+我们要创建一个包含所有这些数的float数组，对吧
+let's make a float array which contains all of these, right
+
+143
+00:09:53,025 --> 00:09:57,833
+所以我要写float positions =，来创建一个数组
+so I'm going to write float positions equals, and then we'll kind of make an array out of it
+
+144
+00:09:58,000 --> 00:10:01,866
+首先, 我要定义我想要多少，你们在C++中可以像这样（[ ]中空着）简单地定义数组
+so first of all, I'll define how many I want, you can kind of just define arrays like this in C++
+
+145
+00:10:01,866 --> 00:10:03,233
+但我喜欢更具体一点
+but I like to be a bit more specific
+
+146
+00:10:03,233 --> 00:10:08,133
+看到这有6个位置坐标，所以有6个顶点（数），所以我在这里写上6
+so we know that we have six vertexes by looking at this six positions, so I'll just put in six here
+
+147
+00:10:08,133 --> 00:10:12,900
+然后我要指定它们，所以如果我向下滚动，复制这个
+and then I'm actually going to specify them, so literally if I, scroll down here and copy this
+
+148
+00:10:12,900 --> 00:10:16,600
+按住alt+shift，然后按住从上到下拖
+I'm holding alt shift and then clicking from the kind of the top to the bottom here
+
+149
+00:10:16,993 --> 00:10:21,075
+复制，粘贴，好了，我们有顶点的位置
+ctrl c, ctrl v and there we go, we have our vertex positions
+
+150
+00:10:21,233 --> 00:10:24,575
+现在我喜欢把它们对齐，在这里，我们也需要一些逗号
+now I like to kind of align them as well, we have to have commas here as well
+
+151
+00:10:24,833 --> 00:10:28,166
+但我想把它们对齐，在这里留个空格
+but I like to align these so I just a space here
+
+152
+00:10:28,366 --> 00:10:31,166
+确保它们很好地对齐，这样我们就有了一个缓冲区
+make sure they're nicely aligned and there we have a basic buffer
+
+153
+00:10:31,166 --> 00:10:35,850
+你们也可以把这个(positions数组)叫做缓冲区，对吧，因为这是一个连续内存数组
+this is you could also call this the buffer, right, because there's an array of contiguous memory
+
+154
+00:10:36,033 --> 00:10:39,250
+在那个数组中，我们有6个浮点数，在这里，我们需要一个指定的大小
+in which we have six floats, so over here, we're gonna need a specific size
+
+155
+00:10:39,250 --> 00:10:43,875
+现在因为这个数组是在堆栈上创建的，我可以输入sizeof(positions)
+now because this array was created on the stack, I could just say sizeof(positions)
+
+156
+00:10:44,166 --> 00:10:48,675
+我真的不喜欢这么做（写sizeof()），所以我要做的替换，就是写6
+I'm really not a fan of doing that there, so what I'm going to do instead, is just say six
+
+157
+00:10:48,800 --> 00:10:52,200
+因为有6个浮点数，所以就是6 * sizeof(float)
+because we know that we have six floats times well, sizeof a float
+
+158
+00:10:52,500 --> 00:10:56,525
+所以需要注意的是，这个大小是指字节的大小，现在你们可能想知道
+so it's important to note that this size is in bytes, now you might be wondering
+
+159
+00:10:56,700 --> 00:11:00,400
+我怎么知道它指的是字节，答案就是，好吧，当然是经验
+how want do I know that it's in bytes, and the answer to that is, well, of course experience
+
+160
+00:11:00,660 --> 00:11:06,356
+但是你们也应该阅读文档，所以这是一个展示给你们看的好机会
+but you also should be reading the documentation,  so this is a good chance for me to show you guys
+
+161
+00:11:06,766 --> 00:11:11,166
+这个我认为可能是OpenGL最好的文档网站，那就是docs.gl
+what I think is probably the best documentation website for OpenGL, and that is docs.GL
+
+162
+00:11:11,166 --> 00:11:12,966
+所以我在下面的描述里放了一个链接(docs.gl)
+so I've put a link to this in the description below
+
+163
+00:11:13,050 --> 00:11:17,566
+这里有OpenGL的大量文档资源
+basically this is a huge kind of documentation resource here for OpenGL
+
+164
+00:11:17,700 --> 00:11:20,966
+它有很多OpenGL版本，包括嵌入式系统版本
+it has a lot of OpenGL versions, including kind of the embedded systems versions
+
+165
+00:11:20,966 --> 00:11:24,700
+OpenGL的移动版本, 以及gl2,gl3和gl4
+so the mobile versions of OpenGL, as well as gl2, 3 and 4
+
+166
+00:11:25,066 --> 00:11:27,733
+所以我们这里要做的就是输入函数的名称
+so what we're going to do up here is just type in the name of our function
+
+167
+00:11:27,733 --> 00:11:30,833
+比如glBufferData，我要点击gl4
+which is glBufferData, I'm going to click on gl4
+
+168
+00:11:30,833 --> 00:11:34,200
+因为我们用的就是这个版本，然后这里可以看到有两个重载
+because that's the version that we're using, and then over here, you can see that there are two overloads
+
+169
+00:11:34,200 --> 00:11:37,100
+有一个叫glNamedBufferData，另一个叫glBufferData
+while there's one called NamedBufferData and one called BufferData
+
+170
+00:11:37,100 --> 00:11:38,750
+显然这(glBufferData)是我们感兴趣的
+obviously this is the one we're interested in
+
+171
+00:11:39,000 --> 00:11:42,800
+你们可以看到这是我们传入的size变量或参数
+you can see there's our size variable or our size parameter that we're passing in
+
+172
+00:11:43,000 --> 00:11:45,924
+向下滚动，我们可以看看它的size，你们可以看到它说
+this scroll down, we can look at the size and it's you can see that it says
+
+173
+00:11:45,930 --> 00:11:52,200
+指定缓冲区对象的新数据存储的字节大小，好了，你们还可以看到data
+specifies the size in bytes of the buffer object's new data store, okay, and then you can see also for data
+
+174
+00:11:52,200 --> 00:11:54,625
+我们的下一个参数是一个指向data的指针
+which is our next parameter specifies a pointer to the data
+
+175
+00:11:54,625 --> 00:11:57,375
+将被复制到数据存储区进行初始化的data
+that will be copied into the data store for initializtion
+
+176
+00:11:57,566 --> 00:12:00,133
+如果没有data要复制，则为null，所以你们可以看到
+or null if no data is to be copied, so you can see
+
+177
+00:12:00,350 --> 00:12:03,700
+通过阅读文档，有多容易知道如何使用它
+just by reading the documentation, how easy it is to see how you can use this
+
+178
+00:12:03,700 --> 00:12:07,366
+比如现在我们知道可以传入null
+like for example, we now know that we can just pass in null
+
+179
+00:12:07,466 --> 00:12:09,666
+如果我们一开始就不想给它提供任何数据
+if we don't want to provide it with any data to begin with
+
+180
+00:12:09,666 --> 00:12:13,200
+这个usage参数也是很重要的东西，因此，它指定了想用的使用模式
+the usage is also something that's important, so it specifies the expected usage pattern
+
+181
+00:12:13,425 --> 00:12:17,488
+所以带着这个想法，我想如果我们往下滚动，你们就可以看到……
+so basically the idea with this, and I think if we scroll down here, you can see that there is
+
+182
+00:12:17,825 --> 00:12:23,225
+这个usage是对GL实现的一个提示，关于如何访问缓冲区对象的数据存储
+the usage is a hint to the GL implementation, as to how a buffer's object's data store will be accessed
+
+183
+00:12:23,666 --> 00:12:27,833
+那么考虑到这点，我们可以在这里指定STREAM，STATIC和DYNAMIC三种
+so with that in mind, we can specify STREAM, STATIC or DYNAMIC in here
+
+184
+00:12:28,100 --> 00:12:32,850
+这些意思是，STREAM意味着它将被修改一次，并且只能使用几次
+which is basically STREAM means that it's going to be modified once and used at most a few times
+
+185
+00:12:33,366 --> 00:12:37,533
+STATIC意味着数据存储内容将被修改一次，并且能用很多次，对吧
+STATIC means that the data store contents will be modified once and use many times, right
+
+186
+00:12:37,700 --> 00:12:40,500
+这实际上就是我们要那一种方式，我等会儿就会告诉你们
+so that's actually the one we're laying towards, and I'll tell you one in a minute
+
+187
+00:12:40,866 --> 00:12:44,433
+最后是DYNAMIC，数据存储的内容会被反复修改，并且多次使用
+and DYNAMIC, the data store contents will be modified repeatedly and use many times
+
+188
+00:12:44,525 --> 00:12:49,833
+所以，STATIC之所以很重要……说实话，STREAM并不经常使用
+so the reason STATIC's important, STREAM is not something that we use too often to be honest
+
+189
+00:12:49,833 --> 00:12:52,366
+STATIC和DYNAMIC是我们比较关心的方式
+STATIC and DYNAMIC are kind of the ones that we care about
+
+190
+00:12:52,666 --> 00:12:56,342
+STATIC意味着我们将会，它会被修改一次，然后使用多次
+STATIC just means that we're going to be, it's going to be modified once and use many times
+
+191
+00:12:56,700 --> 00:12:59,133
+这意味着，你们可以看到，我们将创建这个buffer一次
+what that means is, you can see that we're going to create this buffer once
+
+192
+00:12:59,133 --> 00:13:02,475
+我们不会每帧都修改buffer，但是我们要绘制每一帧
+and we're not going to modify the buffer every frame, but we are going to draw it every frame
+
+193
+00:13:02,766 --> 00:13:04,400
+这就是“多次使用”的意思
+so that's what it means by used many times
+
+194
+00:13:04,400 --> 00:13:07,466
+它会像这个三角形中的每一帧一样被绘制出来
+it's going to be drawn like every frame in this case our triangle
+
+195
+00:13:07,775 --> 00:13:09,300
+而DYNAMIC是指
+whereas DYNAMIC is something
+
+196
+00:13:09,300 --> 00:13:12,975
+数据存储的内容会被反复修改和多次使用
+where the data store contents will be modified repeatedly and used many times
+
+197
+00:13:12,975 --> 00:13:17,066
+如果我们也修改这个三角形，每帧修改这些顶点
+so if we were also modifying this triangle, modifying these vertexes every frame
+
+198
+00:13:17,066 --> 00:13:19,400
+并且每帧都会重绘，我们将使用DYNAMIC
+and drawing it every frame, we would be using DYNAMIC
+
+199
+00:13:20,333 --> 00:13:24,570
+这些只是提示（意思是可以违反），这意味着是如果我声明它为STATIC，然后绘制它
+now these are just hints, meaning that if I declare this a STATIC and then I draw it
+
+200
+00:13:24,570 --> 00:13:28,175
+但我实际上每帧都更新缓冲区，它还是会运行的，可能会慢很多
+and then I update the buffer every frame, it's still gonna work, it's probably just gonna be a lot slower
+
+201
+00:13:28,266 --> 00:13:31,125
+记住这一点，这并不是一成不变的事情
+so just keep that in mind, this isn't like a set in stone kind of thing
+
+202
+00:13:31,400 --> 00:13:36,433
+这只是一个提示，实际上，它在注释这儿说了，这个usage是GL实现的一个提示，好吧
+it's just a hint in fact it says here in the notes, that usage is a hint to be GL implementation, okay
+
+203
+00:13:36,800 --> 00:13:39,764
+考虑到这一点，我们现在知道怎么填了
+so with that in mind, we now know how to fill this out, hopefully
+
+204
+00:13:39,764 --> 00:13:43,966
+那么我们要提供的data指针指向这个positions数组
+So, the data that we're going to provide it with is just going to be appointed to this positions thing
+
+205
+00:13:43,966 --> 00:13:47,033
+这已经不是数组了，当然，我们可以只写positions
+now this is already isn't array, so of course, we can just write positions
+
+206
+00:13:47,366 --> 00:13:50,766
+那么，最后是GLenum usage参数，就是我们刚才讨论的usage
+and finally GLenum usage, so that's the usage that we just talked about
+
+207
+00:13:50,766 --> 00:13:54,333
+我们想使用STATIC，所以这里就是GL_STATIC_DRAW
+we want to use STATIC, so GL_STATIC_DRAW
+
+208
+00:13:54,733 --> 00:13:57,266
+现在我很少谈论绘制的事
+now I didn't talk too much about the drawer thing
+
+209
+00:13:57,266 --> 00:14:01,225
+当然，我们会绘制出三角形，所以，DRAW也是我们关心的一个
+but of course we will be drawing the actual triangles, so DRAW is the one that we care about
+
+210
+00:14:01,550 --> 00:14:05,866
+好了，很好，就是这样，我们为OpenGL指定了一些positions
+okay, cool, so there we go, we've actually specified a bunch of positions for OpenGL and
+
+211
+00:14:06,075 --> 00:14:11,466
+这就是我们需要做的，通常，我们还需要创建一个索引缓冲区
+that's really all we need to do, now, normally, we would also want to create something called an index buffer
+
+212
+00:14:11,466 --> 00:14:13,733
+我们会在以后的视频中讲这个
+but we're gonna have another video about that in the future
+
+213
+00:14:13,733 --> 00:14:15,266
+因为我不想让这个视频太长
+because I don't want to make this video too long
+
+214
+00:14:15,633 --> 00:14:19,366
+但现在理论上我们用这些数据能做的就是把它绘制出来
+but basically what we can do now with this data theoretically is draw it now
+
+215
+00:14:19,366 --> 00:14:23,325
+不过我们还没有着色器，去解释如何用这些数据进行绘制
+Now, we don't have a shader, to actually specify how the data has been drawn
+
+216
+00:14:23,425 --> 00:14:25,565
+我们将在下一期讨论那个问题
+we're actually going to talk about that in the next episode
+
+217
+00:14:25,733 --> 00:14:29,266
+但是我们今天要做的，只是想看看，如果我们能不能把它绘制出来
+but what we will do today is just to see if we can draw it anyway
+
+218
+00:14:29,266 --> 00:14:32,466
+我们需要什么代码来画这个（就好像我们已经有了一个着色器）
+and we'll just see what the code required to draw this as if we did have a shader
+
+219
+00:14:32,466 --> 00:14:36,300
+那么回到这里，这就是我们用来给OpenGL传数据的所有代码
+So back here, this is all the code we need to actually give OpenGL the data
+
+220
+00:14:36,375 --> 00:14:43,160
+然而，当我们给OpenGL数据时，我们并没有告诉它数据是什么
+However, while we've given OpenGL the data, we haven't actually told it how... what the data is.
+
+221
+00:14:43,160 --> 00:14:45,667
+看这儿，这里写着
+Remember, OpenGL is literally, if you kind of look at this
+
+222
+00:14:45,925 --> 00:14:49,466
+OpenGL接收一个数据指针，就是接收一堆字节
+receiving a void pointer of data. It's receiving a bunch of bytes.
+
+223
+00:14:49,666 --> 00:14:52,566
+所以OpenGL到底是怎么知道的
+now, how on earth is OpenGL supposed to know
+
+224
+00:14:53,833 --> 00:14:56,966
+如何正确解读这些字节，明白吧，它们只是一堆字节
+how to interpret those bytes right, they're just a bunch of bytes
+
+225
+00:14:56,966 --> 00:15:00,375
+我们没有指定，嘿，已经给了你三个顶点
+we haven't specified that, hey, we've given you three vertexes
+
+226
+00:15:02,066 --> 00:15:08,766
+它们都是浮点数，并且我们还给出了两个顶点位置，每个顶点，或两个……（这里在胡言乱语了）
+they're floats and also we've given you two vertex positions, kind of per vertex, or two...
+
+227
+00:15:09,066 --> 00:15:12,600
+两个浮点数代表一个位置，就是一个顶点，对吧
+kind of two floats represent one position which is a vertex, right
+
+228
+00:15:13,200 --> 00:15:14,333
+这些我们都没说过
+we haven't said any of that
+
+229
+00:15:14,366 --> 00:15:18,433
+如果我们有纹理坐标，或法线，或其他东西，但它没有表达任何意义
+What if we have texture coordinates, or normal, or other things and it doesn't make any sense
+
+230
+00:15:18,433 --> 00:15:21,366
+OpenGL不能像变魔术似的做到，比如，我知道你做了什么
+OpenGL can't just magically be like, I see what you've done
+
+231
+00:15:21,500 --> 00:15:25,950
+你想让我绘制一个，两个……你指定了两个分量，或者两种坐标
+you want me to draw a, two...you've kind of specified two component, or two kind of coordinates
+
+232
+00:15:26,233 --> 00:15:29,166
+你想让我用它们绘制一个三角形，不是这样的
+and you just want me to draw a triangle with them, no, not how it works
+
+233
+00:15:29,166 --> 00:15:32,533
+实际上，我们需要告诉OpenGL，我们的数据是如何布局的
+we need to actually tell OpenGL, how our data is laid out
+
+234
+00:15:32,533 --> 00:15:35,733
+这是我们绝对需要做的事情，因为从着色器的角度来看
+and that is something that we definitely need to do, because remember from the shader side
+
+235
+00:15:35,733 --> 00:15:38,700
+我们希望能够以适当的方式读取这些数据
+we want to be able to read this data in an appropriate way
+
+236
+00:15:38,700 --> 00:15:42,150
+比如这里这个顶点位置
+for example, this kind of vertex position that we have here
+
+237
+00:15:42,150 --> 00:15:45,833
+我想理解成一个两个分量的向量，对，一个vec2
+I'd love to just be able to read that as a two component vector, right, as a vector two
+
+238
+00:15:46,000 --> 00:15:47,166
+或者甚至可能是vec4
+or maybe even a vector fourth
+
+239
+00:15:47,166 --> 00:15:50,800
+这样就可以用着色器把它与矩阵相乘，或者其他怎么样
+so that I can multiply it with a matrix in my shader, or something like that
+
+240
+00:15:50,800 --> 00:15:54,200
+我们需要能够告诉OpenGL，我们的数据是如何布局的
+we need to be able to tell OpenGL, how our data is laid out
+
+241
+00:15:54,200 --> 00:15:58,600
+我们可以用glVertexAttributePointer()函数来实现，对吧
+and we can do that by using a function called glVertexAttributePointer, okay
+
+242
+00:15:58,600 --> 00:16:02,584
+那又是和着色器紧密联系在一起的东西，那么，我们今天先不讨论这个
+now that is again something that is very closely tied with shader, so we're not going to talk about that today
+
+243
+00:16:02,666 --> 00:16:05,200
+但要把这个记住，我们还没准备好绘制
+but just keep that in mind, we're not really ready to draw yet
+
+244
+00:16:05,200 --> 00:16:08,833
+但假如已经准备好了，那我们就来看一下，我要往下滑动
+but if we were, let's take a look at that, so I'm going to scroll down over here
+
+245
+00:16:09,000 --> 00:16:13,100
+把这些垃圾删掉，腾出地方，我们使用立即模式画三角形
+and instead of, having this junk here where we use, where we ran triangles using immediate mode
+
+246
+00:16:13,100 --> 00:16:18,300
+我实际上会为这个缓冲区发出一个DrawCall指令，并且我们的方法很简单
+I'm actually going to issue a DrawCall for this buffer, and the way that we do that is very simple
+
+247
+00:16:18,566 --> 00:16:20,366
+主要有两种方法实现
+there's two main ways of doing that
+
+248
+00:16:20,400 --> 00:16:25,450
+有个glDrawArrays()函数，这是一个没有索引缓冲区时可以用的方法
+there's glDrawArrays() which is something that you do if you do not have an index buffer
+
+249
+00:16:25,450 --> 00:16:27,500
+因为我们没有索引缓冲区，所以就用这个方法了
+and we don't have an index buffer so we'll look at that
+
+250
+00:16:27,500 --> 00:16:29,866
+你们可以看到，需要指定绘制的模式
+you can see that we need to specify the mode that we're drawing in
+
+251
+00:16:29,866 --> 00:16:32,166
+这意味着，你们要画的是什么图元
+What this means is, what kind of primitive are you trying to draw?
+
+252
+00:16:32,166 --> 00:16:34,033
+在这个例子中，我们要绘制一个三角形
+in this case, we're trying to draw a triangle
+
+253
+00:16:34,200 --> 00:16:38,310
+所以我们输入GL_TRIANGLES，这个first参数，它只是一个偏移量
+so we're just typing GL_TRIANGLES, the first, it's basically just an offset again
+
+254
+00:16:38,533 --> 00:16:41,865
+你们知道看看文档的，对吧，这些我都知道，但是为了你们好
+you know documentation, right, I know all this, but for your sake
+
+255
+00:16:41,865 --> 00:16:45,925
+让我们一起来看看glDrawArrays到底做了什么，以及它的原理
+let's go ahead and take a look atwhat glDrawArrays actually does and how it works
+
+256
+00:16:46,100 --> 00:16:48,866
+那么first参数，指定使用的数组中的起始索引
+so first, specifies the starting index in the enabled array
+
+257
+00:16:48,866 --> 00:16:52,050
+所以换句话说，如果我们因为某种原因，我们想从第二个顶点开始
+So in other ways, if we for some reason, we wanted to start from the second vertex
+
+258
+00:16:52,333 --> 00:16:54,900
+我们在这里输入1，对吧，因为我们从0开始数
+we would type in one here, right, because we started zero
+
+259
+00:16:55,025 --> 00:16:59,309
+我们想要从顶点列表的起始位置开始，所以就写0
+we do want to start from the beginning of our kind of list of vertexes, so I'm just going to write zero
+
+260
+00:16:59,533 --> 00:17:04,050
+然后，就是最后一个参数count，也就是要渲染的索引的数量
+and then finally the count, which is the number of indices to be rendered
+
+261
+00:17:04,333 --> 00:17:10,029
+索引表示顶点，在这个例子中，我们有1个, 2个, 3个顶点
+now indices kind of means vertexes, in this case, so, we have 1, 2, 3 of these
+
+262
+00:17:10,233 --> 00:17:15,033
+所以你们只需要输入3，理论上，如果我们按f5来运行程序
+so you just type in three, and theoretically, if we hit f5 to run our program
+
+263
+00:17:15,033 --> 00:17:16,733
+你们会看到一个三角形
+you would see a triangle
+
+264
+00:17:16,733 --> 00:17:21,166
+但是因为我们只写了大概30%的渲染三角形需要的代码
+however since we've written like 30% of the code needed to render a triangle
+
+265
+00:17:21,166 --> 00:17:24,200
+所以，你们会看到一个黑屏，但大概就是这么回事
+you'll see a black screen, but this is basically the idea
+
+266
+00:17:24,200 --> 00:17:27,400
+另一个DrawCall指令是glDrawElements()
+the other DrawCall that we have is something called glDrawElements
+
+267
+00:17:27,400 --> 00:17:30,000
+这个是有索引缓冲区时使用的函数
+which is something that we use with an index buffer
+
+268
+00:17:30,000 --> 00:17:33,766
+所以在这里，我们同样填GL_TRIANGLES，然后参数count，就是3
+so in this case, we kind of specify the same thing GL_TRIANGLES, then the count so three
+
+269
+00:17:33,850 --> 00:17:37,300
+这个类型，实际上指的是索引数据的类型
+the type which is actually the type of the index data
+
+270
+00:17:37,300 --> 00:17:41,050
+如果我们使用，如unsigned int或unsigned short，就把它放在这里
+so if we're using like an unsigned int or an unsigned short, we would put that in there
+
+271
+00:17:41,133 --> 00:17:44,166
+最后一个参数是indices，那个我们几乎从不使用
+and then finally appointed to the indices, which we almost never use
+
+272
+00:17:44,433 --> 00:17:48,233
+所以这通常填NULL，当我们讲到索引缓冲区的时候，我们再来讲这个
+so that's usually just NULL, but again we'll look at that when we look at what index buffer is actually are
+
+273
+00:17:48,666 --> 00:17:53,166
+所以说，这就是DrawCall，对吧，这是实际绘制三角形的一行代码
+so that being said that's the DrawCall, right, this is the line of code that actually draws our triangle
+
+274
+00:17:53,166 --> 00:17:56,750
+现在你们可能注意到它并没有指明任何东西
+now you may notice here that it doesn't specify well anything
+
+275
+00:17:56,750 --> 00:17:58,800
+我的意思是它说它是一个三角形
+I mean it says that it's a triangle
+
+276
+00:17:58,966 --> 00:18:00,900
+它从0开始，然后写了3
+says it was starting at zero and went wrote three
+
+277
+00:18:01,160 --> 00:18:05,350
+它是怎么知道要画的是这一个呢，这就要回到我之前说的，OpenGL是一个状态机
+how does it notice draw this one, and that comes back to me saying that OpenGL is a state machine
+
+278
+00:18:05,475 --> 00:18:10,825
+当我们写这段代码的时候，我们把这行代码写在这里，glBindBuffer()
+when we were writing this block of code, and we wrote this code right over here, glBindBuffer
+
+279
+00:18:11,166 --> 00:18:14,900
+就是这行表明我们要绘制的是哪一个，绘制的就是当前绑定的那一个图形
+that is what is going to be drawn, the one that is currently bound
+
+280
+00:18:15,300 --> 00:18:20,450
+如果在绘制之前（glDrawArrays()之前），我们没有绑定缓冲区，比如通过绑定0来实现
+if before we did this, we bound no buffer, which you do by binding zero
+
+281
+00:18:20,700 --> 00:18:24,625
+这样就绘制不出我们的三角形了，因为我们选择了别的缓冲区
+then this would not draw our triangle, because we've selected something else
+
+282
+00:18:24,700 --> 00:18:27,400
+我喜欢把这比作使用一个程序，比如photoshop
+I like to compare this to using a program such as photoshop
+
+283
+00:18:27,400 --> 00:18:30,900
+当你们在photoshop中选择东西，如果我选择一个图层
+when you select things in photoshop, if I select a layer
+
+284
+00:18:31,300 --> 00:18:35,010
+然后在该图层上用画笔绘制一些东西，它只会影响这一图层
+and then draw something on that layer using the paintbrush, it's going to affect that layer
+
+285
+00:18:35,266 --> 00:18:38,984
+然而，如果我没有选择任何东西，或者选错了东西
+however if I have nothing selected, or I have the wrong thing selected
+
+286
+00:18:39,300 --> 00:18:43,310
+很明显，它不会影响到我想绘制的那个图层，OpenGL也是一样
+obviously it's not going to be affecting the layer that I want to draw on, OpenGL is the same
+
+287
+00:18:43,310 --> 00:18:48,466
+在使用它之前，你们需要选择或绑定所有东西
+you need to select everything or bind everything before you actually do stuff with it
+
+288
+00:18:48,466 --> 00:18:52,175
+因为这就是它的运行原理，它是上下文相关的，它是一个状态机
+because that's how it works, it's very contextual, it's a state machine
+
+289
+00:18:52,175 --> 00:18:55,533
+不论如何，希望大家喜欢这个视频，作为对顶点缓冲区的一点儿介绍
+anyway, I hope you guys enjoyed this video, as a bit of an introduction towards vertex buffers
+
+290
+00:18:55,533 --> 00:18:56,733
+我们还有很多东西要讲
+we've still got a lot to cover
+
+291
+00:18:56,733 --> 00:19:02,266
+包括顶点属性，着色器和索引缓冲区对象
+including kind of all the vertex attribute stuff, shader and index buffer kind of objects
+
+292
+00:19:02,266 --> 00:19:05,300
+这就是我们从本视频中得到的，我们需要做更多的工作
+that's what we've kind of gathered from this video that we need to do a lot more work
+
+293
+00:19:05,466 --> 00:19:07,666
+但那是最基本的，希望你们喜欢这个视频
+but that is the basics, hope you guys enjoyed this video
+
+294
+00:19:07,666 --> 00:19:12,000
+如果喜欢的话，就为它点赞吧，请在下面的评论区留下你们的评论
+if you did you can hit that like button, leave any comments you may have in the comment section below
+
+295
+00:19:12,233 --> 00:19:14,500
+如果你们想和更多的人谈论这些东西
+if you want to talk about this stuff with a lot more people
+
+296
+00:19:14,500 --> 00:19:18,212
+你们可以通过thecherno.com/discord这个频道加入我的讨论
+you can join my discord by going through thecherno.com/discord, and joining it
+
+297
+00:19:18,212 --> 00:19:21,966
+那里有很多人，我们整天都在谈论这些东西，所以这还是挺愉快的
+there's a bunch of people there and we talk about this stuff all day long, so it's a good time
+
+298
+00:19:22,525 --> 00:19:25,500
+如果你们想帮助支持这个系列，想看更多内容
+also if you want to help support this series, and you want to see more episodes
+
+299
+00:19:25,500 --> 00:19:30,333
+也可以一期接一期地看我在这些视频中写的所有源代码
+as well as get access to all of the source code that I write in these videos episode by episode
+
+300
+00:19:30,333 --> 00:19:32,066
+那么你们可以在patreon上支持这个系列
+then you can support this series on patreon
+
+301
+00:19:32,066 --> 00:19:35,850
+通过patreon.com/thecherno，也可以获取一些非常酷的奖励
+by going to patreon.com/thecherno, get some pretty cool rewards
+
+302
+00:19:35,850 --> 00:19:37,400
+你们可能已经注意到了这些鼓舞人心的名单，就在视频的开头
+you may have noticed the inspiring credits, at the beginning of the video
+
+303
+00:19:38,700 --> 00:19:42,150
+这是你们作为一个赞助人应该得到的，还有很多其他的东西
+it's what you get by being a cool supporter, and there's a lot more kind of stuff
+
+304
+00:19:42,300 --> 00:19:44,504
+以及提前拿到这些视频，我觉得这很酷
+as well as getting these videos early, which I think is pretty cool
+
+305
+00:19:44,775 --> 00:19:47,847
+不管如何，希望大家喜欢这个视频，下次见，再见
+anyway, hope you guys enjoyed this video, and I will see you next time goodbye
+

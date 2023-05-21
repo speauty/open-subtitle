@@ -1,0 +1,1200 @@
+﻿1
+00:00:00,266 --> 00:00:03,633
+看看我的水杯，多恶心啊
+check out my water bottle, how sick is that
+
+2
+00:00:03,666 --> 00:00:07,700
+你们好，欢迎回到这个批渲染迷你系列
+what's up you guys, welcome back to the batch rendering mini series
+
+3
+00:00:07,700 --> 00:00:10,366
+那么上一次，我们了解了顶点颜色
+so last time, we took a look at vertex colors
+
+4
+00:00:10,366 --> 00:00:14,066
+以及我们如何将颜色加入到批渲染中
+and how we can get colors into our batch rendering situation
+
+5
+00:00:14,333 --> 00:00:15,533
+如果你们还没看过那个视频，不妨看看
+check out that video, if you haven't already
+
+6
+00:00:15,533 --> 00:00:18,466
+如果你们是这个系列的新手，不知道到底发生了什么
+and if you're new to this series, and you don't know what on earth is going on
+
+7
+00:00:18,633 --> 00:00:21,066
+然后去看看这个系列的第一个视频
+then check out the first video in the series
+
+8
+00:00:21,133 --> 00:00:26,300
+我们在纸上看看批渲染的原理，为什么它有用
+where we take a look on paper at how batch rendering actually works, and why it's useful
+
+9
+00:00:26,300 --> 00:00:29,300
+今天我们要讨论纹理
+today we're going to be talking about textures
+
+10
+00:00:29,300 --> 00:00:34,200
+现在，批渲染和纹理看起来似乎并没有很好地结合在一起
+now, batch rendering and textures might seem like they don't really go together very well
+
+11
+00:00:34,200 --> 00:00:39,266
+因为通常你们所习惯的只是简单地建立一个纹理
+because usually what you're probably used to is simply setting up a texture
+
+12
+00:00:39,266 --> 00:00:42,033
+为特定的纹理槽激活它
+activating it for a particular texture slot
+
+13
+00:00:42,500 --> 00:00:47,866
+然后发出一个DrawCall，在你们的着色器中，从纹理统一变量中采样
+and then issuing a DrawCall, and in your shader, sampling from the texture uniform
+
+14
+00:00:47,900 --> 00:00:52,200
+你们已经上传到着色器的采样器，那就很不错了
+sampler that you've actually uploaded to the shader, and that's all fine
+
+15
+00:00:52,200 --> 00:00:53,533
+那样做没有什么错
+there's nothing wrong with doing that
+
+16
+00:00:53,533 --> 00:00:58,966
+并且那就是你们如何渲染3D模型的很多方法，任何你们真正渲染的东西
+and that's a lot of how you would render 3D models quads, anything that you're really rendering
+
+17
+00:00:58,966 --> 00:01:03,066
+然而，在批渲染中，我们似乎失去了这种功能
+however, with batch rendering, we kind of lose that functionality
+
+18
+00:01:03,066 --> 00:01:06,400
+因为同样的原因，我们失去了整个颜色功能
+for the same reason that we lose this whole color functionality
+
+19
+00:01:06,400 --> 00:01:10,433
+我们不能再像以前那样有颜色的统一变量了
+we can't have a uniform color anymore like we used to be able to do
+
+20
+00:01:10,525 --> 00:01:13,875
+因为我们所拥有的和我们所面临的限制是
+because what we have and the limitation we're working with is
+
+21
+00:01:13,875 --> 00:01:18,166
+事实上，我们场景中的每一个四边形，每一个物体或实体
+the fact that every single quad, every single object or entity in our scene
+
+22
+00:01:18,366 --> 00:01:20,875
+现在被渲染在一个独立的DrawCall
+is now being rendered in a single DrawCall
+
+23
+00:01:20,875 --> 00:01:22,859
+我们没有DrawCall，DrawCall，DrawCall
+we don't have DrawCall, DrawCall, DrawCall
+
+24
+00:01:22,966 --> 00:01:27,566
+这意味着我们可以插入统一变量DrawCall...
+which means that we can insert uniform DrawCall, uniform DrawCall, uniform DrawCall
+
+25
+00:01:27,600 --> 00:01:32,182
+我们不能再这样做了，不能在那些DrawCall中插入统一变量
+we can't do that anymore, we can't insert uniforms amongst those DrawCalls
+
+26
+00:01:32,182 --> 00:01:32,966
+或者我应该说
+or I should say
+
+27
+00:01:32,966 --> 00:01:38,033
+就像在DrawCall之中，提交和上传统一变量一样
+like uniform submissions uniform uploads amongst those DrawCall
+
+28
+00:01:38,033 --> 00:01:41,700
+我们不能再那么做了，因为所有东西是用独立DrawCall来绘制的
+we can't do that anymore, because everything's being drawn with a single DrawCall
+
+29
+00:01:41,700 --> 00:01:45,366
+这很好，那就是把东西组合在一起的意义
+which is wonderful, that's the whole point of batching things together
+
+30
+00:01:45,433 --> 00:01:50,166
+让我们考虑一下纹理，我们如何将纹理很好地组合在一起
+so let's consider textures, how can we batch together textures well
+
+31
+00:01:50,433 --> 00:01:54,866
+说到将纹理批量处理，你们可能马上想到的一种方法是
+just by saying batch together textures, one of the ways that you might think of immediately is
+
+32
+00:01:55,200 --> 00:01:59,950
+如果我们的纹理包含多个纹理呢
+well, what if our texture contained more than one texture
+
+33
+00:02:00,350 --> 00:02:03,000
+现在，这就像是跳出固有的思维模式进行深入思考
+now, this is really like getting deep thinking outside the box
+
+34
+00:02:03,000 --> 00:02:06,933
+不管你们怎么称呼它，我们如何将纹理批量处理
+whatever you want to call it, how can we batch together textures
+
+35
+00:02:06,933 --> 00:02:11,700
+我们能做的是制作纹理图集或表格
+well what we could do is make something called a texture atlas or a sprite sheet
+
+36
+00:02:11,766 --> 00:02:17,666
+它们在游戏中非常常用，特别是在那些低保真度低分辨率的游戏中
+they're very commonly used in games, especially in games that have kind of low fidelity low resolution
+
+37
+00:02:17,666 --> 00:02:19,975
+我会说渲染动作是一个低保真度
+I'll say render actions a low fidelity
+
+38
+00:02:19,975 --> 00:02:22,533
+因为它仍然可能是视觉上相当高的质量
+because it still might be visually quite high quality
+
+39
+00:02:22,533 --> 00:02:26,933
+但是渲染本身和它所作用的纹理可能低于分辨率
+but the rendering itself and the textures that it acts upon might below resolution
+
+40
+00:02:26,933 --> 00:02:32,733
+我想到了《我的世界》或者《Stardew Valley》就是一个很好的例子
+so something like minecraft comes to mind or like you know Stardew Valley again is a good example
+
+41
+00:02:32,966 --> 00:02:38,700
+它们的纹理分辨率都很低，比如所有的贴图，或者所有的砖块
+they have rather low resolution textures for like all of the tiles, or in microft all of the blocks
+
+42
+00:02:38,700 --> 00:02:42,475
+正因为如此，简单地将纹理组合在一起是非常容易的
+so because of that, it's very easy to simply batch together the textures
+
+43
+00:02:42,475 --> 00:02:50,533
+如果每个纹理都是16x16像素，那么就不会有10个不同的纹理, cluella
+if each texture is like 16 by 16 pixels, then instead of having 10 different textures, cluella
+
+44
+00:02:54,566 --> 00:03:00,200
+我们将不得不去看看她，如果每个纹理只有16x16像素
+we'll have to check her out, if each texture is only 16 by 16 pixels 
+
+45
+00:03:00,200 --> 00:03:04,966
+那么，为什么我们会有10个不同的纹理，每个都是16x16
+then why would we have 10 separate textures that are each 16 by 16
+
+46
+00:03:05,200 --> 00:03:07,633
+相反，我们可以很容易地将它们组合在一起
+instead of doing that we could easily batch it together
+
+47
+00:03:07,666 --> 00:03:11,033
+那只会是一个，那会是什么
+and it would only be like a, what's that gonna be
+
+48
+00:03:11,033 --> 00:03:13,466
+我们就说，128×128的纹理
+let's just say, one twenty eight by one twenty eight texture
+
+49
+00:03:13,666 --> 00:03:16,533
+对，这将会是一个非常低分辨率的纹理
+right, it's gonna be so gonna be quite a lower resolution texture
+
+50
+00:03:16,533 --> 00:03:21,000
+它包含了里面所有的纹理就像子纹理一样
+and it just contains all of the kind of textures inside it almost like sub textures
+
+51
+00:03:21,266 --> 00:03:24,966
+然后如果我们想要渲染那些，我们所要做的就是思考
+and then if we want to actually render those, then all we have to do is think about
+
+52
+00:03:25,166 --> 00:03:27,866
+我们实际的纹理坐标是如何设置的
+how our actual texture coordinates are set up
+
+53
+00:03:27,866 --> 00:03:30,366
+所以不是用纹理坐标采样所有的纹理
+so instead of just sampling all of our textures with texture coordinates
+
+54
+00:03:30,366 --> 00:03:34,666
+0 2 1是整个纹理，我们可以缩小这个范围
+0 2 1 which would be the entire texture, we can reduce this range
+
+55
+00:03:34,766 --> 00:03:40,066
+然后处理一个子集来选择那个纹理的子区域
+and kind of deal with like a subset essentially to select a sub region of that texture
+
+56
+00:03:40,066 --> 00:03:44,866
+这是非常常见的做法，而且肯定会在OpenGL系列中进行探讨
+very commonly done, and definitely something will explore in the OpenGL series, at some point
+
+57
+00:03:45,066 --> 00:03:48,233
+但是，那不是我们解决这个问题的方法
+however, that's not how we're going to solve this
+
+58
+00:03:48,400 --> 00:03:53,075
+因为在这种情况下，我们仍然会有不同的纹理
+because in this case, we are still actually going to have separate textures
+
+59
+00:03:53,333 --> 00:03:56,800
+原因是我们可能想把它们堆在一起，它们不是单独的纹理
+the reason is maybe we want to batch these together, and they're not in separate texture
+
+60
+00:03:56,800 --> 00:03:59,733
+现在我们要把它们组合成一个纹理，那可能很有用
+so what we have to combine them into one texture now, that might be useful
+
+61
+00:03:59,733 --> 00:04:02,366
+例如，如果输入字体和文本，你们知道的
+for example if you're entering like fonts and text, you know
+
+62
+00:04:02,366 --> 00:04:05,800
+你们基本上会有这种纹理图集和所有的字体字符
+you would basically have this kind of texture atlas with all of your font characters
+
+63
+00:04:05,800 --> 00:04:07,033
+然后就像我提到的另一个方面
+and then on the other side as I mentioned
+
+64
+00:04:07,033 --> 00:04:09,925
+如果你们有像《我的世界》那样的低分辨率纹理
+if you've got low resolution textures like minecraft osaji valley
+
+65
+00:04:09,925 --> 00:04:14,733
+也许那也会有用，但这是更一般的情况
+then maybe that would also be useful, but this is going to be much more of a general case of
+
+66
+00:04:14,733 --> 00:04:18,733
+我们如何渲染使用多个纹理的东西
+how do we render something in wonderful that uses multiple textures
+
+67
+00:04:18,733 --> 00:04:24,666
+现在想想这个，想想我们是如何解决颜色的，颜色是个统一变量
+now to think about this, think about how we solves colors, colors were something that were a uniform
+
+68
+00:04:25,433 --> 00:04:28,200
+但后来我们意识到我们不能使用统一变量，所以我们该怎么办
+but then we realized we couldn't use uniforms, so what do we do
+
+69
+00:04:28,200 --> 00:04:33,800
+我们把颜色数据放到顶点缓冲区，对吧
+where do we stick that color data into the vertex buffer, right
+
+70
+00:04:34,033 --> 00:04:39,100
+我们能对纹理做同样的事吗，我们不能把纹理放进顶点缓冲区
+so can we do the same thing with textures, well, we can't really put a texture into a vertex buffer
+
+71
+00:04:39,100 --> 00:04:47,266
+然而，我们可以做的是给每个顶点缓冲区内的四边形分配某种id
+however what we can do is still assign some kind of id to each quad that is inside that vertex buffer
+
+72
+00:04:47,366 --> 00:04:50,433
+尽管我们以后可能会在片段着色器中使用
+though we can then maybe later use in the fragment shader
+
+73
+00:04:50,466 --> 00:04:54,100
+或者在像素着色器中选择一个纹理
+or in the pixel shader to select one of the textures
+
+74
+00:04:54,100 --> 00:04:59,433
+这之所以行得通是因为谁说过，我们一次只需要绑定一个纹理
+and the reason this works is because who says, we have to only bind one texture at once
+
+75
+00:04:59,500 --> 00:05:04,700
+我们实际上有很多纹理槽，这取决于你们的硬件和GPU
+we don't, we actually have many texture slots, and depending on your hardware and your GPU
+
+76
+00:05:04,700 --> 00:05:08,600
+无论你们是在电脑上还是手机上
+and whether you're on like pc or like a phone or something
+
+77
+00:05:09,000 --> 00:05:11,825
+你们会有不同数量的纹理槽
+you will have a varying amount of texture slots
+
+78
+00:05:11,825 --> 00:05:15,666
+例如，这台电脑有32个纹理槽
+and for example, this computer here has 32 texture slots
+
+79
+00:05:15,666 --> 00:05:19,766
+那意味着我可以同时拥有32种不同的纹理
+that means I can have 32 different textures bound at the same time
+
+80
+00:05:20,033 --> 00:05:25,400
+然后从我感兴趣的地方取样，那是完全可行的
+and then just sample from the one that I'm interested in, that's totally totally doable
+
+81
+00:05:25,400 --> 00:05:29,433
+那么这个的工作方式就是进入顶点缓冲区
+so then the way this is going to work is into the vertex buffer
+
+82
+00:05:29,633 --> 00:05:33,600
+对于我们渲染的每一个实际的正方形，和我们渲染颜色的方法是一样的
+for each actual quad that we render, the same way that we did with color
+
+83
+00:05:33,900 --> 00:05:36,466
+我们将提供一些额外的信息
+we're going to supply some additional information
+
+84
+00:05:36,466 --> 00:05:40,225
+在这个例子中，我们提供的数据是一个索引
+and in this case, the data we're supplying is going to be an index
+
+85
+00:05:40,475 --> 00:05:43,500
+并且索引是0或1或2
+an index being like zero or one or two
+
+86
+00:05:43,833 --> 00:05:46,266
+接下来会发生的是，我们会传递那个数据
+and then what's going to happen is we're going to pass that data
+
+87
+00:05:46,266 --> 00:05:51,966
+在渲染这个特定的四边形时，从顶点着色器到片段着色器的索引
+that index from our vertex shader into the fragment shader, upon rendering this specific quad
+
+88
+00:05:52,166 --> 00:05:55,566
+然后片段着色器会使用那个索引
+and then the fragment shader is going to use that index
+
+89
+00:05:55,566 --> 00:06:03,333
+作为纹理数组和采样数组统一变量的索引，以这种方式
+as an index into an array of textures and array of uniform samplers, and in that way
+
+90
+00:06:03,333 --> 00:06:07,833
+我们可以说这个四边形的渲染索引应该是0，纹理索引是0
+we can basically say that this quad should be rendered with index zero texture index zero
+
+91
+00:06:07,833 --> 00:06:10,666
+另一个四边形应该使用纹理索引1进行渲染
+this other quad should be rendered with texture index one
+
+92
+00:06:10,933 --> 00:06:15,333
+然后在我的片段着色器中，我简单地从正确的纹理取样
+and then in my fragment shader, I simply sample from the right texture
+
+93
+00:06:15,333 --> 00:06:19,966
+通过使用它作为纹理采样器数组的索引
+by just using it as an index into an array of texture samplers
+
+94
+00:06:19,966 --> 00:06:23,200
+这一点都不复杂，我们将深入研究一些代码
+it's really not that complicated at all, we're going to dive into some code
+
+95
+00:06:23,200 --> 00:06:26,400
+我们来看看，如何重新设计它，事实上
+and we're going to take a look, at how we can actually redesign this, and in fact
+
+96
+00:06:26,400 --> 00:06:31,400
+我们引入纹理的事实比实际情况要复杂得多
+that the fact that we're introducing textures to this is going to be more complex than the fact
+
+97
+00:06:31,400 --> 00:06:34,800
+我们需要在实际的顶点缓冲区中包含所有这些索引
+that we need to kind of include all these indices in the actual vertex buffer
+
+98
+00:06:34,800 --> 00:06:36,750
+因为我的意思是，我们需要现在加载一个纹理
+because I mean we have to like load a texture now
+
+99
+00:06:36,750 --> 00:06:38,500
+然后把它上传到我们的GPU
+and then upload it to our GPU
+
+100
+00:06:38,500 --> 00:06:43,133
+我们需要提供纹理坐标，这些都是纹理带来的开销
+we need to supply texture coordinates, there's all this kind of overhead that comes on with textures
+
+101
+00:06:43,133 --> 00:06:46,300
+但是我们要试着简单地讲一下，因为它不那么重要
+but we're going to try and kind of breeze through that, because it's not as important
+
+102
+00:06:46,300 --> 00:06:48,275
+如果你们不知道纹理在OpenGL中是如何工作的
+if you don't know how textures work in OpenGL
+
+103
+00:06:48,275 --> 00:06:51,050
+请查看OpenGL系列中的视频
+check out the video in the OpenGL series about that
+
+104
+00:06:51,200 --> 00:06:55,600
+我们将会特别关注批渲染的部分
+and we're going to just kind of focus on specifically the batch rendering part of that
+
+105
+00:06:55,600 --> 00:06:59,666
+这本质上是与绑定纹理到不同的槽
+which is essentially to do with just binding textures to different slots
+
+106
+00:06:59,666 --> 00:07:02,575
+然后把索引放在顶点缓冲区中
+and then having that index inside our vertex buffer
+
+107
+00:07:02,575 --> 00:07:06,633
+好了，我要做的第一件事是写这个LoadTexture函数
+okay, so the first thing that I'm going to do is write this LoadTexture function
+
+108
+00:07:06,633 --> 00:07:11,666
+这将是一个非常基本的函数，它只从给定的路径加载纹理
+this is going to be a pretty basic function that just loads the texture from a given path
+
+109
+00:07:11,766 --> 00:07:14,666
+然后返回给我们OpenGL id
+and then returns to us the OpenGL id
+
+110
+00:07:14,966 --> 00:07:18,900
+这个函数会允许我们加载我们的两个纹理
+and this function is just going to allow us to load our two textures here that we have
+
+111
+00:07:18,900 --> 00:07:23,300
+也就是cherno标志和hazel标志，这将是我们加载的两个样本纹理
+the cherno logo and the hazel logo, those are going to be our two sample textures that we load
+
+112
+00:07:23,300 --> 00:07:27,266
+所以我可以到这里，进入OnAttach函数，然后简单地加载它们
+so I can just come down here, into the OnAttach function and simply load them
+
+113
+00:07:27,333 --> 00:07:28,466
+我要给result赋值
+I'm going to assign the result
+
+114
+00:07:28,466 --> 00:07:32,966
+也就是这两个无符号整数的OpenGL纹理id
+which of course is the OpenGL texture id to these two unsigned integers
+
+115
+00:07:33,700 --> 00:07:37,466
+我们需要的另一个东西是这两个四边形的纹理坐标
+the other thing that we're going to need are the texture coordinates of these two quads
+
+116
+00:07:37,466 --> 00:07:41,966
+我们会把纹理坐标放在这个颜色后面，我们有位置，我们有颜色
+we'll put the texture coordinates after this color here, so we have the position, we have the color
+
+117
+00:07:41,966 --> 00:07:46,533
+然后我们会有每个顶点的纹理坐标，现在我们已经做了那个
+and then we're going to have the texture coordinates for each vertex, and now that we've done that
+
+118
+00:07:46,533 --> 00:07:50,666
+我们到这里来，为这些纹理坐标设置顶点属性
+we're just going to come over here, and set up the vertex attribute for these texture coordinates
+
+119
+00:07:50,900 --> 00:07:53,966
+我们把它设为索引2，当然它是两个浮点数
+so we'll set it up at index two, and of course it's going to be two floats
+
+120
+00:07:53,966 --> 00:07:58,075
+我们还必须调整这里的步幅，现在总共是9个浮点数
+we'll have to also adjust our strides here to be nine floats now total
+
+121
+00:07:58,225 --> 00:08:01,733
+然后这个的偏移量当然也是28字节
+and then the offset of this is also going to be 28 bytes of course
+
+122
+00:08:01,966 --> 00:08:07,166
+现在我们有了这个顶点缓冲区，它能够渲染纹理
+so now we have this whole kind of vertex buffer here, that is capable of rendering textures
+
+123
+00:08:07,166 --> 00:08:10,033
+我们真正需要做的就是到这里来
+all we really need to do to make this possible is just go over here
+
+124
+00:08:10,033 --> 00:08:15,966
+在我们的着色器中修改我们的着色器，使它们支持这些新的纹理坐标
+into our shaders and actually modify our shaders, so that they support these new texture coordinates
+
+125
+00:08:15,966 --> 00:08:19,100
+那么我要在这里添加这个属性，然后和颜色一样
+so I'm just going to add this attribute here, and then just like with our colors
+
+126
+00:08:19,100 --> 00:08:23,266
+我要设置这个out变量来获得片段着色器的纹理坐标
+I'm going to set up this out variable to get this texture coordinate to our fragment shader
+
+127
+00:08:23,633 --> 00:08:27,600
+然后我们可以通过输出纹理坐标作为颜色来测试它
+and then we might as well test it by just outputting the texture coordinate as the color
+
+128
+00:08:27,833 --> 00:08:31,433
+并且这里我们有两个四边形有正确的纹理坐标
+and here we have our two quads with the correct texture coordinates
+
+129
+00:08:31,433 --> 00:08:33,433
+那么现在我们已经做了所有的准备工作
+so now that we've done all of this setup stuff
+
+130
+00:08:33,433 --> 00:08:37,675
+我们实际上可以进入我们如何渲染这些纹理时，他们被批处理绑在一起
+we can actually get into how we render these textures when they're batched together
+
+131
+00:08:37,875 --> 00:08:42,266
+正如我提到的，我们真正需要做的是扩展我们的顶点缓冲区
+so as I mentioned, what we really need to do here is extend our vertex buffer
+
+132
+00:08:42,266 --> 00:08:46,033
+这样每个顶点都包含一个纹理索引
+so that every vertex actually includes a texture index
+
+133
+00:08:46,166 --> 00:08:50,575
+我们来做这个，让第一个四边形成为第一个纹理
+so let's do this, let's make the first quad here be the first texture
+
+134
+00:08:50,575 --> 00:08:52,100
+在这种情况下，就是thecherno的标志
+which in this case will be thecherno logo
+
+135
+00:08:52,100 --> 00:08:56,900
+然后我们会让第二个四边形是第二个纹理，也就是hazel的logo
+and then we'll make the second quad here be the second texture, which is going to be the hazel logo
+
+136
+00:08:56,900 --> 00:09:01,500
+换句话说，第一个四边形的纹理id是0，索引是0
+so in other words, the first quad is going to have a texture id of zero, index zero
+
+137
+00:09:01,500 --> 00:09:06,566
+然后第二个四边形会有一个纹理索引或id为1
+and then the second quad is going to have a texture index or an id of one
+
+138
+00:09:06,733 --> 00:09:11,466
+你们可以看到，我只是添加了0作为所有这些顶点的纹理索引
+and you can see that I've literally just added that zero in as the texture index for all of these vertices
+
+139
+00:09:11,500 --> 00:09:14,333
+然后对于这些顶点，我们应该组成第二个四边形
+and then for these vertices, we should make up the second quad
+
+140
+00:09:14,533 --> 00:09:18,875
+我们只是有一个纹理索引1，所以现在我们有一个0和1
+we simply have a texture index of one, so now we have a zero and one
+
+141
+00:09:19,025 --> 00:09:20,233
+就像任何属性一样
+like with any attribute
+
+142
+00:09:20,233 --> 00:09:25,300
+现在我需要在这里用OpenGL设置属性，所以这个属性将在索引3处
+I now need to set up the attribute with OpenGL here, so this attribute will be at index three
+
+143
+00:09:25,300 --> 00:09:29,266
+它是一个独立浮点数，然后我将设置偏移和调整像之前的步幅
+it's a single float, and then I'll set the offset and adjust the stride like before
+
+144
+00:09:29,300 --> 00:09:31,966
+很好，那么现在每个四边形都有一个纹理索引
+okay cool, so now every quad has a texture index
+
+145
+00:09:32,066 --> 00:09:34,333
+这可能和你们用的颜色有冲突
+now this might conflict with the colors that you're using
+
+146
+00:09:34,333 --> 00:09:37,700
+换句话说，如果我想渲染颜色而不是纹理呢
+which in other words, just means what if I want to render the color and not a texture
+
+147
+00:09:37,700 --> 00:09:39,666
+怎么做呢，一个常见的解法
+how do I do that, well, a common way to solve that
+
+148
+00:09:39,666 --> 00:09:43,966
+将这种纹理槽0保留为完全没有纹理
+would just be to reserve this kind of texture slot zero as no texture at all
+
+149
+00:09:44,333 --> 00:09:47,800
+然后one和on会与给定的纹理id相关联
+and then one and on would kind of correlate to a given texture id
+
+150
+00:09:47,800 --> 00:09:51,900
+然后你们只需要将你们的纹理索引偏移一倍
+and then you just need to offset your texture index by a factor of one
+
+151
+00:09:52,200 --> 00:09:55,833
+在你们的着色器中计算出实际的纹理id，如果它不为零
+in your shader to work out the actual texture id, if it's not zero
+
+152
+00:09:55,833 --> 00:09:57,166
+但我们今天不用担心那个
+but we're not gonna worry about that today
+
+153
+00:09:57,166 --> 00:10:01,366
+我们会用纹理0和纹理1来渲染这两个四边形
+we're just gonna just render both of these quads with texture zero and texture one
+
+154
+00:10:01,500 --> 00:10:04,833
+现在如果我们进入着色器，让我们引入这个新属性
+so now if we come over into our shader, let's take in this new attribute
+
+155
+00:10:04,833 --> 00:10:07,766
+这次它是一个浮点数，当然，我们将它传递到我们的片段着色器
+this time it's a float, of course and we'll pass it into our fragment shader
+
+156
+00:10:07,766 --> 00:10:09,933
+和我们处理纹理坐标的方法一样
+the same way that we did with the texture coordinate
+
+157
+00:10:10,166 --> 00:10:14,066
+现在作为一个有趣的活动，让我们通过输出颜色来测试它
+and now as a little fun activity, let's test it out by just outputting it as the color
+
+158
+00:10:14,066 --> 00:10:19,066
+所以我们应该得到黑色或白色，取决于纹理索引是0还是1
+so we should get either black or white, depending on if the texture index is zero or one
+
+159
+00:10:19,066 --> 00:10:21,875
+你们可以看到，左边的四边形实际上是黑色的
+and as you can see, the quad on the left is in fact black
+
+160
+00:10:21,875 --> 00:10:24,175
+这意味着它的纹理索引是0
+meaning it's got a texture index of zero
+
+161
+00:10:24,400 --> 00:10:29,300
+然后右边的四边形是白色的，这意味着它的纹理索引是1，漂亮
+and then the quad on the right is white, meaning it has a texture index of one, beautiful
+
+162
+00:10:29,300 --> 00:10:34,033
+那么最后一步非常简单，我们需要做的就是回到这里
+so now the last step is super simple, all we really need to do is go back here
+
+163
+00:10:34,166 --> 00:10:38,033
+然后简单地将这些纹理绑定到正确的纹理槽
+and simply bind these textures to the correct texture slots
+
+164
+00:10:38,066 --> 00:10:42,275
+然后在我们的片段着色器中设置一些代码，从这些纹理中实际取样
+and then set up some code inside our fragment shader to actually sample from these textures
+
+165
+00:10:42,533 --> 00:10:45,833
+所以在渲染之前，首先将这些绑定到正确的纹理槽
+so first to bind these to the right texture slots before rendering
+
+166
+00:10:45,866 --> 00:10:50,166
+我们将简单地调用glBindTextureUnit，其索引0是thecherno纹理
+we'll simply call glBindTextureUnit with index zero for thecherno texture
+
+167
+00:10:50,166 --> 00:10:52,500
+然后索引1就是hazel纹理
+and then index one for the hazel texture
+
+168
+00:10:52,766 --> 00:10:56,800
+现在这些直接对应于我们在顶点缓冲区中的内容
+so now these correspond directly to what we've put inside our vertex buffer
+
+169
+00:10:56,800 --> 00:10:58,600
+我们需要设置那个
+we need to actually set up that
+
+170
+00:10:58,633 --> 00:11:02,866
+采样器数组，这样我们就可以对这些纹理进行采样
+sampler array inside our shader, so that we can actually sample these textures
+
+171
+00:11:02,866 --> 00:11:06,633
+因为我们这里只有两个纹理，我把它的大小设为2
+and so since we've just got two textures here, I'll just give it a size of two
+
+172
+00:11:07,033 --> 00:11:12,233
+现在我们有了统一采样2D数组，叫做u_Textures
+so now we have this uniform sampler 2D array called u_Textures
+
+173
+00:11:12,500 --> 00:11:17,500
+然后我们当然需要将这个统一变量设置为我们想要取样的纹理单元
+and then we of course need to set this uniform to be the texture units that we want to sample from
+
+174
+00:11:17,633 --> 00:11:21,100
+所以这就像一个升序列表
+so this will literally just be like an ascending list
+
+175
+00:11:21,100 --> 00:11:23,800
+从0一直到你们的最大纹理槽数
+from zero all the way to whatever your maximum texture slot is
+
+176
+00:11:23,966 --> 00:11:26,933
+所以在这种情况下，这两个，就是0和1
+so in this case, with these two, it'll just be 0 1
+
+177
+00:11:27,100 --> 00:11:30,600
+如果我们有30个纹理，它将从0到29
+if we had 30 textures, it would be zero through 29
+
+178
+00:11:30,800 --> 00:11:35,433
+最后回到我们的着色器，而不是仅仅输出颜色作为纹理索引
+and finally back in our shader, instead of just outputting the color as the texture index
+
+179
+00:11:35,433 --> 00:11:38,400
+我们需要从这个u_Textures数组中采样
+we need to sample from this u_Textures array
+
+180
+00:11:38,533 --> 00:11:40,825
+所以我们在片段着色器中做的第一件事
+so the first thing that we'll do inside our fragment shader
+
+181
+00:11:40,950 --> 00:11:44,033
+就是转换这个索引成一个整数
+ is convert this v tax index into an integer
+
+182
+00:11:44,033 --> 00:11:48,366
+因为我们想把它用作数组下标，所以它必须是int型
+because since we want to use it as an array index, it has to be an int
+
+183
+00:11:48,366 --> 00:11:50,666
+一旦我们这样完成了那个，就像
+and then once we've done that, it's just as simple as
+
+184
+00:11:50,733 --> 00:11:55,466
+用我们的纹理坐标，根据索引选取正确的纹理进行采样
+sampling the correct texture based on whatever that index is, with our texture coordinates
+
+185
+00:11:55,666 --> 00:12:00,050
+就是那样，你们可以看到，如果我们运行这个，我们现在有两个四边形
+and that's it, as you can see, if we launch this, we now have both of these quads
+
+186
+00:12:00,050 --> 00:12:06,033
+在单个DrawCall中，将不同纹理分配给不同纹理槽进行渲染
+rendering with different textures assigned to different texture slots in a single DrawCall
+
+187
+00:12:06,733 --> 00:12:09,725
+很酷的东西，事实上，你们当然可以把它扩展到
+pretty cool stuff, and in fact, you can of course expand this to 
+
+188
+00:12:09,725 --> 00:12:12,775
+你们的设备和硬件支持的纹理插槽数量
+as many texture slots as your device and your hardware supports
+
+189
+00:12:12,900 --> 00:12:16,133
+好了，我希望那有意义，我的意思是这不是特别
+okay, so I hope that that made sense, I mean it's not particularly
+
+190
+00:12:16,200 --> 00:12:19,233
+比如这是一个很难理解的概念
+like a very challenging concept to understand, I think
+
+191
+00:12:19,575 --> 00:12:22,397
+但是还有一些额外的事情你们需要考虑
+but there are some extra things you need to think about
+
+192
+00:12:22,397 --> 00:12:24,975
+例如，如果我们有，让我们看看
+for example, what if we do have, let's just see
+
+193
+00:12:25,133 --> 00:12:28,233
+你们可能在手机上，它可能只有8个纹理槽
+you might be on a phone and it might only have eight texture slots
+
+194
+00:12:28,233 --> 00:12:31,466
+但是你们想要渲染一些可能使用超过八个纹理的东西
+but you want to render something that might use more than eight textures
+
+195
+00:12:31,466 --> 00:12:35,366
+我的意思是，也许你们想渲染有100个纹理的贴图地图
+I mean maybe you want to render this whole tile map that has 100 textures
+
+196
+00:12:35,366 --> 00:12:41,025
+显然有这个限制，你们可以通过使用一些OpenGL函数来查询和发现
+there's clearly this limitation which you can query and find out by using some OpenGL functions 
+
+197
+00:12:41,025 --> 00:12:46,400
+但是我们如何处理它的局限性，答案是你们仍然可以批渲染
+but how do we deal with the limitation of that, and the answer is you still can
+
+198
+00:12:46,733 --> 00:12:48,550
+只是你们得把这批渲染拆分
+it's just that you're going to have to break up your batch
+
+199
+00:12:48,666 --> 00:12:53,700
+不像我们到目前为止所做的那样，在单个DrawCall中渲染所有内容
+so instead of rendering everything in a single DrawCall, like we kind of have been doing so far
+
+200
+00:12:53,900 --> 00:13:00,500
+如果你们想为100个四边形使用100个纹理，那么基于最大纹理槽
+if you want to use 100 textures for 100 quads, then based on that maximum texture slot
+
+201
+00:13:00,800 --> 00:13:03,366
+比如不管它是什么值，假设它是32
+like value whatever it is, let's just say, it's 32
+
+202
+00:13:03,700 --> 00:13:07,466
+每次你们在渲染器中使用所有的32个纹理
+every time you end up using all of your 32 textures loss in a renderer
+
+203
+00:13:07,466 --> 00:13:11,533
+当你们提交越来越多的几何图形，以渲染不同的纹理
+as you submit more and more geometry to be rendered with different textures
+
+204
+00:13:11,633 --> 00:13:15,825
+你们可以简单地触发三下，就像这一批就结束了
+you can simply once you hit three too be like that's the end of this batch
+
+205
+00:13:15,933 --> 00:13:18,554
+我需要刷新这个，我需要把它渲染到屏幕上
+I need to flush this, I need to render it to the screen
+
+206
+00:13:18,554 --> 00:13:20,650
+然后我要开始一个新的批处理
+and then I'm gonna begin a new batch
+
+207
+00:13:20,650 --> 00:13:24,333
+我的意思是你们仍然可以省下很多DrawCall的资源
+and that way I mean you're still gonna save obviously on a lot of DrawCalls
+
+208
+00:13:24,333 --> 00:13:30,066
+因为不是像渲染100个独立的四边形和独立的纹理
+because instead of rendering like 100 separate quads with separate textures
+
+209
+00:13:30,200 --> 00:13:33,133
+你们最终会得到100 / 32
+you're going to wind up rendering my hundred of over by 32
+
+210
+00:13:33,233 --> 00:13:35,866
+换句话说，一组是32，另一组是32
+so in other words, they'll have one group of 32, another group of 32
+
+211
+00:13:35,866 --> 00:13:38,733
+另一组是32个，剩下的就是最后一组
+another group of 32, and then finally another group of like
+
+212
+00:13:38,733 --> 00:13:41,325
+我们最后只用了4次，对吧
+what do we end up with like four or something like that, right 
+
+213
+00:13:41,325 --> 00:13:47,233
+所以这仍然只需要4次而不是100次，节省了很多
+so that's still gonna be only four draw calls instead of like 100, so huge saving
+
+214
+00:13:47,233 --> 00:13:51,525
+并且随着我们这个系列的继续，我们将会设计这个渲染器
+and as we kind of move on with this series, we're gonna get to kind of designing this renderer
+
+215
+00:13:51,525 --> 00:13:54,533
+它可以渲染100种不同的纹理，做所有那些事情
+that can render like 100 different textures, and doing all of that stuff
+
+216
+00:13:54,533 --> 00:13:56,200
+所以别担心，那东西会来的
+so don't worry, that stuff is coming
+
+217
+00:13:56,200 --> 00:14:00,100
+事实上，我们现在所做的是，基本上已经涵盖了所有的基础
+and in fact what we've done right now is we've basically covered all of our bases
+
+218
+00:14:00,100 --> 00:14:04,766
+我的意思是，我们现在可以渲染任何四边形，无论是颜色还是纹理
+I mean we can now render any quad whether it be a color or a texture
+
+219
+00:14:05,100 --> 00:14:08,666
+我们可以在一个单独的DrawCall中渲染尽可能多的它们
+and we can render as many of them as we want in a single DrawCall
+
+220
+00:14:08,766 --> 00:14:11,301
+所以现在我们需要做的是
+so now what we need to be able to do is 
+
+221
+00:14:11,301 --> 00:14:16,666
+没有一个静态的顶点缓冲区，它只包含前面的所有内容
+not have a static kind of vertex buffer that just contains everything up front
+
+222
+00:14:16,966 --> 00:14:20,000
+但我想做的是能够
+but what I want to do is be is to have the ability
+
+223
+00:14:20,200 --> 00:14:23,966
+改变所有四边形的位置
+of actually changing all of these positions of all of the quads
+
+224
+00:14:23,966 --> 00:14:26,166
+基本上，实际就是把它们当成是
+basically having them as if they were in fact
+
+225
+00:14:26,166 --> 00:14:32,033
+提交为独立的四边形的DrawCall和独立转换等等
+submitted as separate quad separate DrawCalls with separate transforms and all of that
+
+226
+00:14:32,366 --> 00:14:34,866
+我希望能够随意添加和删除四边形
+and I want to be able to just add and remove quads at will
+
+227
+00:14:34,866 --> 00:14:38,366
+这是我现在不能做的，因为我们的顶点缓冲区是静态的
+which is something that I can't really do at the moment, because our vertex buffer is static
+
+228
+00:14:38,366 --> 00:14:41,200
+下次，我们会探讨动态顶点缓冲区
+so next time, we're gonna explore a dynamic vertex buffer
+
+229
+00:14:41,200 --> 00:14:45,833
+我们如何让每一帧的数据都流进顶点缓冲区
+how we can actually every frame stream all of this data into that vertex buffer
+
+230
+00:14:45,833 --> 00:14:49,066
+然后让它动态地响应任何我们想要的东西
+and then have that dynamically respond to anything we want
+
+231
+00:14:49,500 --> 00:14:53,233
+然后随着本系列的继续，我们也会开始介绍那个渲染器
+and then as the series goes on, we'll kind of start introducing that renderer as well
+
+232
+00:14:53,233 --> 00:14:55,033
+并且那就是我们正在努力的目标
+and that's kind of the goal that we're working towards
+
+233
+00:14:55,033 --> 00:14:59,900
+就像一个完整的批渲染器，它能够处理我们抛出的任何东西
+like a full on batch renderer, that's gonna be able to handle anything we throwed it 
+
+234
+00:14:59,900 --> 00:15:02,766
+无论如何，希望大家喜欢这个视频，如果喜欢，请点赞
+anyway, hope you guys enjoyed this video, if you did, please hit that like button
+
+235
+00:15:02,766 --> 00:15:09,230
+不要忘记在patreon.com/TheCherno上支持这个频道
+don't forget to help support this channel on patreon.com/TheCherno is the link for that 
+
+236
+00:15:09,230 --> 00:15:12,466
+非常感谢所有人的支持，让这一切成为可能
+huge thank you to everyone who does help support this and make this possible
+
+237
+00:15:12,466 --> 00:15:16,100
+我希望你们和我一样喜欢这个批渲染入门迷你系列
+I hope you guys are enjoying this batch entering mini series as much as I have
+
+238
+00:15:16,100 --> 00:15:19,200
+如果你们有其他想法或任何不明白的地方
+if you have any other ideas or anything that you don't understand
+
+239
+00:15:19,200 --> 00:15:22,100
+请在下方留言，我会尽量回复你们的
+please leave a comment below, and I'll try and get back to you
+
+240
+00:15:22,333 --> 00:15:24,100
+下次见，再见
+I will see you guys next time, goodbye
+

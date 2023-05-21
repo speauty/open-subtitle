@@ -1,0 +1,1260 @@
+﻿1
+00:00:00,100 --> 00:00:00,900
+嘿, 你们好
+hey, what's up guys
+
+2
+00:00:00,900 --> 00:00:03,733
+我是Cherno, 欢迎回到我的OpenGL系列教程
+my name is Cherno, and welcome back to my OpenGL series
+
+3
+00:00:04,000 --> 00:00:06,766
+那么, 今天, 我们要讨论的都是统一变量
+so, today, we're going to be talking all about uniforms
+
+4
+00:00:06,766 --> 00:00:10,600
+一般来说, OpenGL或显卡中的统一变量是什么
+what is a uniform in OpenGL or in graphics pro army in general
+
+5
+00:00:10,700 --> 00:00:13,000
+它们的用途是什么, 以及在OpenGL中是如何工作的
+what are they used for, and how do they work in OpenGL
+
+6
+00:00:13,400 --> 00:00:17,166
+那么首先, 统一变量是一个非常单一的概念
+so first of all, uniforms are a pretty single concept
+
+7
+00:00:17,266 --> 00:00:19,300
+它们基本上对于我们来说, 就是一种方式, 为了
+they're basically just a way for us to
+
+8
+00:00:19,300 --> 00:00:22,066
+实际上从CPU端获取数据
+actually get data from the kind of CPU side of things
+
+9
+00:00:22,066 --> 00:00:25,850
+那么在这个例子中, 是从c++到我们的着色器
+so from c++, in this case, into our shader
+
+10
+00:00:25,850 --> 00:00:27,933
+所以我们实际上把它当一个变量使用
+so we can actually use it like a variable
+
+11
+00:00:28,266 --> 00:00:29,950
+那么一个真不错的关于那个的例子
+so a really good example of that 
+
+12
+00:00:29,950 --> 00:00:33,133
+我们今天就直接进入到一些代码中
+we're just going to just jump into some code straight away today
+
+13
+00:00:33,600 --> 00:00:37,066
+一个真不错的关于这个的例子是在我们的颜色应用中
+a really good example of this is in our color application
+
+14
+00:00:37,066 --> 00:00:39,366
+我正好为你们运行一下那个, 为了恢复你们的记忆
+if I just run that for you guys, for refresh your memory
+
+15
+00:00:40,100 --> 00:00:44,425
+我们在这里绘制了一个蓝色的正方形或矩形
+we have a blue kind of square or rectangle that we're actually drawing over here
+
+16
+00:00:44,425 --> 00:00:45,900
+如果我们看看着色器的代码
+if we take a look at the shader code
+
+17
+00:00:45,900 --> 00:00:47,866
+我们实际上得到那个蓝色的方式
+the way that we're actually getting that blue color
+
+18
+00:00:48,133 --> 00:00:50,400
+只是通过在这儿硬编码一个颜色
+is just by hard coding a color here
+
+19
+00:00:50,400 --> 00:00:55,700
+增加0.2的红色, 0.3的绿色和0.8的蓝色, 以及一个1的透明度
+rise 0.2 red, 0.3 green, and 0.8 blue, with a 1.0 alpha
+
+20
+00:00:55,966 --> 00:01:02,225
+现在, 如果我们能在CPU端定义这些数据, 那就太好了
+now, it would be great, if we could somehow define this data in the CPU side of things so on
+
+21
+00:01:02,225 --> 00:01:06,800
+在我们实际的c++中, 甚至可能在必要时更新那个
+in our actual c++, and possibly even updated as necessary
+
+22
+00:01:07,033 --> 00:01:09,000
+那么好消息就是我们可以那样做
+so the good news is we can do that
+
+23
+00:01:09,033 --> 00:01:11,233
+并且这儿有两种实现那个的主要方法
+and there's two main ways of doing that
+
+24
+00:01:11,233 --> 00:01:12,700
+我们今天先看看统一变量
+today we're going to look at uniforms
+
+25
+00:01:12,800 --> 00:01:17,733
+而这也是可能的, 正如你们可能从顶点那期视频中看到的
+but it's also possible, as you guys could probably tell from the vertex kind of video
+
+26
+00:01:17,966 --> 00:01:22,000
+我们实际上也可以将数据从CPU传输到显卡
+it's also possible for us to actually get data from CPU to the GPU
+
+27
+00:01:22,300 --> 00:01:23,833
+通过一个顶点缓冲区
+via a vertex buffer
+
+28
+00:01:23,900 --> 00:01:26,600
+因此如果你们还没看过那个视频, 一定要去那边看看
+and if you guys haven't seen that video, definitely check that out over there
+
+29
+00:01:27,300 --> 00:01:29,525
+但我们今天要关注统一变量
+but today we're going to be focusing on uniforms
+
+30
+00:01:29,525 --> 00:01:35,433
+其实我打算做一个对比属性和统一变量的视频
+I'm actually planning to make a comparison video between attributes and uniforms
+
+31
+00:01:35,433 --> 00:01:36,225
+因为这些是
+because those are kind of
+
+32
+00:01:36,225 --> 00:01:44,066
+获取每个我们从CPU到显卡绘制的对象数据的两种主要方式
+ the two main ways of getting data kind of per object kind of that we're drawing from the CPU to the GPU
+
+33
+00:01:45,333 --> 00:01:47,933
+但今天又明确是关于统一变量的
+but today again explicitly about uniforms
+
+34
+00:01:47,933 --> 00:01:50,766
+所以在这两者之间进行小小的比较
+so in terms of just comparing the two lightly
+
+35
+00:01:51,533 --> 00:01:56,233
+你确实必须知道的比较大的区别就是, 统一变量是设置每次绘制的
+the big thing that you do have to know is that uniforms are set per draw
+
+36
+00:01:56,266 --> 00:01:58,900
+所以基本上你可以设置一个统一变量
+so basically you can set a uniform up
+
+37
+00:01:59,025 --> 00:02:02,600
+在你调用glDrawElements或glDrawArrays之前
+before you call glDrawElements or glDrawArrays
+
+38
+00:02:02,600 --> 00:02:04,800
+或者任何你实际用来绘制的函数
+or whatever you're using to actually do the drawing
+
+39
+00:02:04,800 --> 00:02:07,833
+而属性实际上是设置每个顶点的
+whereas attributes are actually set kind of per vertex
+
+40
+00:02:07,833 --> 00:02:11,366
+所以, 换句话说, 你可以明显看到这里的位置属性
+so, in other words, you can see that obviously the position attribute we have here
+
+41
+00:02:11,700 --> 00:02:13,733
+理论上来说, 可以是任意类型的数据
+which theoretically could be any kind of data
+
+42
+00:02:13,733 --> 00:02:15,333
+在这里, 虽然它是一个位置
+in this case, though it's a position
+
+43
+00:02:15,700 --> 00:02:17,466
+这就是每个顶点
+this is per vertex
+
+44
+00:02:17,766 --> 00:02:21,866
+而关于统一变量, 我们可以在实际绘制之前设置它们
+whereas with uniforms, we kind of set them before we do the actual drawing
+
+45
+00:02:21,866 --> 00:02:23,566
+所以它们是设置每次绘制的
+so they're set per draw
+
+46
+00:02:23,633 --> 00:02:25,000
+这确实是一个比较大的区别
+there's a really big difference
+
+47
+00:02:25,000 --> 00:02:28,166
+并且我们也会在专门的视频中进一步探讨那个
+and again we'll explore that more in the dedicated video about that
+
+48
+00:02:29,000 --> 00:02:32,666
+那么让我们把这个颜色转换成可以c++中设置的一些参数吧
+so let's convert this color into being something that we set from c++
+
+49
+00:02:32,666 --> 00:02:35,600
+所以实际上我首先要做的就是修改我的着色器
+so the first thing I'm actually going to do is modify my shader
+
+50
+00:02:35,600 --> 00:02:39,433
+来到我的着色器文件, 并且看到这个片段着色器
+I'm going to go into my shader file here, and into this fragment shader
+
+51
+00:02:39,433 --> 00:02:43,966
+我要添加一些代码, 实际上就在我们这里的输出代码下面
+I'm going to add some code, so just underneath this output that we actually have here
+
+52
+00:02:43,966 --> 00:02:48,466
+我要写uniform vec4 u_Color
+I'm going to write uniform vec4 u_Color
+
+53
+00:02:48,700 --> 00:02:50,433
+现在我想在这里使用一些命名约定
+now I'd like to use a bit of a naming convention here
+
+54
+00:02:50,433 --> 00:02:51,933
+我真的不想使用一个构造碎片或其他
+I didn't really use a fabric piece or anything
+
+55
+00:02:51,933 --> 00:02:53,166
+但随着我们接触统一类型
+but as we get into uniforms
+
+56
+00:02:53,166 --> 00:02:54,266
+我要开始用它了
+I'm going to start using it
+
+57
+00:02:55,066 --> 00:02:59,000
+基本上, 任何以u_开头的变量都是一个统一变量
+basically, anything that begins with u_ is an actual uniform variable
+
+58
+00:02:59,033 --> 00:03:00,100
+而在这个例子中
+and in this particular case
+
+59
+00:03:00,100 --> 00:03:01,533
+实际上这对于我来说还是有必要的
+it's actually necessary for me to
+
+60
+00:03:01,533 --> 00:03:05,600
+区分这个变量和那个实际输出的color变量
+differentiate this variable from of course the variable there's an actual output color
+
+61
+00:03:05,766 --> 00:03:07,866
+所以这就是我在着色器中所要做的, 就是这样
+so that's all I have to do in my shader, that's it
+
+62
+00:03:07,866 --> 00:03:09,233
+我已经声明了一个统一变量
+I've declared a uniform
+
+63
+00:03:09,233 --> 00:03:11,466
+我现在可以在我的着色器代码中使用这个统一变量
+I can now use this uniform throughout my shader code
+
+64
+00:03:11,466 --> 00:03:16,133
+实际上, 我要做的是用像这样的u_Color替换这个color
+and in fact what I'm going to do is replace this color with u_Color like this
+
+65
+00:03:16,133 --> 00:03:16,975
+所以我们基本上
+so we're basically
+
+66
+00:03:16,975 --> 00:03:21,666
+把我们实际的矩形的每一像素每一片段的颜色都设置成
+assigning the output color of each fragment of each pixel of our actual rectangle
+
+67
+00:03:21,800 --> 00:03:25,266
+这个统一变量实际的值
+to be whatever this uniform value actually is
+
+68
+00:03:25,666 --> 00:03:30,433
+那么现在剩下的就是从C++中设置那个统一变量
+so now all that's left to do is to actually set that uniform from c++
+
+69
+00:03:30,433 --> 00:03:32,833
+而在这儿的第二个问题就是变量的生存期
+so the two things that matter here are the time of variable
+
+70
+00:03:32,833 --> 00:03:37,233
+就是这个作为组件矢量的vec4, 当你想起它和它的名称时
+which the vec4 for component vector, when you remember that as well as the name
+
+71
+00:03:37,233 --> 00:03:39,133
+就是像那样的u_Color
+so u_Color like that
+
+72
+00:03:39,375 --> 00:03:41,533
+好了, 让我们回到项目来设置这个
+okay, let's go back to application and set this up
+
+73
+00:03:42,066 --> 00:03:45,733
+那么我会在我实际绑定的着色器后面去做, 对吧
+so what I'm going to do is after my shader is actually bound, right
+
+74
+00:03:45,733 --> 00:03:47,900
+所以实际上我这里就是glUseProgram
+so I've actually called glUseProgram
+
+75
+00:03:47,900 --> 00:03:51,800
+在你实际做这个的时候, 必须有一个实际绑定的着色器
+you have to have a shader that's actually bound, when you actually do this
+
+76
+00:03:51,800 --> 00:03:54,600
+这样它才会知道标准输出到哪个着色器
+so that it knows which which shader to standard out to
+
+77
+00:03:54,600 --> 00:03:57,633
+我要在这儿做的就是调用glUniform
+what I'm going to do here is called glUniform
+
+78
+00:03:57,766 --> 00:03:59,750
+那么然后我们就有各种各样的函数
+and then we have a variety of functions 
+
+79
+00:03:59,750 --> 00:04:02,300
+你们实际上可以在文档中看看
+that you guys can actually check out in the documentation
+
+80
+00:04:02,366 --> 00:04:06,433
+基本上在这儿的区别就是我们实际常设的数据类型
+basically the difference here is the type of data that we're actually standing
+
+81
+00:04:06,433 --> 00:04:08,333
+以及我们有多少个组件
+and how many components we have
+
+82
+00:04:08,333 --> 00:04:10,700
+那么我们可以发送多少浮点数
+so how many how many floats are we sending
+
+83
+00:04:10,700 --> 00:04:12,233
+或者我们可以发送多少整数
+or how many integers are we sending
+
+84
+00:04:12,233 --> 00:04:13,966
+现在, 在这个例子中, 我们知道它是一个vec4类型的
+now, in this case, we know it's a vec4
+
+85
+00:04:14,200 --> 00:04:15,633
+它是有四个分量的
+which is a four component kind of
+
+86
+00:04:15,633 --> 00:04:17,333
+基本上就是四个浮点数
+which is basically just four floats
+
+87
+00:04:17,366 --> 00:04:20,533
+所以我们需要选用glUniform4f
+so we need to choose glUniform4f
+
+88
+00:04:20,700 --> 00:04:22,733
+好了, 那么4是因为它们有4个
+okay, so four because there's four of them
+
+89
+00:04:22,900 --> 00:04:24,500
+以及f是因为它们是浮点型
+and f because they're floats
+
+90
+00:04:24,733 --> 00:04:28,475
+在这儿的第一个参数是这个变量的位置
+the first parameter here is the location of this variable
+
+91
+00:04:28,475 --> 00:04:30,100
+以及你可以看到它实际上是一个整型
+and you can see it is actually an int
+
+92
+00:04:30,233 --> 00:04:32,666
+所以在我们调用这个之前需要做的
+so what we need to do before we even call this
+
+93
+00:04:32,733 --> 00:04:35,533
+实际上就是获取这个变量的位置
+is actually retrieve the location of this variable
+
+94
+00:04:35,533 --> 00:04:38,266
+所以OpenGL所做的就是如何创建着色器
+so what OpenGL does is once how shader gets created
+
+95
+00:04:38,375 --> 00:04:40,966
+每个统一变量基本上都有一个id
+every uniform basically gets assigned an id
+
+96
+00:04:40,966 --> 00:04:42,266
+这样我们就可以引用它了
+so that we can then reference it
+
+97
+00:04:42,266 --> 00:04:45,500
+而我们查找id的方式通常是通过它的名称
+and the way that we look up that id typically is by its name
+
+98
+00:04:45,500 --> 00:04:47,333
+所以我们基本上就是问我们的着色器
+so we can basically ask our shader
+
+99
+00:04:47,500 --> 00:04:49,400
+嘿, 这个u_Color变量
+hey, this u_Color variable
+
+100
+00:04:49,400 --> 00:04:51,700
+请告诉我那个变量的位置
+please tell me what the location of that variable is
+
+101
+00:04:51,966 --> 00:04:53,366
+而然后我们会得到一个整数
+and then we'll get a integer back
+
+102
+00:04:53,633 --> 00:04:57,850
+在更现代的OpenGL版本中, 你实际上可以设置和索引
+in more modern versions of OpenGL, you can actually set and index 
+
+103
+00:04:57,850 --> 00:05:02,866
+就和我们实际设置这个layout(location=0)是一样的
+kind of the same way that we that we're actually setting this layout location equals zero
+
+104
+00:05:03,000 --> 00:05:07,300
+所以你可以从 OpenGL 4.3 开始指定一个明确的统一变量位置
+so you can specify an explicit uniform location starting with OpenGL 4.3
+
+105
+00:05:07,300 --> 00:05:09,433
+因此, 这是一种非常现代的新功能
+so it is quite a modern kind of new feature
+
+106
+00:05:09,466 --> 00:05:12,100
+这就是为什么我不太喜欢用它的原因
+which is why I don't really like using it too much
+
+107
+00:05:12,566 --> 00:05:14,966
+而在这个例子中, 我们就使用名称来获取它
+and in this case, we're just going to retrieve it by using the name
+
+108
+00:05:15,066 --> 00:05:16,000
+因为那很好
+because that's fine
+
+109
+00:05:16,033 --> 00:05:17,366
+那么当我回到应用
+so if we go back to application
+
+110
+00:05:17,433 --> 00:05:23,166
+我要写的就是int location=glGetUniformLocation()
+what I'm going to do is just write int location equals glGetUniformLocation
+
+111
+00:05:23,700 --> 00:05:26,833
+然后, 我们指定我们的着色器(shader)程序
+and then we specify the program which is our shader
+
+112
+00:05:26,933 --> 00:05:29,733
+以及我们尝试获取的统一变量的名称
+as well as the name of the uniform we're trying to retrieve
+
+113
+00:05:29,733 --> 00:05:31,833
+那么在这个例子中, 它就是u_Color
+so in this case, it's u_Color
+
+114
+00:05:32,166 --> 00:05:34,066
+确保你清楚地拼写了这个
+make sure that you obviously spell this
+
+115
+00:05:34,233 --> 00:05:39,566
+并使用与着色器中实际变量名完全相同的大小写
+and use the exact same casing as you do with the actual variable name in your shader here
+
+116
+00:05:39,833 --> 00:05:41,866
+因为如果你不这样做, 那就不会得到
+because if you don't, then it's not going to work out
+
+117
+00:05:42,100 --> 00:05:45,566
+现在, 我们有一个ASSERT宏, 我将在这里使用它
+now, we do have an assert macro, I'm going to use it here
+
+118
+00:05:45,566 --> 00:05:48,433
+只要断言location不等于-1
+and just assert that location does not equal -1
+
+119
+00:05:48,433 --> 00:05:52,733
+如果我们得到了-1, 它意味着没有找到我们的统一变量
+if we get the location -1, it means that it could not find our uniform
+
+120
+00:05:52,766 --> 00:05:54,366
+现在这实际上可能是可以的
+now that actually might be okay
+
+121
+00:05:54,800 --> 00:05:56,866
+因为你可能还没意识到
+because what you might not realize immediately
+
+122
+00:05:56,866 --> 00:05:59,466
+就是那并不意味着你一定犯了错误
+is that that doesn't mean necessarily that you've made an error
+
+123
+00:05:59,466 --> 00:06:03,433
+或者你的统一变量名称有拼写错误之类的
+or that you've made a spelling mistake or something like that with your actual uniform name
+
+124
+00:06:03,733 --> 00:06:06,166
+如果在整个着色器中不使用那个统一变量
+if you don't use that uniform throughout your shader
+
+125
+00:06:06,166 --> 00:06:08,866
+那么在着色器中实际存在那个统一变量
+so you have that uniform actually present in your shader
+
+126
+00:06:08,866 --> 00:06:10,266
+但是它没被用过
+but it's unused
+
+127
+00:06:10,533 --> 00:06:13,400
+然后OpenGL将在编译着色器时就会去掉那个
+then OpenGL will just strip that when it compiles the shader
+
+128
+00:06:13,566 --> 00:06:15,500
+所以这实际上可能返回-1
+so this might actually return -1
+
+129
+00:06:16,800 --> 00:06:19,600
+因为这个统一变量已经被删除了, 它没有被使用
+because the uniform has been removed, it it's been unused
+
+130
+00:06:19,766 --> 00:06:23,700
+所以, 你不一定希望, 就像你知道的, 出现错误或程序崩溃
+so, you don't necessarily want to, like you know, write out error or crash your program
+
+131
+00:06:24,100 --> 00:06:25,533
+如果它没有找到你的统一变量
+if it doesn't find your uniform
+
+132
+00:06:25,533 --> 00:06:26,900
+可能是因为你已经重写了这个着色器
+because you might have just rewritten the shader
+
+133
+00:06:26,900 --> 00:06:28,033
+忘记了移除它
+and maybe you forgotten to remove it
+
+134
+00:06:28,033 --> 00:06:30,000
+或者也许你后面需要它等等
+or maybe you want it for later or whatever
+
+135
+00:06:30,200 --> 00:06:31,066
+所以请记住这一点
+so just keep that in mind
+
+136
+00:06:31,066 --> 00:06:33,900
+在这个例子中, 我只是断言它, 因为我确实真的
+in this case, I'm just asserting it, because I do actually
+
+137
+00:06:33,933 --> 00:06:35,200
+我确实打算用它
+I do actually plan on using it
+
+138
+00:06:35,200 --> 00:06:36,366
+我不想确保那个
+I don't want to make sure that
+
+139
+00:06:36,550 --> 00:06:38,000
+事实上, 我做的一切都是对的
+I've actually done everything correctly
+
+140
+00:06:38,033 --> 00:06:41,766
+所以现在我们有了一个位置, 我将把它输入这里, 这是第一个参数
+so now that we have a location, I'm going to feed that into here, that's the first parameter
+
+141
+00:06:41,866 --> 00:06:44,333
+然后你可以看到我们需要设置四个浮点数
+and then you can see that we need to set four floats
+
+142
+00:06:44,333 --> 00:06:47,266
+那么第一个浮点数就是0.2f
+so the first one float I'm going to set is 0.2f
+
+143
+00:06:47,533 --> 00:06:51,000
+然后是0.3f, 基本上就和我之前设置的一样
+then 0.3f, basically the same code that i have before
+
+144
+00:06:51,000 --> 00:06:52,866
+然后是0.8f和1.0f
+then 0.8f and 1.0
+
+145
+00:06:52,866 --> 00:06:56,600
+所以我已经有效地将代码从着色器移到c++中
+so i've effectively moved my code from the shader into c++
+
+146
+00:06:56,600 --> 00:06:59,600
+而最后, 我要把它写进位置调用
+and finally i'm just gonna wrap this into location call
+
+147
+00:06:59,825 --> 00:07:04,075
+以及在GLCall宏中调用这个glUniform为了保证我们不会出错
+and this glUniform call in my GLCall macro to make sure we don't have any errors
+
+148
+00:07:04,075 --> 00:07:05,666
+好了, 那么总结一下
+all right, so to summarize
+
+149
+00:07:05,700 --> 00:07:10,766
+我通过使用实际的着色器id编写glUseProgram来绑定着色器
+I'm binding my shader by writing glUseProgram with that actual shader id
+
+150
+00:07:10,875 --> 00:07:14,575
+获取这个实际颜色变量的位置
+I'm retrieving the location of this actual color variable
+
+151
+00:07:14,575 --> 00:07:16,766
+而然后当得到那个位置时
+and then once I've retrieved that location
+
+152
+00:07:16,766 --> 00:07:21,900
+我就用那个位置整数和这个值调用glUniform4f
+I'm calling glUniform4f with that location integer as well as the value
+
+153
+00:07:21,900 --> 00:07:24,433
+这样我就可以在着色器中设置我的数据
+so that I actually set my data in my shader
+
+154
+00:07:24,600 --> 00:07:25,966
+而在着色器中, 我所做的就是
+and in the shader, all I've done is
+
+155
+00:07:25,966 --> 00:07:30,866
+通过输入关键字uniform以及类型和名称来创建统一变量
+created a uniform by typing the keyword uniform along with the type and the name
+
+156
+00:07:30,866 --> 00:07:32,333
+就像任何其他变量一样
+just like any other variable
+
+157
+00:07:32,333 --> 00:07:35,700
+实际上我用我的统一变量来写输出颜色
+and I'm using my uniform here to actually write to the output color
+
+158
+00:07:35,966 --> 00:07:37,600
+那么如果一切顺利
+so if everything goes correctly
+
+159
+00:07:37,600 --> 00:07:41,633
+我应该将这个颜色值写入我的实际输出颜色
+I should be writing this color value into my actual output color
+
+160
+00:07:41,633 --> 00:07:45,533
+在这个程序中, 为了我的矩形的每一个像素
+for every single pixel in my rectangle lips on this program
+
+161
+00:07:45,533 --> 00:07:47,700
+你可以看到, 我们得到了和以前完全相同的结果
+and you can see, we get the exact same result as before
+
+162
+00:07:47,700 --> 00:07:49,166
+太完美了, 它起作用了
+so perfect, it's working
+
+163
+00:07:49,466 --> 00:07:50,733
+我们会做的另一件事是检查
+one other thing that we can do to check
+
+164
+00:07:50,733 --> 00:07:53,233
+因为很明显我在这里用的是同一种颜色
+just because obviously I am using the same color here
+
+165
+00:07:53,333 --> 00:07:55,400
+我将把红色通道改为0.8f
+I'll just change the red channel to be 0.8f
+
+166
+00:07:55,400 --> 00:07:57,766
+所以我们这里应该有更多的粉红色
+so we should get much more of a pink color here
+
+167
+00:07:57,766 --> 00:07:59,700
+而你可以看到, 就在那里, 完美
+and you can see, there it is, perfect
+
+168
+00:07:59,766 --> 00:08:01,700
+好了, 那么现在做点更令人兴奋的事情吧
+okay, so now this is something a little bit more exciting
+
+169
+00:08:01,700 --> 00:08:05,566
+实际上让我们让这个颜色动起来, 并在渲染循环中随时间改变它
+let's actually animate this color, and change it over time in our rendering loop
+
+170
+00:08:05,866 --> 00:08:10,000
+所以回到这里, 我基本上就是设置这个统一变量, 对吧
+so back over here, I'm going to basically just set this uniform, right
+
+171
+00:08:10,000 --> 00:08:12,166
+在我绘制实际的矩形之前
+before I draw my actual rectangles
+
+172
+00:08:12,166 --> 00:08:13,900
+所以我会把代码复制粘贴到这里
+so I'll copy and paste this code over here
+
+173
+00:08:13,900 --> 00:08:17,166
+我将创建一个浮点数r, 这将是我们的红色通道
+I'll make the float called r, which will be our red channel
+
+174
+00:08:17,166 --> 00:08:19,275
+我首先把它设置为0.0
+I'll set that equal to 0.0 to begin with 
+
+175
+00:08:19,275 --> 00:08:23,200
+我将输入r变量代替0.8f作为红色通道
+I'm going to feed in that r variable instead of 0.8f as the red channel
+
+176
+00:08:23,200 --> 00:08:25,100
+然后我将添加一点记录来让它动起来
+and then I'll just add a little bit of logging to animate it
+
+177
+00:08:25,100 --> 00:08:32,300
+所以我要做的一件事, 是将我的increment初始为0.05f
+so one thing I'm going to do here, is set my increment to be 0.05f to begin with
+
+178
+00:08:32,700 --> 00:08:37,150
+如果我的r大于1.0f
+if my r value is greater than 1.0f
+
+179
+00:08:37,150 --> 00:08:42,775
+我实际就会把increment设置成-0.05f
+I'm actually going to set my increment to be -0.05f
+
+180
+00:08:42,775 --> 00:08:48,975
+否则如果r小于0
+otherwise if r is less than 0
+
+181
+00:08:48,975 --> 00:08:53,125
+我就会把increment设置成0.05f
+I'm going to set my increment to be positive 0.05f
+
+182
+00:08:53,125 --> 00:08:55,633
+我不想费心固定或诸如此类的事情
+I'm not going to bother clamping or anything like that
+
+183
+00:08:55,925 --> 00:08:57,500
+因为这只是一个测试
+because this is just a test really
+
+184
+00:08:57,500 --> 00:09:00,033
+而最后就是 r+=increment
+and then finally r plus equals increment
+
+185
+00:09:00,166 --> 00:09:04,933
+所以, 对于红色通道, 应该做的基本上就是在1和0之间抖动
+so what the should do is basically just bounce between one and zero for the red channel
+
+186
+00:09:04,933 --> 00:09:05,800
+那么让我们运行这个吧
+so let's run this
+
+187
+00:09:05,800 --> 00:09:09,666
+你们可以看到, 我们在这里看到的是一个非常有派对风格的矩形
+and you can see what we get here is a very party mode looking rectangle
+
+188
+00:09:09,733 --> 00:09:10,866
+变化得非常非常快
+going very very quickly
+
+189
+00:09:10,866 --> 00:09:12,566
+因为我们实际上并没有限制帧速率
+because we're not actually limiting our frame rate
+
+190
+00:09:12,566 --> 00:09:13,766
+那我们就尝试去做吧
+so let's have a go up doing that
+
+191
+00:09:13,866 --> 00:09:17,266
+我要做的是向上滚动到这里, 我们实际创建窗口的位置
+what I'm going to do is scroll up here to where we actually create our window
+
+192
+00:09:17,266 --> 00:09:18,166
+我要做的
+and what I'm going to do
+
+193
+00:09:18,166 --> 00:09:22,750
+当我们在一个OpenGL上下文中, 就是设置这个glfwSwapInterval(1)
+once we have an OpenGL context, is just set the glfwSwapInterval to one
+
+194
+00:09:22,750 --> 00:09:25,533
+这应该同步我们的V-Sync(垂直同步)
+which should just synchronize this with our V-Sync
+
+195
+00:09:25,533 --> 00:09:28,225
+或者我们的主频刷新率, 对我来说是60
+or otherwise our master's refresh rate, which for me is 60
+
+196
+00:09:28,225 --> 00:09:29,166
+那么让我们按f5
+so let's hit f5
+
+197
+00:09:29,266 --> 00:09:31,900
+你可以看到, 我们得到了一个更平滑的动画
+and you can see we get a much smoother animation here
+
+198
+00:09:32,433 --> 00:09:33,366
+差不多就是这样
+and that's pretty much it
+
+199
+00:09:33,366 --> 00:09:36,033
+这就是OpenGL中的统一变量, 这就是如何使用它们
+that's what uniforms are in OpenGL, that's how you use them
+
+200
+00:09:36,033 --> 00:09:37,300
+这真的很简单
+it's really really simple
+
+201
+00:09:37,300 --> 00:09:40,833
+当然, 在这个例子中, 我们只使用了四个浮点数作为示例
+of course in this case, we're just using four floats as an example
+
+202
+00:09:40,933 --> 00:09:42,975
+但实际上, 你可以使用任何数据类型
+but you can use really any data type
+
+203
+00:09:42,975 --> 00:09:45,500
+或者你需要的任何数量的组件
+or any kind of number of components that you need to
+
+204
+00:09:45,766 --> 00:09:49,625
+比如浮点数, 整数, 矩阵等等
+so floats, integers, matrices all of that stuff
+
+205
+00:09:49,625 --> 00:09:52,466
+将来肯定会更多地参与其中
+will definitely be getting into that a lot more in the future
+
+206
+00:09:52,566 --> 00:09:57,133
+统一变量是图形编程和OpenGL等的重要组成部分
+uniforms uniforms are a really vital part of graphics programming and of OpenGL and all that
+
+207
+00:09:57,133 --> 00:09:59,233
+所以随着我们开始构建的越来越多
+so as we actually start to build more and more
+
+208
+00:09:59,433 --> 00:10:00,666
+我们将一直使用它们
+we'll be using them all the time
+
+209
+00:10:00,833 --> 00:10:03,166
+但你需要记住的真正重要的事情是
+the really big thing that you need to keep in mind though
+
+210
+00:10:03,166 --> 00:10:05,333
+那统一变量实际上是每次绘制的
+is that uniforms are actually per draw
+
+211
+00:10:05,333 --> 00:10:11,200
+所以很明显, 我们设置了uniform4f, 然后我们绘制了整个几何体
+so obviously we set uniform4f, and then we draw our entire piece of geometry
+
+212
+00:10:11,200 --> 00:10:13,400
+在这个例子中只是一个矩形
+which in this case is just a rectangle
+
+213
+00:10:13,700 --> 00:10:16,566
+所以它们实际上是独立的OpenGL
+so they are actual separate OpenGL course
+
+214
+00:10:16,566 --> 00:10:20,900
+所以我们当然不能以任何方式找到统一变量或改变统一变量
+so of course we can't in any way to find uniforms or change uniforms
+
+215
+00:10:20,900 --> 00:10:21,700
+正如我所说的
+such as I say
+
+216
+00:10:22,000 --> 00:10:24,766
+在这两种绘制之间, 所以如果我
+in between kind of drawing this, so if I had
+
+217
+00:10:25,100 --> 00:10:27,166
+所以很明显, 这绘制了两个三角形
+so this gets obviously drawing two triangles
+
+218
+00:10:27,366 --> 00:10:29,433
+我不能用一种颜色绘制一个
+I can't draw one of them with one color
+
+219
+00:10:29,766 --> 00:10:31,233
+而另一个用其他颜色
+and one with the other color
+
+220
+00:10:31,966 --> 00:10:33,300
+如果是这样设置的话
+if it's set up this way
+
+221
+00:10:33,425 --> 00:10:37,425
+因为在这个时候, 他们实际上是在一个绘制指令中一起绘制的
+because at this point in time, they're actually being drawn together in one DrawCall
+
+222
+00:10:37,425 --> 00:10:39,633
+并且统一变量是设置每次绘制的
+and uniforms are set per draw
+
+223
+00:10:39,633 --> 00:10:42,700
+如果我真的需要构成正方形的两个三角形中的一个
+if I actually one of those two triangles that make up our square to
+
+224
+00:10:42,733 --> 00:10:44,233
+实际是不同颜色
+actually be different colors
+
+225
+00:10:44,233 --> 00:10:47,233
+我需要通过顶点属性来实现这一点
+I would need to do that via a vertex attribute essentially
+
+226
+00:10:47,233 --> 00:10:49,900
+并且我们将来肯定会讨论这个的
+and we can definitely talk about that in the future 
+
+227
+00:10:49,900 --> 00:10:51,466
+不管怎样, 希望你们喜欢这个视频
+anyway, hope you guys enjoyed this video
+
+228
+00:10:51,466 --> 00:10:52,766
+如果你喜欢的话, 就点击那个喜欢按钮
+if you did, hit that like button
+
+229
+00:10:52,766 --> 00:10:55,900
+你也可以在这个渠道上支持这个系列以及我所做的一切
+you can also support this series and everything that I do here on this channel
+
+230
+00:10:55,933 --> 00:10:57,833
+通过转到patreon.com/TheCherno
+by going over to patreon.com/TheCherno
+
+231
+00:10:57,833 --> 00:11:01,000
+你可以访问这些OpenGL视频的所有源代码
+you'll get access to all the source code for these OpenGL videos
+
+232
+00:11:01,075 --> 00:11:05,700
+以及一些其他激动人心的奖励, 你可以通过链接查看
+as well as some other exciting rewards which you can check out by going to the link
+
+233
+00:11:06,433 --> 00:11:09,425
+discord是我喜欢宣传的另一件很酷的事情
+discord is another really cool thing that I like to promote
+
+234
+00:11:09,425 --> 00:11:13,266
+因为基本上discord就是一个社区
+because there's basically what discord is as a community of people
+
+235
+00:11:14,200 --> 00:11:15,466
+你可以讨论
+with which you can talk about
+
+236
+00:11:15,600 --> 00:11:17,666
+所有OpenGL的东西或任何其他编程的东西
+all the OpenGL stuff or any other programming stuff
+
+237
+00:11:17,666 --> 00:11:19,666
+所以discord就是TheCherno.discord
+so discord TheCherno bumps such discord
+
+238
+00:11:19,666 --> 00:11:21,000
+我总是把网址弄错
+I always get that url wrong
+
+239
+00:11:21,300 --> 00:11:23,533
+去TheCherno.com/discord并加入那个服务
+go to TheCherno.com/discord and join that server
+
+240
+00:11:23,533 --> 00:11:26,733
+这真的很愉快, 你可以讨论这一期和所有的东西
+it's a great time, you can discuss this episode and all of the stuff
+
+241
+00:11:27,166 --> 00:11:28,466
+这都是与编程有关的
+that is related to programming
+
+242
+00:11:28,466 --> 00:11:29,766
+也许你在做一个项目
+maybe you're working on a project
+
+243
+00:11:30,066 --> 00:11:32,566
+如果你需要一些帮助, 那是一个很好的去处
+and you need some help, that's a great place to get it
+
+244
+00:11:33,100 --> 00:11:37,366
+下一次, 我们可能会继续讨论一些更的着色器的东西
+next time, we're going to probably move on to some more upstanding shader stuff
+
+245
+00:11:37,600 --> 00:11:40,700
+我真的想开始把这些东西抽象出来
+I really want to start kind of abstracting this stuff out
+
+246
+00:11:40,733 --> 00:11:43,366
+因为很重要我们必须
+and because we'll essential we'll have to
+
+247
+00:11:43,800 --> 00:11:46,666
+我们最终必须将这些代码迁移到类中
+we'll have to eventually kind of move this code into classes
+
+248
+00:11:46,666 --> 00:11:48,600
+因为我们会重复使用很多
+because we'll be reusing a lot of it
+
+249
+00:11:48,766 --> 00:11:51,600
+当我们真正开始绘制模型之类的东西的时候
+when we actually get down to drawing models and all that stuff
+
+250
+00:11:51,866 --> 00:11:54,750
+所以, 这可能就是下一期的内容
+so, that's probably what's gonna be in the next episode
+
+251
+00:11:54,750 --> 00:11:57,700
+还有一些其他的事情我肯定需要提到
+there were a few other things that I definitely need to mention there
+
+252
+00:11:58,033 --> 00:12:00,433
+那么, 下次见, 拜
+so, I will see you guys in the next video, goodbye
+

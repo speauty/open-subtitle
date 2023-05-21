@@ -1,0 +1,505 @@
+﻿1
+00:00:00,000 --> 00:00:03,675
+嘿，你们好，我是TheCherno，欢迎回到我的批渲染迷你系列
+hey, what's up guys, my name is TheCherno, welcome back to my batch rendering mini series
+
+2
+00:00:03,775 --> 00:00:10,350
+那么上次，我们基本讲了动态几何，如何在渲染时实时填充我们的顶点缓冲区
+so the last time, we took a look at dynamic geometry basically, how we could populate our vertex buffer on the fly as we're rendering
+
+3
+00:00:10,350 --> 00:00:15,200
+这样我们就可以动态引入所有这些批处理渲染的东西，而不是静态引入
+so that we could introduce all of this kind of batch rendering stuff to not be static but be dynamic
+
+4
+00:00:15,200 --> 00:00:17,275
+如果你们还没看过那期，就去看看吧
+check out that video, if you haven't already
+
+5
+00:00:17,275 --> 00:00:23,175
+现在我们终于接近这个系列的尾声了，因为我们有些人想回去做别的事
+and now we're actually nearing the end of this series finally, because some of us want to get back to doing other things
+
+6
+00:00:23,175 --> 00:00:28,025
+今天我们将讨论我们的索引缓冲区，并学习如何创建索引缓冲区
+and today we're gonna talk about our index buffer, and learn how we can actually make our index buffer
+
+7
+00:00:28,025 --> 00:00:34,350
+我们如何扩展它来支持所有不同的四边形，所有我们想要渲染的不同的几何图形
+how we can expand it to support all of the different quads, all of the different geometry that we actually want to render
+
+8
+00:00:34,625 --> 00:00:42,075
+上次，我给你们留了一个小练习，就在上期最后时候说的，看看你们能不能弄清楚如何扩展索引缓冲区
+now last time, I gave you guys a little bit of an exercise I said at the end of the episode, see if you can figure out how we can actually extend that index buffer
+
+9
+00:00:42,075 --> 00:00:47,775
+所以我希望你们很多人尝试过我的小挑战，并且希望你们已经自己解决了这个问题
+so I hope that many of you tried my little challenge, and have hopefully worked out the solution for yourselves
+
+10
+00:00:47,775 --> 00:00:55,025
+因为今天，我将向你们演示如何实现那个，说实话，并不难，如果我们看看我们的索引缓冲区
+because today, I'm gonna show you how to do it, and to be honest, it's really not that hard, if we look at the index buffer that we have 
+
+11
+00:00:55,025 --> 00:01:00,925
+我可能会打开代码，在那里解释一下，因为这样更容易理解，当你们真正看到一些东西的时候
+I'll probably jump into the code, and explain it there, because it will be a little bit easier to understand, when you actually see stuff
+
+12
+00:01:00,925 --> 00:01:06,525
+但是我们的索引缓冲区是由一个重复的模式组成的，大概是0 1 2 2 3 0，这就是组成一个四边形的索引
+but our index buffer is made up of a repeating pattern, and kind of goes 0 1 2 2 3 0, that's what makes up a quad
+
+13
+00:01:06,525 --> 00:01:11,775
+我们从顶点缓冲区的前四个顶点绘制了两个相邻的三角形
+we draw two triangles right next to each other from the first four vertices in our vertex buffer
+
+14
+00:01:11,925 --> 00:01:15,650
+并且那就是构成正方形的东西，那就是构成我们四边形的东西
+and that's what makes up a square, that's what makes up our quad
+
+15
+00:01:16,000 --> 00:01:20,050
+所以如果我们采用这种模式，将它扩展到我们需要的所有场景
+so if we take that pattern, and we extend it over as many causes we need
+
+16
+00:01:20,050 --> 00:01:25,550
+我们会在这里定义一个很好的值，然后我们会得到索引缓冲区
+which we're going to define a pretty fine value here, then we're going to get our index buffer
+
+17
+00:01:25,975 --> 00:01:32,750
+能够支持我们想要渲染的所有不同的四边形，现在在批渲染器中，你们可能想要渲染的不仅仅是四边形
+being able to support all of our different quads that we want to render, now in a batch renderer, it's likely you may want to render more than just quads
+
+18
+00:01:32,750 --> 00:01:37,025
+例如，也许你们想要渲染线条，而那需要一个稍微不同的索引缓冲区
+for example, maybe you want to render lines and that requires a slightly different index buffer
+
+19
+00:01:37,025 --> 00:01:41,970
+但是对于四边形来说，其好处是，四边形的索引缓冲区很容易重复
+but for quads, the benefit is that, a quads index buffer is easily repeatable and
+
+20
+00:01:41,970 --> 00:01:48,060
+可扩展的，可调整的，可外推的，无论你们在我们想要渲染的许多场景中得到的关键点
+expandable and scalable and extrapolate able whatever you guys get the point across as many causes we want to render
+
+21
+00:01:48,060 --> 00:01:56,375
+它不像3D模型，在3D模型中，索引可能是完全不同的模型，显然，每个模型都需要一个唯一的索引缓冲区
+it's not like a 3D model, where the indices may be completely different model to model, and you obviously need a unique index buffer per model most likely
+
+22
+00:01:56,375 --> 00:02:01,725
+对于四边形，正如你们将看到的，事情要简单得多，所以让我们直接开始吧，看看如何扩展索引缓冲区
+with quads, things are a lot simpler as you'll see, so let's jump in, and see how we can extend our index buffer
+
+23
+00:02:01,725 --> 00:02:10,275
+如果看看我们当前处理索引缓冲区的方式，它由这些索引构成，也就是0 1 2 2 3 0，然后是4 5 6 6 7 4
+if we take a look at the way that we currently handle our index buffer, it's made up of these indices, 0 1 2 2 3 0, and then later 4 5 6 6 7 4
+
+24
+00:02:10,275 --> 00:02:13,740
+这个构成了第二个四边形，这个构成了第一个四边形
+this makes up our second quad, this makes up our first quad
+
+25
+00:02:13,740 --> 00:02:21,200
+正如我提到的，你们可以看到这里有一个模式，不像顶点缓冲区，很明显，你们无法预测在做什么
+and as I mentioned, you can see that there is a pattern here, unlike the vertex buffer, which is obviously something that you can't predict
+
+26
+00:02:21,200 --> 00:02:28,125
+我的意思是，这完全取决于你们渲染索引缓冲区的场景，实际上是一样的
+I meaning, it it entirely depends on the scene that you're rendering the index buffer, really is kind of the same
+
+27
+00:02:28,125 --> 00:02:35,150
+我们只是在想要渲染选中范围中所有索引的模式，这样就意味着我们可以提前创建这个
+we just kind of scale this pattern over all of the quotes that we want to render, so that means that we can kind of create this up front
+
+28
+00:02:35,450 --> 00:02:40,275
+现在，我们也在提前创建顶点缓冲区，没有填入任何数据
+now at the moment, we're creating our vertex buffer up front as well, we're not filling it with any kind of data
+
+29
+00:02:40,275 --> 00:02:46,225
+因为这对我们来说是不可能知道的，直到我们在更新函数中开始渲染
+because of course that's impossible for us to know, until we actually start rendering over here in the update function
+
+30
+00:02:46,525 --> 00:02:55,525
+但是对于索引，我们当然知道它的模式，所以可以这样说，如果想要1k个顶点，也就是250个四边形
+however with indices, of course we do know the patterns, so we can actually say that, if we want 1,000 vertices, which translates to 250 quads
+
+31
+00:02:55,525 --> 00:03:03,000
+然后，我们可以用正确的索引填充索引缓冲区，所以第一步是确定要画多少个四边形
+then we can fill our index buffer with the correct indices, so the first step is deciding how many quads you want to actually draw
+
+32
+00:03:03,000 --> 00:03:12,500
+我可以在一个独立DrawCall中绘制的最大四边形数量是多少，所以随便选一个数字，假设是1k
+what is the maximum number of quads that I can draw in a single DrawCall, so just arbitrarily throwing a number out there, let's just say 1000
+
+33
+00:03:12,500 --> 00:03:17,900
+在那个前提下，我要到这里来，在我们创建所有的顶点数组之前
+with that in mind, I'm actually going to come over here just before we create all of our vertex arrays and all of that 
+
+34
+00:03:17,900 --> 00:03:25,950
+然后写一些常量，所以我们有一个const size_t MaxQuadCount，正如之前提到的，让它等于1k
+and just write in some constants, so we're gonna have a const size_t MaxQuadCount, and as mentioned, I'm gonna set that to 1000
+
+35
+00:03:26,300 --> 00:03:32,970
+然后我们还要从这个MaxQuadCount来创建MaxVertexCount，以及MaxIndexCount
+and then we're also going to from this MaxQuadCount create a MaxVertexCount and also a MaxIndexCount
+
+36
+00:03:32,970 --> 00:03:38,275
+所以换句话说，我们基本上是在计算有多少个顶点，以及多少个索引
+so in other words, we're basically calculating how many vertices we can have, and how many indices we can have
+
+37
+00:03:38,375 --> 00:03:43,425
+所以我就复制这个，然后把它改成MaxVertexCount和MaxIndexCount
+so I'll copy this, and I'll change this to MaxVertexCount, MaxIndexCount
+
+38
+00:03:43,625 --> 00:03:50,000
+虽然它被称为MaxIndexCount，它实际上只是索引计数，因为我们要把所有的索引都放在这里
+now even though it is called MaxIndexCount, it's really just the index count, because of course we're just gonna put all those indices in there
+
+39
+00:03:50,150 --> 00:03:54,600
+那么每个四边形有多少个顶点，4个，我们可以写成MaxQuadCount*4
+so how many vertices per quad we have, four, so we can just write MaxQuadCount times 4
+
+40
+00:03:54,600 --> 00:03:58,750
+每个四边形有多少个索引，6，所以我们可以写成MaxQuadCount*6
+and how many indices per quads, 6, so we can write MaxQuadCount times 6
+
+41
+00:03:58,850 --> 00:04:05,000
+现在我们知道了顶点缓冲区的大小，还有之前用索引表示的索引的大小
+now we know the size of our vertex buffer in terms of vertices, and also the size of our index before in terms of indices
+
+42
+00:04:05,100 --> 00:04:09,375
+所以对于这个MaxVertexCount，我将使用这个而不是这里的1k
+so with this MaxVertexCount, I'm gonna take this and instead of just using 1000 here
+
+43
+00:04:09,375 --> 00:04:13,150
+我们将使用那个MaxVertexCount变量，换句话说，我将重新排列这个
+we're gonna use that MaxVertexCount variable, so in other words, and I'll rearrange this
+
+44
+00:04:13,150 --> 00:04:18,300
+因为我喜欢这样写，我们有MaxVertexCount，也就是1k*4
+because I kind of like writing it this way, we're gonna have MaxVertexCount, which is 1000 times 4
+
+45
+00:04:18,300 --> 00:04:23,475
+所以就是4000*sizeof(Vertex)，那就是顶点缓冲区的大小，以字节为单位
+so 4,000 vertices times the size of our vertex, that's how large, our vertex buffer is gonna be in bytes
+
+46
+00:04:23,600 --> 00:04:26,425
+下面这里，我们要对索引缓冲区做同样的事情
+coming down here, we're gonna do the same thing for the index buffer  
+
+47
+00:04:26,425 --> 00:04:31,850
+我要做的是写for循环将继续这个模式，得到我们需要的所有索引
+what I wanna do is write for loop is going to continue this pattern on for as many indices as we need 
+
+48
+00:04:31,850 --> 00:04:36,900
+在这个例子中，是6k个索引，我把这些注释掉，留在这里作为参考
+which in this case, is 6000 indices, I'll comment all this out, I'll leave it here for reference
+
+49
+00:04:36,900 --> 00:04:43,044
+然后我要做的是写另一个uint32_t indices[MaxIndexCount]
+and then what I'm going to do is write another one of these uint32_t indices with the MaxIndexCount
+
+50
+00:04:43,225 --> 00:04:48,025
+然后我要写一个for循环，因为我们在这里有一个循环的6个数模式
+and then I'm gonna write a little for loop since we have a recurring pattern of six numbers here
+
+51
+00:04:48,025 --> 00:04:54,850
+我将把这个i加6，然后我们将处理for循环中6个数字的整个模式
+I'm just gonna increment this I variable by 6, and then we're gonna handle the entire pattern of 6 numbers inside this for loop
+
+52
+00:04:54,850 --> 00:04:59,375
+那么我在这里所做的就是把这个模式编码成这些偏移量
+so what I've done here is I've encoded this pattern into these kind offsets here  of
+
+53
+00:04:59,375 --> 00:05:03,375
+然后每次我们通过这个for循环的迭代，我将偏移量增加4
+and then every time we move through an iteration of this for loop, I increment the offset by four 
+
+54
+00:05:03,375 --> 00:05:07,800
+因为4当然是所有这些索引之间的差，就是这样
+because four of course is the difference between all of these indices and that's it 
+
+55
+00:05:07,800 --> 00:05:12,800
+我们现在有了一个索引缓冲区，它一直遵循这个模式，直到我们的MaxIndexCount
+we now have an index buffer that follows this pattern all the way up to our MaxIndexCount
+
+56
+00:05:12,925 --> 00:05:16,050
+如果我们向下滚动到我们的索引缓冲区，这段代码不会改变
+and if we scroll down here to our index buffer, this code doesn't change at all
+
+57
+00:05:16,050 --> 00:05:21,050
+因为我们只是简单地重新定义了索引的大小，而我们仍然存储着最小的索引
+because we've just simply redefined the size of indices, and we're still storing the mini indices
+
+58
+00:05:21,050 --> 00:05:24,625
+这很好，有了这些，我们就可以随机选择了
+this is all great, now with that in mind, we're pretty much ready to random
+
+59
+00:05:24,975 --> 00:05:29,150
+我们甚至不需要改变任何东西，如果我启动它，应该是可以运行的
+we don't really even need to change anything, if I launch this, is it still should work
+
+60
+00:05:29,150 --> 00:05:32,850
+因为我们仍然绘制了12个索引，根据我们的DrawElements调用
+because we're still drawing twelve indices according to our DrawElements call
+
+61
+00:05:32,850 --> 00:05:37,600
+显然，把所有东西都改成for循环，实际上并没有改变前12个索引
+and obviously changing everything to a for loop, didn't actually change the first twelve indices 
+
+62
+00:05:37,600 --> 00:05:41,950
+它们的值还是一样的，所以我们得到了和上次一样的结果
+they're still the same values, so here we have the exact same result as last time
+
+63
+00:05:41,950 --> 00:05:51,225
+但它的强大之处在于我们现在可以画出1k个四边形，所以让我们继续，改变这种创建四边形的方式
+but the power of this obviously is the fact that we can now draw up to 1,000 quads, so let's go ahead, and change this kind of create quad function we have here 
+
+64
+00:05:51,225 --> 00:05:58,950
+这样就可以写一个for循环来渲染一个四边形网格，使用我们的两个纹理，就像我上次写的那样创建函数
+so that we can actually write a little for loop that renders maybe a grid of quads, using our two textures, the way that I wrote this create what function last time
+
+65
+00:05:58,950 --> 00:06:03,775
+一个基本的例子是一个函数，它返回这个由四个顶点组成的数组
+as just a basic example was just a function that returns this array of four vertices
+
+66
+00:06:03,775 --> 00:06:11,125
+我想要做的是改变这个来获取一个目标缓冲区，并且这个函数只需要再添加四个顶点
+what I want to do instead is change this to take in a target buffer, and this function is simply going to add another four vertices
+
+67
+00:06:11,125 --> 00:06:18,690
+所以在目标缓冲区中添加另一个四边形，然后增加指针，所以我要做的是把返回类型改为Vertex*
+so add another quad into that target buffer, and then increment the pointer of course, so what I'll do is change the return type to vertex pointer
+
+68
+00:06:18,690 --> 00:06:22,725
+因为它需要返回到缓冲区内的位置
+because it's going to need to return the position inside the buffer that is up to
+
+69
+00:06:22,850 --> 00:06:29,100
+然后我简单地用target替换所有这些顶点，也把这些顶点变量都去掉
+and then I'll simply replace all of these vertices with the target, also get rid of all these vertex variables here as well
+
+70
+00:06:29,200 --> 00:06:33,175
+在每个顶点之后，我将增加缓冲区指针(target++)
+and after every vertex, I will increment the buffer pointer
+
+71
+00:06:33,650 --> 00:06:38,250
+我要做的最后一件事是返回我们所链接的目标(target)缓冲区位置
+finally, the last thing I'll do is actually return the target buffer position that we're up to
+
+72
+00:06:38,250 --> 00:06:44,400
+如果我向下滚动到调用代码这里，在这个onUpdate函数中，我要创建一个数组
+if I scroll down here to the calling code, what I'm going to is inside this update function, I'm gonna create an array
+
+73
+00:06:44,400 --> 00:06:49,700
+它会存储我需要的所有顶点，所以我们可能不会绘制那么多
+that's essentially going to store as many vertices as I need, so we're probably not gonna draw it that many
+
+74
+00:06:49,700 --> 00:06:55,300
+但我在这里只写1k，只是为了好玩，我要做的是写一个for循环
+but I'm just gonna chuck a thousand in here, just for fun really, and what I'm gonna do is write a for loop 
+
+75
+00:06:55,300 --> 00:06:58,950
+它会渲染纹理的网格，我在这里写一个嵌套的for循环
+that's going to render a grid of our textures, I'll write a nested for loop here 
+
+76
+00:06:58,950 --> 00:07:04,100
+然后还有一个指针指向我们在顶点数组中分配的内存块
+and then also get a pointer to the block of memory that we've allocated inside our vertices array 
+
+77
+00:07:04,100 --> 00:07:08,575
+也就是堆栈上的一些内存，然后在for循环中创建我们的四边形
+which of course is just some memory on the stack well, then create our quads inside this for loop
+
+78
+00:07:08,575 --> 00:07:12,650
+然后我会根据我们在网格中的位置设置纹理ID为间隔的
+and then I'll just set the texture ID to alternate based on our position within the grid 
+
+79
+00:07:12,650 --> 00:07:16,650
+我还将保持一个原始的四边形的位置，我们可以通过ImGui控制
+I'll also keep one of our original quads whose position we could control through ImGui
+
+80
+00:07:16,650 --> 00:07:21,322
+很明显，我们可以摆脱这些拷贝，因为所有的数据都在顶点数组中
+we can obviously get rid of all these mam copies here, because all of our data is inside that vertices array
+
+81
+00:07:21,375 --> 00:07:25,400
+然后我们会到这里上传所有的顶点，差不多就是那样
+and then we'll just come over here and upload all of the vertices and that's pretty much it
+
+82
+00:07:25,400 --> 00:07:34,350
+唯一的问题是我们还是绘制了12个索引，所以必须确保每次创建一个四边形，需要增加索引计数器变量
+the only problem is we are still drawing twelve indices, so we have to make sure that every time we create a quad, we increment some kind of index counter variables
+
+83
+00:07:34,350 --> 00:07:39,710
+所以来到这儿，然后我写indexCount，我把它设为0，然后每次我们绘制一个四边形
+so I'll just come up here, and I'll write our indexCount, I'll set it to zero and then every time we draw a quad
+
+84
+00:07:39,710 --> 00:07:46,500
+我只要增加6，在移除四边形之后我也会做同样的事情，显然，将在DrawElements中也用indexCount
+I'll just incremented by six and I'll do the same after our movable quad, I'll obviously use the indexCount inside our DrawElements call
+
+85
+00:07:46,500 --> 00:07:49,050
+我想我们最好去，我们继续，看看我们得到了什么
+and I think we're good to go, let's go ahead and see what we get
+
+86
+00:07:49,050 --> 00:07:53,975
+好了，正如你们所看到的，我们现在有了所有这些不同四边形的网格，有不同的纹理
+okay, so as you can see, we now have a grid of all of these different quads with different textures 
+
+87
+00:07:53,975 --> 00:07:57,500
+当然我仍然可以控制它，所以现在从理论上讲
+and I can still of course controlled this, so now theoretically speaking 
+
+88
+00:07:57,500 --> 00:08:03,680
+我们可以在一个批处理中渲染多达1k个四边形，因为我们的索引缓冲区现在支持所有这些
+we can render up to 1000 quads in a single batch, because our index buffer now supports that all
+
+89
+00:08:03,680 --> 00:08:08,250
+好了，你们可以看到非常简单的概念，现在我们可以渲染多达1k个四边形
+right, so as you can see pretty simple concept, then now we can render up to 1000 quads 
+
+90
+00:08:08,575 --> 00:08:12,725
+所以最后一期，我们已经涵盖了这个迷你系列的几乎所有内容
+so the last piece of the puzzle, we've covered pretty much everything in this mini series 
+
+91
+00:08:12,725 --> 00:08:19,400
+我的意思是我们会讲像纹理槽和更高级的东西，也许我们将来会解决那个问题
+I mean we could cover like texture slots and more advanced stuff about that, and maybe we'll address that in the future
+
+92
+00:08:19,700 --> 00:08:27,275
+但是现在我们有了所有这些视频，我们有了所有这些信息，最后一步就是把这些都放到一个批渲染器中
+but now that we have all of these videos, and now that we have all this information, the last step is to kind of put it all together into a batch renderer 
+
+93
+00:08:27,275 --> 00:08:32,200
+我们如何这个构建一个渲染器，我们可以把数据扔进去，然后它会找出
+how do we build a renderer out of this that we can just kind of throw data at, and it will figure out
+
+94
+00:08:32,200 --> 00:08:36,100
+如何把所有放在在一起批量处理，并在尽可能少的绘制来渲染它
+how to batch it all together and render it in as least amount of drawers as possible  
+
+95
+00:08:36,575 --> 00:08:39,425
+那就是我们下次要讲的内容，不论如何，希望大家喜欢这个视频
+that's what we're gonna talk about next time, anyway, hope you guys enjoy this video 
+
+96
+00:08:39,425 --> 00:08:42,925
+如果你们喜欢，请点赞，也可以在下方留下你们的想法
+if you did, please hit that like button, also leave a comment below with your thoughts
+
+97
+00:08:42,925 --> 00:08:47,525
+或者其他问题，可能有我没有提到或跳过的内容
+or any other questions you may have things that maybe I didn't cover or I skipped over
+
+98
+00:08:47,525 --> 00:08:50,213
+也非常感谢所有支持本频道的赞助人
+also huge thank you to all the patrons that helped support this channel 
+
+99
+00:08:50,213 --> 00:08:55,050
+让这些视频成为可能，patreon.com/TheCherno是支持这个频道的最好方式
+and make videos like these possible,  patreon.com/TheCherno is the best way to support this channel 
+
+100
+00:08:55,050 --> 00:08:58,375
+所以，如果你们喜欢你们所看到的，并且想在未来看到更多这样的东西
+so if you guys like what you're seeing and you want to see more of this stuff in the future
+
+101
+00:08:58,375 --> 00:09:02,700
+那就请在patreon上支持我们，下次见，再见
+then please show your support on patreon, I will see you guys next time, good bye
+

@@ -1,0 +1,2621 @@
+﻿1
+00:00:00,133 --> 00:00:00,933
+嘿, 你们好
+hey, what's up guys
+
+2
+00:00:00,966 --> 00:00:03,766
+我是Cherno, 欢迎回到我的OpenGL系列教程
+my name is Cherno, and welcome back to my OpenGL series
+
+3
+00:00:03,766 --> 00:00:08,100
+所以, 今天我们将会有一期愉快的放松的视频, 我们只是在讨论
+so, today we're going to have a nice chill episode, in which we just talk about
+
+4
+00:00:08,100 --> 00:00:08,725
+我们如何
+how we're going to
+
+5
+00:00:08,725 --> 00:00:13,925
+将我们在之前写的代码抽象到一些类中
+abstract some of the code that we've actually written in the past episodes out into some classes 
+
+6
+00:00:13,925 --> 00:00:16,000
+这样我们就能更容易地使用它
+so that we can use it more easily
+
+7
+00:00:16,000 --> 00:00:18,925
+当我们开始学习更复杂的OpenGL东西时
+as we start to get into more complicated OpenGL stuff
+
+8
+00:00:19,300 --> 00:00:21,266
+这显然是这个系列前进的方向
+which is obviously where this series is headed
+
+9
+00:00:21,566 --> 00:00:25,750
+因此, 在创建这个系列的过程中, 我确实提到过几次
+so, I did mention a few times throughout creating this series
+
+10
+00:00:25,750 --> 00:00:28,066
+我真的不想把它制作成一个游戏引擎系列
+that I really don't want to make this a game engine series
+
+11
+00:00:28,066 --> 00:00:31,833
+我不想让它像这样, 嘿, 我们要构建某种OpenGL引擎
+I don't want to make it like, hey, we're going to build some kind of OpenGL engine
+
+12
+00:00:31,833 --> 00:00:33,666
+或者像是渲染引擎之类的
+or like a rendering engine or anything like that
+
+13
+00:00:34,300 --> 00:00:38,233
+我真的不想花太多的时间来移动代码和设置东西
+I don't really want to spend too much time moving code around and setting stuff up
+
+14
+00:00:38,233 --> 00:00:41,233
+让它绝对安全, 绝对完美
+and making it absolutely bulletproof, and absolutely perfect
+
+15
+00:00:41,233 --> 00:00:43,133
+因为那不是这个系列的重点
+because that's not the point of this series
+
+16
+00:00:43,333 --> 00:00:45,700
+这个系列只是我向你展示, 如何使用OpenGL
+this series is just me showing you, how to use OpenGL
+
+17
+00:00:45,933 --> 00:00:48,900
+然而, 在现实世界中, 为了真正使用OpenGL
+however, in the real world, in order to actually use OpenGL
+
+18
+00:00:48,900 --> 00:00:53,175
+你确实需要进行某种抽象, 因为你
+you do need to perform some kind of abstraction of some sort, because you're
+
+19
+00:00:53,175 --> 00:00:57,844
+否则你就会得到一堆, 一堆乱七八糟的代码
+otherwise you're just gonna end up having a pile, just a messy pile of code
+
+20
+00:00:57,966 --> 00:01:00,966
+那对你来说没什么意义, 它会非常冗长
+that doesn't make much sense to you, it's gonna be extremely verbose
+
+21
+00:01:01,666 --> 00:01:04,466
+并且你会很难调试
+and you're just gonna it's gonna be difficult to debug
+
+22
+00:01:04,833 --> 00:01:05,866
+有各种各样的问题
+there's all sorts of issues
+
+23
+00:01:05,866 --> 00:01:09,000
+这对我向你展示来说是非常困难的, 举个例子
+and it's gonna be extremely difficult for me to show you, for example
+
+24
+00:01:09,133 --> 00:01:10,666
+如何实现着色器映射
+how to implement shader mapping
+
+25
+00:01:11,200 --> 00:01:15,233
+如果我在一个文件中做这些, 只有原始的OpenGL代码
+if I'm all doing it in one file, with just raw OpenGL kind of code
+
+26
+00:01:15,233 --> 00:01:17,500
+因为这没有多大意义
+because it's just it's not going to make much sense
+
+27
+00:01:17,633 --> 00:01:23,225
+所以, 在接下来的几期里, 我要做的是开始将代码移到类中
+so, what I'm going to do over the next few episodes is, start moving code out into classes
+
+28
+00:01:23,225 --> 00:01:26,733
+向你展示, 我们如何移动公共代码
+and showing you, how we can kind of I guess move common code around
+
+29
+00:01:26,733 --> 00:01:28,266
+这样我们就可以多次复用它
+so that we can reuse it a lot of times
+
+30
+00:01:28,266 --> 00:01:31,400
+也可以把它参数化之类的
+maybe parameterize it as well and all that stuff
+
+31
+00:01:32,300 --> 00:01:37,733
+这也是一个很好的机会来展示给我, 让我来给你们展示一下
+it's also a really good opportunity to show me, a little bit of for me to show you guys a little bit about 
+
+32
+00:01:38,600 --> 00:01:41,466
+比如, OpenGL如何被抽象
+how like, how OpenGL can be abstracted
+
+33
+00:01:41,466 --> 00:01:45,066
+以及它在游戏引擎中是如何抽象出来的
+and how like it typically would be abstracted in a game engine
+
+34
+00:01:45,066 --> 00:01:48,650
+虽然我们不打算深入讨论这个问题
+even though we're not going to go as deep into this
+
+35
+00:01:48,650 --> 00:01:53,033
+就好像我实际上是在开发一个带有多个渲染接口的游戏引擎
+as if I was actually writing a game engine potentially with multiple rendering apis
+
+36
+00:01:53,033 --> 00:01:56,300
+这将是相当简短和高水平的
+it's going to be fairly like brief and high-level here
+
+37
+00:01:56,533 --> 00:01:58,933
+但这仍然是我展示给大家看的好机会
+but still it's a really good chance for me to just show you guys
+
+38
+00:02:00,833 --> 00:02:04,200
+你通常会如何去抽象OpenGL
+how you would typically go about abstructing OpenGL anyway
+
+39
+00:02:04,300 --> 00:02:06,366
+那么, 根据我们到目前为止所做的
+so, out of what we've done so far
+
+40
+00:02:06,366 --> 00:02:08,800
+有一些东西我们需要转移一下
+there are a few things that we need to actually move around
+
+41
+00:02:09,100 --> 00:02:13,800
+顶点缓冲区设置, 对吧, 索引缓冲区, 以及顶点数组
+there's the vertex buffer set up, right, the index buffer set up, vertex arrays as well
+
+42
+00:02:13,800 --> 00:02:15,666
+以及我们是否想要使用它们
+and whether or not we even want to use them
+
+43
+00:02:16,300 --> 00:02:17,500
+我想我在前一期中说过
+I've said in the previous episode I think
+
+44
+00:02:17,500 --> 00:02:19,700
+我们将要用到的顶点数组
+which was about vertex array that we will be using them
+
+45
+00:02:20,133 --> 00:02:22,266
+所以我们需要为它建立某种抽象
+so we need to set up some kind of abstraction for that
+
+46
+00:02:22,466 --> 00:02:26,666
+然后是整个着色器的情况, 可能就是这样
+and then there's the whole shader situation, that's probably it
+
+47
+00:02:27,000 --> 00:02:29,000
+如果你仔细想想我们目前所做的
+like if you really think about what we've done so far
+
+48
+00:02:29,000 --> 00:02:31,425
+我们还没做过纹理之类的东西
+we haven't done textures yet or anything like that
+
+49
+00:02:31,425 --> 00:02:34,666
+比如你知道的, 或者是帧缓冲之类的
+or like you know frame buffers or anything like that
+
+50
+00:02:35,400 --> 00:02:37,633
+所以很明显我们没有一个完整的
+so obviously it's not like we have a complete
+
+51
+00:02:38,266 --> 00:02:41,166
+就像OpenGL在这个主文件中实现的所有功能一样
+like every feature OpenGL implemented in this main file
+
+52
+00:02:41,700 --> 00:02:42,966
+但它变得有点冗长了
+but it is getting a bit lengthy
+
+53
+00:02:42,966 --> 00:02:44,700
+大概有200行代码
+I think it's like about 200 lines of code
+
+54
+00:02:45,600 --> 00:02:48,800
+这就有点难以说清楚到底发生了什么
+and it's getting a little bit hard to tell what's actually going on
+
+55
+00:02:49,033 --> 00:02:50,333
+并且也有点难读
+and it's a little bit hard to read
+
+56
+00:02:51,000 --> 00:02:52,466
+但就我刚刚列出的这些来说
+but in terms of what I just listed out there
+
+57
+00:02:52,466 --> 00:02:54,766
+顶点缓冲区, 索引缓冲区, 顶点数组, 着色器
+vertex buffer, index buffer, vertex array, shader
+
+58
+00:02:54,900 --> 00:02:56,966
+这就是我们现在能抽象出来的所有东西
+that's pretty much all we have right now that we can abstract
+
+59
+00:02:56,966 --> 00:02:59,848
+然而, 有一个东西需要将所有东西联系在一起
+however, there is one thing that needs to tie everything together
+
+60
+00:02:59,848 --> 00:03:01,733
+那通常被称为渲染器
+and that is traditionally known as a renderer
+
+61
+00:03:01,933 --> 00:03:04,333
+所以我们在某些时候也需要创建一个渲染器
+so we do need to create a renderer at some point as well
+
+62
+00:03:04,333 --> 00:03:07,333
+使用渲染器的想法是相当简单的
+and the idea with a renderer is fairly simple
+
+63
+00:03:07,333 --> 00:03:13,550
+你基本上就是给它一个命令, 它会为你渲染那个东西
+you basically give it like a command, and it will render that thing for you 
+
+64
+00:03:13,550 --> 00:03:15,925
+所以换句话说, 我想说
+so in other words, I want to be able to say
+
+65
+00:03:15,925 --> 00:03:18,433
+嘿, 渲染器, 你能帮我绘制一下这个吗
+hey, renderer, can you please draw me this
+
+66
+00:03:18,766 --> 00:03:24,150
+然后这个绘制函数可能会包含所有它需要的东西
+and then the draw kind of function will potentially take in everything it needs to draw something 
+
+67
+00:03:24,150 --> 00:03:27,566
+就是传统的顶点缓冲区和索引缓冲区
+which traditionally would be like a vertex buffer and index buffer
+
+68
+00:03:28,100 --> 00:03:30,475
+可能是任何类型的纹理, 任何渲染状态
+potentially any kind of textures, any render states 
+
+69
+00:03:30,775 --> 00:03:32,566
+就像你在blender的时候做的那样
+such as like you do when blender on
+
+70
+00:03:33,466 --> 00:03:35,666
+我们是否应该写那种东西的深度
+should we be writing to the depth of that kind of stuff
+
+71
+00:03:37,166 --> 00:03:41,900
+然后很明显, 我说的顶点缓冲, 索引缓冲, 比如材质, 着色器
+and then obviously, what I say vertex buffer, index buffer, like materials, like a shader
+
+72
+00:03:41,900 --> 00:03:45,866
+也许是纹理之类的东西, 然后是所有的渲染状态, 对吧
+maybe texture stuff like that, and then all the render states, right
+
+73
+00:03:45,966 --> 00:03:49,566
+所以这种渲染器的概念也需要存在
+so that kind of concept of renderer needs to also exist
+
+74
+00:03:51,466 --> 00:03:53,800
+并且那对我们的实现非常重要
+and that's gonna be extremely important for us to implement
+
+75
+00:03:54,133 --> 00:03:59,233
+所以我们今天要做的是, 只关注顶点缓冲区和索引缓冲区, 这应该很简单
+so what we're gonna do is today, just focus on vertex buffers and index buffers, which should be very easy
+
+76
+00:03:59,233 --> 00:04:01,666
+特别是因为我们决定使用顶点数组
+especially because we've decided to use vertex arrays
+
+77
+00:04:01,866 --> 00:04:05,533
+所以我们不用担心实际顶点缓冲区的布局
+so we don't have to worry about the layout of an actual vertex buffer
+
+78
+00:04:05,533 --> 00:04:07,225
+当我们写顶点缓冲类的时候
+when we write that vertex buffer class
+
+79
+00:04:07,225 --> 00:04:09,650
+我们只关心实际的数据
+we only care about the actual data 
+
+80
+00:04:09,650 --> 00:04:14,500
+也就是一堆字节, 在这一点上很容易处理
+which is just a bunch of bytes, really easy to deal with at this point
+
+81
+00:04:15,300 --> 00:04:17,475
+然后索引缓冲区基本上是一样的
+and then the index buffer is basically the exact same thing
+
+82
+00:04:17,725 --> 00:04:20,866
+就像索引缓冲区和顶点缓冲区基本上是一样的
+like literally index buffer vertex buffer basically the same thing
+
+83
+00:04:21,533 --> 00:04:24,100
+就抽象而言, 诸如此类
+as far as the abstraction, and everything like that
+
+84
+00:04:24,966 --> 00:04:27,300
+然后在下一期, 我们可能会处理顶点数组
+and then in the next episode, we'll probably deal with vertex arrays
+
+85
+00:04:27,300 --> 00:04:28,500
+在那之后可能就是着色器
+and then after that probably shader
+
+86
+00:04:28,500 --> 00:04:29,966
+然后就是渲染器
+and then after that maybe the renderer
+
+87
+00:04:30,600 --> 00:04:33,500
+那么一旦我们建立了所有的类集合
+and then once we have all that kind of collection of classes set up
+
+88
+00:04:33,733 --> 00:04:37,100
+我们可以用它们来做一些相对简单的事情
+we'll be able to actually use them to do things in a relatively easy way
+
+89
+00:04:37,100 --> 00:04:39,566
+在这个应用程序中, 这看起来应该非常简单
+that should look very simple in this application
+
+90
+00:04:39,966 --> 00:04:42,700
+比如我们现在正要做的文件类
+like file class thing that we have going on right now
+
+91
+00:04:42,900 --> 00:04:43,733
+所以那就是我们的计划
+so that's the plan
+
+92
+00:04:44,266 --> 00:04:46,966
+让我们开始深入, 让我们开始抽象这些代码, 好了
+let's dive in, let's start abtracting this code, okay
+
+93
+00:04:46,966 --> 00:04:48,366
+那么首先, 如果按f5运行
+so first of all, if I just hit f5
+
+94
+00:04:48,366 --> 00:04:49,733
+我带你们看看我们现在的情况
+so I can show you guys where we're at
+
+95
+00:04:49,733 --> 00:04:52,066
+当然, 这是我们在上一期讲到的
+of course, is where we left off in the other episode
+
+96
+00:04:52,066 --> 00:04:53,500
+我们基本上只是创建了一个顶点数组
+we basically just created a vertex array
+
+97
+00:04:53,500 --> 00:04:56,900
+以及如何制作矩形颜色的动画
+and how to do this little animation of our rectangle color here
+
+98
+00:04:58,100 --> 00:05:03,166
+我今天主要要关注的是这个顶点缓冲区, 就在这里
+the main thing that I'm going to be focusing on today is this vertex buffer which is right over here
+
+99
+00:05:03,166 --> 00:05:06,900
+也就是这个buffer, 它只接受这些浮点数的位置
+which is called a buffer, and that's just taking in these float positions
+
+100
+00:05:06,900 --> 00:05:08,066
+差不多就是这样了
+and that's pretty much it
+
+101
+00:05:08,933 --> 00:05:11,166
+然后当然还有索引缓冲区, 也就是这里的这个
+and then of course the index buffer which is this thing here
+
+102
+00:05:11,366 --> 00:05:15,166
+现在这些顶点属性的东西
+now this kind of stuff, this vertex attribute stuff
+
+103
+00:05:15,166 --> 00:05:17,766
+就是在顶点缓冲区的实际布局中
+which is at the actual layout of our vertex buffer
+
+104
+00:05:17,866 --> 00:05:21,500
+那将在顶点数组类中处理
+that's going to be dealt with in the vertex array class
+
+105
+00:05:21,500 --> 00:05:26,966
+所有这些在顶点数组类中可能最终也会把顶点缓冲区对象放入其中
+and all of that in vertex array class will probably end up taking vertex buffer objects into it as well
+
+106
+00:05:26,966 --> 00:05:28,866
+因为我们通常会绑定顶点缓冲区
+because we typically tie vertex buffer
+
+107
+00:05:29,166 --> 00:05:33,150
+我们通常在它们的布局中把顶点缓冲区绑定到实际的顶点数组
+we typically tie vertex buffers with actual vertex arrays in their layouts
+
+108
+00:05:33,150 --> 00:05:34,400
+以及所有类似的东西
+and all that kind of stuff
+
+109
+00:05:36,233 --> 00:05:37,833
+在那之后, 当然我们会处理着色器
+and then after that of course we'll go with shaders
+
+110
+00:05:37,833 --> 00:05:39,400
+着色器会更复杂一些
+shader is going to be a little bit more complicated
+
+111
+00:05:39,400 --> 00:05:41,576
+因为我们需要处理统一变量之类的问题
+because we need to actually deal with uniforms and all of that
+
+112
+00:05:41,576 --> 00:05:42,775
+因此那一期应该会很有趣
+so that should be a fun episode
+
+113
+00:05:42,775 --> 00:05:46,433
+但不管怎样, 今天, 很简单, 就出顶点缓冲区和索引缓冲区
+but anyway, today, nice and simple, vertex buffer and index buffer
+
+114
+00:05:46,433 --> 00:05:47,433
+我们该怎么做
+how do we do that stuff
+
+115
+00:05:47,725 --> 00:05:50,721
+首先, 如果我们向上滚动到最上面, 你会看到一些东西
+so first of all, if we scroll up to the very top, you'll see we have some stuff
+
+116
+00:05:50,721 --> 00:05:51,950
+这是相当常见的, 对吧
+that's fairly common, right
+
+117
+00:05:52,200 --> 00:05:55,766
+比如这个错误检查, 这在OpenGL中是很常见的
+like this error checking is stuff, that's kind of common to OpenGL right now
+
+118
+00:05:56,200 --> 00:05:58,366
+所以我要做的是在这个src目录上
+so what I'm going to do is on the source over here
+
+119
+00:05:58,400 --> 00:06:00,766
+右键添加新项
+I'm going to right click add new item
+
+120
+00:06:01,466 --> 00:06:03,666
+就添加一个头文件
+I'm going to just add a header of file
+
+121
+00:06:03,700 --> 00:06:05,266
+我就叫它renderer
+and I'm just going to call it renderer 
+
+122
+00:06:05,266 --> 00:06:07,600
+再说一次, 我不想把它设置成游戏引擎之类的
+again, I don't really want to set this up like a game engine or anything
+
+123
+00:06:07,600 --> 00:06:11,166
+所以我不会创建太多的类
+so I'm not going to I'm going to try to create too many classes
+
+124
+00:06:11,633 --> 00:06:12,600
+所以我要保持这个简单明了
+so I'll keep this nice and simple
+
+125
+00:06:12,600 --> 00:06:15,966
+我会把它放到渲染器类中, 它最终也会包含我们的渲染器
+and I'll just put it into the renderer class, which will eventually contain our renderer as well
+
+126
+00:06:16,200 --> 00:06:18,266
+所以我也要创建一个cpp文件, 因为我们需要它
+so I'm making a cpp file as well, because we need that
+
+127
+00:06:18,266 --> 00:06:20,800
+我们有一个Rendered.cpp和一个Renderer.h
+so we have a Renderer.cpp and a Renderer.h
+
+128
+00:06:21,175 --> 00:06:22,966
+好了, 进入Renderer.h文件
+okay, into the Renderer.h
+
+129
+00:06:23,400 --> 00:06:26,733
+我实际上要加入这个ASSERT, 这可能看起来不太直观
+I'm actually going to put in this ASSERT, which might not seem very intuitive
+
+130
+00:06:26,733 --> 00:06:29,766
+因为断言通常会贯穿整个程序
+because assertions are typically used throughout our entire program
+
+131
+00:06:29,766 --> 00:06:31,533
+不只是渲染器, 但它是可以的
+not just the renderer, but it's okay
+
+132
+00:06:32,100 --> 00:06:34,466
+实际上, 我要复制粘贴所有这些东西
+in fact, I'm just gonna copy and paste all of this kind of stuff
+
+133
+00:06:34,533 --> 00:06:38,600
+剪切它, 然后把它放到Renderer.h, 我刚刚不小心固定了它的工作
+cut it and then put it into Renderer.h, which I just pinned accidentally works
+
+134
+00:06:38,900 --> 00:06:40,666
+很好, 酷, 这就是我们现在有的
+okay, cool, so now this is what we have
+
+135
+00:06:41,600 --> 00:06:42,766
+我要包含一些东西
+I'm going to include some stuff
+
+136
+00:06:43,000 --> 00:06:44,900
+现在我们显然是在输入这个gl
+now we are obviously typing this with gl
+
+137
+00:06:44,900 --> 00:06:48,333
+所以在我们的渲染器头文件中包含glew是可以的
+so it's okay to just include glew over here in our renderer a header file
+
+138
+00:06:48,500 --> 00:06:49,966
+然后我们还需要什么, iostream
+and then what else we need, iostream
+
+139
+00:06:49,966 --> 00:06:52,025
+我们可能不需要这些东西
+potentially we don't really need that stuff here
+
+140
+00:06:52,025 --> 00:06:53,433
+我不打算包含iostream
+I'm not going to include iostream
+
+141
+00:06:53,633 --> 00:06:56,466
+我们只需要glew就行了, 好了, 酷
+all we need is really just glew, okay, cool
+
+142
+00:06:56,466 --> 00:06:58,933
+那么现在这些东西, 我们要怎么处理这些东西
+so now this stuff, what do we do with this stuff
+
+143
+00:06:58,966 --> 00:07:01,625
+我要做的第一件事就是取消静态
+well the first thing I'm going to do is get rid of static 
+
+144
+00:07:01,625 --> 00:07:05,666
+然后让它成为一个实际的声明而不是定义
+and then just make it a an actual declaration rather than a definition
+
+145
+00:07:05,666 --> 00:07:08,933
+因为我们要把这个定义移动到实际的CPP文件中
+because we're going to move that definition into the actual cpp file
+
+146
+00:07:09,133 --> 00:07:12,866
+所以我也会去掉GLLogCall的静态, 添加一个分号
+so I'll get rid of static for GLLogCall as well, add a semicolon
+
+147
+00:07:12,966 --> 00:07:14,500
+实际上, 我们把这两个都复制一下
+in fact, let's just copy both of these
+
+148
+00:07:15,200 --> 00:07:17,466
+我们要把它放进cpp文件
+we're going to put it into the cpp file
+
+149
+00:07:18,800 --> 00:07:21,566
+在这里, 我将包含Renderer.h, 然后粘贴这个东西
+in there, I'll include Renderer.h, and paste in this stuff
+
+150
+00:07:22,033 --> 00:07:23,166
+然后回到这里
+and then back over here
+
+151
+00:07:23,966 --> 00:07:30,750
+我要像那样去掉这两个函数的函数体
+I'm going to just get rid of the bodies of these two functions like that
+
+152
+00:07:30,750 --> 00:07:33,100
+好了, 看起来很简单
+and there we go, okay, looks pretty simple
+
+153
+00:07:33,233 --> 00:07:34,766
+然后在Renderer.cpp中, 如果我们有那些东西
+and then in Renderer.cpp, if we've got that stuff
+
+154
+00:07:34,766 --> 00:07:36,266
+让我们去掉这些分号
+let's get rid of these semicolons
+
+155
+00:07:38,066 --> 00:07:42,100
+这里我们需要包含cout, 那么让我们包含iostream
+now here we will actually need to include cout, so let's include iostream
+
+156
+00:07:43,033 --> 00:07:44,725
+这对我来说很不错, 好了
+and that looks pretty good to me, okay
+
+157
+00:07:44,725 --> 00:07:47,566
+所以, 我们已经移出了常见的东西
+so, we've moved out the kind of common stuff
+
+158
+00:07:47,566 --> 00:07:50,175
+我们可以在所有的类中包含Renderer
+and we can just include renderer in all of our classes
+
+159
+00:07:50,175 --> 00:07:53,333
+如果我们真的需要访问这种GLCall宏
+if we really need to get access to this kind of GLCall macro
+
+160
+00:07:53,433 --> 00:07:56,500
+以及它所做的一切以及断言, 很好
+and everything that it does as well as ASSERT, cool
+
+161
+00:07:56,775 --> 00:07:58,400
+好了, 那么回到我们的应用
+okay, so back our application
+
+162
+00:07:58,766 --> 00:08:01,000
+让我们看看我们这儿实际上需要移出什么
+let's take a look at what we actually need to move out here
+
+163
+00:08:01,000 --> 00:08:04,125
+所以你可以马上看到GLCall, 给了我们一个错误
+so straight away you can see GLCall,  course, is giving us an error
+
+164
+00:08:04,125 --> 00:08:06,325
+因为我们现在需要包含Renderer
+because we now need to include renderer
+
+165
+00:08:06,325 --> 00:08:11,666
+因为我们需要映射, 然后我们向下滚动, 看看这个东西buffer
+because we need the map, and then let's scroll down, and take a look at this buffer stuff
+
+166
+00:08:11,700 --> 00:08:13,633
+这就是我们需要的实际代码
+so this is the actual code that we need
+
+167
+00:08:13,633 --> 00:08:15,466
+这就是一切
+and that really is like all of it
+
+168
+00:08:15,566 --> 00:08:19,700
+我的意思是这个绑定缓冲区需要在某种绑定方法中被重用
+I mean this bind buffer will need to kind of be reused in some kind of bind method
+
+169
+00:08:19,925 --> 00:08:23,800
+因为我们需要重新绑定不同的缓冲区
+because we will have to rebind kind of different buffers as we go along
+
+170
+00:08:23,900 --> 00:08:27,133
+但是实际的创建只是生成缓冲区, 然后设置数据
+but the actual creation is just gen buffers, and then setting the data
+
+171
+00:08:27,133 --> 00:08:29,000
+就是这样, 非常容易, 非常简单
+that's it, really easy, really simple
+
+172
+00:08:29,866 --> 00:08:32,866
+那么在这个src目录, 右键添加新项
+so on this source, I'm going to click right click add new item
+
+173
+00:08:34,266 --> 00:08:37,900
+应该是个头文件, 我就叫这个为VertexBuffer.h
+gonna be a header file, and I'm going to call this VertexBuffer.h
+
+174
+00:08:38,200 --> 00:08:46,000
+然后为了cpp文件做同样的操作, VertexBuffer.cpp
+I'm going to do the same thing for the cpp file, VertexBuffer.cpp
+
+175
+00:08:46,466 --> 00:08:49,166
+VertexBuffer.cpp会包含VertexBuffer.h
+VertexBuffer.cpp is going to include VertexBuffer.h
+
+176
+00:08:49,433 --> 00:08:53,800
+右键这个VetexBuffer, 然后重命名为VertexBuffer
+I'm also going to right click on VetexBuffer or VetexBuffer, and rename it to VertexBuffer
+
+177
+00:08:53,933 --> 00:08:55,133
+因为我刚才拼错了那个
+because I did misspell that
+
+178
+00:08:55,933 --> 00:08:57,933
+好了, 酷, 现在当我回到我的头文件
+okay, cool, now if I go back to my header file
+
+179
+00:08:58,300 --> 00:09:00,833
+输入class VertexBuffer
+I'm going to type in class VertexBuffer
+
+180
+00:09:01,566 --> 00:09:06,500
+现在会有一个私有成员, 叫做unsigned int m_RendererID
+going to have one private member just for now, called unsigned int m_RendererID
+
+181
+00:09:06,733 --> 00:09:08,866
+现在我说的是暂时的, 但它会永远这样
+now I did say just for now, but it will have that forever
+
+182
+00:09:08,866 --> 00:09:11,100
+我的意思是, 我们暂时就这一个成员
+what I meant is, we're just gonna add just one member for now
+
+183
+00:09:11,866 --> 00:09:14,200
+现在就这个m_RendererID, 对吧
+now m_RendererID, right
+
+184
+00:09:14,200 --> 00:09:15,875
+让我们讨论一下这个
+let's talk about this for a little bit 
+
+185
+00:09:15,875 --> 00:09:19,266
+那么我们知道OpenGL需要某种数字id
+so we know that OpenGL needs some kind of numeric id
+
+186
+00:09:19,266 --> 00:09:21,266
+在这个例子中, 它是一个无符号整数
+in this case, it's an unsigned integer
+
+187
+00:09:21,400 --> 00:09:24,033
+这实际上是在跟踪什么
+that actually kind of keeps track of what
+
+188
+00:09:24,766 --> 00:09:28,466
+基本上, 它就是一个id, 对于我们分配的每种类型的对象
+it's an id, basically for every type of object we allocate
+
+189
+00:09:28,466 --> 00:09:31,625
+你知道的, 就像, 在OpenGL中创建, 对吧
+you know, we like, create in OpenGL, right
+
+190
+00:09:31,625 --> 00:09:34,133
+所以当我创建纹理, 创建着色器
+so if I create a texture, if I create a shader
+
+191
+00:09:34,133 --> 00:09:37,866
+当我创建顶点缓冲区, 索引缓冲区, 顶点数组, 帧缓冲区
+if I create a vertex buffer, an index buffer, a vertex array, a frame buffer
+
+192
+00:09:37,866 --> 00:09:43,433
+不管怎样, 它都会得到某种id, 这个id是唯一的, 它是一个整数
+whatever, it gets some kind of id, and that id is a unique id, that is an integer
+
+193
+00:09:43,466 --> 00:09:48,133
+它标识了特定的缓冲区, 或者我创建的特定对象
+that identifies that specific buffer, or that specific object that I've created
+
+194
+00:09:48,300 --> 00:09:51,866
+那就是它的原理, 现在我就称这是一个渲染器id
+that's how it works, now I am calling this a renderer id
+
+195
+00:09:52,466 --> 00:09:56,575
+因为其他的接口也可以在类似的系统上工作, 对吧
+because other apis also work on a similar system, right
+
+196
+00:09:56,575 --> 00:10:02,000
+所以, 我在这里做的是让它保持通用性
+so, what I'm really doing here is just kind of keeping it fairly generic
+
+197
+00:10:02,000 --> 00:10:03,500
+即使这是一个OpenGL系列教程
+even though this is an OpenGL series
+
+198
+00:10:03,500 --> 00:10:07,066
+因此我把东西和OpenGL联系得很紧密
+so I am tying things very closely to OpenGL
+
+199
+00:10:07,900 --> 00:10:11,900
+你知道的, 而不是叫这个OpenGL id, 或者就是id
+you know, instead of just kind of kind of calling this OpenGL id, or just id
+
+200
+00:10:11,900 --> 00:10:14,466
+或者像, 我也不知道, 在叫它buffer之前是什么, 或者其他
+or like, I don't know, what I called it before buffer, or whatever
+
+201
+00:10:14,600 --> 00:10:17,933
+渲染器id就是实际的内部渲染器id
+renderer id is just the actual internal renderer id
+
+202
+00:10:17,933 --> 00:10:19,966
+所以如果你使用OpenGL作为渲染器
+so if you're using OpenGL as your renderer
+
+203
+00:10:19,966 --> 00:10:23,275
+实际上, 这是与OpenGL相关的数字id
+this is the numeric id that is actually relevant to OpenGL
+
+204
+00:10:23,525 --> 00:10:27,550
+因为我们可能有一个高级引擎方面的id
+because we may have a high-level kind of engine side id
+
+205
+00:10:27,550 --> 00:10:29,700
+我们也像那样用它来表示对象
+that we also use for objects like that
+
+206
+00:10:29,933 --> 00:10:35,566
+好了, 那么, 好吧, 我只是想解释一下我在这里做什么
+all right, so, yeah, just just trying to explain what I'm doing here
+
+207
+00:10:35,566 --> 00:10:42,233
+因为我不打算让这个系列变得使我做起来比较艰难
+because I'm not trying to kind of this series is going to be kind of tough for me to do
+
+208
+00:10:42,300 --> 00:10:44,133
+好吧, 现在我们就像这里的假墙一样被打破了
+okay, now we're breaking like the false wall here
+
+209
+00:10:44,133 --> 00:10:46,600
+但无论如何, 这个系列对我来说还是有点难
+but anyway, this series gonna be kind of tough for me to do
+
+210
+00:10:46,633 --> 00:10:49,566
+因为我想教你们OpenGL
+because I'm trying to teach you guys OpenGL
+
+211
+00:10:49,566 --> 00:10:54,233
+但我还会把它和你可能使用OpenGL的方式混合在一起
+but also I'm trying to mix it in with how you'll likely be using OpenGL
+
+212
+00:10:54,266 --> 00:10:55,500
+而这是两码事
+and those are two different things
+
+213
+00:10:55,566 --> 00:10:59,566
+因为如果你看任何OpenGL教程, 它们会告诉你OpenGL的原理
+because if you look at any OpenGL tutorial, they just show you how OpenGL works
+
+214
+00:10:59,900 --> 00:11:03,566
+那很好, 但那并不能告诉你如何在游戏开发中使用它
+and that's great, but that doesn't tell you about, how to use it in a game
+
+215
+00:11:03,600 --> 00:11:04,700
+或者如何在一个引擎开发中使用它
+or how to use it in an engine
+
+216
+00:11:04,700 --> 00:11:06,000
+或者如何在现实世界中使用它
+or how to use it in the real world
+
+217
+00:11:06,300 --> 00:11:09,400
+我试着把这两者结合起来, 希望这会更有意义
+I'm kind of trying to mix the two, I hope this makes sense
+
+218
+00:11:09,633 --> 00:11:12,900
+这显然是一个小例子, 但随着系列教程的继续
+this is obviously a minor case, but as a series goes on
+
+219
+00:11:12,900 --> 00:11:15,100
+如果你有任何想法, 请在下方留言
+if you have any thoughts, just leave a comment below
+
+220
+00:11:15,100 --> 00:11:18,066
+我会来帮你的
+I'm here, I'm human, I'm here to help you
+
+221
+00:11:18,166 --> 00:11:21,566
+我想要改进这个系列, 就像你可能希望看到它们得到改进一样
+I want to improve this series, as much as you probably want to see them improved
+
+222
+00:11:21,666 --> 00:11:23,166
+所以请在下方评论留下你的想法
+so just leave your thoughts in the comments below
+
+223
+00:11:23,166 --> 00:11:24,566
+不管如何, 让我们回到这里吧
+anyway, let's just get back to this here
+
+224
+00:11:24,833 --> 00:11:27,200
+那么, 我们有了一个渲染器id
+so, we have a renderer id
+
+225
+00:11:27,266 --> 00:11:29,733
+我将在这里创建一个公共构造方法
+I'm going to make a public constructor here
+
+226
+00:11:29,733 --> 00:11:36,633
+接收一个常量空指针data, 和一个无符号整型size, 好了
+I'm going to take a constant void pointer data, and then an also an unsigned int size, okay
+
+227
+00:11:36,866 --> 00:11:38,300
+在这儿会有一个析构方法
+we're going to have a destruct here
+
+228
+00:11:38,533 --> 00:11:41,500
+以及Bind和Unbind两个方法
+and we're just going to have two functions Bind and Unbind
+
+229
+00:11:41,600 --> 00:11:42,850
+我现在喜欢添加这两个方法
+I like to add these two now 
+
+230
+00:11:42,850 --> 00:11:46,733
+当然, 在一个实际引擎中, 你会有一些其他方法, 比如设置数据
+of course, in an actual engine, you will have other things like set data
+
+231
+00:11:46,733 --> 00:11:48,650
+可能会有锁定和解锁机制
+maybe maybe have a lock and unlock mechanism 
+
+232
+00:11:48,650 --> 00:11:51,866
+这样你就可以把数据流到顶点缓冲区
+so that you can actually kind of stream data to the vertex buffer
+
+233
+00:11:52,075 --> 00:11:55,500
+当你在渲染的时候, 因为你不是在渲染
+as you're kind of rendering, because you well not as you're rendering
+
+234
+00:11:55,500 --> 00:11:57,133
+但在你下次渲染之前
+but before you render the next time
+
+235
+00:11:57,133 --> 00:11:59,000
+你可能想要修改顶点缓冲区
+you might want to modify the vertex buffer
+
+236
+00:11:59,000 --> 00:12:03,766
+你可能会锁定它, 修改它, 解锁它, 做所有这些事情
+and so you might kind of lock it, modify it, unlock it, and do all that kind of stuff
+
+237
+00:12:03,766 --> 00:12:05,366
+这里有很多你可以做的事情
+there's a bunch of stuff you could do here
+
+238
+00:12:06,300 --> 00:12:07,500
+我们先把它简单化
+we're going to keep it simple for now
+
+239
+00:12:07,500 --> 00:12:09,900
+运行当前程序所需要的只是绑定和取消绑定
+all we need to run our current program is bind and unbind
+
+240
+00:12:10,066 --> 00:12:13,633
+随着这个系列的继续, 我们开始深入到更复杂的主题
+as this series goes on, we start to kind of dive into more complicated topics
+
+241
+00:12:13,633 --> 00:12:15,566
+我们开始需要那些功能
+and we start to require those features
+
+242
+00:12:15,666 --> 00:12:18,066
+我们将扩展这些类
+we're going to just extend these classes
+
+243
+00:12:18,066 --> 00:12:20,200
+好了, 所以Bind和Unbind看起来不错
+okay, so Bind and Unbind looks pretty good
+
+244
+00:12:20,333 --> 00:12:21,950
+我们也有构造和析构方法
+and we have a constructor and a destructor
+
+245
+00:12:21,950 --> 00:12:23,333
+我觉得一切都很好
+everything looks pretty good to me
+
+246
+00:12:23,333 --> 00:12:25,900
+那么现在回到我们的cpp文件
+so now let's go back to our cpp file
+
+247
+00:12:25,966 --> 00:12:27,433
+实际上我要回到头文件
+I'm actually going to go back to my header file
+
+248
+00:12:27,433 --> 00:12:29,000
+因为我要用视图辅助工具
+and because I'm using visual assist
+
+249
+00:12:29,333 --> 00:12:30,933
+就是右键类名
+I can just right click on the class name
+
+250
+00:12:31,033 --> 00:12:33,800
+转到快速动作并创建方法实现
+go to quick actions and create method implementations
+
+251
+00:12:34,200 --> 00:12:35,666
+它会问我想要哪些
+and it will ask me which ones I want
+
+252
+00:12:35,700 --> 00:12:36,700
+然后点击ok
+then I can hit ok now
+
+253
+00:12:36,700 --> 00:12:37,800
+VS也会有这个
+visual studio also does this
+
+254
+00:12:37,800 --> 00:12:39,466
+当你移动鼠标在这个类名上面
+if you kind of hover your mouse over this and
+
+255
+00:12:39,833 --> 00:12:41,250
+我不知道, 按一个小箭头
+I don't know, pressed a little arrow
+
+256
+00:12:41,250 --> 00:12:45,800
+你也可以为你的方法生成一般的实现
+you can also generate stuff generally implementations for your methods as well
+
+257
+00:12:46,675 --> 00:12:48,933
+好了, 酷, 那这里我们要做什么
+okay, cool, so what are we doing here
+
+258
+00:12:48,933 --> 00:12:50,800
+当我们回到我们的应用代码
+if we go back to our application code
+
+259
+00:12:50,800 --> 00:12:54,233
+我们真正需要的是, 如果我复制这三行
+all we really need is, if I copy these three lines
+
+260
+00:12:54,300 --> 00:12:56,033
+我要把它们放到这里
+I'm gonna put them back over here
+
+261
+00:12:56,233 --> 00:12:59,241
+好了, 我们要包含我们的渲染器
+all right, we're going to include our renderer
+
+262
+00:12:59,241 --> 00:13:02,850
+因为我们需要这些GLCall宏
+because we need that for these GLCall macros 
+
+263
+00:13:02,850 --> 00:13:06,133
+然后代替buffer的是, 我们的m_RendererID
+and then instead of buffer, it's going to be our m_RendererID
+
+264
+00:13:07,600 --> 00:13:10,933
+然后代替positions的是data
+and then instead of positions, it's going to be data
+
+265
+00:13:10,933 --> 00:13:13,900
+以及代替这个的是size
+and instead of this thing, it's going to be size
+
+266
+00:13:14,133 --> 00:13:15,366
+那就是我们所需要的
+and that's really all we need
+
+267
+00:13:15,433 --> 00:13:17,466
+现在我要复制这个绑定缓冲区
+now I'm going to copy this bind buffer
+
+268
+00:13:17,766 --> 00:13:21,133
+把它放入Bind和Unbind中, 除了unbind
+and put it into bind and unbind, except with unbind
+
+269
+00:13:21,133 --> 00:13:23,333
+我就让它为0, 好了
+I'm going to make it zero, okay
+
+270
+00:13:23,533 --> 00:13:25,533
+非常简单, 非常直接
+pretty simple, pretty straightforward
+
+271
+00:13:25,733 --> 00:13:28,833
+我们还要添加的一个操作就是删除这个顶点缓冲区
+one more thing we're going to add here is of course the deleting of this vertex buffer
+
+272
+00:13:28,833 --> 00:13:32,066
+所以就是GLCall(glDeleteBuffers)
+so I'm just going to write GLCall glDeleteBuffers
+
+273
+00:13:33,300 --> 00:13:37,033
+我们会删除一个缓冲区, 它会是我们的m_RendererID
+we're going to delete one buffer and it's going to be our m_RendererID
+
+274
+00:13:37,266 --> 00:13:38,266
+好了, 就这样
+okay, that's it
+
+275
+00:13:38,300 --> 00:13:41,233
+这就是我们的整个顶点, 这很简单
+that is our entire vertex, as how simple is that
+
+276
+00:13:41,566 --> 00:13:44,066
+现在让我们对索引缓冲区重复同样的操作
+now let's repeat the same thing for an index buffer
+
+277
+00:13:44,833 --> 00:13:46,433
+现在因为这些类非常相似
+now because these classes are so similar
+
+278
+00:13:46,433 --> 00:13:48,566
+我实际上要打开这个包含文件夹
+I'm actually just going to open this containing folder
+
+279
+00:13:49,100 --> 00:13:51,966
+我将复制粘贴这个VertexBuffer
+and I'm going to literally copy and paste this VertexBuffer
+
+280
+00:13:52,733 --> 00:13:55,133
+这两个文件头文件和cpp文件
+both of these files header file and the cpp file
+
+281
+00:13:55,233 --> 00:13:57,100
+只是重命名IndexBuffer
+and just rename them to IndexBuffer
+
+282
+00:13:57,100 --> 00:13:58,733
+因为它们是如此的相似
+because that's how similar they are
+
+283
+00:13:59,166 --> 00:14:02,933
+好了, 回到VS, 点击这个小按钮来刷新这个
+okay, back in virtual studio, hit this little button here to refresh this
+
+284
+00:14:03,133 --> 00:14:04,500
+你可以看到我们有两个新文件
+you can see we have two new files
+
+285
+00:14:04,566 --> 00:14:07,400
+选择两者, 右键单击包含在项目中
+select both of them, right click include in project
+
+286
+00:14:07,800 --> 00:14:09,592
+然后我们开始重构它们
+and then let's start refactoring them 
+
+287
+00:14:09,592 --> 00:14:12,933
+那么这是一个索引缓冲区, 现在渲染器id保留在那儿
+so this is an index buffer, now renderer id stays there
+
+288
+00:14:13,133 --> 00:14:15,600
+我们唯一需要的另一个成员实际就是m_Count
+the only other thing we need is an actual m_Count
+
+289
+00:14:15,933 --> 00:14:18,500
+因为我们需要知道, 这个实际上有多少个索引
+because we need to know, how many indices this actually has
+
+290
+00:14:18,933 --> 00:14:23,400
+我将用IndexBuffer替换这个, 当然是代替VertexBuffer
+I'm going to replace this with IndexBuffer, of course instead of VertexBuffer
+
+291
+00:14:24,400 --> 00:14:26,233
+至于这个常量空指针data
+const void point data
+
+292
+00:14:26,233 --> 00:14:28,900
+现在, 我们暂时将支持32位索引
+now, for now we're going to support 32 bit indices
+
+293
+00:14:29,866 --> 00:14:33,700
+我不知道是否有必要在这里加上16位索引, 尤其是在这个系列中
+I don't know if it's even worth adding 16 bit indices at this point especially in this series
+
+294
+00:14:33,700 --> 00:14:36,000
+只要知道你可以有不同的整数类型
+just know that obviously you can have different integer types
+
+295
+00:14:36,000 --> 00:14:37,833
+对于你的索引缓冲区, 可以有不同整数大小
+different integer sizes for your index buffer
+
+296
+00:14:37,833 --> 00:14:41,566
+或者可以是16位整型, 比如短整型, 无符号短整型
+or you can have 16 bit integers, so like shorts, unsigned shorts
+
+297
+00:14:42,700 --> 00:14:44,300
+你也可以用32位整型
+you can have 32 bit as well
+
+298
+00:14:44,300 --> 00:14:45,500
+注意, 我就用32位的
+look, I'm just gonna use 32 bit
+
+299
+00:14:45,500 --> 00:14:48,533
+我不认为我们有理由同时支持这两种, 真的
+I don't think there's a reason for us to support both, really
+
+300
+00:14:48,533 --> 00:14:53,100
+当然, 从理论上讲, 使用16位整数有性能优势
+of course, theoretically there are performance benefits to using 16 bit integers
+
+301
+00:14:53,100 --> 00:14:54,433
+如果你没有, 如果你
+if you don't, if you're
+
+302
+00:14:54,866 --> 00:14:56,375
+如果你正在绘制3D模型
+if you're 3D model that you're drawing 
+
+303
+00:14:56,375 --> 00:14:59,500
+没有那么复杂, 没有那么多三角形
+isn't like that complex, doesn't have that many triangles
+
+304
+00:14:59,866 --> 00:15:07,858
+它需要超过76,535个不同或65,536个不同的索引
+that it requires more than 76,535 different or 65,536 different indices
+
+305
+00:15:08,433 --> 00:15:11,266
+但是我们还是简单点吧, 就用无符号整型
+but we're just gonna keep it simple, unsigned int
+
+306
+00:15:12,500 --> 00:15:14,400
+那么就是常量无符号整型data
+so const unsigned int data
+
+307
+00:15:14,533 --> 00:15:17,500
+现在, 因为我们提供了一个无符号整型, 而不是空类型
+now, because we've supplied an unsigned int and not a void
+
+308
+00:15:17,500 --> 00:15:19,766
+我们没有必要使用字节大小
+there's no point for us really taking a byte size
+
+309
+00:15:19,766 --> 00:15:21,750
+我们想要的是统计
+what we instead want is the count
+
+310
+00:15:21,750 --> 00:15:24,333
+那么, 现在我们提供了多少个索引
+so how many indices are we supplied now
+
+311
+00:15:24,333 --> 00:15:27,800
+我喜欢用size和count来区分这两个词
+I like to distinguish these two by using the words size and count
+
+312
+00:15:28,166 --> 00:15:31,366
+当我写size时, 当我创建一个变量size时
+when I write size, when I create a variable called size
+
+313
+00:15:31,400 --> 00:15:33,266
+它几乎总是以字节为单位
+that is almost always in bytes
+
+314
+00:15:33,266 --> 00:15:35,600
+如果因为某种原因, 它不是, 它们可能会
+if for some reason, it's not, they'll probably
+
+315
+00:15:35,600 --> 00:15:37,533
+我肯定会留下注释什么的
+I'll definitely leave a comment or something
+
+316
+00:15:37,800 --> 00:15:39,766
+但是像在实际的源代码中
+but like in the actual source code
+
+317
+00:15:40,133 --> 00:15:44,100
+但是size表示字节数, count表示元素数
+but size means bytes, count means element count
+
+318
+00:15:44,366 --> 00:15:47,366
+所以换句话说, 如果我正在绘制这个正方形
+so in other words, if I have, if I'm drawing the square
+
+319
+00:15:47,366 --> 00:15:49,633
+我知道那个有六个索引, 对吧
+and I know that's six indices,  right
+
+320
+00:15:49,933 --> 00:15:52,900
+6个索引意味着如果我写数字6
+six indices that means if I write the number 6
+
+321
+00:15:52,933 --> 00:15:57,200
+那就是统计, 对吧, 我没有写6乘以4, 等于24
+that's the count, right, I don't write six times four, which is 24
+
+322
+00:15:57,533 --> 00:16:00,966
+那会是size, 24是size, 6是count
+that will be the size, 24 is a size, 6 is a count
+
+323
+00:16:01,333 --> 00:16:02,933
+明白吧, 那就是我们需要的
+okay, and that's all we need here
+
+324
+00:16:02,933 --> 00:16:04,933
+让我们回到这个实现文件
+let's go back to this implementation file
+
+325
+00:16:04,933 --> 00:16:09,200
+现在我要点击这里的control h, 调出这个查找和替换
+now I'm going to just hit control h over here, to bring up this find and replace thing
+
+326
+00:16:09,200 --> 00:16:12,400
+我将用IndexBuffer替换VertexBuffer
+I'm going to replace VertexBuffer with IndexBuffer
+
+327
+00:16:12,400 --> 00:16:15,225
+然后按alt a来替换当前这个文件中的所有内容
+and then hit alt a to replace all in this file current
+
+328
+00:16:15,225 --> 00:16:16,966
+确保它在当前文档中
+make sure it's in current document obviously
+
+329
+00:16:17,733 --> 00:16:18,633
+我们继续
+and there we go
+
+330
+00:16:18,700 --> 00:16:21,566
+现在我要把这个去掉, 用原来的替换掉
+so now I'll get rid of this, and replace it with what I had there
+
+331
+00:16:21,566 --> 00:16:23,500
+视觉辅助工具能帮我处理这个问题
+which visual assist can help me out with again
+
+332
+00:16:24,266 --> 00:16:26,566
+最后, 就是这里替换size和data
+and then finally instead of size and data here
+
+333
+00:16:26,566 --> 00:16:29,025
+我要写, 主要是替换size
+I'm going to write, instead of size primarily
+
+334
+00:16:29,025 --> 00:16:32,066
+它会是count乘以sizeof(unsigned int)
+it's gonna be count times sizeof unsigned int
+
+335
+00:16:32,066 --> 00:16:33,866
+现在这里可能有些危险
+now there may be some danger here
+
+336
+00:16:34,166 --> 00:16:38,266
+因为我假设unsigned int的大小和GLunit是一样的
+because I'm obviously assuming that the size of an unsigned int is the same as GLunit
+
+337
+00:16:38,366 --> 00:16:40,033
+因为我不想用那个
+because I'm specifically not using that
+
+338
+00:16:41,066 --> 00:16:46,600
+平台差异, 我从未见过, 和unsigned int之前没有用它, 老实说
+platform differences I've never seen, and unsigned int not before by its, to be honest
+
+339
+00:16:48,033 --> 00:16:49,000
+是的, 就像从来没有
+yeah, like never
+
+340
+00:16:49,166 --> 00:16:51,733
+你所在的平台可能不是这样, 记住那件事
+you might be on a platform where it's not, keep that in mind
+
+341
+00:16:52,700 --> 00:16:54,566
+我不喜欢使用OpenGL的那个
+I don't really like using the OpenGL one
+
+342
+00:16:54,566 --> 00:16:56,666
+所以这里我还是写unsigned int
+so I'm still gonna write unsigned int here
+
+343
+00:16:56,666 --> 00:16:57,866
+但记住那点
+but just keep that in mind
+
+344
+00:16:57,866 --> 00:17:02,200
+在运行时, 你甚至可能需要完全谨慎
+you may want to even be completely cautious at runtime
+
+345
+00:17:02,400 --> 00:17:03,900
+还有可能检查一下
+and potentially check to see
+
+346
+00:17:03,900 --> 00:17:10,133
+sizeof(unsigned int)实际上是否等于sizeof(GLuint)
+if the sizeof an unsigned int is actually equal to the size of a GLuint
+
+347
+00:17:10,866 --> 00:17:13,900
+确保你使用的是类型, 对吧, 而不是实际的
+make sure you use the type, right, not the actual like
+
+348
+00:17:13,900 --> 00:17:17,500
+不要写GLunsignedint, 因为那不是一种类型, 一定要写GLuint
+don't write GLunsignedint, because that's not a type, make sure you write GLuint
+
+349
+00:17:18,266 --> 00:17:20,954
+但你使用那个可能要非常小心
+but you may want to be like really cautious with that 
+
+350
+00:17:20,954 --> 00:17:23,900
+但无论如何, 我将使用unsigned int
+but anyway, I'm just gonna use unsigned int
+
+351
+00:17:24,166 --> 00:17:26,100
+我们需要替换的另一个东西是ARRAY_BUFFER
+the other thing we need to replace is ARRAY_BUFFER
+
+352
+00:17:26,100 --> 00:17:28,100
+变成ELEMENT_ARRAY_BUFFER
+becomes ELEMENT_ARRAY_BUFFER 
+
+353
+00:17:28,533 --> 00:17:29,300
+就是这样
+that's really it
+
+354
+00:17:29,300 --> 00:17:30,325
+我的意思是, 如果我往下写
+I mean if I go down here
+
+355
+00:17:30,325 --> 00:17:33,600
+这里我要把绑定缓冲区这里, 改成ELEMENT_ARRAY_BUFFER
+I'm just going to write bind buffer here to be ELEMENT_ARRAY_BUFFER
+
+356
+00:17:33,700 --> 00:17:34,500
+就这样
+and that's it
+
+357
+00:17:34,566 --> 00:17:37,233
+在某种程度上, 我们显然还需要做的另一件事是count
+the other thing we obviously need to do is still count somehow
+
+358
+00:17:37,233 --> 00:17:40,325
+所以我要在这里写一个初始化列表
+so I'm going to write an initialized list here 
+
+359
+00:17:40,325 --> 00:17:43,100
+它设置count为count, 就像这里一样
+that just sets count to count like that up here
+
+360
+00:17:43,439 --> 00:17:45,189
+最后是一个获取器
+and then finally a getter
+
+361
+00:17:45,189 --> 00:17:53,075
+inline unsigned int GetCount() const, 返回m_Count
+inline unsigned int GetCount const, return m_Count
+
+362
+00:17:53,075 --> 00:17:58,300
+实际上我还会把Bind和Unbind标记为const
+I'm actually also going to mark Bind and Unbind as const
+
+363
+00:17:58,300 --> 00:17:59,900
+因为它们实际上不会修改任何东西
+because they don't actually modify anything
+
+364
+00:18:00,033 --> 00:18:03,533
+以后我们可能会在const对象上调用它们
+and we'll probably want to call them on const objects in the future
+
+365
+00:18:03,533 --> 00:18:12,100
+顶点缓冲区也一样, 因此顶点缓冲区Bind和Unbind标记为const
+same for the vertex buffer as well, so vertex buffer Bind and Unbind are becoming const
+
+366
+00:18:15,055 --> 00:18:17,233
+好了, 继续, 就这样了
+okay, there we go, so that's it
+
+367
+00:18:17,233 --> 00:18:19,000
+那就是抽象那两个的全部内容
+that's really all there is to abstracting those two
+
+368
+00:18:19,000 --> 00:18:23,433
+让我们继续替换我们在Application.cpp文件中已有的代码
+let's go ahead and replace the code that we've got in the Application.cpp file
+
+369
+00:18:23,633 --> 00:18:27,066
+用这种我们创建的新类
+with this new kind of these new classes that we've created
+
+370
+00:18:27,700 --> 00:18:32,500
+抱歉, 回到Applicatiop.cpp, 我要把它们都包含在顶部
+sorry, back in Application.cpp, I'm going to include both of them at the top here
+
+371
+00:18:32,933 --> 00:18:39,733
+那么包含VertexBuffer和IndexBuffer
+so include VertexBuffer and include IndexBuffer
+
+372
+00:18:40,466 --> 00:18:42,000
+然后向下滚动
+and then I'm going to scroll down here
+
+373
+00:18:42,466 --> 00:18:45,250
+然后当我们实际上创建这个VertexBuffer时
+and then when we actually create this VertexBuffer
+
+374
+00:18:45,250 --> 00:18:49,300
+我要删除所有这些代码, 然后写一个VertexBuffer
+I'm just going to delete all this code, and write a VertexBuffer
+
+375
+00:18:49,300 --> 00:18:50,466
+我不打算把它全部删除
+I'm actually not going to delete all of it
+
+376
+00:18:50,466 --> 00:18:51,966
+因为我需要复制一部分
+because I'll need copy parts of it
+
+377
+00:18:52,133 --> 00:18:53,933
+写一个VertexBuffer vb()
+I'll try a VertexBuffer vb
+
+378
+00:18:54,366 --> 00:19:00,133
+我们把这个作为size, 然后把positions作为data
+we're going to write this as the size, and then positions as the data
+
+379
+00:19:00,366 --> 00:19:04,133
+那么就是positions和那个size, 好了, 漂亮
+so positions and then that size, there we go, beautiful
+
+380
+00:19:05,133 --> 00:19:07,800
+现在我们在这里自动绑定它了
+now we actually bind it automatically here
+
+381
+00:19:07,800 --> 00:19:09,800
+如果我们看一下我们写的代码中的顶点缓冲区
+if we look at the vertex buffer in the code we actually wrote
+
+382
+00:19:09,800 --> 00:19:10,766
+我们从未解绑它
+we never unbind it
+
+383
+00:19:10,766 --> 00:19:11,700
+我们让它保持绑定
+we just leave it bound
+
+384
+00:19:12,050 --> 00:19:14,566
+理论上我们不需要调用vb.Unbind()
+so theoretically we don't need to call vb Unbind
+
+385
+00:19:14,700 --> 00:19:17,433
+在我们这样做之后, 因为它已经被绑定了
+after we do this, because it will already be bound
+
+386
+00:19:18,733 --> 00:19:21,500
+但很明显, 如果我们有多个, 比如我们创建一些像这样的
+but obviously if we have multiple like if we create a few like this
+
+387
+00:19:21,500 --> 00:19:23,766
+我们必须重新绑定我们想要使用的那些
+we'll have to rebind the ones that we want to use
+
+388
+00:19:24,733 --> 00:19:26,825
+但这将由顶点数组来处理
+but that'll be handled by the vertex array
+
+389
+00:19:26,825 --> 00:19:29,766
+无论如何, 因为顶点数组是与顶点缓冲区相关联的
+anyway, since the vertex array is associated with a vertex buffer
+
+390
+00:19:29,766 --> 00:19:32,333
+当我们开始跟踪抽象顶点数组时
+and when we start up track abstracting the vertex array
+
+391
+00:19:32,500 --> 00:19:34,300
+我们会看到那个是如何处理的, 好了
+we will see how that works, okay
+
+392
+00:19:34,300 --> 00:19:37,066
+那么回到这里, 我们会对索引缓冲区做同样的事情
+so back here, we're gonna do the same thing for index buffer
+
+393
+00:19:37,066 --> 00:19:41,366
+那么IndexBuffer ib(), indices就是实际的缓冲区
+so IndexBuffer ib, indices is the actual buffer
+
+394
+00:19:41,366 --> 00:19:41,369
+然后代替6*sizeof(unsigned int), 我们只需要写6
+and then instead of six times sizeof unsigned int, we just need to write six
+so IndexBuffer ib, indices is the actual buffer
+
+395
+00:19:41,369 --> 00:19:45,475
+然后代替6*sizeof(unsigned int), 我们只需要写6
+and then instead of six times sizeof unsigned int, we just need to write six
+
+396
+00:19:45,475 --> 00:19:49,366
+因为我们知道提供的是无符号整数, 好了, 很好
+because we know we're supplying unsigned ints, okay, beautiful
+
+397
+00:19:49,366 --> 00:19:50,466
+把那些也都去掉
+get rid of all that as well
+
+398
+00:19:50,500 --> 00:19:53,725
+这里只剩下实际的顶点数组了
+the only thing we leave here is the actual vertex array stuff, right
+
+399
+00:19:53,725 --> 00:19:55,600
+顶点缓冲区布局之类的东西
+the vertex kind of buffer layout stuff
+
+400
+00:19:56,700 --> 00:19:58,566
+但除此之外, 那就是我们现在需要的
+but other than that, that's really all we need now
+
+401
+00:19:58,566 --> 00:20:02,500
+最后, 不把它绑定在这里, 我们只写vb.Bind()
+finally instead of binding this here, we just write vb.Bind
+
+402
+00:20:03,700 --> 00:20:08,533
+然后绘制元素, 理论上你可以把它放到索引缓冲区中
+and then draw elements is something that you could theoretically put into your index buffer
+
+403
+00:20:10,000 --> 00:20:14,566
+问题是, 就像通常的工作方式一样, 你会
+the thing is, like the way that this usually works is that you will
+
+404
+00:20:14,600 --> 00:20:18,566
+比如你有一个复杂的3D模型, 比如宇宙飞船, 对吧
+like if you have a complex 3D model, like a spaceship, right
+
+405
+00:20:18,733 --> 00:20:21,966
+你可能会有一个顶点缓冲区
+you will probably have a vertex buffer
+
+406
+00:20:21,966 --> 00:20:24,666
+它包含了飞船的每个顶点
+that just contains every single vertex of that spaceship
+
+407
+00:20:24,666 --> 00:20:26,333
+那可能是相当大的
+and that might be like fairly big
+
+408
+00:20:26,633 --> 00:20:31,533
+但是你可能会有几个索引缓冲区, 它们会绘制出飞船的一部分
+but then you may have several index buffers, that draws parts of that ship
+
+409
+00:20:31,833 --> 00:20:38,033
+因为机翼的材料可能与实际的玻璃座舱不同
+because the wings will probably be a different material than the actual glass cockpit, right
+
+410
+00:20:38,166 --> 00:20:41,600
+所以当你画驾驶舱窗户的时候
+so the cockpit glass when you draw the cockpit windows
+
+411
+00:20:42,133 --> 00:20:43,900
+可能是一种玻璃材料
+there'll probably be like a glass material
+
+412
+00:20:44,100 --> 00:20:46,133
+而机翼可能是金属材料
+whereas the wings might be a metal material
+
+413
+00:20:46,133 --> 00:20:48,925
+所以你必须将它们分成两个不同的绘制调用
+so you'll have to split them up into two different draw calls
+
+414
+00:20:48,925 --> 00:20:52,133
+通常的方法是你有一个索引缓冲区
+and the way that you'll usually do that is you'll have an index buffer
+
+415
+00:20:52,200 --> 00:20:53,666
+只绘制机翼
+that just draws the wings
+
+416
+00:20:53,700 --> 00:21:00,033
+还有一个索引缓冲可以绘制真正的玻璃, 比如驾驶舱玻璃之类的东西
+and an index buffer that just draws the actual glass, like cockpit glass and all that stuff
+
+417
+00:21:00,200 --> 00:21:01,575
+我们以后会详细讨论那个
+and we'll definitely talk more about that
+
+418
+00:21:01,575 --> 00:21:04,425
+当我们开始加载3D模型并开始渲染真实的东西时
+when we start loading 3D models and start rendering stuff for reals
+
+419
+00:21:04,800 --> 00:21:07,233
+但那只是一个基本的例子, 正因为如此
+but that's just a basic example, and so because of that
+
+420
+00:21:07,266 --> 00:21:09,033
+你仍然有一个顶点缓冲区
+you still have the one vertex buffer
+
+421
+00:21:09,100 --> 00:21:13,866
+然后你有几个索引缓冲区, 它们被索引到顶点缓冲区中
+and then you have several index buffers, that are just indexed into that vertex buffer
+
+422
+00:21:14,100 --> 00:21:15,525
+你能做的就是
+and so what you could do is
+
+423
+00:21:15,525 --> 00:21:20,200
+把你的绘制, 你的元素绘制,  你实际的绘制调用绑定到你的索引缓冲区
+you could tie your drawer, your drawer elements, your actual draw call to your index buffer
+
+424
+00:21:20,825 --> 00:21:25,200
+因为从理论上讲, 索引缓冲区是这样的, 那就像, 好吧
+because theoretically the index buffer is kind of the thing, that's like, okay
+
+425
+00:21:25,475 --> 00:21:29,166
+我把它绘制成, 像从这个偏移量开始的这些索引
+I'm going to draw the, like this many indices starting at this offset
+
+426
+00:21:29,166 --> 00:21:30,233
+诸如此类的东西
+and all that kind of stuff
+
+427
+00:21:30,766 --> 00:21:32,366
+我们实际不打算那么做
+we're not actually going to do that
+
+428
+00:21:33,266 --> 00:21:36,033
+因为我们会让渲染器来处理实际的绘制调用
+because we're going to let the renderer take care of the actual draw call
+
+429
+00:21:36,166 --> 00:21:39,066
+当我们扩展渲染器类实际上会接收
+so when we extend our renderer class to actually take in
+
+430
+00:21:39,066 --> 00:21:41,100
+你知道, 就像, 我想画点什么
+you know, like, I want to draw something
+
+431
+00:21:41,466 --> 00:21:44,566
+我给你提供了一个顶点缓冲和索引缓冲以及材质, 所有这些东西
+I'm supplying you with a vertex buffer and index buffer and material, all that stuff
+
+432
+00:21:44,733 --> 00:21:47,033
+它只会查看索引缓冲区, 然后问它
+it will just look at the index buffer, and ask it
+
+433
+00:21:47,200 --> 00:21:50,033
+count是多少, 然后自身发出DrawCall指令
+what the count is, and then issue the DrawCall itself
+
+434
+00:21:50,333 --> 00:21:51,066
+所以那就像
+so that's just like
+
+435
+00:21:51,066 --> 00:21:54,733
+如果你关心为什么我不把绘制元素放到索引缓冲区
+if you're concerned about why I'm not putting draw elements into the index buffer
+
+436
+00:21:54,733 --> 00:21:55,533
+你就会看到之前那样
+and you've seen that before
+
+437
+00:21:55,533 --> 00:21:59,000
+这就是为什么, 因为我会让渲染器类来处理这个
+that's why, because I'm actually just gonna let the renderer class take care of that
+
+438
+00:21:59,100 --> 00:22:03,733
+好了, 酷, 如果我们按f5, 来验证我们的代码是否还能运行
+okay, cool, so if we hit f5, just now to verify that our code actually still works
+
+439
+00:22:03,733 --> 00:22:04,600
+因为那是很重要的
+because that's important
+
+440
+00:22:05,466 --> 00:22:07,750
+你可以看到, 现在一切都很好
+you can see it does and everything's great now
+
+441
+00:22:07,750 --> 00:22:10,866
+给你个小提示, 我已经准备好了一个小提示
+quick little tip here, I'm already a tip of thought
+
+442
+00:22:10,966 --> 00:22:14,666
+如果我们关闭这个, 你会看到我们的应用不会终止
+if we close this, you can see our application doesn't terminate
+
+443
+00:22:14,933 --> 00:22:18,350
+如果我们点击暂停，暂停调试器，看看发生了什么
+and if we hit pause over here, to just pause the debugger, and see what's up
+
+444
+00:22:18,633 --> 00:22:20,300
+你可以看到一些GLClearError
+you can see some GLClearError
+
+445
+00:22:20,433 --> 00:22:22,900
+让我们看看核心堆栈, 看看这里发生了什么
+let's look at the core stack and see what's going on here 
+
+446
+00:22:22,900 --> 00:22:26,700
+所以我们调用GLClearError, 它看起来像一个无限循环
+so we're calling GLClearError, it looks like it's an infinite loop
+
+447
+00:22:27,033 --> 00:22:29,166
+它来自IndexBuffer析构方法
+and it's coming from IndexBuffer destructor
+
+448
+00:22:29,433 --> 00:22:30,466
+来自主函数
+which is coming from main
+
+449
+00:22:30,866 --> 00:22:34,600
+这是因为它试图清理所有堆栈分配的对象
+that's because it's trying to clean up all of our stack allocated objects
+
+450
+00:22:34,600 --> 00:22:37,933
+否则这个索引缓冲区, 它会试图清理
+and otherwise this index buffer, it's trying to clean that up
+
+451
+00:22:38,233 --> 00:22:41,333
+现在的问题是
+now the thing with this is that
+
+452
+00:22:41,733 --> 00:22:44,433
+你可以看到这是一个堆栈分配的对象
+you can see that this is a stack allocated object
+
+453
+00:22:44,533 --> 00:22:46,966
+因此, 它的析构方法在作用域退出时被调用
+so its destructor is called when the scope exits
+
+454
+00:22:46,966 --> 00:22:49,333
+也就是主函数的末尾
+which is of course at the end of this main function
+
+455
+00:22:49,566 --> 00:22:55,000
+然而我们调用glfwTerminal会破坏之前的OpenGL上下文
+however we call glfwTerminal which destroys our OpenGL context before that
+
+456
+00:22:55,275 --> 00:22:56,475
+所以实际发生的是
+so what's actually happening is
+
+457
+00:22:56,475 --> 00:23:02,233
+我们现在不再有一个有效的OpenGL上下文和GLCheckError
+we now no longer have an OpenGL a valid OpenGL context and GLCheckError
+
+458
+00:23:02,666 --> 00:23:07,266
+信不信由你, 如果没有上下文, 我们会返回一个OpenGL错误
+believe it or not, we'll return an OpenGL error, if there is no context
+
+459
+00:23:07,266 --> 00:23:10,966
+这就是为什么我认为OpenGL比较搞笑的原因之一
+this is why one of the reasons why I think OpenGL is just comedy
+
+460
+00:23:11,300 --> 00:23:14,833
+但是, 是的, 检查错误函数将返回一个错误
+but, yes, the check error function will return an error
+
+461
+00:23:14,833 --> 00:23:16,700
+如果没有有效的OpenGL上下文
+if there's no valid OpenGL context
+
+462
+00:23:16,733 --> 00:23:20,800
+因为OpenGL本身告诉你, 你应该在循环中运行这个
+and since OpenGL itself tells you, hey, you should be running this in a loop
+
+463
+00:23:21,650 --> 00:23:25,300
+每次调用它, 它都会返回一个错误, 所以这是一个无限循环
+every time you call it, it'll return an error, so it's an infinite loop
+
+464
+00:23:26,333 --> 00:23:29,533
+要解决这个问题, 你可以做的一件事就是从堆分配
+so one thing you could do to fix this is of course heap allocate
+
+465
+00:23:29,733 --> 00:23:31,500
+你实际的顶点数组
+your actual vertex array which you
+
+466
+00:23:32,500 --> 00:23:34,333
+抱歉, 是你的顶点缓冲区和索引缓冲区
+sorry, your vertex buffer and your index buffer
+
+467
+00:23:34,333 --> 00:23:35,266
+然后删除它
+and then deleted it
+
+468
+00:23:35,266 --> 00:23:37,890
+在你的glfw结束之前, 这可能是你应该做的
+before your glfw end of your turn now which is what you probably should do 
+
+469
+00:23:37,890 --> 00:23:41,433
+不管怎样, 实际上, 很少看到它们被很好地分配到栈上
+anyway, it's very rare to see them actually be stack allocated well
+
+470
+00:23:43,066 --> 00:23:46,400
+是的, 可能很少看到它们被分配堆栈
+yeah, it's probably rare to see them be stack allocated, anyway
+
+471
+00:23:47,133 --> 00:23:51,700
+所以, 我们在这里实际上可以做的, 从技术上来说
+so, what we can do here is actually well, technically speaking
+
+472
+00:23:51,700 --> 00:23:54,966
+我们可以创建这些指针, 然后使用new分配它们
+we could just make these pointers, and allocate them using new
+
+473
+00:23:55,133 --> 00:24:01,466
+然后显式地删除它们, 就像这里, 在我们使用glfwTerminate之前
+and then delete them explicitly like over here, right, so before we glfwTerminate
+
+474
+00:24:01,466 --> 00:24:02,600
+这样我们的问题就解决了
+and that would fix our problem
+
+475
+00:24:02,866 --> 00:24:05,000
+然而, 这是一种独特的情况
+however, this is kind of a unique case
+
+476
+00:24:05,000 --> 00:24:09,766
+因为我们实际上是在主函数作用域中创建顶点缓冲区, 这是非常罕见的
+because we're actually making vertex buffers in the main function scope, which is very rare
+
+477
+00:24:09,866 --> 00:24:12,766
+我们可以做的另一件事就是创建一个新的作用域
+another thing we could do obviously just create a new scope
+
+478
+00:24:13,066 --> 00:24:14,766
+所以这也是一种解决方法
+so here's one way to fix it
+
+479
+00:24:15,933 --> 00:24:18,966
+我要在这个positions周围创建一个作用域
+I'm going to make a scope around this positions thing here
+
+480
+00:24:19,400 --> 00:24:21,600
+只是把所有东西最小化
+and have it whoops just minimize everything
+
+481
+00:24:21,766 --> 00:24:24,500
+我要在就像这个positions之前创建作用域
+I'm going to create scope around like just before this positions thing
+
+482
+00:24:24,566 --> 00:24:28,666
+然后像这样结束, 像这样, 好了
+and then have it end like over here like that, okay
+
+483
+00:24:28,900 --> 00:24:31,800
+所以有点看不清楚, 但如果我把它缩小, 可能会更容易看清楚
+so it's a bit hard to see, but if I zoom out, maybe it'll be easier to see
+
+484
+00:24:32,900 --> 00:24:34,500
+尽管文本非常小, 你可以看到
+even though the text is really tiny, you can see
+
+485
+00:24:34,500 --> 00:24:38,066
+我在这里做了一个作用域, 它在这里结束
+I've made a scope over here and it ends kind of over here, right
+
+486
+00:24:38,333 --> 00:24:40,133
+所以理论上它应该包含所有的东西
+so theoretically that should contain everything
+
+487
+00:24:40,200 --> 00:24:42,600
+那么如果我现在按f5运行我的代码
+so if I just hit f5 to run my code now
+
+488
+00:24:42,933 --> 00:24:44,733
+希望没有变量在作用域外面
+hopefully we haven't got any variables outside
+
+489
+00:24:44,733 --> 00:24:47,866
+好了, 编译正常, 所以现在一切都在运行
+okay, I'm good at compiles, so everything's running now
+
+490
+00:24:49,000 --> 00:24:53,300
+然后点击关闭, 你会看到应用实际上终止了
+and then if I hit close, you can see the application actually terminates
+
+491
+00:24:53,300 --> 00:24:56,366
+这只是我想说的一个小问题, 只是为了解决这个问题
+that was just the quick little thing I wanted to throw in, just to fix that
+
+492
+00:24:56,366 --> 00:24:59,466
+因为当我们关闭它时, 这有点烦人, 它实际上没有终止
+because that was a bit annoying when we closed it, and it didn't actually terminate
+
+493
+00:24:59,600 --> 00:25:02,533
+所以我们不得不终止一个第三方VS, 这很烦人
+so we had to terminate a three visual studio which is annoying
+
+494
+00:25:03,400 --> 00:25:04,936
+但不管如何, 就是这样
+but, anyway, that's it
+
+495
+00:25:04,936 --> 00:25:08,366
+那么我们抽象了顶点缓冲区和索引缓冲区类
+so, we've abstracted the vertex buffer and the index buffer class
+
+496
+00:25:08,366 --> 00:25:12,333
+我认为这一期相当随意, 可能讲得很快
+I think this episode was fairly casual, probably talked pretty quickly
+
+497
+00:25:12,500 --> 00:25:14,766
+但那是因为这个东西真的很简单
+but that's because this stuff is really straightforward
+
+498
+00:25:14,766 --> 00:25:16,966
+我希望你能理解我所做的一切
+and I hope you understood everything that I did
+
+499
+00:25:17,333 --> 00:25:18,733
+这里也有一些随机的想法
+there were some random thoughts here as well
+
+500
+00:25:18,733 --> 00:25:22,466
+如果你喜欢这个视频, 就点个赞, 让我知道你对它的看法
+let me know what you thought of the video by just dropping a like, if you liked it
+
+501
+00:25:22,666 --> 00:25:25,500
+然后留下评论, 就像这样
+and leaving a comment,  and like just being like
+
+502
+00:25:25,500 --> 00:25:26,900
+伙计, 这太可怕了
+hey, man, this was like terrible
+
+503
+00:25:26,900 --> 00:25:28,950
+你应该停止在YouTube上的这一切, 这可能不会
+you should stop this whole YouTube thing, which probably wouldn't be 
+
+504
+00:25:28,950 --> 00:25:32,666
+不管怎样, 下次, 我们会抽象着色器类
+anyway, next time, we're going to abstruct the shader class
+
+505
+00:25:32,966 --> 00:25:36,166
+我知道, 我们会先做顶点数组类, 还有着色器类
+I actually know, we're gonna do the vertex array class first, and the shader class
+
+506
+00:25:36,300 --> 00:25:37,466
+然后可能是渲染器
+and then probably the renderer
+
+507
+00:25:38,133 --> 00:25:39,800
+你们喜欢我的这些视频
+you guys like these videos of mine
+
+508
+00:25:39,800 --> 00:25:44,133
+你想要支持我在YouTube上做的c++系列和OpenGL系列
+and you want to support what I do here on YouTube with c++ series and OpenGL series
+
+509
+00:25:44,133 --> 00:25:47,266
+还有即将到来的游戏引擎系列
+and the soon to come game engine series which is actually coming very soon
+
+510
+00:25:47,266 --> 00:25:51,766
+顺便说一句, 然后你可以直接去patreon.com/TheCherno
+by the way, then you can head on over to patreon.com/TheCherno
+
+511
+00:25:51,966 --> 00:25:56,666
+帮助支持这个系列以及我所做的一切
+and contribute to helping support this series and everything that I do
+
+512
+00:25:56,666 --> 00:25:57,766
+你会得到一些很酷的奖励
+and you'll get some cool rewards
+
+513
+00:25:57,766 --> 00:26:01,566
+我们将有每周, 抱歉, 每月的伙伴聚会
+we're about to have the weekly partner, sorry, the monthly partner hang-out
+
+514
+00:26:01,566 --> 00:26:04,266
+我想这周我们基本上就会有聚会
+and I think this week actually, well we basically just hang-out
+
+515
+00:26:04,433 --> 00:26:09,766
+我们谈论的都是合作伙伴级别的赞助人
+and we talk like, all of the partner level tier patron patrons thing we hang-out
+
+516
+00:26:10,366 --> 00:26:12,400
+然后我们就聊了一个小时
+and we just talk about stuff for like an hour
+
+517
+00:26:12,400 --> 00:26:13,400
+那应该很有趣
+that should be pretty fun
+
+518
+00:26:13,733 --> 00:26:14,700
+还有其他一些很酷的奖励
+there's some other cool rewards
+
+519
+00:26:14,700 --> 00:26:18,266
+比如一期接一期地访问所有的源代码
+such as access to all of this source code kind of episode by episode
+
+520
+00:26:19,066 --> 00:26:20,300
+emmm...对
+um yeah
+
+521
+00:26:20,366 --> 00:26:21,100
+非常感谢你们
+thank you huge
+
+522
+00:26:21,100 --> 00:26:23,266
+再次感谢所有的赞助人
+thank you again to all the patrons
+
+523
+00:26:23,266 --> 00:26:24,833
+因为没有他们, 就没有这个系列
+because this series would not be here without them
+
+524
+00:26:25,233 --> 00:26:28,533
+下次见, 拜
+and I will see you next time, goodbye
+

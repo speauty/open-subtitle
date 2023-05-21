@@ -1,0 +1,2675 @@
+﻿1
+00:00:00,133 --> 00:00:00,933
+大家好
+hey, every guys
+
+2
+00:00:00,933 --> 00:00:03,766
+我是Cherno, 欢迎回到我的OpenGL系列教程
+my name is Cherno and welcome back to my OpenGL series
+
+3
+00:00:03,800 --> 00:00:05,056
+那么，上次，我们设置了
+so，last time，we set up
+
+4
+00:00:05,066 --> 00:00:07,733
+一个创建OpenGL窗口和上下文的GLFW库
+an OpenGL windowing and context library called GLFW
+
+5
+00:00:07,733 --> 00:00:08,233
+基本上
+which basically
+
+6
+00:00:08,233 --> 00:00:10,070
+只是让我们认为有创建跨平台窗口的能力
+just gave us the ability to credit cross-platform window
+
+7
+00:00:10,070 --> 00:00:12,800
+以及为OpenGL初始化一个图形上下文
+and initialized a graphics context for OpenGL where
+
+8
+00:00:12,800 --> 00:00:14,533
+就是我们所有绘制的地方
+we could do all about drawing
+
+9
+00:00:14,533 --> 00:00:15,866
+如果你还没看那集视频
+if you haven't seen that video yet
+
+10
+00:00:15,866 --> 00:00:16,800
+你可一定要去看看
+make sure you check it out
+
+11
+00:00:16,800 --> 00:00:18,766
+因为那对这集视频还是挺重要
+because it's gonna be important for this video here
+
+12
+00:00:18,766 --> 00:00:20,550
+在屏幕上，我们已经得到了一个三角形
+and we even got a triangle onto the screen
+
+13
+00:00:20,550 --> 00:00:22,166
+并且一切看起来都没什么问题
+and everything looked like it was working properly
+
+14
+00:00:22,166 --> 00:00:23,733
+的确如此
+and well it was
+
+15
+00:00:23,900 --> 00:00:26,675
+然而，你可能已经注意到了，上集
+however what you might have noticed in the previous video is that
+
+16
+00:00:26,675 --> 00:00:29,724
+实际上，我们链接了opengl32.lib
+we actually linked something called opengl32.lib
+
+17
+00:00:29,724 --> 00:00:32,348
+并且我们最终用的头文件
+and the header of files that we actually ended up using for
+
+18
+00:00:32,348 --> 00:00:35,292
+特别是隐藏OpenGL函数的头文件
+sophistic specifically for OpenGL functions
+
+19
+00:00:35,292 --> 00:00:37,966
+基本上，我们使用的GLFW提供了
+we're basically the ones that either GLFW provided which
+
+20
+00:00:38,000 --> 00:00:39,933
+依次调整Windows图形
+in turn adjust the Windows ones
+
+21
+00:00:40,166 --> 00:00:42,500
+不过现在，Windows已经有了一个图形接口
+now,Windows has a graphics api already
+
+22
+00:00:42,566 --> 00:00:44,300
+它叫DirectX
+it's called DirectX or Direct3D
+
+23
+00:00:44,300 --> 00:00:45,833
+或者是更具体一点的Direct3D
+or Direct3D to be a little bit more specific
+
+24
+00:00:46,325 --> 00:00:47,766
+这就是Windows所使用的
+that's what Windows uses
+
+25
+00:00:47,800 --> 00:00:50,333
+这就是你该使用的
+that's what you should kind of be using
+
+26
+00:00:50,333 --> 00:00:51,200
+根据微软的说法
+according to Microsoft
+
+27
+00:00:51,200 --> 00:00:53,525
+这就是你在Windows上绘图应该使用的图形接口
+that's what you should be using to do graphics on Windows
+
+28
+00:00:53,525 --> 00:00:54,266
+并且这是有一定道理的
+and it makes sense
+
+29
+00:00:54,266 --> 00:00:56,333
+并且就我个人而言，对于一个
+and me personally for a
+
+30
+00:00:56,333 --> 00:00:57,400
+对于开发一个真实的游戏
+for a real kind of game
+
+31
+00:00:57,400 --> 00:00:59,533
+对于开发一个游戏引擎的实际项目
+for a real project for a game engine
+
+32
+00:00:59,566 --> 00:01:01,575
+在Windows上，我可能会用Direct3D来渲染
+I would be using Direct3D to render on Windows
+
+33
+00:01:01,575 --> 00:01:03,214
+因为这是平台原生的图形接口
+because that's what's native to the platform
+
+34
+00:01:03,214 --> 00:01:04,566
+这也是你应该用的图形接口
+that's what you kind of should be using
+
+35
+00:01:04,925 --> 00:01:06,233
+至于OpenGL，请记住
+OpenGL, though, remember
+
+36
+00:01:06,333 --> 00:01:08,666
+不是由Windows决定的
+is not kind of up to Windows to decide
+
+37
+00:01:08,966 --> 00:01:10,033
+如果有的话
+if that's a thing or not
+
+38
+00:01:10,033 --> 00:01:12,100
+它取决于我们显卡的制造商
+it's up to our GPU manufacturers
+
+39
+00:01:12,100 --> 00:01:13,866
+取决于显卡的驱动
+it's up to the GPU drivers
+
+40
+00:01:13,866 --> 00:01:17,733
+并且，来自NVIDIA和AMD以及Intel的显卡驱动
+and, and, and the GPU drivers from NVIDIA and AMD and Intel
+
+41
+00:01:17,733 --> 00:01:20,366
+它们都支持OpenGL作为渲染接口
+they all support OpenGL as a rendering api
+
+42
+00:01:20,933 --> 00:01:22,233
+所以，我们现在需要做的
+so, what we need to do now
+
+43
+00:01:22,400 --> 00:01:24,266
+并不是真的那么依赖Windows
+is not really rely on windows
+
+44
+00:01:24,266 --> 00:01:26,633
+它们只是OpenGL的头文件
+and they're kind of OpenGL header files which
+
+45
+00:01:26,633 --> 00:01:28,900
+只到OpenGL 1.1的版本
+only go up to OpenGL 1.1
+
+46
+00:01:28,933 --> 00:01:31,177
+那是OpenGL的最后一个版本
+which is kind of the last version of OpenGL
+
+47
+00:01:31,177 --> 00:01:33,333
+那也是第一个版本
+which is also kind of the first version
+
+48
+00:01:33,333 --> 00:01:34,900
+1.0有点奇怪
+1.0 was kind of a bit weird
+
+49
+00:01:34,900 --> 00:01:35,933
+我们一般不讨论它
+we don't talk about that
+
+50
+00:01:36,033 --> 00:01:38,300
+1.1，OpenGL 1.1是最后一个
+1.1, OpenGL 1.1 was kind of the last
+
+51
+00:01:38,300 --> 00:01:40,766
+也是OpenGL第一个实际的版本
+the...the first real version of OpenGL
+
+52
+00:01:41,033 --> 00:01:41,833
+但是
+and that
+
+53
+00:01:42,366 --> 00:01:44,000
+关于这个，我们就说到这里吧
+that's as far as we discuss with it
+
+54
+00:01:44,200 --> 00:01:45,533
+所以，当我们在Windows上
+so, since we're on windows
+
+55
+00:01:45,800 --> 00:01:48,333
+实际上，我需要一种方法去得到
+we need a way to actually get
+
+56
+00:01:48,533 --> 00:01:50,057
+所有现代OpenGL的函数
+all of the modern OpenGL functions
+
+57
+00:01:50,057 --> 00:01:51,633
+不不不，我甚至不是在说现代OpenGL
+not even, I'm not even talking about modern ones
+
+58
+00:01:51,633 --> 00:01:52,433
+我只是在说
+I'm just talking about
+
+59
+00:01:52,600 --> 00:01:55,300
+1997年以后的新东西，懂了吧
+anything newer than like 1997, right
+
+60
+00:01:55,300 --> 00:01:56,200
+一个接一个的OpenGL函数
+OpenGL one by one
+
+61
+00:01:56,200 --> 00:01:57,933
+在那(1997)之后的一切
+anything anything newer than that
+
+62
+00:01:58,066 --> 00:02:00,400
+实际上，如果我们需要调用这些函数
+if we want to actually call those functions
+
+63
+00:02:00,400 --> 00:02:01,400
+现在你们说的是c++代码
+you now say c++ code
+
+64
+00:02:01,766 --> 00:02:03,800
+我们需要从一些地方得到那些函数
+we need to get them from somewhere
+
+65
+00:02:03,933 --> 00:02:06,066
+并且，我注意到在“欢迎来到OpenGL”的视频
+and as I mentioned in the welcome to OpenGL video
+
+66
+00:02:06,066 --> 00:02:07,400
+就是第一个链接那里的视频
+which was the first one get linking up there
+
+67
+00:02:07,400 --> 00:02:10,066
+OpenGL函数…
+OpenGL functions
+
+68
+00:02:10,266 --> 00:02:11,833
+它不是你真正下载的一些东西
+it's not something you download really
+
+69
+00:02:12,033 --> 00:02:14,933
+实际上，它是你显卡驱动中一种东西
+it's stuff that is actually in your graphics drivers
+
+70
+00:02:15,400 --> 00:02:18,766
+OpenGL函数是在你的显卡驱动中被实现的
+the OpenGL functions are implemented in your GPU drivers
+
+71
+00:02:19,000 --> 00:02:20,776
+那么，我们现在需要做的就是
+so, what we need to do now is
+
+72
+00:02:20,776 --> 00:02:23,000
+为了去使用这些功能
+in order to use any kind of functionality
+
+73
+00:02:23,066 --> 00:02:25,433
+在OpenGL 1.1版本中比较新的那些
+that is newer, that OpenGL 1.1
+
+74
+00:02:25,800 --> 00:02:28,633
+实际上，我们需要去访问这些驱动
+we need to actually get into those drivers
+
+75
+00:02:28,900 --> 00:02:30,866
+取出函数，并且调用它们
+pull out the functions and call them
+
+76
+00:02:30,966 --> 00:02:32,466
+那我说取出这些函数到底是什么呢
+now what I say pull out the functions
+
+77
+00:02:32,466 --> 00:02:34,466
+并不是我字面上说的把函数取出来
+I don't literally mean pull out the functions
+
+78
+00:02:34,533 --> 00:02:35,966
+我们实际上需要做的
+what we actually need to do
+
+79
+00:02:36,166 --> 00:02:38,666
+基本上就是得到函数声明
+is basically just get the function declarations
+
+80
+00:02:38,666 --> 00:02:40,666
+然后把链接到对应的函数上
+and then link against the functions as well
+
+81
+00:02:41,100 --> 00:02:44,066
+所以，我们需要访问驱动的动态链接库文件
+so we need to access the driver dll files
+
+82
+00:02:44,466 --> 00:02:49,700
+然后只检索库里面那些函数的函数指针
+and just retrieve function pointers to the functions inside those libraries
+
+83
+00:02:49,833 --> 00:02:51,369
+这就是我们需要做的
+that's what we need to do
+
+84
+00:02:51,369 --> 00:02:52,900
+现在，OpenGL
+now, OpenGL
+
+85
+00:02:53,566 --> 00:02:56,733
+经过了1.1版本，基本上都是现代OpenGL了
+passed 1.1, so basically modern OpenGL and all of that
+
+86
+00:02:57,100 --> 00:02:58,533
+有许多函数
+there are a lot of functions
+
+87
+00:02:58,533 --> 00:03:00,366
+确实有许多函数
+there are a lot of functions
+
+88
+00:03:00,400 --> 00:03:02,833
+所以理论上来说，我们可以动手做这个
+so whilst we could theoretically do this manually
+
+89
+00:03:03,366 --> 00:03:04,633
+但它有一点儿问题
+there are a few problems with that
+
+90
+00:03:05,033 --> 00:03:05,833
+首先
+first of all
+
+91
+00:03:06,466 --> 00:03:08,000
+它不可能是跨平台的
+it would not be cross-platform
+
+92
+00:03:08,333 --> 00:03:09,800
+所以，总的来说
+so, to basically
+
+93
+00:03:09,933 --> 00:03:12,301
+访问显卡驱动并从中取出这些函数
+access the drivers and pull out functions from that
+
+94
+00:03:12,301 --> 00:03:14,966
+我们需要使用一些Win32接口调用
+we need to use some Win32 api calls
+
+95
+00:03:14,966 --> 00:03:16,200
+当我们在Windows上的时候，对吧
+if we're on Windows right
+
+96
+00:03:16,433 --> 00:03:18,366
+载入库，然后载入函数指针等等
+load library and load function pointers to all that
+
+97
+00:03:18,900 --> 00:03:19,833
+但这并不太好
+that's not great
+
+98
+00:03:20,125 --> 00:03:21,900
+因为它只能在Windows上用
+because it's gonna be Windows only
+
+99
+00:03:21,900 --> 00:03:23,066
+其次，第二个问题是
+and then the second problem is
+
+100
+00:03:23,166 --> 00:03:23,966
+如果是…
+if there are like
+
+101
+00:03:24,166 --> 00:03:24,766
+我也不知道
+I don't know
+
+102
+00:03:24,766 --> 00:03:26,800
+超过1K个函数或之类的一些事情
+over 1000 functions or something like that
+
+103
+00:03:26,933 --> 00:03:28,200
+那么我们需要手动完成所有这些操作
+then we need to go through all of the manually
+
+104
+00:03:28,200 --> 00:03:29,800
+并且为它们写代码
+and write code for that
+
+105
+00:03:29,800 --> 00:03:32,936
+那将是一个糟糕的计划
+that's gonna just be a terrible plan
+
+106
+00:03:32,936 --> 00:03:34,133
+这一点都不好玩
+it's just not gonna be fun at all
+
+107
+00:03:34,366 --> 00:03:35,666
+所以，我们现在做的就是
+so what we're gonna do now is
+
+108
+00:03:35,666 --> 00:03:37,733
+我们实际上需要使用另一个库
+we're actually gonna use another library
+
+109
+00:03:37,866 --> 00:03:39,266
+现在这儿有一些库
+now there are a few libraries
+
+110
+00:03:39,400 --> 00:03:40,800
+确实能帮你做这些
+that actually do this for you
+
+111
+00:03:40,800 --> 00:03:42,528
+但是，我只想让你们这些家伙明白
+but, i just want you guys to  understand
+
+112
+00:03:42,528 --> 00:03:44,433
+这个库(GLEW)到底是如何运行的
+that what this library actually does
+
+113
+00:03:44,675 --> 00:03:46,100
+其实很简单的
+is actually really straightforward
+
+114
+00:03:46,100 --> 00:03:48,200
+你自己可以去看看这个库的源码
+and you can look at the source code for this library for yourself
+
+115
+00:03:48,200 --> 00:03:49,800
+如果你需要就去看看它是如何运行的，如果你喜欢的话
+and see what it does if you want, if you like
+
+116
+00:03:49,800 --> 00:03:52,133
+但基本上，它能做的就是为你提供
+but basically all it does is it provides
+
+117
+00:03:52,133 --> 00:03:54,309
+OpenGL接口规范 
+the OpenGL api specification
+
+118
+00:03:54,309 --> 00:03:58,066
+各种函数声明，符号声明和常量
+kind of function declarations and symbol declarations and constants
+
+119
+00:03:58,066 --> 00:03:59,166
+诸如此类的东西
+and all that stuff
+
+120
+00:03:59,400 --> 00:04:00,700
+在一个头文件各种
+for you in a header of file
+
+121
+00:04:00,900 --> 00:04:04,484
+然后这种背后的文件
+and then the kind of the behind-the-scenes file 
+
+122
+00:04:04,484 --> 00:04:07,866
+这种场景的C++文件，我认为它是安全的文件
+the cpp file on this scenes, I think it' about safe file
+
+123
+00:04:08,066 --> 00:04:10,033
+这个库的实际实现
+the actual implementation of the library
+
+124
+00:04:10,600 --> 00:04:14,133
+就是进入EDI，在你使用的显卡驱动签名中
+goes into your EDI, it identifies what graphics drivers you're using
+
+125
+00:04:14,300 --> 00:04:16,000
+查找对应的动态链接文件
+finds the appropriate dll file
+
+126
+00:04:16,033 --> 00:04:18,100
+然后载入所有这些函数指针
+and then loads all of the function pointers
+
+127
+00:04:18,233 --> 00:04:19,833
+这就是它所能做的
+that's what it does that's all it does
+
+128
+00:04:19,833 --> 00:04:21,933
+它非常非常无聊，一点儿也不神奇
+it's very very boring, it's not magical at all
+
+129
+00:04:21,933 --> 00:04:24,941
+不要认为这些库实现了一些函数或其他东西
+don't think that these libraries implement the functions or anything
+
+130
+00:04:24,941 --> 00:04:25,666
+它们并没有
+they don't
+
+131
+00:04:25,925 --> 00:04:27,933
+它们只是访问这些函数
+they just access the functions
+
+132
+00:04:27,933 --> 00:04:30,833
+那些函数早就以二进制的形式存在你电脑上了
+that are already on your computer in binary form
+
+133
+00:04:30,833 --> 00:04:33,300
+并且我们使用的这个库只是为我们做了
+and the library that we're going to use that does that for us 
+
+134
+00:04:33,400 --> 00:04:38,700
+一些事情，比如GLUE，不对，应该是GREW，OpenGL扩展管理
+is something called GLUE or GLEW, the OpenGL extension wrangler
+
+135
+00:04:38,700 --> 00:04:40,500
+这儿也有一个GLAD库
+there's also another library called GLAD
+
+136
+00:04:40,800 --> 00:04:41,533
+如果你喜欢，你也可以用它
+you can use that if you like
+
+137
+00:04:41,533 --> 00:04:44,633
+这是OpenGL的一个比较特殊的扩展
+it's a bit more specific with extensions to OpenGL and all that stuff
+
+138
+00:04:44,633 --> 00:04:46,233
+并且你也可以更好的配置它
+and you can configure it a little bit better
+
+139
+00:04:46,866 --> 00:04:48,566
+但我真的不是很在意这些
+I don't really care about that
+
+140
+00:04:49,300 --> 00:04:51,333
+我们只是尝试去写OpenGL的代码
+we're just trying to write OpenGL code and 
+
+141
+00:04:51,500 --> 00:04:52,666
+GLEW就能做到我需要的一切
+GLEW does everything I need
+
+142
+00:04:52,666 --> 00:04:53,800
+而且它也比较简单
+it is a little bit simpler
+
+143
+00:04:54,333 --> 00:04:55,500
+所以我们就用GLEW
+so we're going to use GLEW
+
+144
+00:04:55,666 --> 00:04:58,220
+所以，我们第一件要做的事就是，访问glew.sourceforget.net
+so the first thing we're going to do is go to glew.sourceforget.net
+
+145
+00:04:58,220 --> 00:05:00,033
+再说一下，这个链接我会放在描述里
+again link will be in the description
+
+146
+00:05:00,033 --> 00:05:01,333
+这就是GLEW的网站
+this is the GLEW website
+
+147
+00:05:01,366 --> 00:05:04,250
+如果需要的话，我们也有机会下载源码
+again we have the opportunity to download the source code if we want it
+
+148
+00:05:04,250 --> 00:05:06,233
+并且这事儿我绝对会干的
+and that is what I would absolutely be doing
+
+149
+00:05:06,233 --> 00:05:08,900
+如果这是一个严格的项目或一个游戏引擎
+if this was a serious project or a game engin
+
+150
+00:05:08,966 --> 00:05:11,933
+然而，这只是关于学习OpenGL的
+however because this is just about learning OpenGL
+
+151
+00:05:11,933 --> 00:05:14,700
+并且这只是让我们能够写OpenGL代码的东西
+and this is something that enables us to write OpenGL code
+
+152
+00:05:14,700 --> 00:05:15,833
+一点儿也不在意这些细节
+I don't care about that
+
+153
+00:05:15,933 --> 00:05:18,166
+我只需要下载对应Windows的二进制文件
+I'm just going to get the binaries for Windows
+
+154
+00:05:18,333 --> 00:05:19,700
+在这儿，点击这个链接
+I'm going to click on this link here
+
+155
+00:05:19,866 --> 00:05:21,133
+然后直到它下载完成
+and then once it's downloaded
+
+156
+00:05:21,133 --> 00:05:22,700
+打开这个压缩包
+I'm going to open the zip archive
+
+157
+00:05:22,700 --> 00:05:25,166
+这儿有个文件夹glew-2.1.0
+and there'll be a folder there called glue 2.1
+
+158
+00:05:25,166 --> 00:05:26,766
+在这种情况下，我就复制这个文件夹
+in this case, I'm just going to copy that
+
+159
+00:05:26,800 --> 00:05:31,366
+回到OpenGL方案的实际目录
+I'm going to go back into our actual directory of our OpenGL solution
+
+160
+00:05:31,400 --> 00:05:34,666
+就像上次我们复制GLFW到Dependences文件夹一样
+and just like last time where we put GLFW inside the Dependencies folder
+
+161
+00:05:34,666 --> 00:05:38,633
+也把GLEW粘贴到Dependencies文件夹来，好了
+I'm going to paste GLEW into this Dependency folder as well, okay
+
+162
+00:05:38,633 --> 00:05:40,233
+那么我们进去看看
+so here we go and inside that GLEW folder
+
+163
+00:05:40,233 --> 00:05:41,500
+现在，我们已经有了想要的一切东西
+we have everything we need now
+
+164
+00:05:41,500 --> 00:05:44,700
+实际上，我还要把它重命名为GLEW，好了
+one thing I'm actually going to do is rename this to just GLEW, okay
+
+165
+00:05:44,950 --> 00:05:49,525
+之前这种明显带版本的，真没太必要
+not really necessary and does kind of strip the version it's obviously before
+
+166
+00:05:49,525 --> 00:05:51,766
+很明显，这就是glew-2.1.0
+it was obvious to tell that this was glew-2.1.0
+
+167
+00:05:51,766 --> 00:05:53,366
+现在，你真的不需要知道GLEW到底是什么版本的
+now you don't really know what version of GLEW is
+
+168
+00:05:53,466 --> 00:05:54,900
+我刚刚只是做了一点简化
+I'm just doing this for simplification
+
+169
+00:05:54,900 --> 00:05:56,933
+目的就是对我们来说更容易一点
+kind of purposes just so that it's a bit easier for us
+
+170
+00:05:56,933 --> 00:05:59,333
+现在，我们已经有了GLEW和GLFW
+but now we have GLEW and GLFW as well
+
+171
+00:05:59,366 --> 00:06:01,966
+在GLEW目录中，我们有一些不同的文件夹
+so inside this, we have a few different folders
+
+172
+00:06:02,266 --> 00:06:04,766
+include和lib是为了链接的，我们需要注意的是
+the ones that we kind of care about for linking, as well as include and lib
+
+173
+00:06:04,766 --> 00:06:06,866
+这和链接GLFW完全一样
+this is exactly the same as linking GLFW
+
+174
+00:06:07,066 --> 00:06:08,533
+这是我们上集做的
+so that was an episode to check that out
+
+175
+00:06:08,533 --> 00:06:09,333
+如果你还没看过
+if you haven't already
+
+176
+00:06:09,366 --> 00:06:11,133
+我也制作了一个视频
+I also just made a video
+
+177
+00:06:11,266 --> 00:06:14,310
+关于，如何在c++中链接库
+about how linking libraries in c++ actually works
+
+178
+00:06:14,310 --> 00:06:16,500
+以及，如何在c++中使用库
+and how you can use libraries in c++
+
+179
+00:06:16,500 --> 00:06:17,566
+那儿有链接
+that's linked up there
+
+180
+00:06:17,800 --> 00:06:18,900
+一定要去看看
+check that out for sure
+
+181
+00:06:18,900 --> 00:06:20,466
+那可以帮助你理解这儿在做什么
+that'll help you understand what's going on here
+
+182
+00:06:20,466 --> 00:06:22,233
+因为这次我尽量保持简短点儿
+because I'm going to try and keep this brief this time
+
+183
+00:06:22,300 --> 00:06:25,033
+所以doc文件夹也包含了你需要的各种各样的文档
+so doc, also includes all the kind of documentation that you want
+
+184
+00:06:25,033 --> 00:06:25,333
+你看看
+you can see
+
+185
+00:06:25,333 --> 00:06:28,764
+这只是一种html形式的，所以，你可以直接打开index.html
+it's just an html format, so you can just open up index.html
+
+186
+00:06:28,764 --> 00:06:29,733
+那是主页面
+that's the main web page
+
+187
+00:06:29,733 --> 00:06:30,800
+让我们在谷歌浏览器中打开吧
+let's open it in Chrome
+
+188
+00:06:30,933 --> 00:06:32,766
+并且我看到了和那个网站页面一样的东西
+and we have something that looks exactly the same as the web page
+
+189
+00:06:32,766 --> 00:06:34,433
+但是你现在看到的这个页面是本地的
+but you can see that this one is local
+
+190
+00:06:34,433 --> 00:06:36,320
+所以这就是比较重要的阅读文档的地方
+so this is where reading documentation is kind of important
+
+191
+00:06:36,320 --> 00:06:37,566
+如果我们访问Usage页面
+if we go to Usage
+
+192
+00:06:37,733 --> 00:06:38,966
+首先，它告诉我们
+first of all, it tells us
+
+193
+00:06:39,166 --> 00:06:41,166
+如何去初始化它
+how to actually initialize this issues
+
+194
+00:06:41,325 --> 00:06:43,230
+现在，我要指出一些问题，就是
+now I'm going to point out a few
+
+195
+00:06:43,230 --> 00:06:46,033
+你可能会遇到GLEW
+you might encounter with GLEW
+
+196
+00:06:46,133 --> 00:06:47,833
+如果你没有阅读文档
+if you don't read the documentation
+
+197
+00:06:47,833 --> 00:06:51,966
+我现在能想到两点，可能不太明显
+there's two that I can think of right now, that might not be apparent
+
+198
+00:06:52,133 --> 00:06:54,900
+第一点，实际上也就是字面上的第一个东西
+the first one is actually literally the first thing
+
+199
+00:06:55,366 --> 00:06:56,400
+文档这里提到
+that this documentation says
+
+200
+00:06:56,400 --> 00:07:01,100
+首先，你需要创建一个有效的渲染OpenGL上下文
+and that is first you need to create a valid OpenGL rendering context
+
+201
+00:07:01,100 --> 00:07:04,466
+然后调用glewInit()去初始化扩展的入口
+and call glewInit() to initialize the extension entry points
+
+202
+00:07:04,933 --> 00:07:07,700
+所以你不能直接从GLEW中直接调用OpenGL函数
+so you can't use OpenGL functions from GLEW
+
+203
+00:07:07,700 --> 00:07:08,966
+直到你调用了glewInit()
+until you call glewInit()
+
+204
+00:07:08,966 --> 00:07:11,400
+这是第一点。然后，它提到的第二点是
+that's the first one and second of all as it says
+
+205
+00:07:11,400 --> 00:07:14,933
+你需要创建一个渲染OpenGL的上下文
+you need to create a valid OpenGL rendering context
+
+206
+00:07:15,100 --> 00:07:17,033
+在你调用glewInit()之前
+before you call glewInit()
+
+207
+00:07:17,366 --> 00:07:20,466
+那么，在我们源码中，已经有了glfwInit()
+so over here in our source code, we have glfwInit()
+
+208
+00:07:20,766 --> 00:07:22,800
+如果我们在这儿调用glewInit()
+if we want to call glewInit() here
+
+209
+00:07:23,075 --> 00:07:23,843
+它会正常运行吗，会发生什么
+would it work and what
+
+210
+00:07:23,843 --> 00:07:25,758
+我现在也不知道，等等看吧
+I'm not going to answer that right now, we'll see
+
+211
+00:07:25,758 --> 00:07:27,266
+总之，先回到文档
+anyway, back to the documentation
+
+212
+00:07:27,266 --> 00:07:30,533
+它明确地告诉我们，如何去初始化，我们调用了glewInit()
+it tells us exactly how to kind of initialize this, glewInit() that we call
+
+213
+00:07:30,533 --> 00:07:33,766
+然后我们去检查它的返回值
+and then we can check to see if that return code from glewInit()
+
+214
+00:07:33,766 --> 00:07:35,800
+如果它返回的GLenum整数
+if that return integer of GLenum
+
+215
+00:07:35,800 --> 00:07:36,833
+它只是一个整数
+which is just an intege
+
+216
+00:07:37,066 --> 00:07:38,466
+可能是GLEW_OK，或者不是
+is GLEW_OK or not
+
+217
+00:07:38,466 --> 00:07:40,500
+如果返回值不是GLEW_OK的话，我们可能有点儿问题
+and if it's not GLEW_OK that means we have a problem
+
+218
+00:07:40,500 --> 00:07:41,733
+所以，看起来很容易
+so pretty easy to tell here
+
+219
+00:07:42,000 --> 00:07:45,566
+这里也有很多关于扩展的诸如此类的东西，
+there's a bunch of stuff about extensions here as well and all that stuff
+
+220
+00:07:45,566 --> 00:07:47,666
+现在，在这个的构建部分
+now in the building section of this
+
+221
+00:07:48,000 --> 00:07:50,700
+也有大量对构建它比较重要的一些东西
+we have a bunch of things that are important for building this
+
+222
+00:07:50,700 --> 00:07:52,366
+但是，我们不需要关注这些
+but again we don't really care about that
+
+223
+00:07:52,366 --> 00:07:53,902
+同样，在安装这部分
+and also in the installation section 
+
+224
+00:07:53,902 --> 00:07:55,900
+你可以看到，这儿也列了一些东西
+you can see that there are some things listed
+
+225
+00:07:55,900 --> 00:07:57,933
+关于如何构建库
+about how to build library as well
+
+226
+00:07:57,933 --> 00:08:00,625
+如果你们尝试把它作为共享库，诸如此类的一切
+if you're trying to use it as a shared library, and all that stuff anything
+
+227
+00:08:00,625 --> 00:08:03,100
+我们可能会自己去探索发现
+we'll kind of explore it and find out for ourselves as well
+
+228
+00:08:03,100 --> 00:08:04,966
+但只是另一个提醒
+but just but just another reminder
+
+229
+00:08:05,033 --> 00:08:06,733
+如果你只是在使用一个新库的时候
+if you're using a new library
+
+230
+00:08:07,066 --> 00:08:08,100
+阅读这个文档
+read the documentation
+
+231
+00:08:08,100 --> 00:08:09,400
+那样做并没什么好处
+it doesn't hurt to do that
+
+232
+00:08:09,400 --> 00:08:11,033
+它可能会浪费一点点时间
+it might take a little bit of time
+
+233
+00:08:11,300 --> 00:08:12,000
+但总之
+but overall
+
+234
+00:08:12,000 --> 00:08:14,600
+你可能明白这些事，刚开始需要
+you might see things that first of all are going to 
+
+235
+00:08:14,600 --> 00:08:16,966
+防止你意外犯错
+prevent you from accidentally doing things incorrectly
+
+236
+00:08:17,033 --> 00:08:19,300
+然后扣你的头发，因为它没有正常工作
+and then pulling your hair up because it's not working
+
+237
+00:08:19,433 --> 00:08:21,966
+这就是那样做可能可能出现的情况
+whereas it appears that it might it should be
+
+238
+00:08:22,200 --> 00:08:22,733
+当然
+and also
+
+239
+00:08:22,733 --> 00:08:23,800
+你也可能这么说
+you might be able to say that
+
+240
+00:08:23,800 --> 00:08:26,233
+嗷，实际上，我会用我想到的方式去做它
+oh, I can actually use it in a way that i'm think of
+
+241
+00:08:26,500 --> 00:08:28,633
+虽然，真的很重要的就是
+the really important thing though is that
+
+242
+00:08:28,966 --> 00:08:30,333
+这是c++
+this is c++
+
+243
+00:08:30,366 --> 00:08:31,700
+我们在c++中运行代码
+we're running code in c++
+
+244
+00:08:31,700 --> 00:08:33,333
+并且c++允许你做事情
+and c++ allows you to do things
+
+245
+00:08:33,600 --> 00:08:34,800
+通过很多很多
+in many many
+
+246
+00:08:35,033 --> 00:08:37,633
+很多方式，很多不同的方式
+many ways many different ways
+
+247
+00:08:37,766 --> 00:08:40,000
+并且特别是，当你刚接触c++时
+and especially if you're new to c++
+
+248
+00:08:40,000 --> 00:08:41,366
+你可能这样想，好吧
+you might think okay
+
+249
+00:08:41,575 --> 00:08:42,766
+我使用的每个库
+every library I use
+
+250
+00:08:42,800 --> 00:08:46,200
+遵循这种过程，遵循这种风格
+follows this progression, follows this kind of style
+
+251
+00:08:46,933 --> 00:08:47,933
+但你不能这样假设
+you can't assume that
+
+252
+00:08:47,933 --> 00:08:49,900
+在c++中，做这个东西有许多方法
+there's so many ways to do stuff in c++
+
+253
+00:08:49,900 --> 00:08:51,733
+并且，每个人都认为他们的做法都是对的
+and everyone thinks that they're doing it the right way
+
+254
+00:08:52,266 --> 00:08:53,066
+所以
+so
+
+255
+00:08:53,300 --> 00:08:56,250
+当你需要去阅读这个文档时
+when you need to do is read the documentation and
+
+256
+00:08:56,500 --> 00:08:57,466
+请不要做任何假设
+don't make assumptions
+
+257
+00:08:57,466 --> 00:08:58,966
+因为那可能会让一些事情变得很扯蛋
+because they might be doing something crazy
+
+258
+00:08:58,966 --> 00:09:02,294
+他们可能会为某些事情定义他们自己元语言，诸如此类的
+they might be defining their own meta language for certain things, or whatever,
+
+259
+00:09:02,294 --> 00:09:03,933
+你不能假设那些东西
+you can't kind of assume that stuff
+
+260
+00:09:03,933 --> 00:09:05,875
+所以，阅读文档是比较重要的
+so, documentation is important to read 
+
+261
+00:09:05,875 --> 00:09:07,033
+无论如何，我之前已经阅读过了
+anyway, I've done this before
+
+262
+00:09:07,033 --> 00:09:08,533
+所以，现在，我不准备全部再次看一遍
+so I'm not going to read all of this right now
+
+263
+00:09:08,833 --> 00:09:10,533
+让我们在项目中配置这个吧
+but let's set this up with our project
+
+264
+00:09:10,800 --> 00:09:12,233
+我已经把所有都解压在这儿了
+so I've extracted all of this here
+
+265
+00:09:12,566 --> 00:09:14,350
+再说一次，我们已经看过文档了
+again we've looked at the documentation 
+
+266
+00:09:14,350 --> 00:09:16,200
+bin这个文件夹里面包含了release
+bin, contains inside release
+
+267
+00:09:16,200 --> 00:09:19,166
+我们有x64和Win32，这里有我们的dll文件
+we have x64 and Win32, which has our dll file
+
+268
+00:09:19,266 --> 00:09:20,266
+不过我真的不太关心这些
+I don't really care about that
+
+269
+00:09:20,266 --> 00:09:21,933
+因为我们会用静态链接
+because we're going to link this statically
+
+270
+00:09:21,933 --> 00:09:24,733
+请记住，你要尽可能的使用静态链接
+remember you pretty much always want to link statically if you can
+
+271
+00:09:24,900 --> 00:09:27,933
+所以在include文件夹下，有我们实际需要包含的文件
+so here inside include, we have our actual includes
+
+272
+00:09:27,933 --> 00:09:29,175
+你现在可能已经意识到了
+you're probably realizing right now
+
+273
+00:09:29,175 --> 00:09:30,900
+那正是我们需要的路径
+that this is exactly the path that we need to
+
+274
+00:09:30,900 --> 00:09:33,950
+添加到我们实际项目中的编译器include部分
+add to our actual project to our compiler include parts
+
+275
+00:09:33,950 --> 00:09:34,866
+你是对的
+and you are correct
+
+276
+00:09:35,000 --> 00:09:38,033
+那么，复制Dependences后面的部分
+so I'm going to copy the end of that project after Dependencies
+
+277
+00:09:38,466 --> 00:09:40,966
+来到项目，右键OpenGL，点击属性
+go to our project, right click on OpenGL, hit properties
+
+278
+00:09:40,966 --> 00:09:42,433
+然后就来到这儿
+and then I'm going to go over here
+
+279
+00:09:42,533 --> 00:09:44,366
+选择配置，你可以看到这里是Debug
+into configuration, you can see such a Debug
+
+280
+00:09:44,366 --> 00:09:46,565
+我只是想要保证那里是All Configurations
+I'm just gonna make sure that that's on All Configurations
+
+281
+00:09:46,565 --> 00:09:47,900
+平台，Win32，很好
+platform, Win32, is fine
+
+282
+00:09:47,900 --> 00:09:49,766
+在 c/c++ => 常规下面
+inside c/c++ general
+
+283
+00:09:50,300 --> 00:09:52,533
+在这后面加个分号
+I'm going to add a semicolon to the end of this
+
+284
+00:09:52,533 --> 00:09:54,700
+然后把我刚才复制的路径粘贴进去
+and paste in this path i've copied
+
+285
+00:09:54,800 --> 00:09:58,066
+然后在这前面粘贴$(SolutionDir)
+and then just stick solution directory to the front of that
+
+286
+00:09:58,366 --> 00:09:59,733
+现在你这儿可能有很多东西
+now if there's a lot of stuff here
+
+287
+00:09:59,733 --> 00:10:01,100
+你不太想添加分号
+and you don't really want to add semicolon
+
+288
+00:10:01,100 --> 00:10:01,900
+或者滚动这里
+or scroll through this
+
+289
+00:10:01,900 --> 00:10:04,645
+你可以点击下拉按钮，然后点击编辑
+you can just drop down this box here and here edit
+
+290
+00:10:04,645 --> 00:10:05,255
+你就可以看到
+you can see that
+
+291
+00:10:05,255 --> 00:10:06,500
+在这儿，我们已经有了一个它们的列表
+we have a list of them here
+
+292
+00:10:06,700 --> 00:10:07,933
+这样的话，他们就更容易被找到
+and they're much easier to see
+
+293
+00:10:08,066 --> 00:10:09,066
+好了，完美
+okay, fantastic
+
+294
+00:10:09,166 --> 00:10:10,800
+现在，我们就来说说链接库吧
+let's talk about linking library now
+
+295
+00:10:10,866 --> 00:10:12,400
+所以当我们回到我们这里的文件夹时
+so if we go back to our folder here
+
+296
+00:10:12,700 --> 00:10:14,333
+只需要回退一点点，然后进入
+just going to go back a bit into
+
+297
+00:10:14,966 --> 00:10:16,933
+Dependencies, GLEW, 然后 lib
+Dependencies, GLEW, and then lib
+
+298
+00:10:17,150 --> 00:10:18,333
+现在，就在release文件夹下了
+now inside release
+
+299
+00:10:18,333 --> 00:10:19,733
+我们需要关注的就是Win32
+and Win32 which is the one we care about
+
+300
+00:10:19,733 --> 00:10:20,466
+但这儿我们有两个lib文件
+we've got two
+
+301
+00:10:20,466 --> 00:10:22,200
+你认为其中一个就是静态库
+which one of these do you think is a static library
+
+302
+00:10:22,200 --> 00:10:24,633
+而另一个就是动态库
+and which one do you think is the dynamic library
+
+303
+00:10:24,633 --> 00:10:25,866
+好吧，有些意外
+well, plot-twists
+
+304
+00:10:25,866 --> 00:10:27,666
+从技术上来说，它们都是静态库
+they're both technically static libraries
+
+305
+00:10:27,666 --> 00:10:30,300
+但是如果需要链接dll，你就要用这个glew32.lib
+but this one is used if you want to link with the dll
+
+306
+00:10:30,533 --> 00:10:34,533
+这个glew32s.lib是在链接静态库时需要用到的
+this one is used if you want to link with just the static library
+
+307
+00:10:34,533 --> 00:10:36,333
+因为这就是整个静态库
+because this is the entire static library
+
+308
+00:10:36,333 --> 00:10:38,700
+所以，实际上，这两个之间的区别就是
+so, the two things that give it away is the fact that
+
+309
+00:10:38,700 --> 00:10:39,600
+glew32s.lib这儿多了个一个s
+this has an s, here
+
+310
+00:10:39,633 --> 00:10:39,900
+并且
+and
+
+311
+00:10:39,900 --> 00:10:42,588
+还有就是，glew32s.lib明显比另一个要大一些
+also that the size is significantly larger than the other one
+
+312
+00:10:42,588 --> 00:10:45,633
+记住，如果你这儿有个s，那可能代表静态库
+remember if you have an s that probably stands for static again
+
+313
+00:10:45,633 --> 00:10:47,866
+这些都是你从经验中学到的
+things that you kind of just learned with experience
+
+314
+00:10:48,066 --> 00:10:49,366
+所以glew32s.lib就是我们需要链接的库
+so this is the one that we want to link again
+
+315
+00:10:49,366 --> 00:10:51,466
+复制这个目录路径
+so I'm going to copy this directory path
+
+316
+00:10:51,766 --> 00:10:53,700
+进入链接器，常规
+go into link and general
+
+317
+00:10:53,733 --> 00:10:55,400
+然后找到附加依赖库
+and then additional library directories
+
+318
+00:10:55,400 --> 00:10:56,533
+展开下拉选项，然后点击编辑
+I'm just gonna drop this down, here
+
+319
+00:10:56,533 --> 00:10:58,266
+可以让你们看起来更轻松一些
+to make it easier for you guys to see
+
+320
+00:10:58,433 --> 00:11:00,300
+点击新增这个按钮
+hit this new kind of thing button
+
+321
+00:11:00,333 --> 00:11:04,300
+然后只需要在这儿粘贴, 输入 $(SolutionDir)
+and then just paste in, a solution directory over here  
+
+322
+00:11:04,300 --> 00:11:05,166
+所以这就是我的路径
+and my path
+
+323
+00:11:05,166 --> 00:11:06,666
+好了，看起来还不错
+so there we go, looks pretty good to me
+
+324
+00:11:06,833 --> 00:11:09,200
+然后，我们连接的是GLEW
+and then the one we're linking with remember is GLEW
+
+325
+00:11:09,200 --> 00:11:10,866
+这里的顺序无关紧要
+doesn't really matter about the order here
+
+326
+00:11:10,933 --> 00:11:14,633
+在这里，我还需要glew32s.lib
+in this case, either glew32s.lib is what I want
+
+327
+00:11:14,866 --> 00:11:16,400
+行了，非常棒，搞完了
+okay, fantastic, done
+
+328
+00:11:16,800 --> 00:11:18,900
+现在，我应该可以调用glewInit()
+now, I should be able to call glewInit()
+
+329
+00:11:19,033 --> 00:11:20,866
+然后让我们直接去包含头文件
+and also let's just go ahead and
+
+330
+00:11:21,066 --> 00:11:23,933
+#include <GL/glew.h>
+include my path GL/glew.h
+
+331
+00:11:24,300 --> 00:11:25,580
+实际上，你可以看这儿
+now if you actually look into here
+
+332
+00:11:25,580 --> 00:11:26,900
+这就是我知道这是GL而不是GLEW
+the reason I know is GL and not GLEW
+
+333
+00:11:26,900 --> 00:11:29,666
+不管怎样，GLEW有GLEW，但glew没有
+whatever, GLEW has GLEW but glew doesn't
+
+334
+00:11:29,666 --> 00:11:30,033
+理所应当
+because of course
+
+335
+00:11:30,033 --> 00:11:32,033
+实际上，如果我看一下include目录里面
+if I look in the actual include directory
+
+336
+00:11:32,033 --> 00:11:34,400
+这儿有一个GL文件夹，然后才是glew.h
+there's a folder called GL and then glew.h
+
+337
+00:11:34,400 --> 00:11:36,375
+所以请记住这个路径
+so remember the path the west specifying here
+
+338
+00:11:36,375 --> 00:11:38,871
+就是编译器包含的目录
+is the path from this compiler include directory
+
+339
+00:11:38,871 --> 00:11:40,700
+我们已经包含的，好了，漂亮
+that we've just included, okay,  great
+
+340
+00:11:40,800 --> 00:11:42,050
+所以，回到这儿，你可以看到
+so back over here you can see that
+
+341
+00:11:42,050 --> 00:11:43,433
+这个运行成功
+this works successfully
+
+342
+00:11:43,500 --> 00:11:44,300
+让我们尝试构建它
+let's try building this
+
+343
+00:11:44,300 --> 00:11:46,200
+那么，点击这儿，然后点击构建，好了
+so I'll right click here, and hit build, okay
+
+344
+00:11:46,200 --> 00:11:46,666
+所以马上就可以了
+so it's right away
+
+345
+00:11:46,666 --> 00:11:47,666
+但实际上，我们看到了一个错误
+we actually get an error
+
+346
+00:11:47,666 --> 00:11:50,233
+gl.h需要在glew.h之前包含
+and it says gl.h included before glew.h
+
+347
+00:11:50,833 --> 00:11:51,833
+这是来自于
+this is coming from
+
+348
+00:11:51,833 --> 00:11:53,900
+如果我们看这个输出窗口，这是来自于
+if we look at the output, this is coming from
+
+349
+00:11:53,933 --> 00:11:55,366
+我们当前的glew.h头文件
+our actual glew.h header file
+
+350
+00:11:55,366 --> 00:11:57,000
+所以，如果需要的话，我们可以双击这里
+so we can double click here if we want
+
+351
+00:11:57,233 --> 00:11:59,550
+看看这里，所以原因
+and we can take a look at this so the reason
+
+352
+00:11:59,550 --> 00:12:00,500
+出现这种是
+this is happening is
+
+353
+00:12:00,500 --> 00:12:02,000
+由于这儿定义了一个字面上的哈希错误
+because there's literally a hash error defined
+
+354
+00:12:02,000 --> 00:12:03,300
+这是一种编译时错误
+which is a compile-time error
+
+355
+00:12:03,366 --> 00:12:05,466
+如果这些符号被定义的话，就会出现那种错误
+that happens if these symbols are defined
+
+356
+00:12:05,566 --> 00:12:07,325
+所以基本上要你做的就是
+so basically all this is asking you to do is
+
+357
+00:12:07,325 --> 00:12:10,700
+在包含任何其他OpenGL相关的头文件之前就要包含glew.h
+please include this before you include any other OpenGL things
+
+358
+00:12:11,066 --> 00:12:13,866
+所以glfw的包含需要放到包含gl.h后面
+so glfw appends to include gl.h
+
+359
+00:12:14,533 --> 00:12:16,500
+我们需要做的就是移动这个glew
+so what we're going to do is just move this glew
+
+360
+00:12:16,500 --> 00:12:18,333
+在这之前，就这样
+so that it's before this and that's it
+
+361
+00:12:18,500 --> 00:12:19,800
+再构建一次试试
+let's try building this again
+
+362
+00:12:19,800 --> 00:12:20,400
+好了，太棒了
+okay，awesome
+
+363
+00:12:20,400 --> 00:12:23,200
+我们编译成功了，然而，有一个链接错误
+we compiled successfully, however we get a link error
+
+364
+00:12:23,200 --> 00:12:24,800
+现在, 链接错误是因为
+now, link error is because
+
+365
+00:12:25,100 --> 00:12:26,966
+我们glewInit()符号导致的结果
+on results our symbol glewInit()
+
+366
+00:12:26,966 --> 00:12:29,552
+现在，我们已经链接了一切，真是如此吗？
+now we did link everything, didn't we?
+
+367
+00:12:29,552 --> 00:12:30,900
+那么，问题是什么
+so what's the issue
+
+368
+00:12:31,250 --> 00:12:34,200
+那么，让我们看看，实际上，我们是如何设置GLEW的
+well, let's take a look at how GLEW is actually set up
+
+369
+00:12:34,200 --> 00:12:38,733
+实际上，如果我们去GLEW的头文件，找这个glewInit函数
+if we actually go to the GLEW header file, and we look for this glewInit function
+
+370
+00:12:40,233 --> 00:12:43,775
+你可以看到，这个宏定义GLEWAPI
+you can see that we have this GLEWAPI kind of macro defined
+
+371
+00:12:43,775 --> 00:12:45,266
+在当前返回类型之前
+before the actual return type
+
+372
+00:12:45,366 --> 00:12:47,233
+让我们看看那意味什么
+let's take a look at what that means
+
+373
+00:12:47,233 --> 00:12:48,333
+当我跳转到这里
+and if I jump over here
+
+374
+00:12:48,633 --> 00:12:49,833
+我们看这
+we see this
+
+375
+00:12:50,300 --> 00:12:52,600
+有一个向我们解释它的注释
+as well as a comment which kind of explains it for us
+
+376
+00:12:52,800 --> 00:12:54,933
+那么，GLEW_STATIC是为静态库定义的
+so GLEW_STATIC is defined for static library
+
+377
+00:12:54,933 --> 00:12:57,266
+GLEW_BUILD是为动态库定义的
+and GLEW_BUILD is defined for building the dll library
+
+378
+00:12:57,466 --> 00:12:59,366
+现在我们没有定义GLEW_STATIC
+right now we don't have GLEW_STATIC defined
+
+379
+00:12:59,533 --> 00:13:01,166
+所以，这儿就是接下来发生的
+so what's happening is it's coming over here
+
+380
+00:13:01,266 --> 00:13:02,600
+当然，GLEW_BUILD也没有定义
+GLEW_BUILD isn't defined
+
+381
+00:13:02,833 --> 00:13:03,866
+所以，就运行到这儿了
+so it's coming over here
+
+382
+00:13:04,100 --> 00:13:08,750
+实际上，它就定义了作为从dll文件导入的外部变量GLEWAPI
+and it's actually defining GLEWAPI as extern _declspec(dllimport)
+
+383
+00:13:08,750 --> 00:13:11,133
+这是MSVC编译器固有的
+which is an msvc compiler intrinsic
+
+384
+00:13:11,133 --> 00:13:12,400
+基本上就是告诉链接器
+which basically tells the linker
+
+385
+00:13:12,466 --> 00:13:14,600
+这是来自于一个dll文件
+this is coming from a dll file
+
+386
+00:13:14,600 --> 00:13:16,400
+你需要从dll文件中导入
+you need to dll import this
+
+387
+00:13:16,400 --> 00:13:18,700
+到现在，我们并没有使用GLEW的动态库版本
+now we're not using the dll version of GLEW
+
+388
+00:13:18,700 --> 00:13:20,266
+我们使用的是静态库
+are we using the static library
+
+389
+00:13:20,266 --> 00:13:21,500
+所以如果我们像这样写代码的话
+so if we write code like this
+
+390
+00:13:21,500 --> 00:13:23,333
+它是不可能链接到的
+it's not gonna be able to link it
+
+391
+00:13:23,333 --> 00:13:24,900
+它只是不会运行
+its...it's just not going to work
+
+392
+00:13:24,900 --> 00:13:26,066
+我们现在需要做的就是
+we need to actually just
+
+393
+00:13:26,100 --> 00:13:27,566
+就像其他函数一样使用它
+use it like any other function
+
+394
+00:13:27,700 --> 00:13:28,833
+当然，如果你找到这里
+and of course if you look up here
+
+395
+00:13:28,833 --> 00:13:30,900
+你可以看到，如果GLEW_STATIC定义了的话
+you can see that if GLEW_STATIC is defined
+
+396
+00:13:30,900 --> 00:13:34,125
+我们就不会通过dll导入导出来得到它
+we don't get that kind of decalspec dll import or export export
+
+397
+00:13:34,125 --> 00:13:35,640
+当然如果你现在在编译的话，可能就需要从dll中导入导出了
+of course is if you're actually building it
+
+398
+00:13:35,640 --> 00:13:38,025
+当我们需要从一个dll文件中导入的时候，它就比较重要了
+import is for when we want to import it from a dll
+
+399
+00:13:38,025 --> 00:13:40,300
+所以我们需要
+so we want to use this
+
+400
+00:13:40,300 --> 00:13:42,300
+我们实现它的方式就是定义GLEW_STATIC
+and the way we do that is we define the GLEW_STATIC
+
+401
+00:13:42,300 --> 00:13:44,225
+这也是你可以得到的方法
+again something that you could definitely get
+
+402
+00:13:44,225 --> 00:13:45,366
+如果你看了文档的话
+if you read the documentation
+
+403
+00:13:45,500 --> 00:13:46,366
+但你没看的话
+but if you don't
+
+404
+00:13:46,400 --> 00:13:48,133
+你可能需要对它进行逆向工程
+you might have to kind of reverse engineer it
+
+405
+00:13:48,133 --> 00:13:49,700
+并且明确地知道它是如何运行的，然后指出
+and actually look at how it works to figure out
+
+406
+00:13:49,700 --> 00:13:51,433
+如何让它编译和链接
+how to get the stuff to compile and link
+
+407
+00:13:51,575 --> 00:13:53,233
+我只是想给你们展示一下
+I just wanted to show you that to find basically
+
+408
+00:13:53,233 --> 00:13:56,475
+所以，当回到这里时，我们需要定义GLEW_STATIC
+so if we go back to here, we need to define GLEW_STATIC
+
+409
+00:13:56,475 --> 00:13:58,333
+那么我要做的就是，右键点击我的项目
+and I'm going to do that by right click on my project
+
+410
+00:13:58,333 --> 00:13:59,233
+来到项目属性这里
+going to properties
+
+411
+00:13:59,533 --> 00:14:00,900
+找到c/c++
+going to c/c++
+
+412
+00:14:00,900 --> 00:14:01,700
+预处理器
+pre-processor
+
+413
+00:14:01,700 --> 00:14:03,966
+然后，这儿就是预处理器定义了
+and then over here in are processor definitions
+
+414
+00:14:03,966 --> 00:14:06,166
+输入GLEW_STATIC
+I'm going to type in GLEW_STATIC
+
+415
+00:14:06,266 --> 00:14:07,133
+然后回车
+and hit enter again
+
+416
+00:14:07,133 --> 00:14:10,033
+不过确保我在所有配置，和Win32平台这里
+making sure that I'm on All Configurations and Win32
+
+417
+00:14:10,275 --> 00:14:12,966
+点击确定，然后现在，构建我的项目
+I hit okay and now I'm going to build my application
+
+418
+00:14:13,361 --> 00:14:14,250
+好了，非常棒
+okay, awesome
+
+419
+00:14:14,250 --> 00:14:17,533
+那么，我们在输出窗口这里没看到任何错误，并且，我们的项目运行正常
+so we don't get any errors here in our output and our applications fine
+
+420
+00:14:17,933 --> 00:14:21,600
+所以实际上，如果我们看到这里，就知道glewInit()返回了一个值
+so we know the glewInit() returns a value if we actually look at this
+
+421
+00:14:21,800 --> 00:14:22,400
+你可以看到这儿
+you can see there's
+
+422
+00:14:22,400 --> 00:14:23,933
+在这个头文件中，没有相关注释
+no documentation in the header file
+
+423
+00:14:24,066 --> 00:14:25,166
+所以，我们需要回到文档页面这里
+so we need to go back here
+
+424
+00:14:25,400 --> 00:14:27,566
+当我们回到文档的Usage页面时
+if we go back to our Usage in the documentation
+
+425
+00:14:27,566 --> 00:14:29,300
+你可以看到glewInit()的返回值
+you can see that this return value from glewInit()
+
+426
+00:14:29,300 --> 00:14:31,133
+如果它当前不是GLEW_OK
+if it actually isn't GLEW_OK
+
+427
+00:14:31,333 --> 00:14:32,133
+那么我们就会看到一个问题
+then we have a problem
+
+428
+00:14:32,133 --> 00:14:34,033
+所以，让我们直接检验那个吧，我想说如果
+so let's go ahead and check that I want to say if
+
+429
+00:14:34,250 --> 00:14:36,933
+glewInit()的返回值不等于GLEW_OK
+glewInit() doesn't equal GLEW_OK
+
+430
+00:14:36,966 --> 00:14:38,900
+也许我们就可以打印点什么
+then maybe we can just print something
+
+431
+00:14:39,500 --> 00:14:41,500
+就像这样，就现在而言
+like this, just for now
+
+432
+00:14:41,700 --> 00:14:43,875
+并且在运行之前，我会在这行设置一个断点
+and I'll put a break point on this line before we start
+
+433
+00:14:43,875 --> 00:14:45,700
+当然，我也不得不去包含iostream这个库
+I'll also have to include iostream of course
+
+434
+00:14:46,066 --> 00:14:47,533
+为了能使用cout
+to use cout
+
+435
+00:14:47,666 --> 00:14:50,300
+所以，按f5，好了，那么我们就在这行代码上
+so let's hit f5, okay, so we're on this line of code
+
+436
+00:14:50,500 --> 00:14:51,400
+按f10
+let's hit f10
+
+437
+00:14:51,700 --> 00:14:52,852
+哦，不，看这个
+oh no, look at that
+
+438
+00:14:52,852 --> 00:14:54,133
+它不等于GLEW_OK
+it's not equal to  GLEW_OK
+
+439
+00:14:54,133 --> 00:14:55,366
+我们得到了一个错误的打印
+and we get an error printing
+
+440
+00:14:55,566 --> 00:14:56,400
+这里发生了什么
+what happened
+
+441
+00:14:56,900 --> 00:15:00,100
+记得我说过是否可以调用glewInit()
+well remember when I mentioned whether it was okay to call glewInit()
+
+442
+00:15:00,100 --> 00:15:01,300
+在glfwInit()之后
+after glfwInit()
+
+443
+00:15:01,433 --> 00:15:02,866
+然后我问你们是不是
+and then I asked you guys if it was
+
+444
+00:15:02,866 --> 00:15:04,166
+然后也许你说了些什么
+and then maybe you said something
+
+445
+00:15:04,166 --> 00:15:06,166
+或者你只是无视我，等着结果
+or maybe you just ignored me and waited for the result
+
+446
+00:15:06,333 --> 00:15:07,133
+那行吧
+well
+
+447
+00:15:07,133 --> 00:15:09,666
+这不对，我们不能在这里调用glewInit()
+it's...it's not okay, we can't call glewInit() here
+
+448
+00:15:09,900 --> 00:15:11,333
+我们不能这样的原因是因为
+the reason we can't is because
+
+449
+00:15:11,366 --> 00:15:12,266
+文档
+the documentation
+
+450
+00:15:12,266 --> 00:15:15,333
+清楚地表明了，你需要创建一个有效的渲染OpenGL上下文
+clearly states that you need to create a valid OpenGL rendering context
+
+451
+00:15:15,333 --> 00:15:16,166
+在我们需要做这个的地方
+where do we do this
+
+452
+00:15:16,366 --> 00:15:21,533
+在glfwMakeContextCurrent()这里，我们创建了OpenGL上下文，对吧
+glfwMakeContextCurrent() that is when we create that OpenGL context, okay
+
+453
+00:15:21,833 --> 00:15:23,881
+所以我们需要做的就是移动这行代码
+so what we need to do is move this code 
+
+454
+00:15:23,881 --> 00:15:26,675
+那行代码应该在我们这里一个有效上下文后面
+so, that is after we have a valid context
+
+455
+00:15:26,675 --> 00:15:28,033
+以及一个有效窗口诸如此类的后面
+and a valid window and all of that
+
+456
+00:15:28,300 --> 00:15:30,266
+所以现在，我把它移动到这里来
+so now if I move this down here
+
+457
+00:15:30,366 --> 00:15:31,966
+在这儿设置一个断点，按f5
+put a break point here, hit f5
+
+458
+00:15:32,166 --> 00:15:33,266
+现在当我按下f10
+now if I hit f10
+
+459
+00:15:33,700 --> 00:15:35,775
+看看，它跳过了这里，因为它是对的
+look at that it skips over this, because it is okay 
+
+460
+00:15:35,775 --> 00:15:36,700
+并且一切正常
+and everything is good
+
+461
+00:15:36,700 --> 00:15:37,900
+这就是所有的事情
+and that's all there is to it
+
+462
+00:15:37,900 --> 00:15:40,460
+现在，我们就可以访问所有的OpenGL函数了
+now we have access to all of the OpenGL functions
+
+463
+00:15:40,460 --> 00:15:42,533
+我们当然能够用任何版本
+that we actually have up to karmas job version
+
+464
+00:15:42,533 --> 00:15:43,500
+如果我需要使用
+and if I want to use
+
+465
+00:15:43,500 --> 00:15:46,466
+任意一个OpenGL较新版本的OpenGL函数
+any of the kind of OpenGL functions that are in newer versions of OpenGL
+
+466
+00:15:46,466 --> 00:15:48,700
+比如glGenBuffers()，或者诸如此类的
+such as glGenBuffers(), or something like that
+
+467
+00:15:48,800 --> 00:15:50,266
+你可以看到，我能够在这儿输入它
+you can see that I can just type it in there
+
+468
+00:15:50,266 --> 00:15:51,066
+并且它没有问题
+and it's fine
+
+469
+00:15:51,200 --> 00:15:53,533
+如果你看当前的GLEW头文件时
+if you look at the actual GLEW header file
+
+470
+00:15:53,633 --> 00:15:57,166
+所以当我右键点击这里，打开文档
+so if I right click here, and go to open document
+
+471
+00:15:57,166 --> 00:15:58,700
+实际上，这是一个非常大的文件
+this is actually a really large file
+
+472
+00:15:58,700 --> 00:15:59,666
+如果你把它拉到底部
+if you just pull down to the bottom
+
+473
+00:15:59,666 --> 00:16:01,566
+你可以看到它有23,000行代码
+you can see it's 23,000 lines of code
+
+474
+00:16:01,566 --> 00:16:03,200
+它甚至可能会让你的电脑慢一点
+it might even slow your computer down a bit
+
+475
+00:16:03,375 --> 00:16:06,000
+但这个有它的一切和它的运行方式
+but this has everything that it is and the way that it works
+
+476
+00:16:06,000 --> 00:16:07,533
+如果我们粗略地看一下
+if we loosely look at it
+
+477
+00:16:07,733 --> 00:16:09,633
+对于很多函数来说，它的作用是
+is that for a lot of functions, what it does is
+
+478
+00:16:09,633 --> 00:16:11,833
+它实际上定义了函数指针
+it actually defines function pointers which are all
+
+479
+00:16:11,833 --> 00:16:13,433
+这些都是
+which is what all of these are
+
+480
+00:16:13,800 --> 00:16:15,733
+所以如果你要用一个函数
+so if you're going to use a function
+
+481
+00:16:16,166 --> 00:16:18,866
+就像我刚刚写的glGenBuffers()
+such as glGenBuffers() like I just did
+
+482
+00:16:19,333 --> 00:16:22,466
+它实际上，让我们让它简单地工作
+it actually and let's just to make this loosely make this kind of work
+
+483
+00:16:22,500 --> 00:16:24,533
+所以我们需要一个缓冲变量a
+so we want one buffer a
+
+484
+00:16:24,733 --> 00:16:26,300
+实际上，它必须是一个无符号整数
+and it actually has to be an unsigned int
+
+485
+00:16:26,366 --> 00:16:27,800
+不管怎样，这就是我们的函数
+but anyway there's our function
+
+486
+00:16:27,800 --> 00:16:29,966
+如果我们现在看一下函数的定义
+if we actually go to that function definition
+
+487
+00:16:30,133 --> 00:16:32,333
+你可以看到它只是一个哈希定义的宏
+you can see it's just a macro as to hash define
+
+488
+00:16:32,500 --> 00:16:33,600
+所以我们实际要做的是
+so what we actually want to do
+
+489
+00:16:33,600 --> 00:16:35,833
+如果我们想看看函数签名
+if we want to look at the function signature
+
+490
+00:16:35,900 --> 00:16:36,866
+就是通过这个
+is go through this
+
+491
+00:16:37,000 --> 00:16:38,133
+__glewGenBuffers
+__glewGenBuffers
+
+492
+00:16:38,433 --> 00:16:41,266
+然后转到这个函数指针的类型
+and then go to the type of this function pointer
+
+493
+00:16:41,366 --> 00:16:43,966
+然后我们看到返回类型是void
+and then we get the return type which is avoid
+
+494
+00:16:44,100 --> 00:16:46,175
+以及取GLsizei类型的参数x
+as well as the parameters that takes x GLsizei
+
+495
+00:16:46,175 --> 00:16:47,766
+一个无符号整数
+and an unsigned int
+
+496
+00:16:47,766 --> 00:16:48,366
+当然
+but of course
+
+497
+00:16:48,366 --> 00:16:50,100
+我们会看到这些，并发现很多
+we'll be looking at this and discovering a lot
+
+498
+00:16:50,100 --> 00:16:52,533
+随着我们OpenGL系列的继续
+more of this as our OpenGL journey goes on
+
+499
+00:16:52,700 --> 00:16:54,766
+这就是你初始化GLEW的方法
+that's it that's how you initialize GLEW
+
+500
+00:16:54,766 --> 00:16:56,533
+这就是你获得现代OpenGL版本的方法
+that's how you get to the modern OpenGL version
+
+501
+00:16:56,533 --> 00:16:58,033
+实际上，我们今天要做的另一件事是
+one more thing we'll do for today is actually
+
+502
+00:16:58,033 --> 00:16:59,666
+打印我们的OpenGL版本只是为了
+print our OpenGL version to just
+
+503
+00:16:59,666 --> 00:17:00,466
+确保我们是最新版本
+make sure we're up to date
+
+504
+00:17:00,466 --> 00:17:02,900
+顺便说一下，这和当前的GLEW没有任何关系
+this has nothing to do with actual GLEW by the way
+
+505
+00:17:02,900 --> 00:17:04,933
+这只是我们应该得到的有用信息
+but it's just useful information that we should have
+
+506
+00:17:05,166 --> 00:17:06,100
+所以我要做的是
+so what I'm going to do is
+
+507
+00:17:06,100 --> 00:17:08,433
+一旦我们有一个有效的OpenGL上下文
+once we have a valid OpenGL context
+
+508
+00:17:08,466 --> 00:17:11,533
+基本上，我就写std::cout
+I'm basically just going to write std cout
+
+509
+00:17:11,766 --> 00:17:13,333
+然后glGetString ()
+and then glGetString()
+
+510
+00:17:13,966 --> 00:17:16,400
+就像这样的GL_VERSION
+GL_VERSION just like that
+
+511
+00:17:17,666 --> 00:17:18,933
+我要移除这个断点
+I'm going to remove this break point
+
+512
+00:17:19,100 --> 00:17:20,550
+按f5，可以看到
+hit f5 and you can see that
+
+513
+00:17:20,550 --> 00:17:22,833
+这里说的是OpenGL4.4
+what it says over here is OpenGL 4.4
+
+514
+00:17:22,833 --> 00:17:24,033
+build blah blah blah
+build blah blah blah
+
+515
+00:17:24,033 --> 00:17:25,400
+我现在正在用笔记本电脑
+I'm actually running on a laptop right now
+
+516
+00:17:25,400 --> 00:17:27,600
+有Intel的GPU和NVIDIA的
+which has an Intel GPU as well as the NVIDIA one
+
+517
+00:17:27,775 --> 00:17:29,541
+所以这行很明显
+so, it's obvious from this line here
+
+518
+00:17:29,541 --> 00:17:33,333
+它实际上使用Intel显卡来运行这个应用的
+it's actually using the Intel GPU for running this application
+
+519
+00:17:33,333 --> 00:17:34,300
+如果我切换到NVIDIA
+if I switch to NVIDIA
+
+520
+00:17:34,500 --> 00:17:36,175
+应该是NVIDIA的驱动版本
+it would have said the NVIDIA driver version
+
+521
+00:17:36,175 --> 00:17:37,500
+可能是NVIDIA这个单词结尾
+and probably the word end NVIDIA
+
+522
+00:17:37,566 --> 00:17:39,366
+以及更高的OpenGL版本
+as well as a higher OpenGL version
+
+523
+00:17:39,366 --> 00:17:41,566
+但知道实际运行的是什么总是很有用的
+but it's always useful to know what you're actually running
+
+524
+00:17:41,700 --> 00:17:43,800
+所以打印到终端是很有用的操作
+so printing that to the console is useful stuff
+
+525
+00:17:44,025 --> 00:17:45,433
+无论如何，我希望你们喜欢这个视频
+anyway I hope you guys enjoyed this video
+
+526
+00:17:45,433 --> 00:17:47,000
+如果你喜欢的话，可以点击那个喜欢按钮
+if you did, you can hit that like button
+
+527
+00:17:47,033 --> 00:17:47,700
+你也可以帮助
+you can also help
+
+528
+00:17:47,700 --> 00:17:49,633
+支持这个系列并获得一些奖励，比如
+support this series and get rewards such as
+
+529
+00:17:49,633 --> 00:17:51,966
+…
+videos early contribute to video planning
+
+530
+00:17:52,066 --> 00:17:54,133
+…
+your name and the credits all that kind of fun stuff
+
+531
+00:17:54,300 --> 00:17:55,966
+通过patron
+by going to patron comforts actually channel
+
+532
+00:17:55,966 --> 00:17:57,466
+这真的有助于支持这个系列
+it really does help support the series
+
+533
+00:17:57,466 --> 00:17:58,866
+并且确保
+and make sure that
+
+534
+00:17:58,866 --> 00:18:00,766
+我可以更频繁地为你们更新这些视频
+I can make these videos more frequently for you guys
+
+535
+00:18:01,100 --> 00:18:02,933
+下次再见
+I will see you next time goodbye
+

@@ -1,0 +1,1325 @@
+﻿1
+00:00:00,000 --> 00:00:04,075
+嘿，你们好，我是TheCherno，欢迎回到我的OpenGL系列教程
+hey, every guys, my name is TheCherno, and welcome back to my OpenGL series
+
+2
+00:00:04,150 --> 00:00:06,800
+那么这才应该是我这个OpenGL教程的第一期视频
+so this is really the first episode of my OpenGL series
+
+3
+00:00:06,800 --> 00:00:12,875
+上期我们只是讨论了，OpenGL到底是什么，一小部分原理，以及这个系列的主要内容
+last time, we just talked about what OpenGL actually was, a little bit about how it worked, and also what this series would actually contain
+
+4
+00:00:13,104 --> 00:00:15,550
+如果你们还没看过那期视频，那么快去看看吧，就在那个角落
+if you guys haven't seen that video, then check it out in that corner
+
+5
+00:00:15,625 --> 00:00:18,475
+不过今天我们实际上会开始写些代码，完成一些工作
+today though, we're actually gonna jump in and write some code, we are gonna get some work done
+
+6
+00:00:18,475 --> 00:00:21,425
+我们将会得到一个OpenGL演示窗口，并且甚至有可能绘制出一个三角形
+we're going to get an OpenGL window displaying, and maybe even draw a triangle
+
+7
+00:00:21,425 --> 00:00:25,300
+特别是在这个系列中，我想和C++系列一样，采取一种更实际的方式
+with this series specifically, I want to take a more practical approach with the C++ series
+
+8
+00:00:25,500 --> 00:00:28,650
+实际上，在开始写代码之前，就绝大部分理论，我已经做了很多解释
+I did a lot of explaining, a lot of theory, before we actually started writing code
+
+9
+00:00:28,800 --> 00:00:30,700
+但我还是想要为这个系列补充一些解释说明之类的
+I still want to do that for this, for this series
+
+10
+00:00:30,700 --> 00:00:34,025
+因为我认为对于这些原理的理解，还是挺重要的
+because I believe, it's very important to understand actually how everything works
+
+11
+00:00:34,575 --> 00:00:38,013
+但是有了之前第一期的部分理论解释后，现在的我只想去写代码
+but, with there kind of first few episodes, I just want to get some code done
+
+12
+00:00:38,013 --> 00:00:41,350
+实际上我只是想写代码，并且在屏幕上，看到一些东西
+I just want to actually write some code, and have something happening on the screen
+
+13
+00:00:41,625 --> 00:00:45,250
+这样希望你们就能感受到，那还是有点进度的
+so that hopefully you guys can kind of feel, that sense of progression a little bit better
+
+14
+00:00:45,250 --> 00:00:51,993
+然后我们实际上要做的就是，就是那样的流程，大概每周一次吧，或者只是期纯理论视频
+and then what we'll actually do is end up kind of, as that as going on, maybe once a week, or so have a bit of a theory video
+
+15
+00:00:51,993 --> 00:00:55,769
+讨论OpenGL的具体原理，或者背后实际上发生了什么
+and just talk about how OpenGL specifically works, or what actually happens behind the scenes
+
+16
+00:00:55,800 --> 00:00:59,450
+既然如此，还是说说今天的目标吧，就是去创建一个窗口，对吧
+now that, being said our goal for today is going to be, just to create a window, right
+
+17
+00:00:59,450 --> 00:01:05,025
+我希望能够让我的OS为我创建一个窗口，那么如果我的应用是以窗口的形式
+I want to be able to have my operating system create a window for me, so if my application is actually in the form of a window
+
+18
+00:01:05,475 --> 00:01:10,550
+那么希望那个的目标就是，以后能在那个窗口中，绘制我们的图形
+and then hopefully the goal with that is that in the future, we can draw all of our graphics inside that window
+
+19
+00:01:10,911 --> 00:01:16,300
+现在，特别是这个系列，我想要有多平台支持，对吧
+now, this series specifically, I want I want to have multi-platform support, right
+
+20
+00:01:16,300 --> 00:01:20,675
+我想人们不管在Windows，Mac还是在Linux上写这个代码，都能够运行这个代码
+I want people who are writing this code on Windows, Mac and Linux, to alse be able to run this code
+
+21
+00:01:20,675 --> 00:01:28,275
+并且它应该在这三个平台上运行，尽管那意味着我们需要一些方法, 去设置窗口和打开窗口
+and it should work on all three platforms, what that means though is that we need to, we need some way to set up windowing and windowing on
+
+22
+00:01:28,275 --> 00:01:31,575
+并且通常创建窗口是平台特定的
+and always creating windows is very very platform specific
+
+23
+00:01:31,575 --> 00:01:34,943
+所以换句话说，这就是你们，你们在Windows上创建窗口的方法是
+so, in other words, the way that you, the way that you create a window on Windows is
+
+24
+00:01:34,943 --> 00:01:39,750
+就是使用Win32接口，因此你们实际可以调用Windows的接口
+you use the Win32 api, right so, you actually use the Windows Api to say
+
+25
+00:01:39,750 --> 00:01:41,975
+嗨, 我想要一个窗口，因此那就是
+hi, I want a window, because of cause, the way that
+
+26
+00:01:41,975 --> 00:01:46,175
+你们创建一个特定你们正在使用的操作系统窗口的方法，因为那就是操作系统级别干的事情
+you create a window is going to be specific to the operating system you're useing, because that's like an operating system level thing
+
+27
+00:01:46,287 --> 00:01:50,300
+并且当我开发一个游戏引擎时，那就是我可能会做的，可能只是会花点时间
+and that's what I probably would do if i was writing a game engine, I would probably just take the time
+
+28
+00:01:50,300 --> 00:01:57,925
+使用操作系统的接口为我实际想要支持的每个平台设置一个窗口
+to actually set up a window myself using the actual operating system's api for each platform that I actually want to support
+
+29
+00:01:58,225 --> 00:02:01,875
+尽管这个系列不是关于如何开发一个游戏引擎，但那将是后来的其他系列要讲的
+this series though isn't about how to write a game engine, that's gonna be another series later on
+
+30
+00:02:01,875 --> 00:02:06,300
+这个系列是专门讲OpenGL的，关于OpenGL的原理，以及如何去写OpenGL的代码
+this series are specifically about OpenGL, and how OpenGL works, and how to write a OpenGL code
+
+31
+00:02:06,300 --> 00:02:11,550
+所以我们一点儿也不需要去关心如何设置一个窗口之类的操作，只需写些OpenGL的代码
+so we don't really care about how to set up a window all that, we just want to write some OpenGL code
+
+32
+00:02:11,775 --> 00:02:17,450
+并且正因如此，实际上我会使用一个基本为我实现那些的类库，并且这个类库所能做的就是
+and, so, because of that, I'm actually gonna use a library that will basically do that for me, and all this library is going to do is
+
+33
+00:02:17,450 --> 00:02:20,525
+向我提供适当的平台层，所以换句话说，那就是
+provide me with the appropriate platform layer, so in other words, it's going to
+
+34
+00:02:20,525 --> 00:02:28,400
+为我提供Windows、Mac和Linux的窗口创建代码和管理代码的实现
+provide me with an implement of that windowing creation code and management code as well for Windows, Mac and Linux
+
+35
+00:02:28,400 --> 00:02:32,300
+因此每个人都能跟着那个一起来学习了，并且这儿有几个允许我们实现那个的库
+so that everyone can follow along with that, and there are serveral libraries that allow us to do this
+
+36
+00:02:32,675 --> 00:02:36,950
+但我们要用的是一个叫GLFW的库，我之所以喜欢GLFW是因为
+but the one that we're gonna use is something called GLFW, and the reason that I like GLFW is because
+
+37
+00:02:36,950 --> 00:02:40,700
+这是一个非常轻量级的库，它能为我们做的就是
+this is a really kind of light-weight library, all it's going to do for us is
+
+38
+00:02:40,700 --> 00:02:45,475
+创建窗口和OpenGL上下文，让我们能够访问一些基本的东西，比如输入
+create a window, create an OpenGL context, and give us access to some basic things like Input
+
+39
+00:02:45,825 --> 00:02:47,225
+那就是它要做的一切
+that's all that it's going to do
+
+40
+00:02:47,525 --> 00:02:52,300
+它不像SDL那种全面的库，它们实际上就像一个渲染器
+it's not like SDL, which is like a full kind of, they're actually go like a renderer there
+
+41
+00:02:52,300 --> 00:02:55,075
+这样你们就可以在屏幕上绘制正方形或三角形或任何想绘制的东西
+so that you can draw squares or triangles or whatever you want to the screen
+
+42
+00:02:55,075 --> 00:03:00,500
+并且那会在DirectX或OpenGL中被实现，就像是一个完整的框架，我不想要任何那样的东西
+and that'll be implemented in either DirectX or OpenGL, and that that's like a whole kind of framework, I don't want any of that
+
+43
+00:03:00,500 --> 00:03:06,200
+我们将要编写我们自己的东西，我想做的第一步就是，那就是创建一个窗口
+we're going to be writing our own stuff, all I want to do is automate that first step of, I want to create a window
+
+44
+00:03:06,200 --> 00:03:09,125
+并且我不想为每个平台写不同的实现
+and I don't want to have to write different implementations for each platform
+
+45
+00:03:09,375 --> 00:03:15,000
+我希望这个代码是支持多平台和可移植的，所以我就要使用像GLFW这样的库
+I want this code to be pretty multi-platform, pretty portable, so I'm going to use library like GLFW just be that off for me
+
+46
+00:03:15,079 --> 00:03:17,050
+同样我也可以自己写，但那就意味着
+again, I could write it myself, but that would mean
+
+47
+00:03:17,050 --> 00:03:20,325
+在这种情况下，为每个平台，也就是Windows、Mac和Linux写三次
+writing it three times for each platform, Windows, Mac and Linux, in this case
+
+48
+00:03:20,673 --> 00:03:22,775
+那只是在浪费时间，并且那也不是这个系列的关键
+and that's just gonna to be waste time, and not really the point of the series
+
+49
+00:03:22,775 --> 00:03:27,380
+所以我只是想让每个人都明白我为什么要这么做，所以就让我们直接去下载GLFW吧
+so just want everyone to understand why I'd actually doing this, so yeah, let's go ahead and download GLFW
+
+50
+00:03:27,380 --> 00:03:31,871
+如果你们访问下面描述中的链接glfw.org，就会看到这个网页
+if you go to the url that is in the description below, which is glfw.org, you're be taken to this pape
+
+51
+00:03:32,150 --> 00:03:37,325
+我们关心的基本上就是两个页面，首先，下载GLFW 3.2.1，那正是我们想要的
+we care about basically two pages here, first of all, there's just download GLFW 3.2.1, it's exactly what we want
+
+52
+00:03:37,425 --> 00:03:42,025
+但同样在文档中，实际上会有一些关于如何在GLFW中创建窗口的示例代码
+but alse on the documentation, there's actually some example code of how to create a window in GLFW
+
+53
+00:03:42,025 --> 00:03:47,850
+你们可以看到它非常简洁，对吧，我们所要做的就是初始化GLFW，然后就可以创建窗口了
+you can see that it's very very concise, right, all we have to do is basically initialize GLFW, and then we could just create our window
+
+54
+00:03:47,950 --> 00:03:52,136
+就是那么简单，如果你们想创建OpenGL上下文，我们只需调用这个函数
+and that's as simple as that, if you want to make our OpenGL context, we just call this one function
+
+55
+00:03:52,479 --> 00:03:57,800
+然后我们就可以启动一个主循环来轮询事件，并确保当窗口关闭时，在它实际关闭的时候
+and then, we can start a basic loop to poll for events, and make sure that when our window is closed, and it actually closes
+
+56
+00:03:58,239 --> 00:04:04,475
+你们可以看到，我们就可以在这里编写OpenGL代码，非常简单，正是我们开始需要的
+and you can see, we can write OpenGL code right over here, it's very simple, and it's pretty much exactly what we need to get started
+
+57
+00:04:04,475 --> 00:04:08,800
+那么在这里，我要回到GLFW，所以这个下载实际上是针对所有源代码的
+so up in the to here, I'm gonna go back to GLFW, so this download is actually for all of the source code
+
+58
+00:04:09,250 --> 00:04:13,450
+这就是我想提到的另一件事，如果是我在写，如果这是一个游戏引擎系列的东西
+this is another thing that I want to mention, if I was writing, if this was a game engine series of something
+
+59
+00:04:13,450 --> 00:04:17,825
+实际上如果我是在创建一个专业应用，我可能会下载源代码，然后自己构建它
+I was actually making a serious application, I would probably download the source code, and built it myself
+
+60
+00:04:17,825 --> 00:04:22,175
+我会将其作为一个单独的项目添加到Visual Studio中，并可能将其编译到一个静态库中
+I would add it as a separate project add Visual Studio, and probably complie it into a static library
+
+61
+00:04:22,175 --> 00:04:27,650
+然后将其与我的主应用链接，这样如果我需要调试某些东西，就可以在这里找到源代码
+and then link it with my main application, just so that if I need to debug something, I had the source code right here
+
+62
+00:04:27,650 --> 00:04:33,900
+这样做真的没有坏处，我喜欢在项目中尽可能多地使用源码，然而，这是关于OpenGL的
+and there's really no downside to do that, I like having as much source code as I can in my project, however, this again is about OpenGL
+
+63
+00:04:33,900 --> 00:04:38,450
+就不在那上面浪费时间了，我要做的就是为我的平台准备预构建的二进制文件
+we don't waste time with that all, I'm going to do is just get pre-built binaries for my platform
+
+64
+00:04:38,725 --> 00:04:40,575
+然后用它来构建，对吧
+and just build with that, right
+
+65
+00:04:40,902 --> 00:04:44,775
+那么为了实现那个，我需要去下载，然后你们就可以看到Windows预编译的二进制文件
+so to do that, I'm going to go to download, and then you can see we have Windows precompiled binaries
+
+66
+00:04:44,850 --> 00:04:46,575
+所以Windows实际上有了预构建版本
+so Windows actually has prebuilt
+
+67
+00:04:46,825 --> 00:04:50,287
+至于Linux和Mac，它说你们实际上必须下载并编译上面的源码包
+Linux and Mac, it says that you actually have to downloading, and compile source the package above
+
+68
+00:04:50,675 --> 00:04:53,350
+这有个指南，如果你们是这些平台中的一个，所以就可以参考那个
+there's a guide, so follow that, if you're one of those platforms
+
+69
+00:04:53,350 --> 00:04:55,275
+我怀疑你们可能会在那里遇到问题
+I suspect people will probably run into problems with that
+
+70
+00:04:55,275 --> 00:05:00,806
+因为这不是最琐碎的任务，对于像make系统，就像那样的操作，往往到处都是
+because it's not the most trivial task, and with like make systems, like that, it just tends to be all over the place
+
+71
+00:05:01,075 --> 00:05:06,050
+所以如果你们需要在Linux下编帮助，一定要通过thecherno.com/discord加入我的Discord
+so, if you need help, with compiling this format for Linux, definitely join my discord at thecherno.com/discord
+
+72
+00:05:06,582 --> 00:05:10,900
+那里会有很多人，他们会很乐意为你们提供帮助，但特别是因为我们使用的是Windows
+there will be plenty of people there, who will be happy to help you out with that, but specifically since we're on Windows
+
+73
+00:05:10,900 --> 00:05:14,745
+在本系列的整个过程中，我们都用Windows，所以就直接去下载相应的二进制文件
+and we will be for the entirety of this series, I'm just going to download the appropriate binaries
+
+74
+00:05:14,950 --> 00:05:18,025
+不过另一个需要注意的是，我们可以选择32位或64位的二进制文件
+another note here, we have 32-bit or 64-bit binaries
+
+75
+00:05:18,025 --> 00:05:21,375
+但我一直会收到这样的问题，哪个，我该下载哪个，对吧
+question I get all the time, which one do, which one do I get, right
+
+76
+00:05:21,550 --> 00:05:24,425
+很多人似乎认为，我运行的是64位Windows
+a lot of people seem to think that, well I'm running 64-bit Windows
+
+77
+00:05:24,425 --> 00:05:28,275
+那么当然，我需要64位Windows二进制文件，仅此而已，但那并不正确
+so of course, I want 64-bit Windows binaries, that's all, that's not corrent
+
+78
+00:05:28,675 --> 00:05:33,950
+你们实际需要哪种架构，那个问题在于项目需要构建的架构, 对吧
+what you actually want the architecture, that matters is the architecture that you're building for, right
+
+79
+00:05:34,400 --> 00:05:40,975
+如果我们将Visual Studio项目设置为为Win32或x86构建，那么就需要下载32位二进制文件
+if we set up our Visual Studio project to build for Win32 or x86, then we want to get the 32bit ones
+
+80
+00:05:41,275 --> 00:05:46,925
+如果我们的应用是为64位或x64构建的，对吧，那么那就是我们需要的二进制文件
+if our application is being built for 64-bit or x64, right, that's where we want the binary
+
+81
+00:05:46,925 --> 00:05:53,812
+因此，实际上它的关键就在于应用的架构和平台，所以你们编译应用的方式？
+so it's actually the base what matters is the architecture the platform of your application, so how you compile your application
+
+82
+00:05:53,975 --> 00:06:00,575
+不，不是你们正在使用的操作系统，当然64位应用不会在一个32位操作系统上运行
+not, not the operating system you're using, of course, the 64-bit application won't work on a 32-bit operating system
+
+83
+00:06:00,950 --> 00:06:09,006
+但如果在一个64位操作系统上，比如64位的Win10，你们就可以运行32位和64位的应用
+but, if you're on a 64-bit operating system, like Windows 10 64-bit, you can run either 32-bit application or 64-bit applications
+
+84
+00:06:09,150 --> 00:06:14,050
+所以实际下载哪个取决于你们为哪个平台编译应用
+so the one that you actually download is going to depend on on what you compile your application with
+
+85
+00:06:14,050 --> 00:06:21,450
+既然如此，我们就使用32位的应用吧，因为不需要64位，对于专业项目, 可能会用到64位的
+so we'll just be using a 32-bit application, because we don't need a 64-bit one, for more serious projects, I probably use 64-bit
+
+86
+00:06:21,450 --> 00:06:24,926
+它们确实没有什么区别，切换起来也很方便，不像那种一整套解决方案
+there's no real difference, it's easy to switch as well, it's not like a whole deal
+
+87
+00:06:24,926 --> 00:06:30,300
+大多数时候，我们不需要编写不同的代码或任何东西，那几乎是一样的，但为了保持简单
+it's not like we have to write different code or anything most of the time, it's pretty much the same thing, but to keep it simple
+
+88
+00:06:30,800 --> 00:06:35,050
+我们就用32位的吧，那么在这里，点击32位的Windows二进制文件进行下载
+we're just gonna use 32-bits, so over here, I'm gonna click on 32-bit Windows binaries, and download that
+
+89
+00:06:35,150 --> 00:06:37,100
+好了，那么在下载的这个压缩包里
+ok, so inside the archive that you download
+
+90
+00:06:37,100 --> 00:06:41,100
+这儿有个GLFW文件夹和一大堆类库，我们过会儿将讨论如何设置那些
+there'll be a GLFW folder and a bunch of libs, we'll talk about setting all that upin a minute 
+
+91
+00:06:41,100 --> 00:06:46,000
+但首先，实际上我们需要创建一个解决方案，那么我已经有了VS2017
+but first, we actually need to create a Visual Studio solution, so every here, I've got Visual studio community 2017
+
+92
+00:06:46,275 --> 00:06:52,814
+我就去点击，文件 => 新建 => 项目，需要确保我是在Visual C++和常规下面
+I'm going to click file -> new, and the projects, I'm going to make sure that I'm under Visual C++ and general
+
+93
+00:06:52,814 --> 00:06:57,350
+然后选择空项目作为我的模板，因为我们打算从头开始做个全新的项目
+and select empty project as my template, we're just going to make a brand new project from scratch
+
+94
+00:06:57,350 --> 00:07:03,750
+在路径这里，实际上我需要从我的文档切换到C:/dev/YouTube/OpenGL
+in the location, I'm actually going to change location from being in my documents to basically being C:/dev/YouTube/OpenGL
+
+95
+00:07:03,750 --> 00:07:09,375
+你们可以将路径设置成任意位置，我喜欢保持开发之类的所有项目在C:/dev这个路径下面
+you can set this to anything else, I like to have, I like to keep all of my development kind of stuff under C:/dev that way
+
+96
+00:07:09,375 --> 00:07:13,200
+这不是一个用户文件夹，那我就不需要设置了，就用C:/dev吧
+it's not in a user folder, and I don't have to deal with all that, so just C:/dev
+
+97
+00:07:13,200 --> 00:07:18,075
+然后OpenGL或其他，我只需要将它放在这个YouTuBe文件夹下，因为这是youtube系列的
+and then OpenGL or whatever, I've just put it into a YouTuBe folder, because of couse this is for the youtube series
+
+98
+00:07:18,475 --> 00:07:21,387
+我就叫它OpenGL，然后点击确认
+I'm going to call this OpenGL and just click ok
+
+99
+00:07:21,600 --> 00:07:24,700
+好了，那么我们已经创建一个解决方案和项目设置，一切都看起来不错
+okay, so we've got a visual studio solution and project setup, everything looks pretty good
+
+100
+00:07:24,913 --> 00:07:29,075
+如果你们或多或少想要合理的设置，以一种更漂亮的方式去设置它
+if you want to set it up properly and more or less, just set it up in a nicer way
+
+101
+00:07:29,075 --> 00:07:33,775
+因为Visual Studio新方案和新项目的默认设置稍微有点儿奇怪
+because the default visual studio way that it sets up new projects and solutions is a bit weird
+
+102
+00:07:34,001 --> 00:07:39,839
+在我的收藏中去找那个视频吧，就是在Visual Studio中的C++设置，所以那儿应该有个链接的
+check out my video on my kind of favorite, set up for visual studio for c++, so there'll be a link up there
+
+103
+00:07:40,450 --> 00:07:43,921
+但现在我不会去做那些的，那只是在浪费时间，毕竟那个真的不太重要
+I'm not gonna go through all that right now, it's just gonna take time, that's not really about necessay
+
+104
+00:07:43,921 --> 00:07:48,850
+但如果你们想知道我是如何正确设置的，一定要去看看那个视频，所以我们今天要做的就是
+but definitely check out that video, if you want to know how I would set this up properly, so again all we're doing today is
+
+105
+00:07:48,850 --> 00:07:54,150
+我们正在尝试尽快设置GLFW，所以在源文件中，我实际上要做的一件事是
+we're trying to set up GLFW basically as quickly as possible, so in the source files well one thing I'll actually do is
+
+106
+00:07:54,375 --> 00:08:02,000
+点击项目名称，展示所有文件，然后为源文件创建一个src文件夹
+I'll click on the project name, I'll click on show all files, and then, I'm going to actually make a new folder here called src for source
+
+107
+00:08:02,300 --> 00:08:07,800
+那么在显示所有文件模式下, 它将模拟我们的资源管理器文件结构和目录结构那些
+so, in this show all files mode actually will mimic our windows explorer file structure and directory structure and all that
+
+108
+00:08:07,975 --> 00:08:12,000
+同样，我在那里链接的视频中描述了所有那些，如果你们不确定的话，就去看看
+again, that's all described in the video that I linked up there, so check that out, if you're not sure
+
+109
+00:08:12,604 --> 00:08:18,108
+在这下面添加一个新项，就是Application.cpp，也就是我们的主文件
+under there, I'm going to add a new item, I'm going to call this Application.cpp, this going to be our main file
+
+110
+00:08:18,108 --> 00:08:23,375
+也就是拥有主函数的文件，点击添加，最终在项目里面，就有了个普通的C++文件
+the file with the main function, I'll hit add, and I finally just have a normal c++ file in my project
+
+111
+00:08:23,375 --> 00:08:28,047
+现在我要做的基本上就是包含iostream，并且保证主文件没有问题
+what I'm going to do now is just basically include iostream, and make sure everything is set up in main
+
+112
+00:08:28,125 --> 00:08:33,800
+只需要输入std::cout << "hello" 和 std::cin.get()
+I just type in std::cout hello and std::cin.get
+
+113
+00:08:33,800 --> 00:08:36,500
+我喜欢做这个，只是为了保证一切正常，以及一切都会编译
+I like to do this, just to make sure everything's set up, and everything will compile
+
+114
+00:08:36,675 --> 00:08:42,075
+你们可以看到，得到了hello，挺不错的，那么现在准备真正链接GLFW吧，让它运行起来
+you can see, we get this Opening with hello, which is perfect, so, now I'm ready to actually link GLFW and get it to work
+
+115
+00:08:42,192 --> 00:08:50,075
+回到GLFW网站，在文档下面，我所能做的就是复制这个
+if I go back to the GLFW website, so here under documentation literally, all I'm going to do here is just copy pretty much this
+
+116
+00:08:50,425 --> 00:08:57,250
+在这个完整的源码中，复制，粘贴到这儿，好了，你们就会得到一大堆错误
+in this source code, just in its entirety, copy, and just paste it over here, ok, when you get a bunch of things not working
+
+117
+00:08:57,250 --> 00:09:01,300
+因为还没有设置对应的类库，那么接下来我们说说如何设置GLFW库吧
+because of couse when you actually setup the library, so let's talk about how I'm gonna set p GLFW in our project
+
+118
+00:09:01,392 --> 00:09:05,888
+我要去我下载的所有lib的zip压缩包那里，这里有两个东西对我们很重要
+I'm going to go to that zip archive that I downloaded with all of our libs, there are two things that matter for us here
+
+119
+00:09:05,950 --> 00:09:12,750
+每个C++类库都有include和lib，对吧，所以我们需要更进一步讨论
+every kind of c++ library has include and also lib, right, so we're going to talk more in depth about
+
+120
+00:09:12,750 --> 00:09:18,525
+C++类库是如何运行的，怎样去链接它们，以及之间的区别，在未来的C++系列中会深入讨论
+how C++ libraries work, and how to link them, and all the differences between all that, in a future video, in the C++ series
+
+121
+00:09:18,525 --> 00:09:24,375
+如果已经发布了，那儿会有链接，但是如果你们不确定库是如何运行的话, 一定要去看看
+it'll be linked up here if it's already made, but definitely check that out, if you're not sure about how kind of libraries work in C++
+
+122
+00:09:24,825 --> 00:09:30,300
+但在这里，我们需要关心的就是lib文件，这儿有两个，确实有两个lib文件
+but out of here, what we care about is the lib file, there's actually two here, the two lib files that we have here
+
+123
+00:09:30,300 --> 00:09:35,775
+你们可以看到，一个是dll标记的，如果想要在runtime使用dll，那这个就是用于动态链接的
+you can see, one is labeled with dll, so this one's used for dynamic linking, if you want to use the dll to link up runtime
+
+124
+00:09:36,075 --> 00:09:39,744
+但是吧，我们要使用的是glfw3.lib这个文件，因为这是为静态链接创建的
+glfw3.lib is the one that we're going to use though, because that's just for static linking
+
+125
+00:09:39,875 --> 00:09:46,075
+我们不想动态链接GLFW，也不想使用dll文件，没有理由不使用静态链接
+we don't want to link GLFW dynamically, we don't want to have to use a dll file, there's no reason for us not a static link yet
+
+126
+00:09:46,075 --> 00:09:49,700
+那么我们就去静态链接它吧，所以我想做的就是，在OpenGL下面
+so we're going to link it statically, so what I'm going to do is under OpenGL
+
+127
+00:09:49,700 --> 00:09:54,923
+就是点这儿，在资源管理器中打开这个文件夹，因此实际上就可以得到这个路径了
+just gonna right click on here hit open folder in file explorer, so that we actually get to our location of all of this
+
+128
+00:09:55,050 --> 00:10:00,225
+我喜欢做的就是在解决方案目录中，这是解决方案目录，也就是包含sln文件的目录
+and what I like to do is in the solution directory, so this is the solution directory, the directory with that solution file
+
+129
+00:10:00,475 --> 00:10:05,400
+创建一个新文件夹Dependencies，在Dependencies中，再创建一个文件夹GLFW
+I'm going to make a new folder called Dependencies, and inside Dependencies, I'm gonna make a folder called GLFW
+
+130
+00:10:05,625 --> 00:10:11,650
+就像这样，把我想要的所有文件放进去，那么除了刚下载的压缩包那些东西
+and then it's like here, I'm actually going to put all the files that I want, so out of what I want in this actual archive that I download
+
+131
+00:10:11,650 --> 00:10:18,575
+我需要include，以及这儿VS最新版本的lib-vc2015，把这些粘贴到这儿
+I want include, and I want to lib-vc2015 which is the latest visual studio version that we have here, we'll paste this into here
+
+132
+00:10:18,575 --> 00:10:23,875
+虽然我们实际用的是vs2017，但它对我们的目标不会有太大影响，仍然会正常运行
+of course we're actually using visual studio 2017 although, it won't matter for our purposes, it will still work inside here
+
+133
+00:10:23,875 --> 00:10:29,950
+实际上我会删除dll文件和相关的lib，不需要那些，在include中, 已经有了我们需要的一切
+I can actually delete that dll file and the dll lib as well, we don't need that, and include should just have everything we need
+
+134
+00:10:30,125 --> 00:10:36,150
+那么现在，实际上我需要做就是让这个项目包含这个include文件夹
+so now what we actually need to do is tell this project that I want you to also include this folder for includes
+
+135
+00:10:36,225 --> 00:10:41,625
+这样我们就可以写#include GLFW/glfw3.h，对吧，那么就需要添加一个包含目录
+so that we can write code such as #include GLFW/glfw3.h, right, so we need to add an include directory
+
+136
+00:10:41,925 --> 00:10:47,472
+然后我们也需要在链接器中添加这个lib，这样链接器实际上就会链接到这个lib文件
+and then we also need to add this lib file to the linker, so that the linker actually links this lib file in
+
+137
+00:10:47,472 --> 00:10:51,400
+这样的话，它就可以匹配GLFW所有的函数，所以让我们来看看，该如何设置那个
+and it can match up all of the GLFW functions, so let's take a look at how we might set that up
+
+138
+00:10:51,900 --> 00:10:56,450
+我现在做的就是右击项目，点击属性，现在这儿最重要的事情，我刚把这个窗口缩小了些
+what i'm going to do is right click on OpenGL hit properties, now the most important thing here, I'll just make this smaller
+
+139
+00:10:56,450 --> 00:11:01,240
+这儿最重要的事情就是你们应该选择所有配置，好了，所有平台也是个关键
+the most important thing here is that you're all configurations, okay, and all platform is really matter
+
+140
+00:11:01,400 --> 00:11:05,900
+我们只是在做你们现在不会做的，但所有配置，确保你们处于所有配置
+we're just messing with wouldn't that you do for now, but all configurations, make sure you're on all configurations
+
+141
+00:11:05,900 --> 00:11:09,425
+和release不同，如果你们正在编辑release，并且实际上正处于debug
+and not like release, if you're editing release, and you're actually in debug
+
+142
+00:11:09,775 --> 00:11:12,375
+它不会影响你们当前选择的配置
+it's not gonna affect your currently selected configuration
+
+143
+00:11:12,375 --> 00:11:19,987
+你们会得到所有的错误，所以我需要所有配置，在C\C++的常规下，添加一个包含目录
+you all you get errors, so we want all configurations, under C\C++ in general, we're going to add an include directory
+
+144
+00:11:20,200 --> 00:11:26,350
+现在我们可以做的是，打开我们的文件夹，基本上复制这个路径，然后把它粘贴在那里
+now what we could do, right, is open up our folder here, and just basically copy this path, and put it in there
+
+145
+00:11:26,725 --> 00:11:32,803
+但我们不想这样做，因为其他使用此项目的人可能不会保存在C:/dev/YoutouBe/OpenGL中
+now we don't want to do that though,because other people who will use this project, might not be storing it in C:/dev/YoutouBe/OpenGL
+
+146
+00:11:33,250 --> 00:11:39,175
+实际上我们需要一个项目自身的相对路径，并且我特别喜欢使用相对方案目录的相对路径
+we actually want to make a relative to the project itself, and specifically I like making it relative to the solution directory
+
+147
+00:11:39,650 --> 00:11:47,299
+现在VS为我们提供了一个宏，恰好就是当前方案的目录，如果打开这个选项卡进入宏
+now visual studio has a macro for us, that is actually ours current solution directory, if we if we open this tab here and go to macros
+
+148
+00:11:47,575 --> 00:11:52,475
+那么实际上就可以输入SolutionDir了，你们可以看到，它实际上就是C:/YouTuBe/OpenGL
+then you can actually type in SolutionDir, and you'll see what it actually is is C:/YouTuBe/OpenGL
+
+149
+00:11:52,475 --> 00:11:58,600
+所以基本上它就是我们这里的实际解决方案目录，这个目录包含这个sln文件
+so basically what it is is the actual solution directory that we have here, the directory that has this solution file
+
+150
+00:11:58,600 --> 00:12:06,450
+实际上, 我们将根据那个方案目录来定位我们的包含目录路径，那么我就输入SolutionDir
+and we're actually going to based our our our include directory path from that solution directory, so I'm going to type in SolutionDir
+
+151
+00:12:06,950 --> 00:12:13,525
+实际上已经有了个反斜杠，后面也有反斜杠，接下来就是Dependencies/OpenGL/include
+that actually already has a backslash at the end a trailing backslash, so next, we'll go into Dependencies OpenGL and include
+
+152
+00:12:13,725 --> 00:12:19,200
+实际上我需要做的就是复制那个，然后放在这儿，好了，那就是我们的包含目录
+in fact, I'm going to do is copy that last part, and put it over here, okay, that is our include directory
+
+153
+00:12:19,200 --> 00:12:23,875
+如果你们想去确认它是对的，可以编辑这里，看看计算出来的值
+if you want to make sure it's correct, you can go to edit here, and look at the evaluated value
+
+154
+00:12:23,875 --> 00:12:29,175
+如果你们复制这个值到资源管理器中, 然后回车，就会打开GLFW目录
+if you copy that into you're file explorer and hit enter, it should take you to well GLFW
+
+155
+00:12:29,500 --> 00:12:37,177
+当然，现在你们已经在这里设置好了，这个GLFW/glfw3.h包含应该有用
+and of course, now that you're set that up on the over here, this #include GLFW/glfw3.h should work
+
+156
+00:12:37,177 --> 00:12:41,925
+因为我们从这个包含目录开始的，然后就是GLFW文件夹，这儿就是glfw3.h
+because we start in this include directory, we're going to the GLFW folder and there's glfw3.h
+
+157
+00:12:42,000 --> 00:12:46,100
+好了，那么那就是我们如何设置包含目录的操作，接下来我将同样设置我的库目录
+ok, so that's how we can set up the include directory, next, I'm gonna set up my library directory as well
+
+158
+00:12:46,100 --> 00:12:52,350
+那么在链接器的常规下，我会指定一个附加库目录，这和我们之前做的很像
+so on the linker in general, I'm going to specify an additional library directory, this could be very similar to what we had before
+
+159
+00:12:52,575 --> 00:13:00,000
+从解决方案目录开始，然后是Dependencies，事实上，我只想回到我的文件夹
+so it's gonna start off with solution directory, it's going to go to Dependencies, in fact, I'm just gonna go back to my folder
+
+160
+00:13:00,000 --> 00:13:07,250
+复制路径，那么在GLFW下，有lib-vc2015，就在那里，对吧，复制它，就在这儿检查一下
+and copy the path, so under GLFW, we have lib-vc2015, and there there it is, right, so grab that, check that in here
+
+161
+00:13:07,825 --> 00:13:12,450
+在输入这里，没什么问题，实际上我指定了我们需要链接的文件
+and we're good to go on the input, I'm actually going to specify which file we want to link
+
+162
+00:13:12,450 --> 00:13:16,150
+现在不需要真的去链接所有这些，我不知道它们为什么会在这儿，看起来，像是默认的
+now, we don't actually need to link all of these, I don't know why they here, they feel but kind of be default
+
+163
+00:13:16,150 --> 00:13:20,025
+但实际上它们已经被包含在默认的库中，所以我们需要删掉那些为了保持整洁
+but they're actually included in default libraries, so we can get rid of all that to keep it nice and clean
+
+164
+00:13:20,450 --> 00:13:28,775
+然后只输入glfw3.lib，所以基本上只是链接这个文件，再说一次，如果我讲的太快或其他
+and just type in glfw3.lib, so basically, we're linking with this glfw3.lib file, again, if I'm going too fast or anything
+
+165
+00:13:28,775 --> 00:13:32,550
+我将会专门做一期关于这个更多细节的视频，只是不想一整天都耗在这儿
+I. will make a video sepcifically about this in more detail, I just don't want to spend all day on this
+
+166
+00:13:32,925 --> 00:13:36,150
+如果它已经发布了，那去看看那个视频吧，还没有的话，那就只有再等等了
+so check that out tear that video out, if it's already made, it's not, then just wait
+
+167
+00:13:36,375 --> 00:13:41,075
+现在另一个必须链接的东西是OpenGL，但我们马上就要做了，点击确定
+now another thing actually have to link with is OpenGL, but well we'll do it in a minute, I'm going to hit ok
+
+168
+00:13:41,075 --> 00:13:44,550
+因为那就是我们现在所需要的，所以你们可以看到我们所有的编译错误都消失了
+because that's all we'll need for now, you can see that all of our compiler is go away
+
+169
+00:13:44,550 --> 00:13:51,075
+如果按ctrl f7实际编译应用，你们可以看到每个应用都已成功编译，但现在它无法成功链接
+if we hit ctrl f7 to actually compile our application, you can see each compiled successfully, now it's not gonna link successfully
+
+170
+00:13:51,075 --> 00:13:55,125
+因为我们实际上没有链接，你们可以看到，在这使用OpenGL函数，但没有与OpenGL链接
+because we haven't actually, you can see, we're using an OpenGL function here, but we haven't links with OpenGL
+
+171
+00:13:55,625 --> 00:14:00,250
+但是它们不能编译成功，那就是我们现在关心的，如果我右键单击构建这个
+but they can't the compilation succeeds, and that's kind of all we care about for now, now if I right click build this
+
+172
+00:14:00,250 --> 00:14:05,325
+它实际上将编译它并链接整个应用程序，所以让我们看看那个，好了，那么得到了一些错误
+it's actually going to compile it and link the entire application, so let's take a look at that, okay, so we get a few things
+
+173
+00:14:05,600 --> 00:14:10,850
+首先我们又有一个未解析的外部符号，但我不喜欢看实际的错误列表
+first of all, we have an unresolved external symbol again, I don't I'm not a big fan of looking at the actual error list
+
+174
+00:14:10,975 --> 00:14:14,625
+你们应该查看输出，因为它们是一个列表，大部分都是假的
+you should be looking at the output, because they are a list is just mostly lies
+
+175
+00:14:14,800 --> 00:14:16,600
+好吧，不是这种情况，但是，它可以
+well, not is this case, but, it can be
+
+176
+00:14:16,973 --> 00:14:22,400
+这总会给你们更多的细节，好吧，这种默认的库限制，不用担心那个，只是一个警告
+and this always gives you more details, ok, this kind of default lib conficts, don't worry about that, that's just a warning
+
+177
+00:14:22,400 --> 00:14:27,475
+具体来说，它是一个烦人的警告，我们不需要考虑修复它，即使它没有那么重要
+and specifically it's an annoying warning that we don't need to think about fixing even, it's not that important
+
+178
+00:14:27,725 --> 00:14:33,875
+这很重要，但是我们有GL_CLEAR是一个未解决的异常，还有一堆未解决的窗口问题
+this is important however we have GL_CLEAR is an unresolved exception,we also have a bunch of window stuff that is unresolved 
+
+179
+00:14:33,875 --> 00:14:40,175
+现在，因为我确实删除了我们漏掉的大部分库，所以我们马上会把其中的一些找回来
+now because I did actually delete most of the libraries that we leaked, again so we'll bring some of them back in a minute
+
+180
+00:14:40,325 --> 00:14:43,311
+但我们首先要解决的第一个问题是GL_CLEAR
+but the first one that we're getting, which we'll fix first is GL_CLEAR
+
+181
+00:14:43,500 --> 00:14:47,850
+好了，我们实际上可以通过链接OpenGL库来消除这个错误
+ok, and we can actually get rid of that error by linking with the OpenGL library
+
+182
+00:14:47,850 --> 00:14:49,725
+所以在得到链接错误时，到底发生了什么
+so what's happening is we're getting a linking error
+
+183
+00:14:49,725 --> 00:14:53,675
+如果你们不知道C++链接器是如何运行的，就去看看那期视频，因为我已经制作了那个
+if you guys don't know, how to C++ linker works, check out that video, because I have already made that
+
+184
+00:14:54,125 --> 00:14:56,325
+但链接现在想做的基本上就是
+but basically what link is trying to do now is
+
+185
+00:14:56,325 --> 00:15:02,350
+查找该GL_CLEAR函数的定义，该GL_CLEAR函数定义位于OpenGL库文件中
+find a definition for that GL_CLEAR function, that GL_CLEAR function definition is inside an OpenGL library file 
+
+186
+00:15:02,350 --> 00:15:10,075
+所以我们实际上必须链接那个，所以在其他依赖项的视图中，我只需要添加;opengl32.lib
+so we actually have to link against that, so our view here in additional dependencies, I'm just gonna add a semicolon type in opengl32.lib
+
+187
+00:15:11,000 --> 00:15:16,500
+点击确认，然后构建它，你们就可以看到第一个错误已经消失了
+if I hit ok, and I build this, you can see that first error should go away
+
+188
+00:15:16,775 --> 00:15:20,825
+实际上第一次解决这个未解决的符号只是注册了设备通知之类的东西
+and in fact now the first time resolue a sternal symbol is just register device notification stuff
+
+189
+00:15:20,825 --> 00:15:24,652
+基本上就是Windows的接口之类的，那么就让我们直接把那个添加进去
+which is basically Windows kind of api stuff, so let's go ahead and add that in
+
+190
+00:15:24,850 --> 00:15:27,775
+在我们这样做之前，我想告诉你们一种方法，可以找到这些东西
+now before we do that I actually want to show you one way that you can find these things
+
+191
+00:15:27,775 --> 00:15:32,850
+我是故意删除了所有Windows，然后关闭，因为我想让你们看看这到底是怎么回事
+I've deliberately gotten rid of all the kind of Windows and close, because I wanted to show you guys how this actually works
+
+192
+00:15:32,850 --> 00:15:36,525
+并且如何从零开始设置它，但如果你们看像这种错误
+and how to set it up kind of really from scratch, but if you see errors like this
+
+193
+00:15:36,650 --> 00:15:40,325
+因为如果设置不正确的话，它们实际上往往很模糊，有时很明显
+because they actually do tend to be quite fog, quite common sometimes, if you don't set up correctly
+
+194
+00:15:40,650 --> 00:15:43,625
+你们可以看到这个函数名称实际是RegisterDeviceNotificationW
+you can see that the function name is actually RegisterDeviceNotificationW
+
+195
+00:15:43,925 --> 00:15:48,050
+所以让我们抓住并复制它，实际上谷歌搜索了它，所以在MSDN上，我只想谷歌一下
+so let's grab that and copy that actually googled that, so on MSDN, I'm just gonna google that
+
+196
+00:15:48,050 --> 00:15:51,650
+你们可以看到，我们实际上是在这里使用MSDN创建的，也就是Microsoft文档
+you can see we're actually created with MSDN here, which is the Microsoft documentation
+
+197
+00:15:51,800 --> 00:15:56,850
+所以这是我们试图链接的实际函数，不知道它在哪里，所以如果向下滚动，你们就可以看到
+so this is the actual function that we're trying to link, and we don't know where it is, so if we scroll down, you can actually see that
+
+198
+00:15:56,850 --> 00:16:01,775
+它所在的库是User32.lib，所以我们可以做的就是复制并实际链接到它
+the library that it's in is User32.lib, so what we can do is copy that and actually link with that
+
+199
+00:16:01,825 --> 00:16:05,825
+那个错误实际上就会消失，所以在这里，我只需要输入User32.lib
+and that that will actually go away, so over here, I'll just type in User32.lib
+
+200
+00:16:06,200 --> 00:16:08,900
+点击回车，点击确定，然后再次尝试构建这个
+hit enter, hit ok, and try and build this again
+
+201
+00:16:09,075 --> 00:16:12,316
+你可以看到，我们现在的错误少了很多，我们现在只有很少的错误
+you can see that we get way less errors now, we've only got just a handful now
+
+202
+00:16:12,625 --> 00:16:18,075
+其中一些基本上是在这里创建设备上下文，交换缓冲区等，所以当我用这做同样的事情时
+and a few of them are basically create device context here and swap buffers and all that stuff, so again when I do the same thing with this 
+
+203
+00:16:18,075 --> 00:16:24,450
+我要复制这个，我要去谷歌，基本上就是谷歌搜索那个函数，点击MSDN链接
+I'll gonna copy this, I'm going to go to, I'm going to go over to the google, just basically google that function, click on the MSDN link
+
+204
+00:16:24,800 --> 00:16:33,575
+向下滚动，你们就可以看到这个在Gdi32.lib中，那么回到我的项目，链接Gdi32.lib
+scroll down, and you can see this one is in Gdi32.lib, so back to my project, and I'm going to link against Gdi32.lib
+
+205
+00:16:34,925 --> 00:16:41,575
+好了，我将点击确定，然后再次尝试编译代码，好了，错误少了些，再看DragQueryFileW
+okay, I'll hit ok and try and compile my code again, alright, just a few more now, DragQueryFileW again
+
+206
+00:16:41,575 --> 00:16:52,175
+复制粘贴到这里，也就是MSDN，这里是Shell32.lib，回到这里，你们就有了Shell32.lib
+copy that paste it in here, MSDN, and here it is Shell32.lib, so back to over here, you guys kind of get the drift Shell32.lib
+
+207
+00:16:52,225 --> 00:16:59,250
+好了，构建，棒极了，没有任何错误，如果我们点击f5或只是本地Windows调试来运行应用
+okay and build, alright, awesome, no errors at all, if we hit f5 or just local Windows debugger to run our actual application
+
+208
+00:16:59,450 --> 00:17:03,725
+你们可以看到我们得到了一个黑窗口，现在所有这些都手动链接到了我刚刚加的那些库
+you can see that we get a black screen, now all this manual linking that I've just done
+
+209
+00:17:03,825 --> 00:17:07,675
+你们自己不需要那样做，当你们像我们那样在Visual Studio中创建一个新的空项目时
+you don't need to do that yourself, when you create a new empty project in Visual Studio like we did
+
+210
+00:17:07,675 --> 00:17:12,425
+你们可以看到它实际上已经包含了一大堆链接，比如Kernel32.lib之类的
+you can see it actually did have a bunch of links already including, like Kernel32.lib and stuff like that
+
+211
+00:17:12,988 --> 00:17:17,875
+我只是想删除它们，向你们展示它的实际原理，以及如何从零开始将一切链接起来
+I just wanted to get rid of them just to show you how it actually works, and how to link everything kind of from scratch
+
+212
+00:17:18,400 --> 00:17:23,200
+我希望你们不需要做那些，这只是一个例子，现在我们这里得到了一个黑窗口
+I hope you don't need to do that, they're just this was just kind of as an example, now we've got a black screen here
+
+213
+00:17:23,200 --> 00:17:28,450
+让我们快速绘制一个三角形吧，现在我要实际绘制这个三角形的是使用传统的OpenGL
+let's quickly draw a triangle, now what I'm actually gonna do to draw this triangle is use legacy OpenGL
+
+214
+00:17:28,525 --> 00:17:32,775
+那么在第一期视频中，我们讨论了什么是传统OpenGL，以及为什么我们不应该使用它
+so in the first video, we talked about what a legacy OpenGL was, and why we shouldn't be using this
+
+215
+00:17:33,775 --> 00:17:41,437
+传统OpenGL是我现在可以用五行代码在屏幕上绘制三角形的最快方法
+legacy OpenGL is the fastest way that I can now in like five lines of code draw a triangle on the screen
+
+216
+00:17:41,759 --> 00:17:47,250
+我现在的目的是确保OpenGL已启动并运行，不再编写，我现在没有编写图形引擎
+and my purpose right now is just making sure that OpenGL is up and running, not writing again, I'm not writing a graphics engine right now
+
+217
+00:17:47,375 --> 00:17:55,885
+对吧，所以为啥不用合适的OpenGL开始呢，我猜专业应用有良好的调试
+right, so whilst you shouldn't be using like a seat OpenGL like in, I guess professional applications is perfectly fine for debugging
+
+218
+00:17:56,250 --> 00:17:59,900
+人们需要意识到那个，即使是思考，有些操作也是不推荐的
+people need to realize that, even thought, some things are discouraged
+
+219
+00:18:00,275 --> 00:18:02,950
+如果你们只是临时写一些东西用来测试
+if you're just writing it temporarily to test something
+
+220
+00:18:02,950 --> 00:18:07,342
+绝对没有错，这儿就是如此，请记住那个，那么我们在这里要做什么
+there's absolutely nothing wrong with it, so here's, keep that in mind, so what we're gonna to over here
+
+221
+00:18:07,575 --> 00:18:11,925
+在glClear后面，因为实际上我只需要输入glBegin(GL_TRIANGLES)
+I'm to glClear, because I'm actually just gonna type in glBegin, GL_TRIANGLES
+
+222
+00:18:11,925 --> 00:18:15,886
+这就是你们可以体验一下的传统OpenGL的代码
+and this you and you guys will kind of get it to experience and legacy OpenGL codes
+
+223
+00:18:15,886 --> 00:18:19,825
+那么在glBegin()和glEnd()之间，我只需要指定三个顶点
+so between glBegin glEnd, we just want to specify three vertices
+
+224
+00:18:20,175 --> 00:18:25,625
+我需要输入glVertex2f，它将指定它为组件类型的顶点或2D，我猜是顶点
+I want to type in glVertex2f, which is going to specify it to component kind of vertex or 2D, I guess vertex
+
+225
+00:18:25,700 --> 00:18:32,383
+现在默认情况下，OpenGL中的投影矩阵在每个轴的每个维度上都介于-1和1之间
+now by default, our projection matrix in OpenGL is between -1 and 1 in all in every dimension in every axis
+
+226
+00:18:32,725 --> 00:18:36,555
+我们将在以后的视频中再次介绍投影矩阵和所有这些有趣的东西
+we'll take more about projection matrix and all this fun stuff in future video again
+
+227
+00:18:36,675 --> 00:18:42,987
+现在试着绘制一个三角形，我要输入-0.5f，然后输入-0.5f代表y
+just trying to draw a triangle now, so I'm going to type in -0.5f, and then -0.5f for y as well
+
+228
+00:18:43,083 --> 00:18:45,771
+然后对于我其他的顶点，我可能会把这个放在中间
+and then for my other ones, I'm going to maybe make this one in the middle
+
+229
+00:18:45,771 --> 00:18:55,225
+所以x值为0f，y值为0.5f，这个的x值为0.5，y值为-0.5
+so it's going to be just 0f for x, and also a 0.5f for y, and this one's going to be 0.5 for x, and -0.5 for y
+
+230
+00:18:55,225 --> 00:18:57,825
+所以我应该绘制了一个基本上就这种形状的三角形
+so I should be brawing a triangle that is basically in this shape
+
+231
+00:18:58,250 --> 00:19:01,925
+让我们点击f5，你们就可以看到，一个三角形正好在我的屏幕中间
+let's hit f5 and you can see that I get a triangle is perfectly kind of be in the middle of my screen
+
+232
+00:19:01,925 --> 00:19:07,515
+看起来不错，好了，所以现在我们可以断定OpenGL是正常运行的，这个视频就要结束了
+and looks pretty good, okay, so, we can now conclude that OpenGL is working, and that's gonna wrap up this video
+
+233
+00:19:07,515 --> 00:19:12,675
+基本完成了想要的，我们有一个OpenGL窗口，现在所有的代码都在Application文件中
+we've bascially accomplished everything wanted to, we're got an OpenGL window, everything right now is in our Application file
+
+234
+00:19:13,075 --> 00:19:17,700
+我们可能会把它移到一个类或其他地方，只是为了让它更简单一点，下次再来做那些吧
+we are probably going to move it just into a class or something, just to keep it a bit more simple, we'll do that next time
+
+235
+00:19:18,625 --> 00:19:22,971
+但总的来说，我们不会花太多时间为自己创建接口，因为我们只是想学习OpenGL
+but overall again, we're not going to spend too much time creating an api for ourselves, because we want to learn OpenGL
+
+236
+00:19:23,250 --> 00:19:26,750
+所以我们只是让一些东西运行起来，你们需要你们电脑上重写这个代码
+so we've got something up and running, you guys can recreate this code on your computer
+
+237
+00:19:26,750 --> 00:19:31,600
+希望不会出什么问题，所以最终你们会创建出一个精致的OpenGL应用
+and hopefully get something as well, so you can finally making a nice lit cute OpenGL application
+
+238
+00:19:31,600 --> 00:19:36,900
+也就绘制了个独立三角形，令人兴奋的东西，如果随着我们的继续学习，会处理更多的东西
+which draws a single triangle exciting stuff, I know if as we go as we go what kind of deal with more stuff
+
+239
+00:19:36,900 --> 00:19:41,200
+现在对于这个系列的所有代码，实际上我是比较鼓励你们去复制它的
+now for all the code in this series, I do actually encourage that you copy it down yours sells
+
+240
+00:19:41,200 --> 00:19:45,275
+因为当你们复制代码时，即使你们想，只是从屏幕上复制，实际上也是在学习它
+because when you actually copy code, even even thought, you are just copying from a screen, you actually learn it
+
+241
+00:19:45,275 --> 00:19:49,000
+因为是你们亲自敲出来的，它就像当你们遇到新人的时候，大多数时候，碰见他们
+because you're typing it out yourself, it's like when you meet someone new a lot of times, you'll meet someone
+
+242
+00:19:49,000 --> 00:19:53,025
+你们不向他们做自我介绍，也不叫他们的名字，然后马上就会忘了他们的名字
+you don't introduce themselves and say their name, and then you'll just forget their name right away
+
+243
+00:19:53,025 --> 00:20:00,975
+但你们实际上会对他们说名字，比如你好，Bob，然后实际上更可能记住他们的名字，对吧
+but you actually say their name back to them, like hello bob, then you'll actually you're way more likely to remember their name, right
+
+244
+00:20:01,250 --> 00:20:09,275
+所以对于这个，我也喜欢那种想法，人们实际上自己复制代码，实际上就是亲自敲出来
+so kind of with this, as well I like I like the idea of peopel actually copying code down themselves, and actually physically typing it themselves
+
+245
+00:20:09,375 --> 00:20:13,525
+因为一旦你们那样做了，肌肉记忆就会活跃起来，实际上就会学得更快
+because once you do that, muscle memory will kind of kick in, and you'll actually learn a lot faster
+
+246
+00:20:13,850 --> 00:20:18,050
+也就是说，如果你们真的想要源代码，我实际上会把那个提供给赞助人
+that being said if you really want the source code, I am actually making that available to patreons
+
+247
+00:20:18,166 --> 00:20:22,981
+所以，如果你们在thecherno.com/patreon上保证，对不起，patreon.com/thecherno上保证
+so if you pledge on thecherno.com/patreon, I'm sorry, if you pledge on patreon.com/thecherno
+
+248
+00:20:23,075 --> 00:20:27,325
+可能会搞一个thecherno.com/patreon也可以，但是如果你们去patreon.com/thecherno
+probably make thecherno.com/patreon work as well, but if you go to patreon.com/thecherno
+
+249
+00:20:27,625 --> 00:20:31,775
+如果你们保证它只会帮助你们支持这个系列，那么你们实际上可以访问github上的代码
+and you pledge it only helps support this series, you will actually get access to the code on github
+
+250
+00:20:32,075 --> 00:20:36,675
+每一期都会分开，就像我的其他系列一样
+and that will be separate for each episode as well, just like it is for all of my other series
+
+251
+00:20:37,050 --> 00:20:39,825
+所以如果你们真的想要源代码，并且真的想帮助支持这个系列
+so if you really want the source code, and you really wanna help to support the series
+
+252
+00:20:40,133 --> 00:20:45,825
+基本上，你们只是因为帮助支持这个系列而获得奖励，并确保我可以创作更多的视频
+it's just basically you just get a reward for helping to support this series, and make sure that I can make more videos
+
+253
+00:20:45,825 --> 00:20:49,175
+在patreon.com/thecherno上还有很多其他的奖励
+there's also a bunch of other rewards on patreon.com/thecherno
+
+254
+00:20:49,675 --> 00:20:52,266
+所以我真的很感激我从那里得到的所有帮助
+so I really appreciate all the help I get from there
+
+255
+00:20:52,266 --> 00:20:56,475
+那基本上让我可以坐下来好好创作这些视频，所以，非常感激
+and that's what basically lets me sit down and make these videos properly, so much appreciated
+
+256
+00:20:56,475 --> 00:21:00,625
+无论如何，下一次我们将在把这个抽象到类，并真正讨论一个现代OpenGL
+anyway, next time we're going to strike this out into a class, and actually talk about a modern OpenGL
+
+257
+00:21:00,625 --> 00:21:04,400
+因为我们现在所做的是创建了一个OpenGL上下文和一个窗口等
+because what we've done right now is we've created an OpenGL context and a window and everything
+
+258
+00:21:04,700 --> 00:21:08,925
+我们实际上只限于使用OpenGL 1.1，这是Windows附带的
+we're actually only limited to using OpenGL 1.1, which is what ships with Windows
+
+259
+00:21:08,925 --> 00:21:12,256
+Windows没有，Windows有自己的渲染接口，DirectX和Direct3D
+Windows doesn't, Windows has its own rendering api DirectX Direct3D
+
+260
+00:21:12,700 --> 00:21:16,225
+因此，它们实际上并没有提供现代OpenGL所需的函数
+so they don't actually provide, you will the functions you need for modern OpenGL
+
+261
+00:21:16,725 --> 00:21:22,097
+正如我在欢迎OpenGL视频中提到的，那是由我们的GPU驱动程序提供的
+as I mentioned in the welcome to OpenGL video, that's provided for us by our GPU drivers
+
+262
+00:21:22,466 --> 00:21:30,625
+所以我们下期需要做的是从我们的GPU驱动程序中获取OpenGL新版本中的所有函数
+so what we need to do next time is actually somehow get all those functions that are in newer versions of OpenGL out from our GPU drivers
+
+263
+00:21:30,725 --> 00:21:35,750
+这样我们就可以真正地调用函数了，对吧，所以那就是我们需要做的
+so that we can actually we want to be able to call the functions, right, so that's what we need to do
+
+264
+00:21:35,750 --> 00:21:40,650
+那就是我们下期要讨论的内容，也可能会是把它抽象到类等
+and that's what we'll talk about next time, as well as probably moving this out into a class and all that fun stuff
+
+265
+00:21:40,700 --> 00:21:45,500
+然后真正有趣的事情将在下期开始，所以我会在下期视频中看到你们，再见
+and then that's when the real fun something gonna begin next time, so I'll see you guys in the next video, goodbye
+

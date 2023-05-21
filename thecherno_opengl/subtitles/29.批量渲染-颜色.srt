@@ -1,0 +1,690 @@
+﻿1
+00:00:00,200 --> 00:00:02,600
+那么让我们继续讲这个批渲染部分吧
+so let's continue this batch rendering party
+
+2
+00:00:02,600 --> 00:00:06,200
+上次我们看了批渲染实际上是什么，我们说了一点理论
+last time we took a look at what batch rendering actually was, we did a bit of theory
+
+3
+00:00:06,300 --> 00:00:09,366
+以及举了一个渲染两个正方形的简单的例子
+and put together a basic example of just rendering two squares
+
+4
+00:00:09,366 --> 00:00:12,700
+如果你们错过了，就去看看那个视频，今天我们将继续
+check out that video, if you missed it, and today we're gonna continue on
+
+5
+00:00:12,966 --> 00:00:16,233
+填补传统渲染的空白
+with kind of filling in the blanks of what we could do with traditional rendering
+
+6
+00:00:16,233 --> 00:00:18,100
+那是批渲染做不到的
+which we can't do with batch rendering
+
+7
+00:00:18,333 --> 00:00:21,350
+我想把所有这些特性都放进去
+and kind of bringing all of those features I guess back into it
+
+8
+00:00:21,350 --> 00:00:25,666
+上次我们绘制了两个白色的四边形，也就是白色的方块
+so last time we did just draw two white quads, two white squares
+
+9
+00:00:25,733 --> 00:00:29,125
+那很好，但最终你们可能会想做其他事情
+and that was fine, obviously but eventually you're probably gonna want to do other things
+
+10
+00:00:29,125 --> 00:00:33,375
+例如，绘制不同颜色的四边形或绘制有纹理的四边形
+for example, drawer quads of different colors or draw textured quads 
+
+11
+00:00:33,375 --> 00:00:36,511
+或者动态地改变已经绘制出来的四边形
+or dynamically changed the quads that are being drawn
+
+12
+00:00:36,511 --> 00:00:39,300
+所有这些东西，那正是这个迷你系列的主题
+all those things and that's exactly what this mini series is about
+
+13
+00:00:39,300 --> 00:00:44,666
+我们会一步一步地讲解，用一种非常简单的方法把它分解
+we're kind of going through everything step by step, breaking it down doing it in a really kind of simple way
+
+14
+00:00:45,133 --> 00:00:50,033
+然后填充所有我们想要用批渲染实现的东西
+and then filling in everything that we would want to actually achieve with batch rendering
+
+15
+00:00:50,033 --> 00:00:54,800
+所以今天讲的都是颜色，我们如何绘制两个不同颜色的四边形
+so today that's going to be all about color, how do we draw two quads of different colors
+
+16
+00:00:54,800 --> 00:00:57,733
+或者是任意数量的不同颜色的四边形
+or in fact any number of quads with different colors
+
+17
+00:00:57,933 --> 00:01:02,700
+当我们想画一个有颜色的四边形时，如果你们想用最简单的方法
+traditionally, when we want to draw a colored quad, if you think about the most simplest way
+
+18
+00:01:02,700 --> 00:01:07,633
+我的意思是最简单的方法可能很主观，对我来说可能很简单
+I mean the simplest way is probably quite subjective, something that might be simple to me
+
+19
+00:01:07,766 --> 00:01:10,100
+可能对你们来说并不简单，你们可能认为其他方法很简单
+might not be simple to you, you might think something else is simple
+
+20
+00:01:10,100 --> 00:01:13,600
+但是当我想到，让我们渲染一个四边形，一个有颜色的四边形
+but when I think of like, let's just render a quad, a colored quad
+
+21
+00:01:13,600 --> 00:01:18,333
+用最基本的方式绘制一个扁平的彩色四边形我认为这很简单
+a flat colored quad in the most basic way possible, what I think of is simply
+
+22
+00:01:18,333 --> 00:01:23,200
+用顶点位置填充顶点缓冲区，然后渲染那个四边形
+filling in a vertex buffer with the vertex positions, and then rendering that quad
+
+23
+00:01:23,200 --> 00:01:24,466
+然后在片段着色器中
+and then in the fragment shader
+
+24
+00:01:24,466 --> 00:01:27,533
+传入一个包含颜色的统一变量
+passing in some kind of uniform variable which contains the color
+
+25
+00:01:27,733 --> 00:01:31,266
+当然，我们可以硬编码片段着色器为一个特定的颜色
+of course we could just hard code the fragment shader to be a particular color
+
+26
+00:01:31,533 --> 00:01:34,266
+但如果我们有两个不同的四边形，那就没用了
+but that wouldn't really be useful, if we have two different quads
+
+27
+00:01:34,266 --> 00:01:37,333
+我们得写两种不同的颜色，像这样而不是那样
+we'd have to write two different shade or something, like that instead of that
+
+28
+00:01:37,333 --> 00:01:40,933
+我们要做的就是使用两个不同的绘制调用来渲染我们的正方形两次
+what we would do is just render our quad twice using two different draw calls
+
+29
+00:01:41,133 --> 00:01:45,866
+然后在我们的片段着色器中有一个像vec4或vec3 color
+but then have a uniform like vec4 or vec3 color inside our fragment shader
+
+30
+00:01:45,866 --> 00:01:48,033
+那里就是我们设置输出颜色的地方
+which we would set the output color to be
+
+31
+00:01:48,300 --> 00:01:52,566
+那实际上会在绘制调用发生之前设置好
+and then that would actually be kind of set up before the draw call happens
+
+32
+00:01:52,566 --> 00:01:56,433
+所以我可以用glUniform3f或glUniform4f
+so I can just use like glUniform3f or glUniform4f
+
+33
+00:01:56,500 --> 00:02:02,266
+在绘制我的四边形之前设置这些变量，在调用glDrawElements之前
+and actually set those variables before drawing my quad, before actually calling glDrawElements
+
+34
+00:02:02,266 --> 00:02:06,333
+那对我来说是绘制一个四边形最简单的方法
+that's kind of to me what would be the simplest way of rendering a quad
+
+35
+00:02:06,700 --> 00:02:10,166
+但是我们不能再那样做了，而我们不能再那样做的原因是
+however we can't do that anymore, and the reason we can't do that anymore is
+
+36
+00:02:10,166 --> 00:02:11,500
+因为我们只有一个DrawCall
+because we just have one DrawCall
+
+37
+00:02:11,500 --> 00:02:14,700
+我们不能调用glUniform4f，然后调用glDrawElements
+we can't call glUniform4f, then glDrawElements
+
+38
+00:02:14,733 --> 00:02:18,000
+然后再次调用glUniform4f，然后调用glDrawElements
+and then call glUniform4f again, and then DrawElements
+
+39
+00:02:18,000 --> 00:02:21,933
+因为我们只有一个绘制元素调用，只有一个DrawElements调用
+because we only have one elements call, we only have one DrawElements call
+
+40
+00:02:22,266 --> 00:02:28,366
+所以我们不能将统一变量设置为绘制之间的两个不同值
+so we can't set the uniform to be two different values between drawers
+
+41
+00:02:28,875 --> 00:02:32,139
+怎么做呢，我们现在确实有很多实现这个的解决方法
+what we do, now there are a number of solutions to this
+
+42
+00:02:32,775 --> 00:02:35,000
+我的意思是，你们可以有一个颜色值的数组
+I mean you could have like an array of color values
+
+43
+00:02:35,000 --> 00:02:39,966
+你们可以传入索引，有很多不同你们可以做的东西
+and you could kind of pass in the index, and like there's a lot of different things you could do
+
+44
+00:02:40,266 --> 00:02:41,700
+其中一些可能比另一些好
+some of them better than others
+
+45
+00:02:41,700 --> 00:02:45,066
+但这个视频中我们解决这个要用的方法，我认为可能是
+but the way that we're gonna solve it in this video is what I think is probably
+
+46
+00:02:45,200 --> 00:02:47,800
+最好的解决方法，我的意思是，当然只是主观的
+the best way to solve it, I mean, subjectively of course
+
+47
+00:02:47,800 --> 00:02:49,666
+只是我的意见，没必要生气
+just my opinion, no need to get mad
+
+48
+00:02:49,666 --> 00:02:54,100
+并且那就是通过使用顶点颜色，现在你们可能听说过顶点颜色
+and that is by using vertex colors, now you may have heard of vertex colors before
+
+49
+00:02:54,100 --> 00:02:57,166
+那么我们来讨论一下，那到底意味着什么
+so let's just talk a little bit about, what that actually means
+
+50
+00:02:57,166 --> 00:03:00,566
+目前我们的顶点只简单地包含一个位置
+currently our vertex simply contains a position
+
+51
+00:03:00,566 --> 00:03:06,700
+所以每个顶点都有三个浮点数xyz，它定义了顶点的位置
+so every vertex just has three floats xyz, and that defines the position of that vertex
+
+52
+00:03:06,700 --> 00:03:12,533
+但是位置并不是顶点能够包含的唯一内容，事实上
+but positions are not the only things that vertices are capable of containing, and in fact
+
+53
+00:03:12,966 --> 00:03:17,833
+顶点和顶点位置经常互换使用，这是不太恰当的
+the vertex and vertex position is often used interchangeably, which isn't exactly correct
+
+54
+00:03:17,833 --> 00:03:20,733
+例如，某人可能会引用对象的顶点
+for example, someone might refer to the vertices of an object
+
+55
+00:03:20,733 --> 00:03:24,200
+实际上是在讨论一个对象的顶点位置
+and really be talking about the vertex positions of an object
+
+56
+00:03:24,450 --> 00:03:29,666
+然而，顶点这个词以及它在图形编程中的实际含义只是一个点
+however the word vertex and what it actually means in graphics programming is simply a point
+
+57
+00:03:29,800 --> 00:03:32,966
+它可以包含你们真正想要的所有数据
+which can contain as much data as you really want it to do
+
+58
+00:03:32,966 --> 00:03:39,533
+你们可以在顶点中存储任何东西，然后在顶点着色器中访问这些数据
+you could store absolutely anything inside of vertex, and then access that data inside your vertex shader
+
+59
+00:03:39,533 --> 00:03:41,000
+所以那就是我们今天要做的
+so that's what we're going to do today
+
+60
+00:03:41,033 --> 00:03:46,233
+每个单独的顶点在我们的顶点缓存区中都会包含一个颜色
+every single vertex that we actually have inside our vertex buffer is going to contain a color
+
+61
+00:03:46,366 --> 00:03:51,650
+然后我们会在顶点着色器顶点缓冲区中访问这个颜色
+and then we're going to access that color from within the vertex buffer inside our vertex shader
+
+62
+00:03:51,733 --> 00:03:53,733
+然后传到片段着色器
+pass it to the fragment shader 
+
+63
+00:03:53,733 --> 00:03:59,133
+并且然后将它设置为输出颜色，因为现在每个顶点都包含一种颜色
+and then set that as our output color, so since each vertex now contains a color
+
+64
+00:03:59,666 --> 00:04:03,600
+显然，每个坐标都可以是我们设置的任何颜色
+obviously every coord has the ability to be any color we set it to
+
+65
+00:04:03,600 --> 00:04:08,533
+并且事实上，它的纹理更细，我们可以控制每个顶点的颜色
+and in fact it's even finer grain than that, we can actually control the color of every vertex
+
+66
+00:04:08,533 --> 00:04:12,066
+因此，如果我们想这样做的话，就可以创造出一个梯度或者类似的东西
+thus creating like a gradient or something like that, if we would want to do that
+
+67
+00:04:12,066 --> 00:04:15,933
+仅仅依赖于顶点和片段着色器之间的插值
+just relying on the interpolation between the vertex and the fragment shaders
+
+68
+00:04:15,933 --> 00:04:18,733
+但不管怎样，那是另一个故事，所以我们来深入了解下这个
+but anyway, that's the story for another day, so to break this down
+
+69
+00:04:18,900 --> 00:04:24,066
+我们今天要做的就是打开顶点缓冲区，给每个顶点添加颜色
+all we're going to do today is just open up our vertex buffer, and just add a color into every vertex
+
+70
+00:04:24,066 --> 00:04:27,466
+然后在着色器中访问它，把它设为输出颜色
+and then access that inside our shader, and set that as our output color
+
+71
+00:04:27,466 --> 00:04:31,900
+就那么简单，没有必要把事情复杂化，让我们深入代码并看一看
+it's as simple as that, there's no need to complicate things, let's dive into the code and take a look
+
+72
+00:04:32,166 --> 00:04:35,333
+那么现在我们有上期视频创建的这两个白色方块
+so at the moment we have these two white squares from the previous video
+
+73
+00:04:35,700 --> 00:04:39,266
+让我们给它们一些颜色，来到这里的顶点缓冲区
+let's give them some color, let's come over here to our vertex buffer
+
+74
+00:04:39,266 --> 00:04:42,933
+它目前只包含这两个正方形的顶点位置
+which currently contains just the vertex positions of these two squares
+
+75
+00:04:43,100 --> 00:04:46,000
+让我们在这里加一些颜色，比如蓝色和黄色
+and let's add some colors here, maybe like a blue and a yellow
+
+76
+00:04:46,508 --> 00:04:49,325
+那么对于第一个四边形，我们就用一个漂亮的蓝色
+so for this first quad, let's make it a nice blue color
+
+77
+00:04:49,475 --> 00:04:52,525
+我们在这儿添加一些值，红绿蓝和alpha
+we'll add the values here red green blue and alpha
+
+78
+00:04:53,133 --> 00:04:58,750
+现在这给了这个顶点的颜色，但因为我们想让整个四边形是一个纯色
+now this gives us a color for this vertex, but since we want the entire quad to be one solid color
+
+79
+00:04:58,750 --> 00:05:03,133
+我们需要将这个颜色复制到构成正方形的四个顶点上
+we'll need to copy this color across all of these four vertices which make up our square
+
+80
+00:05:04,100 --> 00:05:07,700
+现在我们来看第二个四边形，我们用漂亮的黄色
+now let's come down here to our second quad, and we'll make it a nice yellow color
+
+81
+00:05:08,000 --> 00:05:12,766
+我会为构成第二个正方形的所有顶点添加粘贴值
+I'll add in the grab values for all of the vertices which make up that second square
+
+82
+00:05:13,200 --> 00:05:15,033
+就那样，我们有了两个正方形
+and that's it, we have our two squares
+
+83
+00:05:15,033 --> 00:05:20,200
+每个顶点的前三个浮点数是那个顶点的xyz位置
+where the first three floats of each vertex are the xyz position of that vertex
+
+84
+00:05:20,333 --> 00:05:24,833
+然后每个顶点接下来的四个浮点数是RGBA颜色值
+and then the next four floats of each vertex are the RGBA color values
+
+85
+00:05:25,000 --> 00:05:28,500
+就那样了，那就是所有的数据，来到下面这儿
+and that's it, that's all about data, going down here
+
+86
+00:05:28,500 --> 00:05:32,366
+我唯一需要改变的是我们这里的顶点属性声明
+the only thing I need to change is the vertex attribute declarations we have here
+
+87
+00:05:32,566 --> 00:05:35,750
+因为我们改变了顶点缓冲区的布局，我们在这里做的是
+since we changed our vertex buffer layout, what we're doing here is
+
+88
+00:05:35,750 --> 00:05:40,633
+将第一个属性0作为位置，我们不想改变它
+treating the first attribute attribute zero as the position, and we don't want to change that
+
+89
+00:05:40,633 --> 00:05:44,766
+但我们要做的是添加另一个属性，也就是索引1
+but what we want to do is add another attribute, which is going to be index one
+
+90
+00:05:45,133 --> 00:05:49,100
+并且那将是我们的颜色，也是四个浮点数的RGBA
+and that's going to be our color, it's going to be four floats RGBA
+
+91
+00:05:49,133 --> 00:05:51,800
+然后这儿另一个需要改变的是步幅
+and then the other thing that changes here is the stride
+
+92
+00:05:52,133 --> 00:05:59,000
+步幅是一个完整顶点的字节数，那么这里每个顶点有7个浮点数
+the stride is how many bytes a complete vertex is, so here we have seven floats per vertex
+
+93
+00:05:59,033 --> 00:06:04,233
+所以我们可以把这两个都改成7，最后这是这个属性的偏移量
+so we can just change both of these to seven, and finally this is the offset of that attribute
+
+94
+00:06:04,233 --> 00:06:06,900
+从顶点的第四个浮点数开始
+which starts at the fourth float of our vertex
+
+95
+00:06:07,000 --> 00:06:10,600
+那么这就是我们的顶点，这三个浮点数的大小是多少
+so this is our vertex, what is the size of these three floats
+
+96
+00:06:10,933 --> 00:06:13,700
+三个浮点数是12个字节，所以我们可以直接写入12
+three floats are 12 bytes, so we can just write in 12
+
+97
+00:06:13,700 --> 00:06:15,875
+并将其转换为const void指针
+and cast it into a const void pointer
+
+98
+00:06:15,875 --> 00:06:20,500
+因为那就是接口需要的，就那样吧，那就是我们在C++这边所要做的
+because that's what the api wants, and that's it, that's all we have to do C++ side
+
+99
+00:06:20,666 --> 00:06:24,500
+然后我们像往常一样渲染它，我们在顶点缓冲区中得到这些颜色
+then we just render it as usual, we've got those colors in the vertex buffer
+
+100
+00:06:24,733 --> 00:06:29,333
+那么现在我们要做的是修改我们的着色器，让它使用这些顶点颜色
+so now what we need to do is modify our shader, so that it will use these vertex colors
+
+101
+00:06:29,400 --> 00:06:33,300
+现在我们已经得到了这个layout(location = 0) in vec3 a_Position
+at the moment we've just got this layout(location = 0) in vec3 a_Position
+
+102
+00:06:33,500 --> 00:06:37,366
+就是顶点的位置，我们需要的是另一个
+which is the position of our vertex, and what we need is another one of these
+
+103
+00:06:37,400 --> 00:06:42,466
+但是在位置1，因为索引1是我们设置的属性
+but at location one, because index one is what we set our attribute to be
+
+104
+00:06:42,800 --> 00:06:48,566
+这就是vec4 a_Color，颜色在顶点着色器中不是很有用
+and this is going to be our vec4 color, now our color isn't very useful in a vertex shader
+
+105
+00:06:48,566 --> 00:06:52,433
+我们要做的是使用这个颜色来着色我们所有的像素
+what we want to do is use this color to shader all of our pixels with
+
+106
+00:06:52,733 --> 00:06:54,700
+所以我们需要在片段着色器中使用它
+so we need it in our fragment shader
+
+107
+00:06:55,333 --> 00:07:00,533
+我们要做的是创建这个输出颜色变量，我叫它v_Color v表示变化
+the way we do that is create this output color variable, I'll call it v_Color, v for varying
+
+108
+00:07:00,533 --> 00:07:05,366
+这就是这些变量的名称，我们将它设置为a_Color，就像那样
+which is what these variables use to be called, and we'll set it equal to a_Color just like that
+
+109
+00:07:05,766 --> 00:07:09,533
+然后在片段着色器中，我要取那个v_Color变量
+and then inside the fragment shader, I'm going to take in that v_Color variable
+
+110
+00:07:09,733 --> 00:07:12,633
+然后我将我们的输出颜色设置为v_Color
+and then I'll set our output color to be that v_Color
+
+111
+00:07:12,900 --> 00:07:17,100
+就是那样，现在让我们启动这个，看看我们得到了什么，好了
+and that's it, now let's launch this and see what we get, and there we go
+
+112
+00:07:17,100 --> 00:07:20,700
+我们有漂亮的颜色，对着这些颜色的乌克兰粉丝大声喊出来
+we have our beautiful colors, shout out to my Ukrainian fans here with these colors
+
+113
+00:07:20,700 --> 00:07:24,800
+但不管怎样，那就是我们为四边形设置不同颜色的方法
+but anyway, that's what we do to set different colors for our quads
+
+114
+00:07:24,866 --> 00:07:27,366
+尽管它们被挤在一个绘制中
+even though they're batched together into a single drawer
+
+115
+00:07:27,750 --> 00:07:30,149
+所以就像我提到的超级简单的东西
+so yeah as I mentioned super simple stuff
+
+116
+00:07:30,149 --> 00:07:33,066
+顶点颜色不仅仅用于四边形或2D渲染
+vertex colors are used not just for quads or 2D rendering
+
+117
+00:07:33,066 --> 00:07:38,133
+而且对于3D渲染来说，例如，我们不需要渲染一个带有纹理的3D模型
+but also for 3D rendering, for example, we don't necessarily need to render a 3D model with a texture
+
+118
+00:07:38,233 --> 00:07:43,333
+如果我们只是想让3D模型是纯色的，或者不同的子模型，类似于子网格
+if we just want that 3D model to be like a solid color, or different sub models kind of sub meshes
+
+119
+00:07:43,333 --> 00:07:46,200
+在那个模型中是不同的颜色之类的
+within that model to be different colors or something like that
+
+120
+00:07:46,200 --> 00:07:49,225
+如果我们在做low poly风格的游戏
+if we're going with something like a low poly style game
+
+121
+00:07:49,225 --> 00:07:52,933
+或者不需要纹理之类的东西
+or something that just doesn't need textures and textures and stuff like that
+
+122
+00:07:52,933 --> 00:07:55,066
+一些只依赖于颜色的东西
+something that can just rely on colors
+
+123
+00:07:55,066 --> 00:07:59,266
+所以顶点颜色肯定被广泛使用，不仅仅是为了渲染，记住这一点
+so vertex colors are definitely widely used, not just for too rendering, keep that in mind
+
+124
+00:07:59,475 --> 00:08:01,381
+但在这种情况下，它们真的非常有用
+but in this case, they're really really useful
+
+125
+00:08:01,381 --> 00:08:04,650
+它是一个非常简单快速的方法来设置每个四边形的颜色
+and a very easy quick way to set up the color of each quad 
+
+126
+00:08:04,650 --> 00:08:08,966
+如果我们处理的是批处理场景，比如批渲染
+if we're dealing with like a batched kind of scenario, like we are with batch rendering
+
+127
+00:08:08,966 --> 00:08:10,533
+但不管怎样，我希望你们喜欢这个视频
+but anyway, I hope you guys enjoyed this video
+
+128
+00:08:10,533 --> 00:08:12,000
+如果你们喜欢的话，就为它点赞吧
+if you did, please hit that like button 
+
+129
+00:08:12,000 --> 00:08:14,533
+并且也可以在下方留下你们的想法
+and also leave a comment with your thoughts below
+
+130
+00:08:14,866 --> 00:08:17,425
+我也有一个patreon，也就是patreon.com/TheCherno
+also I do have a patron, patreon.com/TheCherno
+
+131
+00:08:17,425 --> 00:08:20,075
+非常感谢所有在patreon上支持我的人
+huge thank you to everyone who supports me on patreon 
+
+132
+00:08:20,075 --> 00:08:23,333
+因为是你们让这些视频成为了可能
+because you are what make these kinds of videos possible
+
+133
+00:08:23,500 --> 00:08:27,700
+下次我们将会说一说纹理，那么我们已经讲了颜色，那很好
+next time we're going to be talking about textures, so we've covered colors and that's great
+
+134
+00:08:27,700 --> 00:08:31,400
+但如果我想让每个四边形都是不同的纹理呢
+but what if I want each of my quads to be a different texture
+
+135
+00:08:31,400 --> 00:08:37,266
+那么也许渲染贴图，就需要水贴图和草贴图，也许渲染带有文本的标签
+so maybe I'm rendering a tile map, and I need water tiles grass tiles, maybe I'm rendering a label with text
+
+136
+00:08:37,266 --> 00:08:41,033
+我需要每个四边形都是不同的字符，我该怎么做呢
+and I need each quad to be a different character, how do I do all of that
+
+137
+00:08:41,033 --> 00:08:44,766
+我们如何处理一个批处理场景中的不同纹理
+how do we deal with different textures inside a batched scenario
+
+138
+00:08:44,966 --> 00:08:47,566
+我们下次就会讨论那个，下次见，拜
+we're going to talk about that next time, I will see you then, goodbye
+

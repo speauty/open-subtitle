@@ -1,0 +1,2252 @@
+﻿1
+00:00:00,133 --> 00:00:00,966
+嘿, 你们好
+hey, what's up guys
+
+2
+00:00:00,966 --> 00:00:04,166
+我是Cherno, 欢迎回到我的OpenGL系列教程
+my name is Cherno, and welcome back to my OpenGL series
+
+3
+00:00:04,400 --> 00:00:09,100
+那么今天我们会讲OpenGL中的顶点数组
+so today we're gonna be talking all about vertex arrays in OpenGL of course
+
+4
+00:00:09,600 --> 00:00:14,500
+到目前为止, 我们已经讨论了什么是顶点缓冲区
+so, so far we've been talking about what a vertex buffer is
+
+5
+00:00:14,500 --> 00:00:17,366
+什么是索引缓冲区或元素缓冲区
+what a index buffer is or an element buffer
+
+6
+00:00:17,933 --> 00:00:19,000
+我们讲过着色器
+we've talked about shaders
+
+7
+00:00:19,000 --> 00:00:24,866
+我们讲了很多OpenGL的基本概念甚至一般的图形编程
+we've talked about a lot of kind of basic concepts of OpenGL and even graphics programming in general
+
+8
+00:00:25,000 --> 00:00:28,633
+但OpenGL实际上有一个顶点数组
+but OpenGL actually has something called a vertex array
+
+9
+00:00:28,966 --> 00:00:30,266
+乍一看
+and at first glance
+
+10
+00:00:30,533 --> 00:00:33,633
+你可能会说, 顶点数组, 顶点缓冲区
+you might be like well vertex array vertex buffer
+
+11
+00:00:34,033 --> 00:00:34,833
+它们之间的区别是什么
+what is the difference
+
+12
+00:00:34,833 --> 00:00:36,866
+它们听起来非常相似, 确实如此
+they sound extremely similar, and they are
+
+13
+00:00:37,600 --> 00:00:40,033
+而更疯狂的是
+and to make it even even crazier
+
+14
+00:00:40,433 --> 00:00:42,000
+所以那个确实意味着这不是特别疯狂
+so does that mean this isn't particularly crazy
+
+15
+00:00:42,000 --> 00:00:43,333
+但更疯狂的是
+but to make it even crazier
+
+16
+00:00:45,000 --> 00:00:49,966
+这并不是DirectX等其他渲染接口中真正存在的东西
+this isn't really something that exists in other rendering apis like DirectX
+
+17
+00:00:50,433 --> 00:00:52,966
+顶点数组是OpenGL的一个特殊之处
+vertex arrays are a bit of an OpenGL special
+
+18
+00:00:52,966 --> 00:00:55,000
+或者如果你喜欢的话, 也可以说是一个OpenGL原始接口
+or an OpenGL original if you like
+
+19
+00:00:55,600 --> 00:01:03,533
+它们基本上是一种通过一种特定的规范绑定顶点缓冲区的方式
+and what they basically are are a way to bind buffers vertex buffers with a certain kind of specification
+
+20
+00:01:03,533 --> 00:01:05,933
+用于那个实际顶点缓冲区的布局
+for the layout of that actual vertex buffer
+
+21
+00:01:06,200 --> 00:01:07,900
+那么让我们来看看
+so let's take a look at
+
+22
+00:01:08,266 --> 00:01:10,600
+我的意思是快速地看一些代码
+what I mean by that by just looking at some code real quick
+
+23
+00:01:10,600 --> 00:01:15,333
+那么在我们的应用中, 我们在这里创建了这个buffer
+so in our application, we have this buffer that we're creating over here
+
+24
+00:01:16,200 --> 00:01:17,633
+确切地说, 这是个数组buffer
+specifically there's array buffer
+
+25
+00:01:17,633 --> 00:01:19,500
+包含了我们所有的顶点数据
+which contains all of our vertex data
+
+26
+00:01:19,600 --> 00:01:21,825
+并且实际上, 你们可能已经从之前的视频中注意到了
+and actually you may have noticed from previous episodes
+
+27
+00:01:21,825 --> 00:01:23,575
+我在这里写了6作为一个size
+that I have six written here as a size 
+
+28
+00:01:23,575 --> 00:01:26,100
+如果我们有6个顶点, 但显然我们只有4个
+so as if we have six vertices, clearly we have four
+
+29
+00:01:26,333 --> 00:01:27,533
+根据这个, 这是个漏洞
+according to this, that's a bug
+
+30
+00:01:27,533 --> 00:01:29,233
+我们把这个设为4来修复那个
+let's fix that by setting this to four
+
+31
+00:01:29,933 --> 00:01:33,433
+但这个顶点缓冲区只包含了这些顶点位置
+but this vertex buffer contains these vertex positions
+
+32
+00:01:33,433 --> 00:01:35,600
+这些顶点, 这个顶点的所有数据
+these vertex, all of this vertex data
+
+33
+00:01:35,600 --> 00:01:38,725
+在这个例子中就是四个顶点的顶点位置
+which in this case is just vertex positions for four vertices
+
+34
+00:01:38,850 --> 00:01:41,100
+然后, 在我们创建了缓冲区之后, 也做了绑定
+and then, after we've created the buffer, and we've bound
+
+35
+00:01:41,100 --> 00:01:41,108
+我们已经设置了数据和所有这些
+and we've set the data and all of that
+and then, after we've created the buffer, and we've bound
+
+36
+00:01:41,108 --> 00:01:42,933
+我们已经设置了数据和所有这些
+and we've set the data and all of that
+
+37
+00:01:42,933 --> 00:01:48,666
+我们实际上启用了顶点属性, 然后在这里指定实际数据的布局
+we actually enable the vertex attribute, and then specify the layout of this actual data here
+
+38
+00:01:48,866 --> 00:01:52,700
+通过说基本上每个顶点, 每个顶点是两个浮点数
+by saying that basically every vertex, each vertex is two floats
+
+39
+00:01:52,800 --> 00:01:56,433
+然后那个就是stride, 这个顶点到下个顶点的间隔, 对吧
+and then that's the stride, kind of vertex to vertex, right
+
+40
+00:01:56,433 --> 00:01:59,333
+我们还指定了这个属性的偏移量等等
+and we also specify like the offset of this attribute and all of that
+
+41
+00:01:59,333 --> 00:02:02,900
+所以我们基本上只是指定这个实际顶点缓冲区的布局
+so we basically just specify the layout of this actual vertex buffer
+
+42
+00:02:02,900 --> 00:02:05,500
+现在, 一个顶点数组对象实际上允许我们做的
+now, what a vertex array object actually lets us do
+
+43
+00:02:05,766 --> 00:02:09,400
+就是绑定我们指定的顶点规范
+is kind of bind that vertex specification that we specify
+
+44
+00:02:09,400 --> 00:02:11,900
+通过使用这个vertexAttribPointer
+by using this vertex vertexAttribPointer
+
+45
+00:02:12,066 --> 00:02:15,800
+到实际缓冲区, 到实际顶点缓冲区或一系列顶点缓冲区
+to an actual buffer, to an actual vertex buffer, or a series of vertex buffers
+
+46
+00:02:15,800 --> 00:02:17,700
+这取决于我们实际上如果组织这个
+depending on how we actually organized this
+
+47
+00:02:18,100 --> 00:02:24,500
+因此, 为了代替我们每次在绘制之前都明确指定顶点布局
+so, instead of us having to actually explicitly specify the vertex layout every time before we draw
+
+48
+00:02:24,833 --> 00:02:26,300
+好吧, 再说一次, 所以现在
+well, again, so right now
+
+49
+00:02:26,300 --> 00:02:27,833
+显然, 我们没有绘制任何复杂的东西
+obviously we're not drawing anything complex
+
+50
+00:02:27,833 --> 00:02:30,650
+所以对于那些刚刚接触OpenGL的人来说, 这可能有点困难
+so it might be a little bit difficult for those of you who are new to OpenGL
+
+51
+00:02:30,650 --> 00:02:32,733
+为了真正理解我的意思
+to actually get what I mean by this
+
+52
+00:02:32,966 --> 00:02:35,525
+但是我们现在绘制这个需要做的
+but what we actually need to do currently to draw this
+
+53
+00:02:35,525 --> 00:02:36,566
+如果我有多个
+if we had multiple
+
+54
+00:02:36,933 --> 00:02:38,566
+如果屏幕上有多个对象
+if we had multiple objects in the screen
+
+55
+00:02:38,566 --> 00:02:41,033
+多个网格, 多个顶点缓冲区所有这些
+multiple meshes, multiple vertex buffers all of that
+
+56
+00:02:41,066 --> 00:02:43,666
+就是我们基本上需要绑定顶点缓冲区
+is we would basically have to bind our vertex buffer
+
+57
+00:02:43,733 --> 00:02:47,933
+绑定索引缓冲区, 然后绘制实际的对象
+bind our index buffer, and then draw our actual object
+
+58
+00:02:48,133 --> 00:02:50,300
+但在我们绑定顶点缓冲区之后
+but after we bind the vertex buffer
+
+59
+00:02:50,300 --> 00:02:53,200
+我们实际上也需要指定那个布局
+we also need to actually specify that layout
+
+60
+00:02:53,350 --> 00:02:55,233
+因为如果我们以后
+because if we later on
+
+61
+00:02:55,366 --> 00:02:59,350
+如果我们后面继续绑定另一个有不同的层的顶点缓冲区
+if we later down the road bind another vertex buffer which has a different layer
+
+62
+00:02:59,350 --> 00:03:03,500
+那么我们必须有一种方式来表示那个, 好吧
+then we have to actually have a way of saying that, well
+
+63
+00:03:04,566 --> 00:03:07,000
+这个缓冲区是用这个布局, 而另一个缓冲区是用其他布局的
+this buffer has this layout, and this buffer has the other layout
+
+64
+00:03:07,000 --> 00:03:09,033
+它实际上并没有存储在缓冲区中
+it's not actually stored in the buffer
+
+65
+00:03:09,033 --> 00:03:12,866
+你可能会认为, 因为我们实际上在代码中绑定了一个缓冲区
+you might think that because we actually in our code we bind a buffer
+
+66
+00:03:13,033 --> 00:03:15,900
+然后我们实际上调用了这个vertexAttribPointer
+and then we actually call this vertexAttribPointer
+
+67
+00:03:15,933 --> 00:03:20,433
+这个状态与实际缓冲区对象绑定并保存在一起
+that this state is kind of tied to and saved with this actual buffer object
+
+68
+00:03:20,433 --> 00:03:25,633
+但事实并非如此, 这实际上是与顶点数组对象有技术联系的
+but it's not, this is something that is actually technically tied to a vertex array object
+
+69
+00:03:25,933 --> 00:03:28,466
+因此, 我们每次都需要调用它
+and thus we need to call it every time
+
+70
+00:03:28,500 --> 00:03:30,466
+事实上, 让我们看看我们的代码会是什么样子。
+in fact, let's take a look at what our code would look like
+
+71
+00:03:30,500 --> 00:03:35,133
+如果我们真的绑定了每次渲染所需的所有内容
+if we were actually kind of binding everything that we needed to render every time
+
+72
+00:03:35,133 --> 00:03:36,300
+因为现在, 我们所做的是
+because right now, what we've done is
+
+73
+00:03:36,300 --> 00:03:38,466
+我们已经绑定了我们所拥有的所有类型的对象
+we've bound all of the kind of objects that we have
+
+74
+00:03:38,466 --> 00:03:39,633
+因为我们每种只有一个
+because we only have one of each
+
+75
+00:03:39,633 --> 00:03:42,750
+我们有一个着色器, 一个顶点缓冲区, 或者一个索引缓冲区
+we have one shader, we have one vertex buffer, or one index buffer
+
+76
+00:03:42,750 --> 00:03:43,625
+以及所有这些
+and all of that
+
+77
+00:03:43,625 --> 00:03:46,250
+如果我们真的有多个对象
+if we actually would have multiple objects
+
+78
+00:03:46,250 --> 00:03:50,133
+我们每次都必须重新绑定当前绘制所需的所有东西
+we would have to rebind everything we need for the current drawer every time
+
+79
+00:03:50,133 --> 00:03:51,833
+那么让我们来看看, 那会是什么样子
+so let's take a look at what that will look like
+
+80
+00:03:51,833 --> 00:03:54,733
+我要做的是, 当我们把一切都设置好的时候
+what I'm going to do is, when we actually set everything up
+
+81
+00:03:54,833 --> 00:03:57,366
+在这里, 我实际上要解绑一切
+over here, I'm actually going to unbind everything
+
+82
+00:03:57,566 --> 00:03:59,933
+所以我要调用glBindBuffer
+so I'm going to call glBindBuffer
+
+83
+00:03:59,933 --> 00:04:01,633
+事实上, 让我从这里复制所有代码
+in fact, let me just copy everything from here
+
+84
+00:04:01,633 --> 00:04:04,800
+那么我们需要这个glBindBuffer
+so we need bind buffer, we need binds
+
+85
+00:04:04,800 --> 00:04:08,333
+需要这个我们索引缓冲区或元素缓冲区的glBindBuffer
+we need this bind buffer which is our index buffer or our element buffer
+
+86
+00:04:08,700 --> 00:04:10,266
+然后我们需要这个glUseProgram
+and then we have this use program
+
+87
+00:04:10,500 --> 00:04:15,133
+好的, 所以我要做的就是基本上把所有这些都调用0, 对吧
+okay, so what I'm going to do is basically called zero for all of these, right
+
+88
+00:04:15,133 --> 00:04:16,725
+所以glUseProgram(0)
+so glUseProgram zero
+
+89
+00:04:16,725 --> 00:04:19,866
+和glBindBuffer(GL_ARRAY_BUFFER, 0)以及索引缓冲区
+and bind buffer zero for array buffer and index buffer
+
+90
+00:04:20,133 --> 00:04:22,825
+所以我在这里做的是, 我基本上解绑了所有的东西
+so what I've done here is, I've basically unbound everything
+
+91
+00:04:22,825 --> 00:04:24,466
+那么到了绘制的时候
+so when it comes time to draw
+
+92
+00:04:24,466 --> 00:04:25,650
+我们需要做的是
+what we need to do is
+
+93
+00:04:25,650 --> 00:04:28,800
+实际上绑定我们需要的所有东西, 让这个绘制元素工作
+actually bind everything that we need, for this draw elements to work
+
+94
+00:04:28,800 --> 00:04:30,600
+这样我们才能正确地渲染所有东西
+so that we render everything correctly
+
+95
+00:04:30,666 --> 00:04:34,400
+这将包括, 你知道, 设置, 我们可能需要的任何一种状态
+and this will include, you know, setting up, any kind of state that we may need
+
+96
+00:04:34,700 --> 00:04:36,733
+在这个例子中是非常非常简单的
+in this example is very very simple
+
+97
+00:04:36,766 --> 00:04:39,600
+所以我们真正需要做的就是绑定这些东西
+so all we really need to do is just bind these things
+
+98
+00:04:39,600 --> 00:04:41,833
+好吧, 那么在我们绘制这个之前
+right, so before we draw this
+
+99
+00:04:42,100 --> 00:04:45,733
+我将通过调用glUseProgram绑定这个着色器, 对吧
+I'm going to bind this shader, right, by calling glUseProgram
+
+100
+00:04:45,733 --> 00:04:47,833
+然后一旦那个绑定好了, 我们可以设置统一变量
+and then we can set the uniform once that's bound
+
+101
+00:04:48,333 --> 00:04:52,250
+然后我要绑定我的缓冲区, 就是个缓冲区
+then I'm going to bind my buffer, which is going to be just buffer
+
+102
+00:04:52,250 --> 00:04:56,269
+然后我将绑定我的索引缓冲区, 我相信我们叫它ibo
+and then I'm going to bind my index buffer which I believe we called ibo
+
+103
+00:04:56,269 --> 00:05:00,133
+好了, 很酷, 还有我真正需要做的, 这在这里可能并不明显
+okay, cool, and what I actually need to do, which might not be apparent here
+
+104
+00:05:00,366 --> 00:05:04,333
+我还需要用到这个glVertexAttribPointer, 然后再次运行它
+is I also need to get this glVertexAttribPointer, and run that again
+
+105
+00:05:04,766 --> 00:05:08,033
+现在, 如果最后是disableVertexAttribArray, 你可能会
+now, you will probably, if you end up disableVertexAttribArray
+
+106
+00:05:08,033 --> 00:05:10,500
+你可能需要再做一次, 所以让我们复制一下这个
+you probably have to do that again, so let's just copy this
+
+107
+00:05:10,533 --> 00:05:14,700
+就这整个代码块, 因为我们可能像那样需要它, 好了
+and this whole block here, because we might need it like that, okay
+
+108
+00:05:14,766 --> 00:05:16,750
+所以这就是它最终的样子
+so this is what it kind of ends up looking like
+
+109
+00:05:16,750 --> 00:05:20,600
+我们绑定着色器, 设置统一变量, 绑定顶点缓冲区
+we bind our shader, we set up our uniforms, we bind our vertex buffer
+
+110
+00:05:20,733 --> 00:05:25,066
+我们设置顶点缓冲区的布局, 最后绑定索引缓冲区
+we set up the layout of that vertex buffer, and then finally we bind our index buffer
+
+111
+00:05:25,133 --> 00:05:27,600
+然后我们调用glDrawElements, 让我们运行这段代码
+and then we call glDrawElements, let's run this code
+
+112
+00:05:27,600 --> 00:05:28,500
+看看会发生什么
+and see what happens
+
+113
+00:05:28,500 --> 00:05:30,566
+你可以看到, 我们得到了和以前一样的结果, 完美
+you can see, we get the same result as before, perfect
+
+114
+00:05:30,600 --> 00:05:33,966
+所以这里有趣的是这两个
+so the part that is interesting here is these two
+
+115
+00:05:34,100 --> 00:05:37,675
+我们是否每次都要这样做, 答案是肯定的
+do we have to do these every time, and the answer is well yes
+
+116
+00:05:37,675 --> 00:05:42,000
+因为它们可能已经改变了, 如果我们用不同的布局绘制另一个对象
+because they may have changed, if we draw another object with a different layout
+
+117
+00:05:42,300 --> 00:05:46,233
+所以顶点数组对象实际上就是包含这种状态的对象
+so vertex array objects are actually what contained this state
+
+118
+00:05:46,533 --> 00:05:49,533
+因此, 如果我们正确地利用顶点数组对象
+so if we utilize vertex array objects properly, and work to do
+
+119
+00:05:49,533 --> 00:05:54,000
+例如, 为几何体的每个部分创建不同的顶点数组对象
+for example, make a different vertex array object for each piece of geometry
+
+120
+00:05:54,000 --> 00:05:56,933
+我们实际上在绘制的, 或者基本上在每个DrawCall指令发出时
+that we actually draw or for each DrawCall basically
+
+121
+00:05:57,066 --> 00:06:01,033
+然后理论上我们只需要绑定顶点数组对象
+then all we would need to do theoretically is just bind the vertex array object
+
+122
+00:06:01,866 --> 00:06:03,266
+就这样, 我们做完了
+and that's it, we're done
+
+123
+00:06:03,633 --> 00:06:09,050
+因为顶点数组对象将包含顶点缓冲区之间的绑定
+because a vertex array object will contain a binding between a vertex buffer or buffers
+
+124
+00:06:09,350 --> 00:06:13,594
+以及实际的顶点规范或顶点到布局
+and that actual kind of vertex specification or that vertex to layout
+
+125
+00:06:13,594 --> 00:06:14,925
+所以换句话说
+so in other words
+
+126
+00:06:14,925 --> 00:06:20,166
+vertexAttribPointer实际上会绑定一个实际的顶点缓冲区和数组缓冲区
+so in other words, vertexAttribPointer actually will bind an actual vertex buffer and array buffer
+
+127
+00:06:20,166 --> 00:06:22,600
+所以一些东西绑定到这个GL_ARRAY_BUFFER插槽
+so something bound to this GL_ARRAY_BUFFER slot
+
+128
+00:06:23,000 --> 00:06:26,700
+它会将其与具有该规范的实际层绑定
+it will bind that with that actual layer with that specification
+
+129
+00:06:26,900 --> 00:06:30,633
+无论你是否有一个像我们这里一样的独立缓冲区, 这都是有效的
+and that works whether or not you have a single buffer like we do here
+
+130
+00:06:30,766 --> 00:06:32,133
+或者如果你有多个缓冲区
+or if you have multiple buffers
+
+131
+00:06:32,133 --> 00:06:33,800
+我们以后最终肯定也会讨论
+and we'll definitely end up talking about
+
+132
+00:06:34,100 --> 00:06:37,333
+单缓冲区和多顶点缓冲区
+kind of a single buffer and multiple vertex buffers in the future as well
+
+133
+00:06:37,333 --> 00:06:40,266
+因此, 我们绘制方式的改变从
+and so the way that we draw things changes from being
+
+134
+00:06:40,400 --> 00:06:41,588
+绑定我们的着色器
+bind our shader
+
+135
+00:06:41,588 --> 00:06:46,000
+绑定我们的顶点缓冲区, 设置顶点布局, 绑定我们的索引缓冲区
+bind our vertex buffer, set up the vertex layout, bind our index buffer
+
+136
+00:06:46,000 --> 00:06:48,333
+然后实际发出那个DrawCall指令
+and then actually issue that DrawCall
+
+137
+00:06:48,566 --> 00:06:50,500
+它从那个变成了, 绑定我们的着色器
+it changes from that to just being bind our shader
+
+138
+00:06:50,533 --> 00:06:52,633
+因为很明显, 这是不变的
+because obviously that stays the same
+
+139
+00:06:52,766 --> 00:06:56,800
+然后我们绑定顶点数组, 然后绑定索引缓冲区
+then we bind our vertex array, and then we bind our index buffer
+
+140
+00:06:56,966 --> 00:06:59,200
+然后最终我们应该发出DrawCall指令
+and then finally we should that DrawCall
+
+141
+00:06:59,233 --> 00:07:02,966
+所以基本上是绑定顶点缓冲区并设置其布局
+so basically binding that vertex buffer and setting up its layout
+
+142
+00:07:02,966 --> 00:07:05,175
+只是变成了绑定顶点数组对象
+just becomes binding that vertex array object
+
+143
+00:07:05,175 --> 00:07:07,900
+因为它包含了我们实际需要的所有状态
+because that contains all the state that we actually need
+
+144
+00:07:08,466 --> 00:07:11,500
+我需要在这里提到的一件事是
+one of the thing that I need to mention here is that
+
+145
+00:07:11,666 --> 00:07:15,300
+从技术上讲, 顶点数组对象是必需的
+technically speaking vertex array objects are mandatory
+
+146
+00:07:15,533 --> 00:07:17,333
+它们现在正在被使用
+and they are actually in use right now
+
+147
+00:07:17,333 --> 00:07:20,033
+这就是为什么我说即使我们没有创建它们
+which is why I said that even without us creating them
+
+148
+00:07:20,233 --> 00:07:22,500
+这个状态仍由顶点数组对象保持
+this state is still maintained by the vertex array object
+
+149
+00:07:22,600 --> 00:07:26,200
+这个东西就是OpenGL兼容性配置文件
+the thing is the OpenGL compatibility profile 
+
+150
+00:07:26,200 --> 00:07:27,575
+这就是我们在这里实际运行的
+which is what we're actually running here 
+
+151
+00:07:27,575 --> 00:07:30,066
+就像OpenGL基本上运行的一种模式
+is like a mode for OpenGL basically running
+
+152
+00:07:30,300 --> 00:07:34,666
+默认情况下, 兼容性配置文件实际上为我们创建了一个顶点数组对象
+the compatibility profile actually creates a vertex array object for us by default
+
+153
+00:07:34,666 --> 00:07:36,200
+并且那就是这个0的作用
+and that's what zero is
+
+154
+00:07:37,000 --> 00:07:40,566
+然而, 核心配置文件没有
+whereas the core profile does not
+
+155
+00:07:41,033 --> 00:07:47,300
+所以我们实际上需要自己显式地创建一个OpenGL顶点数组对象
+so we actually need to explicitly create an OpenGL vertex array object by ourselves
+
+156
+00:07:47,300 --> 00:07:49,466
+绑定它, 确保一切正常
+and bind it, and make sure that's all up and running 
+
+157
+00:07:49,666 --> 00:07:52,066
+如果我们正在使用核心配置文件, 需要手动处理
+manually if we're using the core profile
+
+158
+00:07:52,366 --> 00:07:55,366
+为了证明这一点, 我将要做
+so to demonstrate this, what I'm going to do
+
+159
+00:07:55,366 --> 00:07:58,800
+我要点击f5, 我的绘制代码, 看看是否一切都正常运行
+I'm just going to hit f5 draw my code just to see if everything's running correctly
+
+160
+00:07:58,800 --> 00:07:59,666
+你可以看到它是这样的
+and you can see it is
+
+161
+00:08:00,066 --> 00:08:01,666
+我现在要做的就是
+what I'm going to do now is
+
+162
+00:08:01,666 --> 00:08:06,133
+告诉GLFW我想创建一个上下文, 这个OpenGL上下文
+actually tell GLFW that I want to create a context, this OpenGL context
+
+163
+00:08:06,266 --> 00:08:09,966
+实际上, 我想在这个上下文中用核心配置文件创建这个窗口
+I actually want to create this window in this context with the core profile
+
+164
+00:08:09,966 --> 00:08:11,200
+我要做的是
+and the way I'm going to do this is
+
+165
+00:08:11,200 --> 00:08:13,066
+基本上只需在这里粘贴这个代码
+basically just by pasting this code here
+
+166
+00:08:13,066 --> 00:08:16,066
+所以我在这里做的是设置一个glfwWindowHint
+so what I'm doing here is I'm setting a glfwWindowHint
+
+167
+00:08:16,066 --> 00:08:19,204
+这说明我希望我的主要版本是OpenGL 3
+which says that I want my major version to be OpenGL three
+
+168
+00:08:19,204 --> 00:08:22,166
+次版本是3, 所以是OpenGL 3.3
+minor version to be three, so it's OpenGL 3.3
+
+169
+00:08:22,700 --> 00:08:24,900
+然后这是这里的重要代码
+and then this is the important code here
+
+170
+00:08:25,133 --> 00:08:28,033
+设置我的OpenGL配置是核心配置文件
+I'm setting my OpenGL profile to be core
+
+171
+00:08:28,200 --> 00:08:30,200
+现在, 我已经有了兼容配置文件(COMPAT)
+now currently I've got compatibility on
+
+172
+00:08:30,200 --> 00:08:33,166
+所以如果我实际上设置这个是兼容配置文件, 然后按f5
+so if I actually just set this to combat profile, and hit f5
+
+173
+00:08:33,700 --> 00:08:37,300
+你会注意到的唯一变化是我们的OpenGL的实际版本
+the only thing that you'll notice the changes is our actual version of OpenGL
+
+174
+00:08:37,300 --> 00:08:41,100
+而不是使用我们的驱动程序中提供的绝对最新版本
+instead of using the absolute latest one that we have available in our drivers
+
+175
+00:08:41,100 --> 00:08:44,466
+它使用的是3.3, 这当然是我指定的
+it's using 3.3, which of course is the one that I specified
+
+176
+00:08:44,700 --> 00:08:47,366
+你可以看到, 当然, 我的代码仍然可以完美地工作
+and you can see that, of course, my code still works perfectly
+
+177
+00:08:47,500 --> 00:08:53,166
+但是, 如果我把它改成这样的核心配置文件, 并按f5
+however, if I change this to be the core profile like this, and hit our f5
+
+178
+00:08:53,300 --> 00:08:55,433
+我们实际上会触发一个断言, 如你所见
+we're actually going to trigger an assert as you can see
+
+179
+00:08:55,433 --> 00:08:58,133
+当我们尝试启用这个vertexAttribArray的时候
+when we try and enable this vertexAttribArray
+
+180
+00:08:58,133 --> 00:09:02,133
+这是因为, 如果我们在这里进入OpenGL文档
+and that is because, if we go over here into the OpenGL documentation here
+
+181
+00:09:02,133 --> 00:09:05,100
+这个关于顶点规范的hkronos站点实际上非常好
+this hkronos site on vertex specification is actually really really good
+
+182
+00:09:05,100 --> 00:09:06,733
+你可以看到高亮的这行
+and you can see the line of highlighted here
+
+183
+00:09:07,100 --> 00:09:11,066
+兼容OpenGL配置文件使VAO对象零成为默认对象
+the compatibility OpenGL profile makes VAO object zero a default object
+
+184
+00:09:11,066 --> 00:09:14,966
+而核心配置不是, 它根本不是一个对象, 明白吗
+whereas core does not, it's not an object at all, right
+
+185
+00:09:14,966 --> 00:09:16,433
+那就是这里实际发生的事情
+that's what's actually happening here
+
+186
+00:09:16,600 --> 00:09:19,833
+正如你所看到的, 特别的是, 如果我们看一下这里的实际控制台
+as you can see, specifically, if we look at our actual console here
+
+187
+00:09:20,600 --> 00:09:24,866
+我们看到了一个OpenGL错误码1282, 这是无效操作
+we have an OpenGL error 1282, which is gl invalid operation
+
+188
+00:09:25,933 --> 00:09:28,500
+在enableVertexAttribArray这行代码中
+on this line of code enableVertexAttribArray
+
+189
+00:09:28,666 --> 00:09:32,200
+让我们再次打开文档, 看看glEnableVertexAttribArray
+so let's again, open the documentation, and look at glEnableVertexAttribArray
+
+190
+00:09:32,300 --> 00:09:34,566
+看看1282的真正含义
+and see what 1282 actually means
+
+191
+00:09:34,766 --> 00:09:38,433
+你可以在这里看到, 这个导致无效操作的原因之一就是
+and you can see over here, that one of the causes of this invalid operation
+
+192
+00:09:38,533 --> 00:09:40,600
+就是当没有绑定顶点数组对象的时候
+is if no vertex array object is bound
+
+193
+00:09:40,766 --> 00:09:43,533
+这就是发生的事情, 我们没有绑定顶点数组对象
+so that's what's happening, we don't have a vertex array object bound
+
+194
+00:09:43,766 --> 00:09:49,600
+因此, 我们无法指定顶点属性类型的规范或enableVertexAttribArray
+therefore we cannot specify a vertex attribute kind of specification or enableVertexAttribArray
+
+195
+00:09:49,800 --> 00:09:52,333
+那么, 在核心配置文件中, 我们修复这个需要做的
+so what we need to do now to fix this in the core profile
+
+196
+00:09:52,333 --> 00:09:55,033
+就是实际上创建那个VAO, 也就是顶点数组对象
+is actually create that VAO, that vertex array object
+
+197
+00:09:55,033 --> 00:09:57,100
+那么让我们来实现那个吧, 它真的很简单
+so let's do that, it's really easy to do this
+
+198
+00:09:57,133 --> 00:10:00,500
+我要做的就是在我们真正生成这个缓冲区并创建之前
+all I'm going to do is before we actually generate this buffer and created
+
+199
+00:10:00,633 --> 00:10:06,333
+我将输入一个 unsigned int vao, 它将保存实际的顶点数组对象id
+I'm going to type an unsigned int vao, which will hold that actual vertex array object id
+
+200
+00:10:06,633 --> 00:10:11,700
+然后是GLCall(glGenVertexArrays)
+and then going to GLCall glGenVertexArrays
+
+201
+00:10:12,066 --> 00:10:17,000
+我将生成其中一个, 然后将那个id保存在vao变量中
+I'm going to generate one of them, and then store that id in that vao variable
+
+202
+00:10:17,000 --> 00:10:20,433
+当然, 它和缓冲区是一样的, 除了生成顶点数组之外
+so it's the same as with buffer as of course except we're generating vertex arrays
+
+203
+00:10:20,966 --> 00:10:24,750
+最后我要使用glBindVertexArray绑定它
+and then finally I'm going to bind it and glBindVertexArray
+
+204
+00:10:24,750 --> 00:10:26,200
+这儿没有实际的目标
+there's no actual target
+
+205
+00:10:26,366 --> 00:10:29,333
+所以我们只需要像这样指定要绑定的对象的id
+so we just specify the id of what we want to bind like this
+
+206
+00:10:29,700 --> 00:10:31,700
+所以我没没有像GL_ARRAY_BUFFER这样的目标
+so we don't have a target like GL_ARRAY_BUFFER or anything
+
+207
+00:10:31,700 --> 00:10:34,200
+它只是绑定顶点数组, 然后就用这个id
+it's just bound vertex array, and then the id
+
+208
+00:10:34,366 --> 00:10:36,166
+而我仍然使用的核心配置文件
+so I've still got the core profile on
+
+209
+00:10:36,566 --> 00:10:39,266
+这是之前用OpenGL错误断言的
+which is what asserted before with an OpenGL error
+
+210
+00:10:39,433 --> 00:10:41,466
+现在让我们试着运行它, 看看会发生什么
+let's try and run this now, and see what happens
+
+211
+00:10:41,666 --> 00:10:42,466
+你可以看到
+and you can see
+
+212
+00:10:42,700 --> 00:10:45,533
+我没有得到任何错误, 我仍然得到相同的结果
+I don't get any errors, and I still get the same result
+
+213
+00:10:45,533 --> 00:10:48,100
+好了, 这就是我们显式地创建一个vao
+okay, so that is us explicitly creating a vao
+
+214
+00:10:48,100 --> 00:10:50,100
+这也是你使用VAO的具体方式
+and that's specifically how you use VAO as well
+
+215
+00:10:50,100 --> 00:10:51,866
+我们只是生成一个顶点数组对象, 然后绑定它
+we just generate one, we bind it
+
+216
+00:10:51,933 --> 00:10:57,233
+然后我们就可以实际绑定一个缓冲区, 并为它指定一个布局
+and then we have the ability to actually bind a buffer, and specify a layout for it
+
+217
+00:10:57,500 --> 00:11:02,000
+现在, 真正有趣的是如果我们向下滚动到这儿
+now, what's really interesting is that if we scroll down here
+
+218
+00:11:02,000 --> 00:11:07,433
+我们不再需要实际执行这个enableVertexAttribPointer代码, 明白吧
+we no longer have to actually do this enableVertexAttribPointer code, okay
+
+219
+00:11:07,433 --> 00:11:10,033
+我们也不需要实际绑定缓冲区
+and we also don't need to actually bind the buffer
+
+220
+00:11:10,233 --> 00:11:15,300
+让我们添加这个gl, 为了清除我们所有的gl状态
+let's add to this gl, well, to us clearing all of our gl states
+
+221
+00:11:15,600 --> 00:11:19,833
+glBindVertexArray, 所以我们将绑定顶点数组为零
+glBindVertexArray, so we'll be binding vertex array zero
+
+222
+00:11:19,900 --> 00:11:21,866
+只是为了让我们把一切都清理干净
+just so we're clearing everything
+
+223
+00:11:21,866 --> 00:11:26,000
+然后在这里, 我要绑定顶点数组vao
+and then over here, I'm just going to bind vertex array vao
+
+224
+00:11:26,000 --> 00:11:26,533
+那么你可以看到
+so you can see that
+
+225
+00:11:26,533 --> 00:11:26,600
+我根本没有绑定顶点缓冲区
+I'm not binding my vertex buffer at all
+and then over here, I'm just going to bind vertex array vao
+
+226
+00:11:26,600 --> 00:11:28,500
+我根本没有绑定顶点缓冲区
+I'm not binding my vertex buffer at all
+
+227
+00:11:28,500 --> 00:11:33,433
+当前绑定到GL_ARRAY_BUFFER插槽的缓冲区实际上是零, 对吧
+and the currently bound buffer to GL_ARRAY_BUFFER is actually zero, right
+
+228
+00:11:33,633 --> 00:11:35,666
+我只绑定了我的顶点数组
+I'm just binding my vertex array
+
+229
+00:11:35,900 --> 00:11:38,933
+然后绑定我的索引缓冲区, 就这样, 好吧
+and just binding my index buffer, and that's it, okay
+
+230
+00:11:38,933 --> 00:11:40,633
+显然, 我也绑定了着色器
+obviously I'm binding my shader as well
+
+231
+00:11:40,766 --> 00:11:43,800
+然后发出那个DrawCall指令, 让我们按f5, 看看这个
+and then issuing that DrawCall. let's hit f5, check that out
+
+232
+00:11:43,800 --> 00:11:46,200
+我仍然可以正确地进行矩形渲染
+I still get my rectangle rendering correctly
+
+233
+00:11:46,200 --> 00:11:47,633
+所以实际上发生的是
+so what's actually happening
+
+234
+00:11:47,966 --> 00:11:52,766
+是将该顶点缓冲区链接到这个顶点数组对象的位置
+is where linking that vertex buffer to this vertex array object
+
+235
+00:11:52,766 --> 00:11:55,100
+问题是, 到底是什么代码实现了那个
+and the question is what code is actually doing that
+
+236
+00:11:55,100 --> 00:11:56,700
+这可能有点让人困惑
+and it might be a little bit confusing
+
+237
+00:11:56,900 --> 00:11:58,166
+如果你不知道它的原理
+if you don't know how it works
+
+238
+00:11:58,200 --> 00:11:59,966
+但当然, 我会告诉你它的原理
+but of course, I'm going to tell you how it works
+
+239
+00:12:00,400 --> 00:12:03,700
+当我们绑定顶点数组和缓冲区的时候
+when we bind a vertex array and we bind a buffer
+
+240
+00:12:04,233 --> 00:12:05,800
+实际上没有东西去链接这两个
+nothing actually links the two
+
+241
+00:12:06,033 --> 00:12:09,066
+但当我们实际上指定这个vertexAttribPointer的时候
+but when we actually specify this vertexAttribPointer
+
+242
+00:12:09,200 --> 00:12:12,700
+我们说的是这个顶点数组的索引为零的位置
+we're saying index zero of this vertex array
+
+243
+00:12:13,033 --> 00:12:17,950
+将实际绑定到当前绑定的GL_ARRAY_BUFFER插槽, 明白吗
+is going to actually be bound to the currently bound GL_ARRAY_BUFFER, okay
+
+244
+00:12:17,950 --> 00:12:19,533
+换句话说, 这就是
+so this in other words
+
+245
+00:12:19,533 --> 00:12:22,366
+这是一行实际链接这个缓冲区的代码
+it's a line of code that actually links this buffer
+
+246
+00:12:22,566 --> 00:12:23,833
+通过这个vao
+with this vao
+
+247
+00:12:24,100 --> 00:12:27,200
+对吧, 如果然后我绑定一个不同的缓冲区
+okay, if I was then to bind a different buffer
+
+248
+00:12:27,500 --> 00:12:30,500
+然后调用带有索引1的glVertexAttribPointer
+and then call glVertexAttribPointer that with the index one
+
+249
+00:12:30,866 --> 00:12:33,500
+在启用, 当然使用这行代码
+after enabling, of course using this line
+
+250
+00:12:33,633 --> 00:12:37,500
+然后我会说, 在这个数组缓冲区内
+then I would actually be saying, that inside this array buffer
+
+251
+00:12:37,500 --> 00:12:40,833
+索引1实际上指向不同的顶点缓冲区
+index one is actually pointing to a different vertex buffer
+
+252
+00:12:41,100 --> 00:12:44,100
+同样, 我们将来肯定会讨论多个顶点缓冲区
+and again, we'll definitely talk about multiple vertex buffers in the future
+
+253
+00:12:44,100 --> 00:12:47,066
+以及在一个缓冲区中包含一切, 就在一个缓冲区中
+as well as having one buffer with everything, in one buffer
+
+254
+00:12:47,066 --> 00:12:48,500
+因为那也是一种选择
+because that's also an option
+
+255
+00:12:48,533 --> 00:12:49,866
+所以那就是它实际的原理
+so that's how it actually works
+
+256
+00:12:49,866 --> 00:12:53,000
+因为我们实际上指定了这个vertexAttribPointer
+and because we've actually specified this vertexAttribPointer
+
+257
+00:12:53,133 --> 00:12:57,033
+我们绑定了一个顶点, 也绑定了一个实际的缓冲区
+and we have a vertex right bound, and we have an actual buffer bound
+
+258
+00:12:57,366 --> 00:12:58,633
+基本上就是把两个链接起来
+the two are basically linked
+
+259
+00:12:58,633 --> 00:13:00,166
+这意味着我们要做的一切就是
+which means that all we have to do
+
+260
+00:13:00,500 --> 00:13:03,233
+绑定我们的顶点数组和索引缓冲区
+is just bind our vertex array and then index buffers
+
+261
+00:13:03,233 --> 00:13:04,600
+当然, 完全是另一回事
+of course for a separate thing completely
+
+262
+00:13:04,600 --> 00:13:06,233
+这也是我们仍然需要绑定它的原因
+which is why we still need to bind it
+
+263
+00:13:06,466 --> 00:13:07,866
+然后我们就是绘制元素了, 而你也可以看到
+and then we can draw elements, so you can see
+
+264
+00:13:07,866 --> 00:13:10,066
+这段代码已经变得相当干净了
+this code has become quite a bit cleaner
+
+265
+00:13:10,066 --> 00:13:11,633
+这就是我们要做的一切
+and that's all we have to actually do
+
+266
+00:13:11,666 --> 00:13:13,533
+所以最大的问题是我该怎么做
+so the big question is what do I do
+
+267
+00:13:14,000 --> 00:13:17,900
+我应该一直使用顶点数组对象吗
+am I supposed to use vertex array objects like all the time
+
+268
+00:13:17,900 --> 00:13:21,566
+我可以根据顶点规范设置顶点缓冲区吗
+do I can I just be setting a vertex buffer from a vertex specification
+
+269
+00:13:21,733 --> 00:13:22,700
+什么是最优的
+what's optimal
+
+270
+00:13:23,533 --> 00:13:25,666
+比如我怎么做, 所有这些问题
+like how do I do things, all these questions
+
+271
+00:13:25,666 --> 00:13:28,266
+当我们要绘制多个网格时会发生什么
+what happens when we have multiple meshes that we want to draw
+
+272
+00:13:28,566 --> 00:13:32,833
+我知道很多事情都非常简单
+I know that a lot of this is incredibly kind of simple
+
+273
+00:13:32,833 --> 00:13:34,200
+因为我们只绘制了一个对象
+because we're just drawing one object
+
+274
+00:13:34,200 --> 00:13:36,650
+而这真的非常简单
+and it happens to be really really simple
+
+275
+00:13:37,250 --> 00:13:41,533
+我将开始把所有这些代码抽象成类, 而一旦我那样做了
+I am going to start abstracting all of this code out into classes, and as soon as I do that
+
+276
+00:13:41,533 --> 00:13:43,700
+我想在下一期真的要开始做那个了
+I think I want to actually start doing that next episode
+
+277
+00:13:44,100 --> 00:13:44,933
+那个一做完
+as soon as that's done
+
+278
+00:13:44,933 --> 00:13:46,375
+这对我们来说真的很容易做到
+it's going to be really easy for us to
+
+279
+00:13:46,375 --> 00:13:48,100
+实际上, 创建一组不同的顶点缓冲区
+actually create a bunch of different vertex buffers
+
+280
+00:13:48,100 --> 00:13:50,766
+用数据填充它们, 并在屏幕上绘制多个对象
+fill them with data, and draw multiple objects on the screen
+
+281
+00:13:50,933 --> 00:13:53,700
+我们可能需要设置一些其他的东西, 比如数学等等
+and we'll probably have to set up some other things like maths and all of that
+
+282
+00:13:53,866 --> 00:13:54,666
+为了做到那一点
+to make that happen
+
+283
+00:13:55,233 --> 00:13:59,600
+但是这个想法就像什么样的, 如何处理
+but the idea is what's the like what is the deal like
+
+284
+00:13:59,666 --> 00:14:02,233
+我应该使用多个顶点数组对象吗
+should I be using multiple vertex array objects
+
+285
+00:14:02,233 --> 00:14:03,733
+我能不用它们吗
+can I get away without using them
+
+286
+00:14:04,200 --> 00:14:04,904
+如何处理
+what's the deal
+
+287
+00:14:05,100 --> 00:14:07,466
+现在, 我要告诉你的是
+now, what I'm about to tell you is going to be
+
+288
+00:14:07,466 --> 00:14:10,266
+有点固执己见, 可能有点含糊不清
+a little bit opinionated and probably a bit vague
+
+289
+00:14:10,533 --> 00:14:14,300
+但问题是没有更好的办法让我向你解释
+but the thing is there's no better way for me to actually explain it to you
+
+290
+00:14:14,333 --> 00:14:16,900
+因为答案是视情况而定
+because the answer is it depends
+
+291
+00:14:17,233 --> 00:14:19,500
+那么首先, 让我们来看看这里发生了什么。
+so first of all, let's take a look at what's happening here
+
+292
+00:14:19,500 --> 00:14:22,600
+如果我们使用我当前使用的核心配置文件
+if we use the core profile which I'm currently using
+
+293
+00:14:22,833 --> 00:14:24,666
+我们必须创建一个顶点数组对象
+we have to create a vertex array object
+
+294
+00:14:24,666 --> 00:14:26,600
+如果我们只使用兼容性配置文件
+if we just use the compatibility profile
+
+295
+00:14:26,633 --> 00:14:28,433
+这并不意味着没有顶点数组对象
+it doesn't mean there are no vertex array objects
+
+296
+00:14:28,433 --> 00:14:30,366
+这只意味着我们有一个默认的
+it just means that we have one default
+
+297
+00:14:30,466 --> 00:14:32,900
+我们有一个默认的顶点数组对象, 它被绑定并设置为供我们使用
+we have a default one, that's bound and set up for us to use
+
+298
+00:14:33,400 --> 00:14:36,033
+如果使用的核心配置文件, 我们必须自己创造一个
+if we're in core, we have to create one ourselves
+
+299
+00:14:36,233 --> 00:14:40,400
+现在, 技术上你可以做的是, 你可以创造一个
+now, what you could do technically is you could just create one
+
+300
+00:14:40,466 --> 00:14:43,600
+像这里我们做的一样创建一个顶点数组对象
+create one vertex array object like we did here
+
+301
+00:14:43,600 --> 00:14:46,600
+在你整个项目的过程中, 都把它放在一边
+and just leave it bound for the duration of your entire program
+
+302
+00:14:46,600 --> 00:14:49,000
+因此, 始终有一个绑定的顶点数组对象
+so you always have one vertex array object bound
+
+303
+00:14:49,400 --> 00:14:54,333
+然后你可以绑定一个顶点缓冲区并指定一个顶点布局
+and then what you can do is bind a vertex buffer and specify a vertex layout
+
+304
+00:14:54,400 --> 00:14:57,666
+每次在绘制几何体之前
+every time before you actually end up drawing your geometry
+
+305
+00:14:57,900 --> 00:15:00,275
+换句话说, 你在做和我们一样的事情
+so in other words, you're kind of doing the same thing that we did
+
+306
+00:15:00,275 --> 00:15:02,166
+在我们介绍这个顶点数组对象之前
+before we introduce this vertex array object
+
+307
+00:15:02,166 --> 00:15:06,200
+就好像我们在使用兼容性配置文件一样
+so as if we were using that compatibility profile
+
+308
+00:15:06,766 --> 00:15:07,766
+那是一种选项
+that is an option
+
+309
+00:15:08,133 --> 00:15:10,366
+那是你表示的一种方式
+and that's kind of, that kind of a way for you to say
+
+310
+00:15:10,366 --> 00:15:12,233
+我完全忽略顶点数组对象
+I'm ignoring vertex array objects entirely
+
+311
+00:15:12,233 --> 00:15:15,033
+我只是自己绑定了一种默认的
+I'm just binding one kind of default one by myself
+
+312
+00:15:15,100 --> 00:15:17,133
+因为我需要这样做, 否则我的程序将无法运行
+because I need to, otherwise my program won't run
+
+313
+00:15:17,133 --> 00:15:18,966
+否则我将无法渲染任何东西
+otherwise I won't be able to render anything
+
+314
+00:15:18,966 --> 00:15:22,266
+因为OpenGL实际上在核心配置文件中规定了这一点
+because OpenGL actually mandates that in the core profile
+
+315
+00:15:22,300 --> 00:15:23,500
+所以那是一种选项
+so that is one option
+
+316
+00:15:23,566 --> 00:15:26,333
+通过绑定一个顶点数组对象, 可以忽略该顶点数组对象
+you could just ignore vertex array objects by binding one
+
+317
+00:15:26,633 --> 00:15:28,100
+忘记它, 丢在一边
+forgetting about it, leaving it bound
+
+318
+00:15:28,100 --> 00:15:30,366
+然后, 每次你实际上要绘制一些东西时
+and then, every time you actually have to draw something
+
+319
+00:15:30,709 --> 00:15:32,400
+你已经绑定了一个顶点缓冲区
+you spit you bind a vertex buffer
+
+320
+00:15:32,400 --> 00:15:35,100
+你绑定了一些东西到GL_ARRAY_BUFFER插槽中
+you bind something into the GL_ARRAY_BUFFER slot
+
+321
+00:15:35,266 --> 00:15:37,733
+然后指定启用任何vertexAttribArray
+then you specify that you enable any vertexAttribArray
+
+322
+00:15:37,733 --> 00:15:40,133
+你不得不指定那个vertexAttribPointer
+you have to and specify that vertexAttribPointer stuff
+
+323
+00:15:40,133 --> 00:15:41,566
+这样你就可以映射你的布局了
+so that you map your layout
+
+324
+00:15:41,933 --> 00:15:44,933
+然后绑定索引缓冲区, 然后渲染, 对吧
+and then you bind your index buffer, and then you render, right
+
+325
+00:15:44,933 --> 00:15:46,966
+很明显, 在任何其他状态下都有一个着色器
+and obviously you have a shader abound in any other state
+
+326
+00:15:46,966 --> 00:15:48,700
+你可能不得不设置一下, 对吧
+that you might have to set up, right
+
+327
+00:15:49,133 --> 00:15:50,033
+你可以做那个
+you could do that
+
+328
+00:15:50,066 --> 00:15:51,325
+那是一个选项, 那就是选项A
+that's one option, that's option a
+
+329
+00:15:51,325 --> 00:15:54,700
+选项B是对于你创建的几何体的每一块
+option b is for every piece of geometry that you create
+
+330
+00:15:54,733 --> 00:15:57,666
+基本上创建一个顶点数组对象
+you basically create a vertex array object
+
+331
+00:15:57,900 --> 00:15:59,633
+然后指定那个规范一次
+then you specify that specification once
+
+332
+00:15:59,633 --> 00:16:02,075
+那么你就可以启用你需要的任何vertexAttribArray了
+so you enable any vertexAttribArray you need to
+
+333
+00:16:02,075 --> 00:16:05,166
+可以根据需要多次指定glVertexAttribPointer
+you specify glVertexAttribPointer as many times as you need
+
+334
+00:16:05,166 --> 00:16:06,600
+把那些都设置好
+to set all of that stuff up
+
+335
+00:16:07,233 --> 00:16:10,633
+然后, 在执行所有这些操作之前, 你将看到绑定顶点缓冲区
+and then you'll see bind vertex buffers as well before you do all that
+
+336
+00:16:11,233 --> 00:16:13,400
+然后到了绘制的时候
+and then when it comes time to draw
+
+337
+00:16:13,533 --> 00:16:16,225
+基本上只需绑定不同的顶点数组对象
+you just bind a different vertex array object basically
+
+338
+00:16:16,225 --> 00:16:18,500
+每次在你绘制几何体之前
+every time before you draw your geometry
+
+339
+00:16:18,833 --> 00:16:21,266
+然后将其绑定到索引缓冲区中
+and then you bind it in an index buffer
+
+340
+00:16:21,266 --> 00:16:22,866
+然后你就可以调用glDrawElements
+and then you call glDrawElements
+
+341
+00:16:22,866 --> 00:16:25,000
+或者你用的任何绘制函数, 好吧
+or whatever draw function you're using, okay
+
+342
+00:16:25,466 --> 00:16:30,000
+所以你基本上可以在整个项目中有一个全局VAO
+so you basically you either have one global VAO for the entire program
+
+343
+00:16:30,000 --> 00:16:33,933
+然后每次绑定不同的缓冲区和不同的顶点规范
+and then you bind different buffers and different vertex specifications every time
+
+344
+00:16:34,500 --> 00:16:41,266
+或者你对每个几何体或唯一几何体或任何东西都有单独的VAO, 对吧
+or you have a separate VAO for each piece of geometry or each unique piece of geometry or whatever, right
+
+345
+00:16:42,766 --> 00:16:46,900
+哪一个更好, 还是很难回答
+which one's better, again, it's hard to answer
+
+346
+00:16:47,166 --> 00:16:49,833
+所以一个更好更容易回答的问题是
+so a better an easier question to answer is
+
+347
+00:16:49,833 --> 00:16:51,100
+哪一个更优秀
+which one is more optimal
+
+348
+00:16:51,100 --> 00:16:53,100
+我应该用哪一个, 哪一个更快
+which one should I use which one is faster
+
+349
+00:16:53,233 --> 00:17:00,166
+只绑定缓冲区并在每次布局时指定该规范是否更快
+is it faster to just bind a buffer and specify that specification every time that layout
+
+350
+00:17:00,433 --> 00:17:04,166
+或者每次绑定不同的VAO是否更快
+or can I or is it faster to bind a different VAO every time
+
+351
+00:17:04,766 --> 00:17:09,766
+现在, 在过去, 有一个VAO的速度更快
+now, in the past, it has been faster to actually just have one VAO
+
+352
+00:17:09,933 --> 00:17:11,933
+然后每次绑定一切
+and then bind everything every time
+
+353
+00:17:11,933 --> 00:17:16,033
+我知道这是事实, NVIDIA实际上有一篇关于这方面的研究
+I know that for a fact, and NVIDIA actually has a paper on that
+
+354
+00:17:16,766 --> 00:17:18,566
+描述中的某个链接
+a link something in the description
+
+355
+00:17:18,566 --> 00:17:21,566
+我觉得是67页PPT之类的
+it's like I think slide 67 or something of that
+
+356
+00:17:21,566 --> 00:17:23,666
+我这儿只是凭记忆说的
+I'm really just talking from memory here
+
+357
+00:17:24,666 --> 00:17:27,366
+一个源引擎或着阀源引擎
+of a source engine, valve source engine
+
+358
+00:17:27,433 --> 00:17:32,300
+他们实际上嫉妒的那种表现, 阻止了VAO的使用
+kind of presentation where they actually envious physically, discouraged the use of VAO
+
+359
+00:17:32,300 --> 00:17:34,000
+然后说不要用它们
+and said just don't use them
+
+360
+00:17:34,300 --> 00:17:35,600
+那是很久以前的事了
+that was a while ago
+
+361
+00:17:36,066 --> 00:17:38,400
+我最近没有做过这方面的基准测试
+I haven't done any recent benchmarks on this
+
+362
+00:17:38,533 --> 00:17:43,766
+所以我建议你使用VAO, 对吧
+so what I would recommend for you to do is use the VAO, right
+
+363
+00:17:43,800 --> 00:17:46,333
+就使用它们, OpenGL建议你使用它们
+just use them, OpenGL recommends that you use them
+
+364
+00:17:46,466 --> 00:17:47,700
+所以就使用VAO
+so use them
+
+365
+00:17:48,733 --> 00:17:52,466
+现在只是因为规范建议你做一些事情
+now just because of specification recommends that you do something
+
+366
+00:17:52,633 --> 00:17:55,466
+这并不意味着这是最好的选择, 对吧
+does not mean that it is the best thing to do, okay
+
+367
+00:17:56,100 --> 00:17:57,133
+这是一个真实的世界
+this is the real world
+
+368
+00:17:57,133 --> 00:18:01,766
+与理想情况下VAO的工作原理略有不同
+things work a little bit differently than the ideal case where VAO just work
+
+369
+00:18:01,900 --> 00:18:03,333
+对吧, 它们很快
+right, and they're faster
+
+370
+00:18:03,700 --> 00:18:07,833
+所以我建议你做的是, 如果你真的关心性能
+so what I recommend you do is that, if you really really care about performance
+
+371
+00:18:08,000 --> 00:18:12,300
+你绝对需要从这一切中挤出最后一点性能
+and you absolutely need to squeeze every last bit of performance out of all this
+
+372
+00:18:12,733 --> 00:18:14,266
+实际上你需要进行一些测试
+you actually run some tests
+
+373
+00:18:14,266 --> 00:18:18,033
+所以在你的环境中, 在你的平台上, 在你的设备中
+so in your environment, on your platform, on your device
+
+374
+00:18:18,033 --> 00:18:19,800
+不管你实际上在做什么
+whatever it is that you're actually doing
+
+375
+00:18:20,033 --> 00:18:23,266
+在你的实际生产环境中进行尝试
+try in your actual production environment
+
+376
+00:18:23,533 --> 00:18:27,800
+尝试实际使用一个全局VAO与对每个对象使用一个VAO
+try to actually use one global VAO vs a VAO for each object
+
+377
+00:18:28,200 --> 00:18:30,466
+看看从中得到一些真实的数字
+and see get some real numbers out of that
+
+378
+00:18:30,733 --> 00:18:32,666
+看看什么对你更好
+and see what works better for you
+
+379
+00:18:32,666 --> 00:18:34,366
+因为这将是视情况而定的
+because it is going to be circumstantial
+
+380
+00:18:34,366 --> 00:18:35,833
+这将是不同的
+it is going to be different
+
+381
+00:18:36,166 --> 00:18:37,700
+取决于你的环境
+depending on your environment
+
+382
+00:18:37,700 --> 00:18:40,733
+因此, 在你的环境中对那个配置文件进行基准测试
+so benchmark that profile that in your environment
+
+383
+00:18:40,733 --> 00:18:42,800
+看看哪个选项更适合你
+and see whatever option works better for you
+
+384
+00:18:42,800 --> 00:18:45,600
+然后选择对你更好的, 好吧
+and then stick with the one that works better for you, okay
+
+385
+00:18:45,600 --> 00:18:48,266
+我真的很难回答这样的问题
+it's really difficult for me to answer questions like this
+
+386
+00:18:48,366 --> 00:18:50,700
+因为它是视情况而定的, 对吧
+because it depends, right
+
+387
+00:18:51,333 --> 00:18:53,366
+再说一次, 我最近没有做过这方面的基准测试
+again, I haven't done any recent benchmarks on this
+
+388
+00:18:53,366 --> 00:18:57,033
+在过去, 我发现使用一个全局VAO更快
+in the past, I have found using one global VAO to be faster
+
+389
+00:18:57,300 --> 00:18:59,000
+但那是多年前的事了
+but that was years ago
+
+390
+00:18:59,000 --> 00:19:02,600
+所以我现在不能以现在的驱动谈论这个
+so I cannot talk about this right now with current drivers
+
+391
+00:19:02,600 --> 00:19:04,525
+那么我以后能做的就是
+so what am I doing the future is
+
+392
+00:19:04,525 --> 00:19:08,266
+实际上, 对这种引擎或我们现在拥有的任何东西进行基准测试
+actually benchmark this this kind of engine or whatever that we have right now
+
+393
+00:19:08,266 --> 00:19:09,933
+这个小沙盒应用程序
+this little sandbox application
+
+394
+00:19:11,466 --> 00:19:12,600
+这个还不够成熟
+there's no way near mature enough
+
+395
+00:19:12,600 --> 00:19:15,533
+没有足够的东西让我去测试它
+doesn't have enough stuff going on for me to actually test it
+
+396
+00:19:15,933 --> 00:19:17,900
+否则我可能会做一个小基准测试
+otherwise I would probably throw a little benchmark
+
+397
+00:19:17,900 --> 00:19:21,100
+事实上是的, 如果你想让我做个基准测试, 请在下面留言
+actually yeah drop a comment below, if you want me to benchmark this
+
+398
+00:19:21,100 --> 00:19:22,233
+我会看看我能做些什么
+and I'll see what I can do
+
+399
+00:19:22,433 --> 00:19:26,766
+如果你自己进行压力测试, 对这个做基准测试, 做所有的事情
+if you yourself run a stress test and benchmark this and do all that
+
+400
+00:19:26,766 --> 00:19:28,333
+你可以在下面的评论中留下你的结果
+you can leave your results in the comments below
+
+401
+00:19:28,333 --> 00:19:29,233
+我很想看它们
+I'd love to read them
+
+402
+00:19:30,333 --> 00:19:33,266
+但这个想法是, 这取决于你是否想使用VAO
+but the idea is again, it kind of depends whether or not you want to use VAO
+
+403
+00:19:33,266 --> 00:19:35,675
+从现在起我将使用VAO
+I will from now on be using VAO
+
+404
+00:19:35,675 --> 00:19:38,811
+只是因为我现在并不特别关心性能
+just because I don't particularly care about performance right now
+
+405
+00:19:38,811 --> 00:19:41,066
+并且这也是OpenGL建议你实际执行的操作
+and it is what OpenGL recommends that you actually do
+
+406
+00:19:41,166 --> 00:19:45,900
+不过, 一定要看看我在评论部分链接的那篇文章或演示文稿
+however, do check out that paper or presentation or whatever that I linked in the comment section
+
+407
+00:19:45,933 --> 00:19:47,300
+在下面的说明框中
+in the description box below
+
+408
+00:19:47,425 --> 00:19:52,866
+如果你对此感兴趣, 并确定在你的环境中为你的用例测试它
+if you're interested in that and definitely test it in your environment for your use case
+
+409
+00:19:52,866 --> 00:19:56,566
+你知道, 在你的平台上, 在你的设备上, 不管什么，实际上你会看到
+you know, on your platform on your device whatever to actually see
+
+410
+00:19:56,933 --> 00:19:59,700
+你得到了什么, 因为这才是真正重要的
+what you get, because that's what actually matters
+
+411
+00:20:00,033 --> 00:20:01,366
+不管怎样, 我希望你们喜欢这个视频
+anyway, I hope you guys enjoyed this video
+
+412
+00:20:01,666 --> 00:20:03,050
+如果你喜欢的话, 可以点击那个喜欢按钮
+if you did, you can hit the like button
+
+413
+00:20:03,050 --> 00:20:05,933
+如果你想支持我在这个频道所做的一切
+if you want to support everything that I do here on this channel
+
+414
+00:20:06,033 --> 00:20:08,266
+那就去patreon.com/theCherno
+then head on over to patreon.com/theCherno
+
+415
+00:20:08,366 --> 00:20:09,366
+你将得到一些很酷的奖励
+you'll get some cool rewards
+
+416
+00:20:09,366 --> 00:20:10,666
+比如更早得到视频
+such as getting videos early
+
+417
+00:20:10,666 --> 00:20:14,200
+访问我在此频道制作的每个系列的所有源代码存储库
+access to all the source repositories for every series that I make on this channel
+
+418
+00:20:14,200 --> 00:20:16,666
+包括我今天在这里写的所有代码
+including all the code that I've written here today as well
+
+419
+00:20:16,666 --> 00:20:18,533
+它就像每一期之间的差异
+it's like a diff between each episode
+
+420
+00:20:18,533 --> 00:20:20,766
+这样你就可以很容易地看到任何添加的内容, 以及所有这些
+so that you can easily see whatever added, and all of that
+
+421
+00:20:21,233 --> 00:20:22,700
+还有一些很酷的奖励
+there's some other pretty cool rewards
+
+422
+00:20:22,733 --> 00:20:26,100
+例如, 像所有合作伙伴一样, 就是patreon上面的赞助人
+like for example all of the partners, which is the highest patreon tier
+
+423
+00:20:26,233 --> 00:20:27,933
+我们每个人来聚会, 比如一个月一次
+all of us we hang-out, like once a month
+
+424
+00:20:27,933 --> 00:20:30,166
+就像一个小时的生活对话
+and just have like an hour long conversation about life
+
+425
+00:20:30,166 --> 00:20:32,766
+关于编程, 关于开发等等
+and about programming and about developing and all that
+
+426
+00:20:32,933 --> 00:20:34,500
+那真是一段美好的时光
+that's a really great time
+
+427
+00:20:34,500 --> 00:20:36,100
+所以一定要看看那些奖励
+so definitely check out those rewards there
+
+428
+00:20:36,766 --> 00:20:40,200
+你做的最大的事情显然是帮助我继续制作新视频
+the biggest thing you're doing is obviously helping me to continue making new videos
+
+429
+00:20:40,200 --> 00:20:41,333
+这是比较酷的
+which is pretty cool and
+
+430
+00:20:41,600 --> 00:20:43,475
+像往常一样, 向每个人大声说出
+as always a huge shout out to everyone 
+
+431
+00:20:43,475 --> 00:20:45,166
+就是支持我的那些人
+who supports what I do
+
+432
+00:20:45,166 --> 00:20:47,100
+因为没有你的支持, 这是不可能的
+because without you, not this would be possible
+
+433
+00:20:47,366 --> 00:20:50,133
+下次, 我想我们要么谈谈数学
+next time, I think we're either going to talk about maths
+
+434
+00:20:50,733 --> 00:20:54,100
+要么可能会开始抽象所有这些代码
+we're going to probably start extracting all this code out
+
+435
+00:20:54,100 --> 00:20:55,533
+让我知道你的想法
+let me know what you want to think
+
+436
+00:20:55,900 --> 00:20:58,033
+让我知道你想看什么, 请在下面评论区留言
+let me know what you want to see in the comment section below
+
+437
+00:20:58,033 --> 00:20:59,533
+我们会看到我们最终在做什么
+and we'll see what we actually end up doing
+
+438
+00:21:00,500 --> 00:21:01,833
+我想提的一件事是
+one thing I wanted to mention was
+
+439
+00:21:03,433 --> 00:21:06,966
+如果我们谈论数学, 我们将不得不使用数学库
+if we talk about maths, we'll have to use a math library
+
+440
+00:21:07,066 --> 00:21:10,233
+以及可能谈论
+as well as probably talk about
+
+441
+00:21:10,233 --> 00:21:12,300
+你知道投影矩阵是怎么工作的吗
+you know how things like projection matrices work
+
+442
+00:21:12,300 --> 00:21:14,150
+还有一般的矩阵等等
+and matrices in general and all that 
+
+443
+00:21:14,150 --> 00:21:17,566
+这可能是一件很长的事情, 但这是我们必须做的事情
+so that might be a long thing, but it is something we have to do
+
+444
+00:21:17,700 --> 00:21:20,900
+所以, 你唯一会做的, 我唯一能说的
+so, the only thing you can, the only thing I can say
+
+445
+00:21:21,066 --> 00:21:23,066
+我可以说, 关于数学, 你必须学会热爱它
+I can say, about maths is you gotta learn to love it
+
+446
+00:21:23,066 --> 00:21:24,666
+因为作为一个图形程序员
+because as a graphics programmer
+
+447
+00:21:25,066 --> 00:21:26,766
+你要学很多数学
+you're gonna be dealing with maths quite a lot
+
+448
+00:21:26,766 --> 00:21:28,333
+因为几乎所有的事情都是这样运行的
+because that's how pretty much everything works
+
+449
+00:21:28,333 --> 00:21:29,733
+不管怎样, 我希望你们喜欢这个视频
+anyway, I hope you guys enjoyed this video
+
+450
+00:21:29,900 --> 00:21:32,133
+下次见, 拜
+I will see you guys next time, goodbye
+

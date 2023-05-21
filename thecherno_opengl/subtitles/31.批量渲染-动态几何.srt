@@ -1,0 +1,1218 @@
+﻿1
+00:00:00,100 --> 00:00:03,966
+嘿，你们好，我是TheCherno，欢迎回到这个批量渲染迷你系列
+hey what's up guys, my name is TheCherno, welcome back to this batch rendering mini series
+
+2
+00:00:03,966 --> 00:00:09,600
+那么上次我们看了如何将纹理放入批量渲染中，如果还没看过那期视频，一定要去看看哦
+so last time we took a look at how we could get textures into our batch, definitely check out that video if you haven't already
+
+3
+00:00:09,925 --> 00:00:13,475
+今天我们要讨论的是动态批量渲染
+and today we're gonna be talking all about dynamic batching
+
+4
+00:00:13,600 --> 00:00:20,033
+那么到目前为止，我们已经预先定义了整批顶点缓冲区中的所有数据
+so up until now, we've had our entire batch our vertex buffer kind of defined up front all of the data that's been in it
+
+5
+00:00:20,033 --> 00:00:24,575
+我们在应用的一开始就定义了，并且在每帧中所做的就是
+we've defined at the beginning of our application, and all we've done every frame is
+
+6
+00:00:24,575 --> 00:00:29,675
+只是简单地引用我们已经发送到GPU的现有数据进行渲染
+just simply rendered it with reference that existing data that we've already sent to the GPU
+
+7
+00:00:29,675 --> 00:00:36,875
+然后告诉它要渲染，我们已经命令用DrawCall渲染，那很好，因为在游戏中有一些场景
+and then just told it to be rendered, we've commanded to be rendered by a DrawCall, now that's great, because there are peeps and scenarios in games
+
+8
+00:00:36,875 --> 00:00:45,175
+我们只有这种静态的几何体，只是想继续渲染它，并不关心是否能够控制它
+where we just have like this kind of static geometry blob,and we just want to keep rendering that, we don't really care about being able to control it 
+
+9
+00:00:45,300 --> 00:00:50,350
+但也有很多情况下那并不能解决问题
+but there are also a lot of cases in which that's just not going to cut it
+
+10
+00:00:50,350 --> 00:00:55,300
+实际上我们需要一帧一帧设置所有这些不同的四边形位置
+we actually need to be able to frame to frame set the positions of all these different quads 
+
+11
+00:00:55,300 --> 00:01:01,275
+我们动态地将它们组合成一个DrawCall，并将它们组合成批量渲染，并且那就是今天的主题
+that we've grouped together into one DrawCall into one batch dynamically, and that is what today's video is about
+
+12
+00:01:01,275 --> 00:01:05,950
+但首先我想感谢skillshare对本期视频的赞助，那么对于那些不知道的人
+but first I want to thank skillshare for sponsoring this video, so for those of you who don't know
+
+13
+00:01:06,100 --> 00:01:12,300
+skillshare是一个为创意人士提供的在线学习社区，在他们的创意之旅中迈出下一步
+skillshare is an online learning community for creatives, where millions come together to take the next step in their creative journey
+
+14
+00:01:12,375 --> 00:01:15,925
+你们会分享数千个激发创造力和好奇心的课程
+you'll share offers thousands of inspiring classes for creative and curious
+
+15
+00:01:15,925 --> 00:01:20,925
+人们的主题包括插图设计，摄影，视频自由撰稿等等
+people on topics including illustration design photography video freelancing and more
+
+16
+00:01:21,133 --> 00:01:26,000
+我想现在正在看这期视频的大部分人，那些真正想要学习更多的朋友
+I think that pretty much all of you watching this video right now, so people who really want to learn more
+
+17
+00:01:26,000 --> 00:01:32,400
+那正是skillshare能让你们做到的，我喜欢skillshare的视频通常都很短
+and that's exactly what skillshare lets you do, and I love the fact that skillshare's videos are typically so short
+
+18
+00:01:32,400 --> 00:01:36,400
+我的意思是我的可以坚持学习很长一段时间，而不是说那是不好的
+I mean mine can go on for quite a while and not saying that's bad
+
+19
+00:01:36,675 --> 00:01:41,375
+但有时你们只是想学一门新技能，而不需要看很长的视频
+but sometimes you just want to pick up a new skill without having to watch really long videos
+
+20
+00:01:41,375 --> 00:01:45,475
+并且花太多的时间来学习那个，因为说实话
+and spend too much of your time actually learning that, because let's be honest
+
+21
+00:01:45,650 --> 00:01:50,275
+我的意思是谁有大量的时间躺在那里，就像人们看这些图形编程的视频
+I mean who has tons of time lying around, as people watching these videos on graphics programming
+
+22
+00:01:50,275 --> 00:01:54,400
+很重要的一点是，除了编程之外，你们还要有创造性的眼光
+it's really important that apart from just programming, you have more of a creative eye
+
+23
+00:01:54,400 --> 00:02:01,266
+比如设计和插图，所有这些有创意的东西把这些图形联系在一起
+and you're aware of like design and illustration, and all of this kind of creative stuff that ties these graphics together
+
+24
+00:02:01,266 --> 00:02:05,925
+如果你们只是把它归结到代码中，那就是你们所关心的，只是在代码中
+if you're just kind of boil down into that code, and that's it's all you care about, you just in the code
+
+25
+00:02:06,475 --> 00:02:11,150
+你们做不出漂亮的东西，我真的很喜欢这些创意插图课程
+you're not gonna make anything pretty, for example, i really like these creative illustration classes
+
+26
+00:02:11,150 --> 00:02:14,275
+事实上，这门课可以帮助你们设计一个标志
+and in fact, this class is great for helping you to design a logo
+
+27
+00:02:14,566 --> 00:02:22,525
+每年花20美元来探索新技能，深入现有的激情，并沉迷于创造力与技能在线课程
+make twenty twenty a year in which you explore new skills, deep in existing passions, and get lost in creativity with skills hares online classes
+
+28
+00:02:22,866 --> 00:02:28,200
+并且每月不到10美元的订阅费，确实是实现所有那些的好路子
+and with an annual subscription of less than $10 a month, it's a really good way to actually do all of that
+
+29
+00:02:28,400 --> 00:02:35,533
+但当然skillshare他们也会提供那些，通过下面链接注册的前500个朋友
+but of course skillshare being the lovely company that they are are offering, the first 500 of youth that sign up using the link in the description below
+
+30
+00:02:35,966 --> 00:02:41,750
+两个月的免费技能学习，所以请确保你们尽快访问这个链接
+two whole months of free skillshare premium, so make sure you jump on that link as soon as possible
+
+31
+00:02:42,000 --> 00:02:46,433
+开始学习所有这些新技能，让我知道你们最后学到了什么技能
+and start learning all of those new skills, let me know what kind of skills you guys end up learning as well
+
+32
+00:02:46,433 --> 00:02:50,400
+这个平台上有很多东西，我还没有全部探索，一定要去看看
+there's so much on that platform, i haven't explored it all yet, definitely check it out
+
+33
+00:02:50,400 --> 00:02:53,782
+当然一如既往地感谢skillhare对本期视频赞助
+and of course as always thank you to skills hare for sponsoring this video
+
+34
+00:02:54,250 --> 00:02:58,175
+好了，让我们说说动态批渲染，有一些移除的部分
+okay, let's talk about dynamic batch rendering, so there are a few moving parts
+
+35
+00:02:58,175 --> 00:03:05,600
+当涉及到动态批渲染时，实际上有两种主要部分，那就是顶点缓冲区和索引缓冲区
+when it comes to making your batch rendering dynamic, in fact there's two kind of main parts, and that's the vertex buffer and the index buffer
+
+36
+00:03:05,950 --> 00:03:13,475
+所以今天我们要特别关注顶点缓冲区，正如在本系列中看到的，当应用第一次启动时
+so today we're going to focus specifically on that vertex buffer, as we've seen so far in this series when our program first starts up
+
+37
+00:03:13,566 --> 00:03:20,500
+那时我们就创建了这种顶点缓冲区，但如果不需要预先定义所有这些顶点呢，对吧
+that's when we create this kind of vertex buffer, but what if we didn't have to predefined all those vertices, right
+
+38
+00:03:20,500 --> 00:03:25,325
+然后，在我们的初始化代码中，如果能以某种方式移动这个，让它成为能设置的每帧数据
+then, and there during our initialization code, what if we could somehow move that responsibility
+
+39
+00:03:25,325 --> 00:03:25,350
+然后，在我们的初始化代码中，如果能以某种方式移动这个，让它成为能设置的每帧数据
+
+40
+00:03:25,350 --> 00:03:29,475
+然后，在我们的初始化代码中，如果能以某种方式移动这个，让它成为能设置的每帧数据
+and make it something that we can actually do, every frame data that we can set
+
+41
+00:03:29,900 --> 00:03:33,600
+每一帧都意味着我们可以动态响应
+every frame that would mean that we could dynamically respond to
+
+42
+00:03:33,600 --> 00:03:37,633
+例如一个四边形的位置或者类似的东西或者四边形的大小
+for example, the position of a quad or something like that or the size of a quad
+
+43
+00:03:37,633 --> 00:03:43,566
+或者这个四边形是否需要渲染，它会给我们带来巨大的力量
+or if this quad even has to be rendered or not, it would give us tremendous power really
+
+44
+00:03:43,566 --> 00:03:47,825
+当然，好消息是我们可以实现那个，而且实际上很简单
+and the good news of course is that we can do that and it's actually pretty simple
+
+45
+00:03:48,150 --> 00:03:51,925
+我们真正要做的就是将顶点缓冲区标记为动态
+all we really have to do is mark our vertex buffer as dynamic
+
+46
+00:03:51,925 --> 00:03:56,566
+那意味着可以随时在顶点缓冲中设置，可以简单地将内存字节复制到顶点缓冲区的某个位置
+that means that we can actually set the data inside that vertex buffer, whenever we like
+
+47
+00:03:56,566 --> 00:04:02,390
+那意味着可以随时在顶点缓冲中设置，可以简单地将内存字节复制到顶点缓冲区的某个位置
+we can just simply copy bites of memory into that vertex buffer at some kind of location
+
+48
+00:04:02,566 --> 00:04:08,166
+这涉及到几个不同的步骤，只是快速总结一下它是什么，我们在这里要做的，当进入代码时
+there are a few different steps involved in this, but just to quickly summarize what it is, we're going to do here, when we jump into the code
+
+49
+00:04:08,166 --> 00:04:11,800
+我们将使用设置数据的函数，并且只用它在GPU上分配一个足够容纳所有顶点的缓冲区
+we're basically going to take the function that we use to actually set the data
+
+50
+00:04:11,800 --> 00:04:12,050
+我们将使用设置数据的函数，并且只用它在GPU上分配一个足够容纳所有顶点的缓冲区
+
+51
+00:04:12,050 --> 00:04:17,475
+我们将使用设置数据的函数，并且只用它在GPU上分配一个足够容纳所有顶点的缓冲区
+and use it only to allocate an actual buffer on our GPU that is large enough to hold all of our vertices
+
+52
+00:04:17,475 --> 00:04:21,900
+我们不会设置任何数据，然后在实际渲染代码中，在渲染之前，会从CPU中复制所有数据
+we're not going to set any data at all, and then later on in the actual rendering code
+
+53
+00:04:21,900 --> 00:04:26,825
+我们不会设置任何数据，然后在实际渲染代码中，在渲染之前，会从CPU中复制所有数据
+just before we render we're going to come in, and we're going to copy all of that data from our CPU
+
+54
+00:04:27,166 --> 00:04:34,125
+我们所有的顶点都打到我们的GPU中，这样我们就能访问它并正常渲染它
+all of the vertex starter that we have there into OpenGL into our GPU, so that we can then access it and render it as normal
+
+55
+00:04:34,600 --> 00:04:39,208
+所以这是一个非常简单的改变，当你们考虑它时，我们只是取这个顶点块
+so it's a very simple move, when you think about it, we're just literally taking that block of vertices
+
+56
+00:04:39,600 --> 00:04:44,328
+并且将它们移动到我们使用的那种渲染函数中，每一帧都会被调用
+and moving them to be in that kind of rendering function that we're using that gets called every frame
+
+57
+00:04:44,700 --> 00:04:49,650
+但当然，通过这样做，我们使它是动态的，因为现在可以计算数据
+but of course by doing, so we make it dynamic, because we can now calculate that data
+
+58
+00:04:49,650 --> 00:04:54,425
+或者对任何事情做出响应来确定数据应该是什么，然后上传，不用担心任何预定义的数据
+or respond to anything really to determine what the data should be, and then uploaded
+
+59
+00:04:54,425 --> 00:05:00,500
+或者对任何事情做出响应来确定数据应该是什么，然后上传，不用担心任何预定义的数据
+then and there without having to worry about any kind of predefined data whatsoever
+
+60
+00:05:00,575 --> 00:05:04,566
+无论如何，当看到代码时候，我带你们过一遍，它会更容易理解
+anyway, it's going to be a lot easier to actually understand, when you see the code, and when I walk you through it
+
+61
+00:05:04,566 --> 00:05:11,300
+那么让我们看一下，这是所有上次的代码，如果运行这个，我们就会得到这个结果
+so let's dive in and take a look, so this is all the code from last time, and if I launched this, we got this result
+
+62
+00:05:11,300 --> 00:05:16,425
+我们只是在这里渲染了这两个四边形，用单独的纹理一起在一个DrawCall指令中批量处理
+we just kind of had these two quads being rendered here, with separate textures all batched together into one DrawCall
+
+63
+00:05:16,750 --> 00:05:22,550
+现在我要做的是带你们看看如何让这一切变成动态的，正如我提到的
+and now what I want to do is take you guys through what it takes to make this all dynamic, so as I mentioned
+
+64
+00:05:22,550 --> 00:05:28,800
+它目前是静态的，因为我们为这个特定的批量处理定义的所有东西都是这个顶点缓冲区
+it's currently static in the sense that everything that we define for this particular batch for this vertex buffer
+
+65
+00:05:29,133 --> 00:05:34,833
+都完成了，就像这个OnAttach函数一样，它都固定为某个值
+it's all done, like in this OnAttach function, it's all kind of set in stone to be a certain value
+
+66
+00:05:34,833 --> 00:05:41,357
+并且就是那样，当我们到这里的OnUpdate，我们所做的基本上就是绑定纹理
+and that's it, when we come over here into OnUpdate, all we're doing here is essentially binding the textures
+
+67
+00:05:41,566 --> 00:05:47,800
+然后绑定顶点数组并发出那个绘制指令，现在还有一些东西我们可以自定义
+then binding the vertex array and just issuing that draw as well, now there are some things we can still customize 
+
+68
+00:05:47,800 --> 00:05:54,250
+比如这儿这些统一变量，我们可以改变摄像头，改变整个批量渲染的变换
+like for example these uniforms here, we can change the camera, we can change the transform of the entire batch
+
+69
+00:05:54,250 --> 00:06:00,500
+并且还可以绑定任何两种纹理，所以这两种目前是Cherno标志和Hazel标志
+and we can also bind any two textures we want, so the fact that those two are currently the Cherno logo and the Hazel logo
+
+70
+00:06:00,833 --> 00:06:06,133
+没有什么可以阻止我们翻转它们或引入另一种纹理，我们可以实现所有这些，都很不错
+there's nothing to stop us from flipping them or introducing another texture, we can do all of that, that's all fine
+
+71
+00:06:06,305 --> 00:06:11,875
+但是我们不能改变其中一个四边形的位置，或者改变它的大小
+but what we can't do is change the position of one of the quads for example, or change the size of it 
+
+72
+00:06:11,875 --> 00:06:17,825
+或者做一些类似的事情，因为这些顶点数据实际上已经在顶点缓冲区中了
+or do anything like that whatsoever, because this vertex data is in fact already inside the vertex buffer
+
+73
+00:06:18,066 --> 00:06:24,833
+并且那个顶点缓冲区是固定的，那么我们要做的就是完全改变这些
+and that vertex buffer is essentially set in stone, so what we're going to do is just change all of that completely
+
+74
+00:06:24,833 --> 00:06:31,666
+那么每一帧我们都会创建顶点缓冲数据，有一些方法可以实现，比如这样
+so that every frame we actually create this vertex buffer data, and there are a few ways to actually achieve something, like this
+
+75
+00:06:31,666 --> 00:06:36,366
+我要给你们展示一种我喜欢的处理方法，但要记住这个想法
+so I'm just going to show you one of the ways that I like doing it, but just keep that in mind the idea here
+
+76
+00:06:36,366 --> 00:06:42,400
+这里需要注意的是你们可以动态地改变顶点缓存的内容
+and the thing to really take home here is that you can dynamically change the contents of your vertex buffer
+
+77
+00:06:42,400 --> 00:06:47,566
+那就是你们’如何实现这种动态的渲染，好了，我们开始吧
+and that is how you achieve this dynamic kind of rendering, okay, cool, let's begin
+
+78
+00:06:47,566 --> 00:06:53,500
+我真正要做的第一件事是，不要担心这些顶点，我的意思是，它们在这里设置得很好
+so the first thing that I'm really gonna do is, not worry about these vertices, I mean, they're set up pretty well here
+
+79
+00:06:53,733 --> 00:06:58,700
+但我要假装它们不存在，我要把它们注释掉，原因就是这样
+but I'm just going to pretend that they don't exist, I'm gonna just comment them out, the reason being that
+
+80
+00:06:59,150 --> 00:07:05,525
+即使我们可以从这些顶点开始，我们可能想要在每一帧中动态地设置它们
+even though we could start with these vertices, we're probably going to want to dynamically set them every frame 
+
+81
+00:07:05,525 --> 00:07:11,700
+那么这些数据最终会转移到OnUpdate函数中，我要做的是到这里，到glBufferData中
+so this data will eventually move into the OnUpdate function, what I'll do is I'll come down here, into glBufferData
+
+82
+00:07:11,700 --> 00:07:20,400
+这是我们在这里调用的重要函数，因为它的作用很好，它实际上做了一些事情除了简单地设置这些顶点
+this is the important kind of function that we call here, because what this does is well, it actually does a few things apart from just simply setting these vertices 
+
+83
+00:07:20,400 --> 00:07:27,050
+并将它们发送给我们的GPU并存储在GPU内存中，它实际上也在我们的GPU上分配了缓冲区
+and actually sending them to our GPU in storing them in GPU memory, it also actually allocates the buffer on our GPU
+
+84
+00:07:27,050 --> 00:07:32,048
+它会保存所有这些数据，注意这一点很重要，因为我们实际上能做的是
+that will hold all of this data, and this is really important to note, because what we can actually do is
+
+85
+00:07:32,400 --> 00:07:38,275
+基本上改变我们使用这个函数的方式而不是用它来设置数据
+basically change how we use this function completely instead of actually using it to set data
+
+86
+00:07:38,666 --> 00:07:45,533
+我们可以把它作为一个分配函数，而不是提供给它一个指向缓冲区的指针
+we can just use it as an allocation function, and the way that we do that is instead of supplying it with a pointer to a buffer
+
+87
+00:07:45,533 --> 00:07:51,266
+这就是我们在这里做的，我们给它一个顶点指针，这是一个浮点数组，这是一个浮点指针
+which is what we're doing here, we're giving it that vertices pointer, which is a float array, which is a float pointer
+
+88
+00:07:51,266 --> 00:07:56,500
+相反，我们可以给它空指针，这意味着当我给它提供任何数据时
+instead of doing that, we can simply give it null pointer, which means when I'm supplying it with any data 
+
+89
+00:07:56,925 --> 00:08:03,950
+所以这个函数的有用之处就在于这个参数，也就是我们想要分配多少字节的数据
+so then the usefulness of this function falls into this parameter, which is how much data do we want to allocate in bytes
+
+90
+00:08:04,100 --> 00:08:10,925
+这就是我们如何使用这个函数，我们要做的是，我们要为顶点缓冲区分配一个最大大小
+and this is how we're going to use this function, what we're going to do is, we're going to just allocate a maximum size for our vertex buffer
+
+91
+00:08:11,225 --> 00:08:19,925
+然后每一帧，我们会用特定的数据填充顶点缓冲区，跟踪我们实际填充了多少数据
+and then every frame, we're going to kind of populate that vertex buffer with certain data, and keep track of how much data we've actually populated it with
+
+92
+00:08:20,000 --> 00:08:26,006
+所以我们现在需要做的是，决定我们能在顶点缓冲区中存储多少个顶点
+so what we need to do now is decide how many vertices essentially we can store inside our vertex buffer
+
+93
+00:08:26,300 --> 00:08:36,166
+当然可以任意输入一个数字，比如1024，也就是1kb的内存，那不是很有用，因为很明显这是一个顶点缓冲区
+of course arbitrarily typing in a number, like ten twenty four, meaning a kilobyte of memory, that's not really that useful, because obviously this is a vertex buffer
+
+94
+00:08:36,166 --> 00:08:44,350
+我们想要使用的单位是顶点，因为我们不可能有半个顶点，那是没用的，所以我们要做的是算出
+and we want to kind of the units that we want to use for these are vertices, because we can't have half a vertex, that's useless, so what we want to do is figure out
+
+95
+00:08:44,350 --> 00:08:50,866
+一个顶点有多大，现在所有的都是一些浮点数，有点烦人
+just how big one of vertex is, now at the moment, everything is just a bunch of floats, which is kind of annoying
+
+96
+00:08:50,866 --> 00:08:58,875
+这并不是一种很好的方法，因为仅仅看这个，仅仅通过阅读，很难判断
+it's not really a really nice way of doing things at all, because just by looking at this, it's actually really hard to tell, just by reading it that
+
+97
+00:08:59,075 --> 00:09:06,975
+这三个是位置，这四个是颜色，这两个是纹理坐标，这是纹理ID，这个切割没有意义
+these three are the position, these four are the color, these two are the texture coord, and this is the texture id, that cut it makes no sense
+
+98
+00:09:07,466 --> 00:09:13,250
+所以我们可能要做的是创建一个叫做Vertex的结构体，在这个结构体里
+so what we would probably want to do instead is create a structure called Vertex, and inside this structure
+
+99
+00:09:13,250 --> 00:09:17,866
+我们会有每个顶点的结构，所以我们要做的就是
+we're going to basically have the structure of each vertex, so what we'll do is
+
+100
+00:09:17,866 --> 00:09:22,766
+我们有3个浮点数表示Position，我这样写，然后有4个浮点数表示Color
+we'll have three floats for the Position, which I'll write like this, then we'll have four floats for the Color
+
+101
+00:09:22,766 --> 00:09:29,746
+然后我们会有两个纹理坐标，我称这个为TexCoords[2]，最后我们还会有一个TexID
+then we'll have the two texture coordinates, so I'll call this TexCoords two, and finally we'll have a TexID as well
+
+102
+00:09:29,975 --> 00:09:34,000
+好了，现在我们有了一个可以取代所有这些的完整顶点
+okay, so now we have a complete vertex that basically replaces all of this
+
+103
+00:09:34,000 --> 00:09:39,250
+实际上我们可以更容易地设置这些，现在如果想要创建一个新的顶点，我们可以这样做
+and we can actually set these up much easier, now if we want to create a new vertex, we can do something like this
+
+104
+00:09:39,566 --> 00:09:43,776
+然后设置Position等于任意位置
+and then set for example the position equal to whatever the position should be
+
+105
+00:09:43,776 --> 00:09:50,450
+不需要有这一大排浮点数，不管怎么说，这是可以被解释的
+without actually having to just basically have this huge row of floats, which could be interpreted, anyway
+
+106
+00:09:50,550 --> 00:09:55,400
+很好，现在我们有了那个，让我们决定我们想要多少个顶点，就这个例子而言
+okay, cool, so now that we've got that, let's decide how many vertices we want, well just for this example
+
+107
+00:09:55,400 --> 00:10:01,700
+让我们看看，我们想要1000个顶点，所以我们需要做的就是，sizeof(Vertex)*1000
+let's just see, we want 1000 vertices, so what we'll need to do is say, sizeof vertex times 1000
+
+108
+00:10:02,300 --> 00:10:08,066
+那么我们就创建了一个顶点缓冲区，它能存储1000个这样的顶点
+so we've basically created a vertex buffer, that is capable of storing 1000 of these vertices
+
+109
+00:10:08,066 --> 00:10:13,275
+那就是我们分配的内存，我们不需要存储刚好1000或差不多数量的顶点
+that is how much memory we've allocated, we don't have to store exactly 1000 or anything like that
+
+110
+00:10:13,650 --> 00:10:18,125
+那就是大小，那就是顶点缓冲区的全部容量，我们不能超过它
+that's just the size, that's the entire capacity of our vertex buffer, we can't exceed that
+
+111
+00:10:18,466 --> 00:10:25,227
+但我们可以明确地看到，在这个例子中，只需要8个顶点，如果我们想的话，可以从8开始
+but we can definitely see that, you know, in this case, for example we only need eight vertices, so we can absolutely just start eight in there if we want
+
+112
+00:10:25,800 --> 00:10:30,725
+最后这个参数很重要，它被设为GL_STATIC_DRAW
+and now finally this parameter is really important at the moment, it's set to STATIC_DRAW
+
+113
+00:10:31,100 --> 00:10:37,825
+这是对OpenGL的一点提示告诉我们如何使用这个内存，所以GL_STATIC_DRAW意思就是
+what this is is a little bit of a hint to OpenGL to how we're going to actually use this memory, so STATIC_DRAW means that
+
+114
+00:10:38,200 --> 00:10:42,805
+我们在前面已经静态地定义了所有东西，我们想用它来绘制
+we've kind of defined everything statically up front, and that we want to use it for drawing
+
+115
+00:10:43,000 --> 00:10:48,650
+这实际上是说，它将作为只读内存，我们不打算写入它
+so really what this is saying is it's going to act as read only memory, we're not exactly going to write to it
+
+116
+00:10:48,866 --> 00:10:54,775
+但是我们想要在每一帧写入它，所以我们需要做的是把它改为GL_DYNAMIC_DRAW
+however we want to write to it every frame, so what we need to do is change this to read GL_DYNAMIC_DRAW
+
+117
+00:10:55,266 --> 00:10:59,233
+所以这就意味着我们要动态地填充顶点缓冲区
+so what this means is that we're going to dynamically be populating the vertex buffer
+
+118
+00:10:59,233 --> 00:11:04,200
+当然，我们还是会用它来绘制，如果你们还不确定这到底是什么意思
+and of course we're still going to be using it for drawing, if you're still unsure as to what this actually means
+
+119
+00:11:04,200 --> 00:11:08,725
+那么就一定要去翻翻OpenGL文档，它会更正式地定义它
+then definitely consult the OpenGL documentation, which will define it more formally
+
+120
+00:11:08,825 --> 00:11:15,033
+好了，酷，下面这里，这是完全一样的除了这里不是这个10*sizeof(float)
+okay, cool, down here, this remains exactly the same except instead of having this 10 times float here
+
+121
+00:11:15,033 --> 00:11:20,600
+一个顶点就是它的10个浮点数，我们可以简单地写上sizeof(Vertex)
+which is what basically one vertex is its 10 floats, we can simply write sizeof Vertex
+
+122
+00:11:20,600 --> 00:11:24,300
+这样就能把它弄清楚，能把它应用到所有这些式子中
+which is just going to kind of clear it up, will kind of just apply that to all of these
+
+123
+00:11:24,466 --> 00:11:29,733
+最后，还有一种提高代码清晰的方法就是使用offsetof函数
+and finally another kind of code clarity thing you can do here is just use the offsetof function here
+
+124
+00:11:29,733 --> 00:11:33,533
+它实际上是一个让你们计算出任何成员的字节偏移量的宏函数
+well it's actually a macro that lets you figure out the byte offset of any member
+
+125
+00:11:33,533 --> 00:11:40,450
+所以换句话说，我们可以用这个来得到每个严格成员的正确的字节偏移量
+so in other words, we can use this to actually get the correct offset in bytes of each one of these strict members
+
+126
+00:11:40,666 --> 00:11:45,000
+这当然是我们的顶点属性，所以我要复制并粘贴到所有这些
+which are of course our vertex attributes, so I'll copy and paste this into all of these ones
+
+127
+00:11:45,000 --> 00:11:51,375
+所以我们有Color，然后是TexCoord，然后是TexID，我甚至会为把第一个也改成这样的
+so we have Color, then we have TexCoords, then we have TexID, and I'll even do this for the first one
+
+128
+00:11:51,375 --> 00:11:55,475
+为了以防万一，我们决定重新安排我们的结构，因为这意味着这将永远有效
+just in case, we decide to rearrange our structure, because that means that this will always work
+
+129
+00:11:55,475 --> 00:11:59,400
+因为如果我们重新排列这个，那么偏移量也会在这里重新排列
+because of course if we do rearrange this, then the offset will also be rearranged here
+
+130
+00:11:59,750 --> 00:12:03,358
+好了，酷，所以这个看起来更清楚了，现在更容易读了
+okay, cool, so this is looking a little bit more clear, now a little bit easier to read
+
+131
+00:12:03,625 --> 00:12:09,275
+这些都没有改变，让我们看看我们的索引缓冲区，索引缓冲区改变了什么
+none of this changes, let's take a look at our index buffer, so what changes with our index buffer
+
+132
+00:12:09,525 --> 00:12:14,825
+那就是它的美妙之处，什么也没有改变，索引缓冲区不应该改变
+well that's kind of the beauty of this, nothing, the index buffer really shouldn't change
+
+133
+00:12:14,825 --> 00:12:18,433
+因为我们要做的是动态地设置这个开始
+because what we're gonna be doing is just setting this started dynamically
+
+134
+00:12:18,433 --> 00:12:26,200
+但事实上要绘制一个四边形，我们需要绘制索引0 1 2，然后是2 3 0，那是不会改变的
+but the fact that to draw a quad, we need to draw index 0 1 2, and then 2 3 0, that's not gonna change
+
+135
+00:12:26,200 --> 00:12:31,100
+在我们决定绘制多少个四边形的情况下，那个会一直这样的
+which is going to keep going in this pattern for as many quads as we decide to draw
+
+136
+00:12:31,300 --> 00:12:35,575
+那么换句话说，我们可能想做的是既然我们已经把这个标记为1000个顶点
+so in other words, what we would probably want to do is since we've marked this as 1000 vertices
+
+137
+00:12:35,575 --> 00:12:38,600
+我的意思是，我甚至不知道这是多少个四边形，你们要除以4
+which I mean, I don't even know how many quads that is, you have to divide it by four
+
+138
+00:12:38,700 --> 00:12:45,300
+所以250个四边形就是我们能绘制的数量，在顶点缓冲区中，1000个顶点，250个四边形
+so I guess 250 quads is how many we can draw with, 1000 vertices inside our vertex buffer 250 quads
+
+139
+00:12:45,300 --> 00:12:50,400
+你们需要足够的索引来绘制所有这些，通常会设置一个完整的循环
+you would want enough indices for all of that to be drawable, so typically you'd set up like a full loop
+
+140
+00:12:50,566 --> 00:12:54,750
+那基本上会在这个模式中继续产生递增的索引
+that would basically continue generating indices ever ascending in this pattern
+
+141
+00:12:54,900 --> 00:13:00,066
+那么我们会在以后的视频中看一下，因为我想特别关注顶点缓冲区
+so we'll take a look at that in a future video, because I really want to focus on specifically the vertex buffer here
+
+142
+00:13:00,066 --> 00:13:04,900
+我们仍然假设绘制的是两个四边形，尽管从技术上讲，我们可以绘制1000个顶点
+we'll still pretend that we're drawing two quads, even though technically of course, we can draw 1000 vertices
+
+143
+00:13:04,900 --> 00:13:11,975
+并且下一期视频我们就会讲到扩展索引缓冲区，如何绘制任意数量的四边形
+and then next video will expand the index buffer and all of that to take care of, how to actually draw any arbitrary amount of quads
+
+144
+00:13:11,975 --> 00:13:16,700
+这很令人兴奋吧，话虽如此，如果我们回顾一下我们已经做过的
+which will be quite exciting, so with that being said, if we recap what we've done, basically what we've done
+
+145
+00:13:16,700 --> 00:13:19,750
+除了在这里建立一个结构来定义顶点
+apart from kind of set up a structure here to define our vertex
+
+146
+00:13:20,200 --> 00:13:26,866
+我们已经为1000个顶点分配了足够的内存，但实际的顶点缓冲区仍然是空的
+we've allocated enough memory for 1000 vertices, but the actual vertex buffer is still completely empty
+
+147
+00:13:26,866 --> 00:13:28,625
+但它被标记为GL_DYNAMIC_DRAW
+but it's been marked as DYNAMIC_DRAW
+
+148
+00:13:28,966 --> 00:13:33,809
+这意味着我们可以在每一帧更新循环中填充它，如果我们需要的话
+meaning that we can actually populate it within our update loop every frame, if we need to
+
+149
+00:13:34,000 --> 00:13:38,350
+所以我们就这样做，我要到这里来，留出一些空行来
+so let's do exactly that, I'm gonna come over here, and I'm just gonna make some space
+
+150
+00:13:38,350 --> 00:13:48,300
+因为这是我们要设置动态顶点缓冲区的地方，那么我要做的是像这里一样绑定缓冲区
+because this is where we're going to actually set our dynamic vertex buffer, so what I want to do is bind the buffer the same way that I do it here
+
+151
+00:13:48,300 --> 00:13:55,358
+有几种不同的方法来实现这个，但实际上我想做的是把一些数据发送到顶点缓冲区
+and then there are a few different ways to actually do this, but essentially what I want to do is somehow send some data into that vertex buffer
+
+152
+00:13:55,533 --> 00:14:02,813
+那么其中一种方法就是使用glMapBuffer，如果我们仔细看一下，这是实际的函数
+so one of the ways you can do this is by using glMapBuffer, what this will do, if we actually take a look at it, there is the actual function
+
+153
+00:14:03,100 --> 00:14:11,400
+这实际上会返回一个指向内存的空指针，我们可以直接写入，然后调用glUnMapBuffer
+what this will actually do is return a void pointer to us of memory that we can actually directly write into, and when we do that, and call glUnMapBuffer
+
+154
+00:14:11,400 --> 00:14:18,325
+这是这个函数的另一边，它会把缓冲区上传到GPU，所以那也是实现这个的一种方法
+which is kind of the other side of this function, it will actually upload that buffer to the GPU, so that's one way of doing it
+
+155
+00:14:18,500 --> 00:14:23,366
+在很多情况下，这实际上比我要用的方法稍微慢一些
+in a lot of cases, though this actually ends up being slightly slower than the method that I'm going to use
+
+156
+00:14:23,466 --> 00:14:31,850
+我要用的方法还有一个额外优点，那就是它支持低版本OpenGL，就是glBufferSubData
+and also the method I'm going to use has the added advantage of the fact that it supported in lower versions of OpenGL, and that is glBufferSubData
+
+157
+00:14:31,966 --> 00:14:37,494
+所以这和glBufferData非常相似，glBufferData是我们用来分配内存的
+so this is extremely similar to glBufferData, which is what we used here to actually allocate the memory
+
+158
+00:14:37,966 --> 00:14:41,475
+但它所做的基本上不是任何形式的内存分配
+but what it does is basically instead of doing any kind of allocation
+
+159
+00:14:41,566 --> 00:14:47,450
+它只是把数据发送到那个缓冲区，所以要做的是输入GL_ARRAY_BUFFER作为第一个参数
+it just simply sends that data into that buffer, so what we'll do is type GL_ARRAY_BUFFER as that first argument
+
+160
+00:14:47,450 --> 00:14:54,025
+因为那就是我们的目标，然后我们必须指定数据的偏移量，因为想把它复制到缓冲区的开头
+because that's our target, then we'll have to specify the offset of this data, so since we want to actually copy this data into the beginning of the buffer
+
+161
+00:14:54,100 --> 00:15:01,000
+这里写0，因为没有偏移，然后我们只需要数据的大小，复制并指定到实际数据
+we'll just write zero here, because there is no offset, and then we simply need the size of the data, where copying and then appoint it to the actual data
+
+162
+00:15:01,300 --> 00:15:07,050
+所以我们回到这儿，复制顶点，那就是我们要做的，我们会把这些设置到缓冲区
+so let's come back over here, and we'll steal our vertices, and that's what we'll do, we'll just set these into our buffer
+
+163
+00:15:07,333 --> 00:15:14,566
+我把它们粘贴到这里，然后我要做的是，暂时不动它们，马上就会把它们转换到那个Vertex
+I'll just paste them over here, and then what I'll do is, I'll just leave them intact for now, we'll transition them over to that vertex structure in a minute
+
+164
+00:15:14,566 --> 00:15:22,175
+但我仍然可以把它们作为顶点，毕竟内存是相同的，就是sizeof(vertices)，最后是vertices
+but I can still leave them as flow vertices, the memory's identical, so we'll just say sizeof vertices and then finally vertices
+
+165
+00:15:22,375 --> 00:15:26,633
+好了，酷，所以我们在这里做的是有效地动态每一帧
+okay, cool, so what we've done here is effectively dynamically every frame
+
+166
+00:15:26,633 --> 00:15:31,900
+我们现在用这个顶点数据填充顶点缓冲区，并且就是那样
+we're now populating our vertex buffer with this vertex data, and that's it
+
+167
+00:15:31,900 --> 00:15:35,325
+我的意思是，你们可以解绑你们的缓冲区，但在这个例子中，那不是必须的
+I mean you could unbind your buffer, but that's not strictly necessary in this case
+
+168
+00:15:35,766 --> 00:15:41,325
+这就是我们的方法，记住我们实际上只渲染了12个索引
+this is how we do it keep in mind that we're still actually only rendering 12 indices
+
+169
+00:15:41,675 --> 00:15:48,077
+我们在这里动态地建立了顶点缓冲区，但是如果我们在这里进入索引
+what we've done here is we've set up our vertex buffer dynamically, but if we come up over here into indices
+
+170
+00:15:48,366 --> 00:15:52,966
+我们仍然要绘制12个，这意味着在这个例子中，我们只有12个
+we are still drawing 12 of these, meaning that well 12 is all we have in this case
+
+171
+00:15:52,966 --> 00:15:57,333
+但我们要绘制出第一个四边形的索引0 1 2 2 3 0
+but we're just going to be drawing index 0 1 2 2 3 0 for the first quad
+
+172
+00:15:57,333 --> 00:16:02,633
+然后第二个四边形就是4 5 6 6 7 4，所以无论如何如果我复制这个数据
+and then 4 5 6 6 7 4 for that 2nd quad, so no matter what if I duplicate this data
+
+173
+00:16:02,633 --> 00:16:05,750
+如果我对它做任何我想做的事情，如果我添加更多的东西，都没有关系
+if I do whatever I want with it, if I add more stuff, it doesn't matter
+
+174
+00:16:05,750 --> 00:16:11,775
+因为这前面的0到7个顶点，那就是实际要渲染的
+because these first zero to seven vertices by index, that's actually what's gonna get rendered 
+
+175
+00:16:11,850 --> 00:16:16,600
+因为我们的索引缓冲区控制了我们在顶点缓冲区中渲染的内容
+because our index buffer controls what we render from within this vertex buffer
+
+176
+00:16:16,900 --> 00:16:23,633
+这个控制了我们实际渲染的数量，那么如果我按f5来运行程序
+and this controls how many we actually render, okay, so if I hit f5 to run my program here
+
+177
+00:16:23,633 --> 00:16:29,313
+我们应该得到完全相同的结果，你们可以看到，做到了，好了，所以实际上改变了什么
+we should get exactly the same result, and you can see, we do, okay, so what's actually changed
+
+178
+00:16:29,433 --> 00:16:37,250
+现在每帧都是这样的，意味着可以控制这些值，让我们来过渡一下mover来使用Vertex
+well this is done every frame now, which means we can control these values, and in fact let's go ahead and transition the mover to use our Vertex struct
+
+179
+00:16:37,425 --> 00:16:43,966
+我把这个结构体拉出来，放到文件的顶部，这样整个文件都能访问这个，我到这里来
+I'll pull this structure out, and I'll just put it at the top of our file here, so that the entire file can actually access this, I'll come over here
+
+180
+00:16:43,966 --> 00:16:50,350
+我会创建一个函数为我们返回四个顶点，这就是我们渲染四边形需要的
+and I'll make some kind of function that returns four vertices for us, which is what we need to actually render a quad
+
+181
+00:16:50,525 --> 00:16:58,425
+这只是一个我们如何动态地控制它的简单例子，我会返回一个顶点类型的标准数组
+this is just gonna be a really simple example to show how we can actually control this dynamically, so I'll return a standard array of type vertex
+
+182
+00:16:58,425 --> 00:17:07,000
+当然我们会有四个这样的数组，称它为CreateQuad，这里是静态的，然后把x和y作为参数
+and of course we'll have four of these, I'll call this CreateQuad, and I'll actually market as static, and then let's take in x and y as arguments
+
+183
+00:17:07,000 --> 00:17:12,700
+这意味着我们可以控制这个四边形的位置，然后我要做的就是创建顶点
+meaning we can actually control the position of this quad, then what I'll do is simply create the vertices
+
+184
+00:17:12,966 --> 00:17:18,700
+所以我有Vertex v0，这是我的第一个顶点，我要把它的位置设为
+so I'll have my vertex v zero, which is going to be my first vertex, I'm going to set the position of that equal to
+
+185
+00:17:18,900 --> 00:17:23,233
+我们先来复制这些东西，因为这要花一点时间
+let's go ahead and just copy this stuff to begin with, because this will take a little bit of time
+
+186
+00:17:23,233 --> 00:17:26,600
+实际上，我要做的是把这个快进，当我复制所有的启动器
+in fact, what I'm going to do is just fast forward through this, as I copy all of this starter 
+
+187
+00:17:26,600 --> 00:17:31,133
+把它们放到相关的顶点上，好了，酷，那么我觉得很好
+and just simply put them into the relevant vertex, okay, cool, so that looks pretty good to me
+
+188
+00:17:31,133 --> 00:17:37,075
+最后我可以返回\{v0, v1, v2, v3\}作为我们的数组
+and then finally I can just return v0, v1, v2, v3 as our array
+
+189
+00:17:37,225 --> 00:17:43,225
+好了，那么现在我们有了一个简单的方法来获取四个顶点，然后根据这些参数定制它们
+okay, so now we have a really simple way of just getting four vertices, and then customizing them based on these parameters
+
+190
+00:17:43,225 --> 00:17:50,025
+那么让我们来实现那个，我们将这些的大小设为1，也就是说应该是一个单元四边形
+so let's actually make that happen, we'll kind of set the size of these to be one, meaning a quad should be a one by one unit quad
+
+191
+00:17:50,200 --> 00:17:55,175
+并且为了简单起见，假设左下角是这个四边形的原点
+and then just for simplicity sequel, assume that the bottom left corner is actually kind of the origin of this quad
+
+192
+00:17:55,366 --> 00:18:01,200
+也就是说，这里是x和y，这里是x + size和y
+meaning this will simply set to be x and y, and now this will be x plus size and just y
+
+193
+00:18:01,366 --> 00:18:09,875
+这里也是x + size，然后是y + size，然后这里是x和y + size
+this will also be x plus size, and then now we'll have y plus size,  and then over here, we'll just have x and y plus size
+
+194
+00:18:10,000 --> 00:18:15,566
+好了，酷，那么现在我们有了所有顶点位置的设置，颜色我们已经硬编码为这个值
+okay, cool, so now we have all of our vetex position setup, the color we've currently hard coded to be this value
+
+195
+00:18:15,566 --> 00:18:21,500
+但是现在在哪里使用纹理并不重要，那么我要做的另一件事是在这里取一个textureID
+but it doesn't really matter where using textures now, so the other thing that I'll do is just simply take in a textureID here
+
+196
+00:18:21,500 --> 00:18:29,900
+这个textureID是我们放到这个属性中的，所有顶点都有一个textureID，好了，酷，那继续
+and this textureID is what we'll actually put into this attribute over here, so we have a texture id for all of our vertices, okay, cool, there we go
+
+197
+00:18:29,900 --> 00:18:35,100
+我们现在应该能够使用这个来绘制四边形，我要做的是，调用我的CreateQuad函数
+we should now be able to use this to draw quads, so what I'll do, I'll call my CreateQuad function
+
+198
+00:18:35,466 --> 00:18:44,325
+然后我会传入-1.5和-0.5，这是它以前的样子，然后纹理id为0
+and then I'll pass in -1.5 and -0.5, which is what this used to be of course, and then a texture id of zero
+
+199
+00:18:44,766 --> 00:18:50,133
+很好，那就是我的第一个四边形，然后第二个四边形是0.5 -0.5
+so that's great, that's my first quad, and then my 2nd quad is going to be at 0.5, -0.5
+
+200
+00:18:50,133 --> 00:18:56,000
+我们把-0.5保留在这里，我们把这个改成0.5，很好，那么现在我有了两个四边形
+so we'll keep the -0.5 here, and we'll just change this to be 0.5, cool, so I've got my two quads now
+
+201
+00:18:56,000 --> 00:19:04,300
+但显然我需要把它们添加到内存的缓冲区中，然后我可以给glBufferSubData函数
+but obviously I need to actually add them to some kind of buffer of memory, that I can then give to this glBufferSubData function
+
+202
+00:19:04,675 --> 00:19:12,733
+那么我要做的是保持这个简单，我就说第一个四边形就是auto q0，第二个是auto q1
+so what I'll do is keep this real simple, I'll just say auto q zero for quad zero auto q one quad one
+
+203
+00:19:12,800 --> 00:19:16,500
+然后我会为这两个四边形分配足够的空间，所以换句话说
+and then I'll allocate enough storage for both of these quads, so in other words
+
+204
+00:19:16,500 --> 00:19:24,375
+我知道两个四边形有8顶点，所以就是Vertex vertices[8]，然后简单复制所有数据到这里
+I know that two quads are gonna be eight vertices, so we'll see Vertex vertices[8], and then I'll simply me copy all of that data here
+
+205
+00:19:24,375 --> 00:19:35,300
+所以我要复制所有的q0.data()到vertices，那将是q0.size() * sizeof(Vertex)
+so I'll say into vertices, I'm going to copy all q0 data, and that's going to be q0 size times size of vertex
+
+206
+00:19:36,300 --> 00:19:44,625
+然后对q1做同样的处理，只不过现在是vertices + 4或者vertices + q0.size()
+and then I'm going to do the same thing for q1, except this is now going to be vertices plus four or vertices plus q0 size
+
+207
+00:19:44,625 --> 00:19:47,466
+如果你们真的不想硬编码任何东西，现在我们有了这个
+if you really don't want a hardcode anything, and now that we've got this
+
+208
+00:19:47,466 --> 00:19:53,066
+我将通过注释来隐藏所有这些数据，显然，我们还是用了相同的名称
+I'm just going to hide all of this data by just commenting it out, and obviously we've called it the same thing
+
+209
+00:19:53,066 --> 00:19:56,625
+所以顶点应该设置在这里，让我们运行我们的程序，看看我们得到了什么
+so vertices should in fact be set here, let's run our program and see what we get
+
+210
+00:19:56,733 --> 00:19:59,950
+当然，我似乎忘记了数组，像这个未知的赋值
+and of course I seem to have forgotten that arrays, like this unknown assignable
+
+211
+00:19:59,950 --> 00:20:05,033
+所以我们要做的就是到顶点，创建一个叫做vec3的结构体
+so what we'll do is just go to our vertex, and simply make a struct called vec3
+
+212
+00:20:05,400 --> 00:20:12,833
+也就是三个分量的vec，然后我对vec2和vec4做同样的事情，重新排列它们
+which will be just a three component vec here, and then I'll do the same for vec2 and vec4, rearrange these
+
+213
+00:20:13,300 --> 00:20:19,933
+然后我们简单地把这个变成vec3，把这个变成vec4，这个变成vec2
+and then we'll simply change this to be a vec3, we'll change this to be a vec4, this will be a vec2
+
+214
+00:20:20,166 --> 00:20:23,175
+然后我们有一个浮点数，显然在实际例子中，你们可能会用到数学库
+and then we have a float off, obviously in a real example, you probably use a math library 
+
+215
+00:20:23,175 --> 00:20:28,118
+那么你们不会做任何错误的事情，好了，酷，那么现在希望我们的代码能编译
+so you wouldn't be doing any error stuff anyway, okay, cool, so now hopefully our code will compile
+
+216
+00:20:28,333 --> 00:20:30,966
+现在它完成了，让我们看看我们得到了什么，好了，很酷
+and now that it does, let's take a look at what we get, okay, cool
+
+217
+00:20:30,966 --> 00:20:35,125
+所以我们看起来得到了相同的结果，但是它们有相同的纹理，我想那会是
+so we looks like we have the same result, but they have the same texture, and I guess that would be
+
+218
+00:20:35,125 --> 00:20:41,700
+因为我们传递了相同的纹理索引，所以我们会传递一个纹理索引1到我们的第二个四边形
+because we passed the same texture index, so we'll pass a texture index of one into our second quad
+
+219
+00:20:42,166 --> 00:20:46,500
+现在我们应该得到和之前一样的结果，你们可以看到，这是很酷的东西
+and now we should get the exact same result as before, and you can see, here it is, pretty cool stuff
+
+220
+00:20:46,700 --> 00:20:50,566
+但这是它变得更酷的地方，我们可以真正利用这个动态的东西
+but here is where it gets cooler, and we can really take advantage of this dynamic stuff
+
+221
+00:20:50,566 --> 00:20:55,775
+我要做的是添加一个controls，也就是ImGui::Begin("Controls")
+what I'm going to do is add a controlled ImGui, just right ImGui::Begin controls
+
+222
+00:20:56,100 --> 00:21:00,800
+然后我们会为我们的四边形的实际位置做一个ImGui控制面板
+and then we'll simply make an ImGui control for the actual position of our quad
+
+223
+00:21:00,800 --> 00:21:03,433
+所以我们会看到DragFloat2("Quad Posi")
+so we'll see DragFloat2 quad position
+
+224
+00:21:03,600 --> 00:21:10,000
+我们会传入一个叫quadPosition的变量成员，这个我们还没做过，然后我们把速度写成0.1
+we'll pass in a member of variable called quadPosition which we haven't made yet, and then we'll just write the speed as 0.1
+
+225
+00:21:10,125 --> 00:21:16,400
+所以我要做的是到头文件这里，对吧，就是m_quadPosition[2]
+so what I'll do is I'll go over here into our header file, our right, float and quadPosition
+
+226
+00:21:16,633 --> 00:21:22,625
+我们可以让它等于-1.5 -0.5，这就是它的初始值
+and we can set it equal to -1.5, -0.5, which is what it was in the first place
+
+227
+00:21:22,766 --> 00:21:28,200
+然后我要做的是我要用这个作为我们的第一个四边形的位置
+and then what I'll do is I'll actually use this as the position for our first quad here 
+
+228
+00:21:28,400 --> 00:21:32,266
+如果我按f5，你们可以看到，这里有这个四边形的控制
+and now if I hit f5, you can see, I have these controls here for this quad
+
+229
+00:21:32,266 --> 00:21:36,750
+如果我移动这个，你们可以看到，这个四边形实际上在移动，这个当然不会
+and if I move this, you can see, the quad actually moves, and of course this one doesn't
+
+230
+00:21:36,750 --> 00:21:44,050
+因为我们只是动态地在顶点缓冲区中设置顶点，所以现在我们可以动态地渲染批量顶点了
+because we're just dynamically setting the vertices inside our vertex buffer, so now we can dynamically render our batch
+
+231
+00:21:44,050 --> 00:21:47,733
+并且就是那样，我们的顶点缓冲区现在是完全动态的
+and that's all, there is to it, our vertex buffer is now completely dynamic
+
+232
+00:21:47,866 --> 00:21:53,225
+还有另一部分，那就是索引缓冲区，我们如何设置它
+now there is the other part of this, and that is what about the index buffer, how do we set that up
+
+233
+00:21:53,400 --> 00:21:59,333
+这本身并不是那么难，我想让你们作为练习去尝试一下
+now that in itself is not all that hard, I want you guys as an exercise to go ahead and try that out right now
+
+234
+00:21:59,400 --> 00:22:03,100
+让那个索引缓冲区不止处理两个四边形
+just try and make that index buffer handle more than just two quads
+
+235
+00:22:03,100 --> 00:22:10,366
+也许渲染3个四边形 1个四边形或10个四边形或类似的东西，你们应该能够扩展索引缓冲区
+maybe render 3 quads or 1 quad or 10 quads or something like that, you should just be able to extend that index buffer
+
+236
+00:22:10,366 --> 00:22:15,133
+然后改变glElements函数中实际渲染的索引的数量
+and then change the amount of indices that you actually render inside your glElements function
+
+237
+00:22:15,133 --> 00:22:20,800
+并且那就是全部了，真的，所以下一期我们将具体讨论那个
+and that's all, there is to it really, so what we're gonna do in the next video is talk about that specifically
+
+238
+00:22:20,800 --> 00:22:24,850
+我还要添加一些ui来控制所有这些
+and I'm just going to kind of add some more ui to control all of these things 
+
+239
+00:22:24,850 --> 00:22:27,933
+这样我们就可以添加和移除四边形，做一些类似的事情
+so that we can maybe add and remove quads and do something like that
+
+240
+00:22:27,933 --> 00:22:32,800
+并有一个相当扎实的批量渲染例子，这是完全动态的
+and have a pretty solid batch rendering example, this is completely dynamic
+
+241
+00:22:32,800 --> 00:22:35,800
+不管怎样，希望你们喜欢这个视频，如果喜欢的话，就为它点赞吧
+anyway, hope you guys enjoyed this video, if you did, please hit that like button
+
+242
+00:22:35,800 --> 00:22:40,600
+请留下你们的想法，或者如果有什么不清楚的地方，我会努力回来帮助你
+leave a comment with your thoughts, or if anything was unclear, and I'll try and get back to and help you out
+
+243
+00:22:40,966 --> 00:22:43,733
+不要忘记查看下面的技能链接
+don't forget to check out skills hare link in the description below
+
+244
+00:22:43,733 --> 00:22:49,850
+前500人将获得两个月的免费技能奖励，下次见，再见
+first five hundred people get two months of free skills hare premium, and I will see you guys next time, goodbye
+

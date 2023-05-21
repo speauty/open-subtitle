@@ -1,0 +1,1410 @@
+﻿1
+00:00:00,133 --> 00:00:03,966
+嘿，你们好，我是TheCherno，欢迎回到我的OpenGL系列教程
+hey, what's up guys, my name is TheCherno and welcome back to my OpenGL series
+
+2
+00:00:04,266 --> 00:00:07,033
+那么我们已经完成了混合和纹理
+so we've done blending, we've done textures
+
+3
+00:00:07,033 --> 00:00:10,266
+以及顶点数组，索引缓冲区和顶点缓冲区
+we've done vertex arrays, index buffers, vertex buffers
+
+4
+00:00:10,700 --> 00:00:11,900
+这些我们都做过了
+we've done all of this stuff
+
+5
+00:00:11,900 --> 00:00:13,733
+我们得到了在屏幕上渲染的东西了
+we've got stuff rendering on our screen
+
+6
+00:00:14,700 --> 00:00:19,233
+但我们实际上还没有触及图形编程中最重要的一个部分
+but we haven't actually even touched on one of the biggest parts of graphics programming
+
+7
+00:00:19,833 --> 00:00:22,566
+就是数学，如果你们一直跟着我们学习的话
+maths or math, if you're from the us
+
+8
+00:00:23,066 --> 00:00:25,266
+那么数学是什么，我们为什么要用它
+so what is maths, why do we use it
+
+9
+00:00:25,900 --> 00:00:29,100
+比如我们如何使用它，为什么需要它
+like how can we use it, and why do we even need it
+
+10
+00:00:29,833 --> 00:00:33,200
+那么数学通常被用在图形编程的个个领域
+so maths in general is used in pretty much every area of graphics programming
+
+11
+00:00:33,200 --> 00:00:35,433
+随着这个系列的继续，我们开始处理一些东西
+and as this series continues, and we start dealing with things
+
+12
+00:00:35,433 --> 00:00:39,025
+我们实际上需要开始实现我们自己的算法
+we'll actually have to start implementing our own kind of algorithms
+
+13
+00:00:39,025 --> 00:00:41,766
+包括数学和计算，所有这些
+that involve maths and doing calculations, and all of that
+
+14
+00:00:42,100 --> 00:00:44,875
+我敢肯定，任何刚刚接触OpenGL的人
+I'm fairly sure that anyone who is new to OpenGL
+
+15
+00:00:44,875 --> 00:00:46,000
+或你们在做图形编程
+or you do graphics programming
+
+16
+00:00:46,266 --> 00:00:49,366
+也许他们的脑子里有个想法，认为数学是必须的
+probably has an idea in their head, that maths is going to be required
+
+17
+00:00:49,566 --> 00:00:51,366
+我们将开始深入这些话题
+and we are going to start diving into those topics
+
+18
+00:00:51,366 --> 00:00:55,300
+但是今天我们要讲的是数学在一般情况下是如何应用的
+but today we're just going to kind of talk about how maths use in general
+
+19
+00:00:55,300 --> 00:00:58,966
+从数学库开始，写一些真正有用的代码
+and get started with a math library, and actually write some code that does something
+
+20
+00:00:59,933 --> 00:01:05,425
+那么数学，当我谈到图形编程中的数学时
+so math, when I talk about math in graphics programming
+
+21
+00:01:05,425 --> 00:01:08,666
+我确实要说一说数学的两个不同领域
+I'm really talking about two different kind of areas of maths
+
+22
+00:01:08,666 --> 00:01:12,700
+或者是矩阵和向量这两个不同的概念
+or two different concepts that we have matrixes and vectors
+
+23
+00:01:13,033 --> 00:01:17,200
+矩阵，矩阵本质上是一个数字数组
+now matrixes, a matrix is essentially an array of numbers
+
+24
+00:01:17,466 --> 00:01:22,766
+我们可以通过乘法来处理，或者我们可以用不同的方法来设置，对吧
+that we can kind of manipulate by multiplying, or we can set up in various ways, right
+
+25
+00:01:23,433 --> 00:01:25,366
+它实际上就是一个数字数组
+it is literally an array of numbers
+
+26
+00:01:25,433 --> 00:01:32,050
+当我们用这些数乘以其他数，我们得到一组新的数
+and when we multiply those numbers by something else, we get a new set of numbers
+
+27
+00:01:32,050 --> 00:01:38,266
+这些计算可以用于一些事情，比如在一个3D世界中定位物体
+and those calculations can be useful for things, like positioning objects in a 3D world
+
+28
+00:01:38,966 --> 00:01:40,533
+在另一边的向量
+on the flip side vectors
+
+29
+00:01:40,833 --> 00:01:45,533
+在图形编程中，我们要处理两种类型的向量，并且我知道
+there are two types of vectors that we deal with in graphics programming, and I know
+
+30
+00:01:45,633 --> 00:01:48,133
+因为我一直收到很多关于这方面的评论
+because I get a lot of comments about this all the time
+
+31
+00:01:48,133 --> 00:01:50,100
+所以我们要花点时间快速地讲一下它们
+so we are going to take the time to quickly talk about them
+
+32
+00:01:50,575 --> 00:01:54,500
+这是方向向量，这是位置向量，对吧
+there's directional vectors, and there's positional vectors, right
+
+33
+00:01:54,766 --> 00:01:58,725
+所以向量可以指代一些你们可能已经习惯了的东西
+so a vector can refer to something that you're probably used to
+
+34
+00:01:58,725 --> 00:01:59,500
+如果你们完成了一些学习
+if you've done something
+
+35
+00:01:59,500 --> 00:02:03,150
+比如工程数学，或者高中数学，或者取决于不同的国家
+like engineering maths, or high school maths, or depending on different countries 
+
+36
+00:02:03,150 --> 00:02:04,866
+他们是怎么教的，你知道的所有这些
+how they teach, you know that and all of that
+
+37
+00:02:05,100 --> 00:02:07,200
+但本质上，一个向量
+but essentially, a vector
+
+38
+00:02:07,900 --> 00:02:13,333
+它在区域上被看作是一个方向，一个大小或长度，对吧
+it's regionally seen as like a direction and a magnitude or a length, right
+
+39
+00:02:13,566 --> 00:02:14,433
+所以你们可能会
+so you're probably
+
+40
+00:02:14,433 --> 00:02:19,433
+如果你们是学了数学过来的，可能已经习惯了听到向量之类的东西
+if you if you're coming from actual maths, you're probably used to hearing about a vector as like
+
+41
+00:02:19,533 --> 00:02:27,733
+你们知道，指向某个地方，像字面方向向量，图形编程可以是那样的
+you know, pointing somewhere, like a literal direction vectors, and graphics programming can be that
+
+42
+00:02:28,300 --> 00:02:35,233
+但它们也可以是2D，3D或4D空间中的位置，对吧
+but they can also be just positions in either a 2D, 3D or 4D space, right
+
+43
+00:02:35,466 --> 00:02:40,900
+那么举个例子，我有这么一个向量，大概是(200, 100)
+so for example, I could have a vector, that's like 200, 100
+
+44
+00:02:41,266 --> 00:02:43,700
+那意味着它是屏幕上的一个点
+and what that means is that it's a point on my screen
+
+45
+00:02:43,700 --> 00:02:48,633
+大概是从左边往里200像素，从下面往上100像素
+that's like 200 pixels in from the left, and 100 pixels up from the bottom
+
+46
+00:02:49,100 --> 00:02:50,600
+那也是一个向量
+that is also a vector
+
+47
+00:02:50,866 --> 00:02:53,938
+所以你们一定要习惯那些术语
+so you should definitely get used to that terminology
+
+48
+00:02:54,100 --> 00:02:56,975
+至于向量和矩阵
+vectors and matrixes
+
+49
+00:02:58,066 --> 00:03:03,275
+我用了很多，但我想说的可能是最常见和最重要的用法
+I used a lot, but I would say probably the most common usage and the most important usage
+
+50
+00:03:03,275 --> 00:03:07,000
+尤其是当你们刚刚开始接触变换的时候
+especially when you're just beginning is for transformation
+
+51
+00:03:07,566 --> 00:03:11,033
+所以我们以后会用图表更详细地讨论这个
+so we are definitely going to talk about this in much more detail with like diagrams
+
+52
+00:03:11,033 --> 00:03:13,266
+以及我们所有的东西
+and all of our stuff in the future
+
+53
+00:03:13,533 --> 00:03:19,000
+但是这个变换本质上是我们得到顶点缓冲的一种方法
+but the transformation is essentially a way that we can get our vertex buffer
+
+54
+00:03:19,000 --> 00:03:24,366
+以及所有的点，所有的顶点都变成了我们在屏幕上看到的某种形式
+with all of its points, and all of the vertices into some kind of form that we see on our screen
+
+55
+00:03:24,933 --> 00:03:27,833
+我们需要变换的原因有很多
+the reason that we need transformation is for a number of reasons
+
+56
+00:03:27,833 --> 00:03:32,633
+首先，让我们看看，我们有一个巨大的3D世界，有一个球，对吧
+first of all, let's just see, we have a massive 3D world, and we have a ball, right
+
+57
+00:03:32,766 --> 00:03:35,966
+我们需要在3D世界中定位这个球
+we need to position that ball somewhere in the 3D world
+
+58
+00:03:36,400 --> 00:03:38,000
+如果我们有一个移动的相机呢
+what if we have a camera moving around
+
+59
+00:03:38,000 --> 00:03:42,033
+也许它是绕着球转的，对吧，它的工作方式就是那样的
+maybe it's orbiting around the ball, right, the way that that works is that well
+
+60
+00:03:42,033 --> 00:03:43,600
+其实这儿根本就没有相机这回事
+there's no such thing as a camera really
+
+61
+00:03:43,600 --> 00:03:47,400
+我们真正需要做的是移动世界和球
+what we need to do really is just move the world and the ball around
+
+62
+00:03:47,866 --> 00:03:50,366
+所以我们改变了世界和球的位置
+so we change the position of the world and the ball
+
+63
+00:03:50,633 --> 00:03:55,833
+这是一种疯狂的幻觉，相机旋转或围绕着我们的目标
+and that kind of crazy illusion of a camera circling, or orbiting our our subject
+
+64
+00:03:57,066 --> 00:04:03,233
+我们可能还想以某种方式定位顶点，那不仅仅是变换
+we might want to also position vertices in a way, that isn't just a translation
+
+65
+00:04:03,233 --> 00:04:06,575
+可能是缩放，或者我们想要旋转
+it might be something like scale, or we want to rotate things
+
+66
+00:04:06,575 --> 00:04:11,100
+所有这些都需要数学来完成，而我们如果
+all of that stuff requires maths to actually accomplish, and the reason that we if
+
+67
+00:04:11,100 --> 00:04:13,433
+我的意思是，如果我们运行我们现在拥有的东西
+I mean if we launched the thing that we have right now
+
+68
+00:04:13,633 --> 00:04:16,966
+你们可以看到没有3D世界或其他东西，我们只有这个ChernoLogo
+you can see that we don't really have like a 3D world or anything, we have this ChernoLogo
+
+69
+00:04:16,966 --> 00:04:20,800
+然而，纵横比是完全错误的，因为默认情况下
+however the aspect ratio is completely wrong, because by default
+
+70
+00:04:20,800 --> 00:04:23,600
+OpenGL给了我们一个-1到1的投影矩阵
+OpenGL gives us a projection matrix of -1 to 1
+
+71
+00:04:23,600 --> 00:04:26,100
+这种假设窗口实际上是方形的
+which kind of assumes that the window is actually square
+
+72
+00:04:26,233 --> 00:04:31,833
+我们的窗口不是正方形的，是640x480像素，意味着它的纵横比是4:3
+our window is not square, is 640 by 480 pixels, which means it has a 4 3 aspect ratio
+
+73
+00:04:31,933 --> 00:04:34,233
+4:3，对吧，不是1:1
+4:3, right, not 1 to 1
+
+74
+00:04:34,233 --> 00:04:38,600
+所以即使是像这样的小事，我们也需要变换
+so even for something as trivial as this, we also need a transformation
+
+75
+00:04:38,600 --> 00:04:44,866
+我们需要让我们的几何图形不像我们的窗口是正方形的
+we need to actually make our geometry not be as if our window was square
+
+76
+00:04:45,166 --> 00:04:49,100
+我们需要改变我们绘制的这个四边形
+we need to actually kind of change this quad that we're drawing here
+
+77
+00:04:49,200 --> 00:04:50,666
+然后应用纹理
+and applying the texture to it
+
+78
+00:04:50,733 --> 00:04:53,400
+这样它的纵横比才适合我们的显示器
+so that it's the right aspect ratio to fit our monitor
+
+79
+00:04:53,400 --> 00:04:57,944
+即使是我们的窗口，即使那需要变换，所以很多的变换正在发生
+even though our window, even that requires a transformation, so a lot of transformation is happening 
+
+80
+00:04:58,175 --> 00:05:01,933
+不管怎么说，我整天都在谈论数学，以及它是如何使用的
+anyway, I consider talking all day about maths, and how it's used
+
+81
+00:05:01,933 --> 00:05:04,333
+随着本系列的继续，你们将会看到
+you will see as this series continues
+
+82
+00:05:04,866 --> 00:05:07,350
+我们直接开始吧，用一个数学库
+let's just jump into it, and let's use a maths library
+
+83
+00:05:07,350 --> 00:05:11,600
+让我们现在就来解决我们在ChernoLogo上遇到的这种变换问题
+and let's just fix for now this kind of transformation issue we have with the ChernoLogo
+
+84
+00:05:11,600 --> 00:05:14,966
+那么我要用一个数学库，它是免费的，叫做glm
+so I'm going to be using a maths library, that's free, it's called glm
+
+85
+00:05:14,966 --> 00:05:17,000
+你们可以找到这个，我会把链接留在下面的描述中
+you can find this, I'll leave the link in the description below
+
+86
+00:05:17,200 --> 00:05:21,466
+这是一个OpenGL数学库，其实你们用什么数学库并不重要
+this is specifically an OpenGL mathematics library, doesn't really matter what maths library you use
+
+87
+00:05:21,466 --> 00:05:24,566
+只要它可以运行，并且包含我们需要的所有功能
+as long as it's something that works, and contains all the features we need
+
+88
+00:05:24,966 --> 00:05:28,475
+通常，如果我在编写自己的引擎，我可能会编写自己的数学库
+typically if I was writing my own engine, I probably write my own math library
+
+89
+00:05:28,475 --> 00:05:29,666
+那会更有意义
+that makes a lot of sense
+
+90
+00:05:30,700 --> 00:05:33,025
+至于OpenGL，为什么要用那个库
+OpenGL, the reason
+
+91
+00:05:33,025 --> 00:05:35,269
+这是因为这个很好，因为它是OpenGL特定的
+this one's good is because it's OpenGL specific
+
+92
+00:05:35,833 --> 00:05:39,633
+这意味着，例如，矩阵是列主排序的
+which means that, for example, the matrixes are column-major ordering
+
+93
+00:05:39,900 --> 00:05:45,333
+所以实际矩阵在内存中布局的方式是OpenGL期望的
+so the way that the actual matrix is laid out in memory is in a way that OpenGL kind of expects it to be
+
+94
+00:05:45,333 --> 00:05:50,900
+不需要做任何形式的变换或者叫做转置
+and doesn't need to do any kind of transformation or as it's called transposition transposing
+
+95
+00:05:51,166 --> 00:05:53,066
+把它转换成正确的格式
+to actually convert it into the right format
+
+96
+00:05:53,233 --> 00:05:59,033
+如果我使用一个数学库，如果我有一个带有许多不同显卡接口的引擎
+if I was using a math, if I had an engine with a lot of different graphics apis
+
+97
+00:05:59,100 --> 00:06:01,433
+我可能会选择行主排序
+I'd probably opt for a row major ordering
+
+98
+00:06:01,433 --> 00:06:05,800
+因为这对于CPU端乘法之类的来说更友好一些
+because that can be a little bit more friendly for CPU side multiplication and all that
+
+99
+00:06:06,200 --> 00:06:09,866
+我们就不多讲了，我想说的是，如果你们不喜欢glm
+we're not going to talk too much about this, what I'm saying is if you don't like glm
+
+100
+00:06:09,866 --> 00:06:12,800
+或者如果你们想使用其他库，请随意，我只是在使用glm
+or if you want to use a different library, feel free to, I'm just using glm
+
+101
+00:06:12,800 --> 00:06:15,833
+因为它似乎是标准的OpenGL数学库
+because it seems to be the standard kind of OpenGL maths library
+
+102
+00:06:15,833 --> 00:06:18,325
+并且在这一点上，我倒是不怎么在乎，因为这对我来说够用就行
+and at this point, I don't care, because it works for what I need
+
+103
+00:06:18,325 --> 00:06:21,733
+所以在这里，我要去releases，在这里
+so over here, I'm going to go to releases, which is over here
+
+104
+00:06:21,733 --> 00:06:25,833
+然后点击这里的zip文件下载最新版本
+and then download this latest release by just clicking on the zip file over here
+
+105
+00:06:25,866 --> 00:06:27,666
+一旦我下载完成后，在zip文件中
+and once I've got it downloaded, inside the zip file
+
+106
+00:06:27,666 --> 00:06:31,600
+我们有一个glm文件夹，里面有很多不同的东西
+we have a glm folder inside there, we have a bunch of different things
+
+107
+00:06:31,750 --> 00:06:34,900
+我只关心glm文件夹中的实际代码
+I really only care about the actual code which is in the glm folder
+
+108
+00:06:34,900 --> 00:06:39,733
+那么复制glm文件夹，然后到OpenGL项目的位置
+so I'm going to copy that glm folder, I'm going to then go to the location of my OpenGL project
+
+109
+00:06:39,733 --> 00:06:44,666
+然后在src/vendor，我将粘贴glm源代码
+and then on the src/vendor, I'm going to paste in that glm source code
+
+110
+00:06:44,700 --> 00:06:48,200
+因此，glm是一个只包含头文件的库，这意味着没有cpp文件
+so glm is a header only library, which means there are no cpp files
+
+111
+00:06:48,325 --> 00:06:49,725
+我们根本不需要编译它
+we don't need to compile it at all
+
+112
+00:06:49,725 --> 00:06:52,300
+它会被包含或像那样被编译
+it's going to be included or kind of get compiled like that
+
+113
+00:06:52,633 --> 00:06:58,400
+所以我们不需要链接到库，或创建cpp文件，就像用stb_image那样
+so we don't have to link against a library, or kind of create a cpp file, like we did with stb_image
+
+114
+00:06:58,700 --> 00:07:01,800
+这个东西真的很容易使用，让我们直接进入它
+this stuff is really easy to use, and let's just get right into it
+
+115
+00:07:01,800 --> 00:07:03,566
+那么一旦我把它粘贴在这里
+so once I've got this pasted over here
+
+116
+00:07:03,566 --> 00:07:06,800
+我要做的是右键点击OpenGL，到属性
+one thing I will do is I'll right click on OpenGL, go to properties
+
+117
+00:07:06,800 --> 00:07:09,633
+在C/C++通用的所有配置下
+and under all configurations here in C/C++ general
+
+118
+00:07:09,733 --> 00:07:15,666
+我将把src\vendor添加到实际的附加包含目录中
+I'm just going to add src\vendor to my actual additional include directory
+
+119
+00:07:15,666 --> 00:07:18,766
+这样我就不需要每次我想要包含一个文件时都输入vendor
+so that I don't have to type vendor every time I want to include a file
+
+120
+00:07:18,966 --> 00:07:24,733
+那么我们看到了这个，在Texture.cpp中，包含了vendor/stb_image
+so we kind of saw this, I guess in the Texture.cpp file, we included vendor/stb_image
+
+121
+00:07:24,733 --> 00:07:28,675
+我们不再需要那样做了，我们可以那样做，那样应该没问题
+we don't need to do that, anymore, we can just do stb_image like that, and that should work fine
+
+122
+00:07:28,675 --> 00:07:31,000
+因为我们已经添加了编译器的包含目录
+because we've added that compiler include directory
+
+123
+00:07:31,633 --> 00:07:33,533
+我在这里刷新一下我的项目
+I'm just gonna refresh my project over here
+
+124
+00:07:33,866 --> 00:07:41,000
+现在我想在我的项目的实际解决方案中包含这些文件
+now I do want to include this like all of these files in my actual solution in my project
+
+125
+00:07:41,233 --> 00:07:42,600
+我的意思是，反正它们也不会被编译
+I mean they're not gonna get compiled anyway
+
+126
+00:07:42,600 --> 00:07:45,700
+但我还是希望它们能给出搜索结果之类的
+but I still want them to come up with searches and all of that
+
+127
+00:07:45,833 --> 00:07:51,266
+否则，如果我，你们知道的，按ctrl shift f，我想搜索glm之类的
+so otherwise if I, you know, press like control shift f, and I want to search for like glm or something
+
+128
+00:07:51,266 --> 00:07:54,166
+我想搜索我所有的文件
+I wanted to actually search all of my files
+
+129
+00:07:54,166 --> 00:08:01,100
+但是在gtc里面有一个文件，我认为它是或者可能在gtx里
+however there is a file inside gtc, I think it is or maybe it's in gtx、
+
+130
+00:08:01,766 --> 00:08:06,500
+有个dummy.cpp文件，上面说它是一个只包含头文件的库
+yeah, there's this dummy.cpp file, which just says that it's a header only library
+
+131
+00:08:06,500 --> 00:08:09,333
+这只是一种暗示，如果你们往下滚动
+and this is just for kind of semic, if you scroll down
+
+132
+00:08:09,433 --> 00:08:12,800
+你们会看到它确实有一个主函数，它会影响我们的主函数
+you'll see it actually does have a main function, that will interfere with our main function
+
+133
+00:08:12,966 --> 00:08:15,966
+所以我们右键点击这个文件，然后点击从项目中移除
+so let's just right-click with that file and hit exclude from project
+
+134
+00:08:15,966 --> 00:08:18,733
+因为我们显然不想编译它，好了，酷
+because we obviously don't want to compile that, okay, cool
+
+135
+00:08:18,733 --> 00:08:21,400
+总之，我们有了glm，运行的是非常简单的东西
+so anyway, we've got glm and running really easy stuff
+
+136
+00:08:21,766 --> 00:08:25,733
+我现在要做的是在我的Application.cpp文件中使用它
+what I'm going to do now is actually use it inside my Application.cpp file
+
+137
+00:08:25,733 --> 00:08:27,600
+我们解决ChernoLogo问题的方法是
+the way that we're going to fix our issue with the ChernoLogo is
+
+138
+00:08:27,600 --> 00:08:30,100
+通过一个叫做投影矩阵的东西
+by using something called a projection matrix
+
+139
+00:08:30,200 --> 00:08:35,025
+投影矩阵是我们告诉窗口的一种方式
+now a projection matrix is a way for us to actually tell our window
+
+140
+00:08:35,025 --> 00:08:38,750
+我们想要如何将所有不同的顶点映射到它
+how we want to map all of our different vertices to it
+
+141
+00:08:39,133 --> 00:08:44,666
+所以我们有一个填充了顶点位置顶点缓冲区这样的概念
+so we have this concept of having a vertex buffer filled with vertex positions
+
+142
+00:08:44,916 --> 00:08:50,983
+但是我们需要把它转换到2D平面
+however we need to obviously transform that into some kind of 2D plane
+
+143
+00:08:51,375 --> 00:08:55,733
+因为当我们把它绘制在笔记本电脑屏幕或电脑显示器上时
+because when we draw it on our laptop screen or on our computer monitor
+
+144
+00:08:56,233 --> 00:08:59,100
+我们需要它以2D的方式绘制出来
+we need it to actually be drawn in a 2D way
+
+145
+00:08:59,400 --> 00:09:04,133
+那么想象一个3D世界，我们有一个3D世界的数学表示
+so picture a 3D world, right, we have this mathematical representation of a 3D world
+
+146
+00:09:05,100 --> 00:09:07,266
+但我们需要把它绘制在2D表面上
+but we need to draw it on a 2D surface
+
+147
+00:09:07,433 --> 00:09:10,366
+那么数学是如何计算的，对吧
+so how does the maths work for that, right
+
+148
+00:09:10,366 --> 00:09:16,425
+我们如何从3D几何图形到2D平面图形
+how do we go from having this 3D geometry to having a flat kind of 2D drawing
+
+149
+00:09:16,425 --> 00:09:18,666
+那就是投影矩阵的用处
+that is what a projection matrix is useful
+
+150
+00:09:18,666 --> 00:09:23,233
+以后的视频中，我们会详细图解这些东西
+and we'll definitely dive into the details and diagrams and all that stuff in a future video
+
+151
+00:09:23,733 --> 00:09:27,433
+但我们需要解决这个问题的方法基本上是告诉
+but the way that we need to fix this problem is by basically telling
+
+152
+00:09:27,433 --> 00:09:30,700
+所有构成ChernoLogo的顶点位置
+all of our kind of vertex positions that make up their ChernoLogo
+
+153
+00:09:30,933 --> 00:09:35,500
+嘿，我们绘制所在这个窗口实际上不是一个正方形，它是4 × 3的
+that hey, the window that we're drawing on to isn't actually a square, it's 4 by 3
+
+154
+00:09:35,833 --> 00:09:40,933
+那么我们可能做一些计算让那个运行，所以如果我们往下看
+so maybe do some maths to make that work, so if we go down here
+
+155
+00:09:40,966 --> 00:09:42,966
+我们要实现那个的方法很简单
+the way that we're really going to do that is pretty simple
+
+156
+00:09:42,966 --> 00:09:50,966
+首先，我要在这里输入glm/glm.hpp包含glm
+first of all, I'm going to include the glm over here by typing in glm/glm.hpp
+
+157
+00:09:50,966 --> 00:09:57,100
+我们还需要包含一个，我想是glm/gtc/matrix_transform.hpp
+and we actually need one more include, which I think is gtc/matrix_transform
+
+158
+00:09:57,266 --> 00:10:00,666
+好了，酷，我们在这里包含了两个头文件，现在向下滚动
+okay, cool, so we've included two header files here, now if we scroll down
+
+159
+00:10:02,100 --> 00:10:05,400
+我现在要做的就是开始创建我们所有的统一变量
+what I'm going to do here is where we actually start to create all of our uniforms
+
+160
+00:10:05,533 --> 00:10:09,833
+我要创建一个，我要创建我的投影矩阵
+I'm going to create a, want to create my projection matrix 
+
+161
+00:10:10,733 --> 00:10:13,766
+我把这个叫做glm::mat4，那是它的类型，这是一个4×4矩阵
+I'm going to call this glm::mat4, that's the type, it's a 4 by 4 matrix
+
+162
+00:10:14,133 --> 00:10:19,566
+我们将它命名为proj，我想把它设为glm::ortho()
+we're going to call it proj, and I want to set it equal to glm::ortho()
+
+163
+00:10:20,200 --> 00:10:22,933
+这将会产生一个叫做正交矩阵的东西
+this is going to create something called an orthographic matrix
+
+164
+00:10:22,933 --> 00:10:26,000
+现在对于左边和右边，我的意思是，首先是左边，右边，底部，顶部
+now for the left and right, we just I mean first left right bottom top
+
+165
+00:10:26,000 --> 00:10:30,066
+我们真的只需要指定一些东西，但遵循4x3的纵横比
+we really just need to specify something, but adheres to that 4 by 3 aspect ratio
+
+166
+00:10:30,200 --> 00:10:34,300
+那么，左边是-2，右边是2
+so I'm going to use something like -2 for the left, 2 for the right
+
+167
+00:10:34,566 --> 00:10:40,200
+底部是-1.5，顶部是1.5，至于远近
+-1.5 for the bottom, and then 1.5 for the top, and we, for near and far
+
+168
+00:10:40,200 --> 00:10:42,500
+我们可以指定-1和1
+we can just specify something like -1 and 1
+
+169
+00:10:42,533 --> 00:10:45,200
+我们不需要指定那个，但是我们可以，好了
+we don't need to specify that, but we can, okay
+
+170
+00:10:45,200 --> 00:10:49,633
+所以如果把这两个数都乘以2，就得到4 × 3
+so if you multiply both of these numbers by 2, you'll get four by three
+
+171
+00:10:49,633 --> 00:10:51,200
+那基本上就是我的理解
+that's essentially my reasoning here
+
+172
+00:10:51,333 --> 00:10:57,075
+我刚创建了一个从窗口顶部到底部有3个单位距离的东西
+I've just created something that has a distance of 3 units from the top to bottom of the window
+
+173
+00:10:57,075 --> 00:10:59,666
+从左到右有4个单元距离
+and 4 units from the left and right
+
+174
+00:10:59,666 --> 00:11:03,963
+这是一个4x3的纵横比，应该能固定所有的顶点位置
+so it's a four by three aspect ratio, which should fix all of our vertex positioning
+
+175
+00:11:04,233 --> 00:11:11,500
+一个正交矩阵本质上就是把所有的坐标映射到2D平面上的一种方法
+now an orthographic matrix is just essentially a way to map all of our coordinates onto a 2D plane
+
+176
+00:11:11,733 --> 00:11:15,933
+离得更远的物体并不会变小
+where objects that are further away do not actually get smaller
+
+177
+00:11:17,700 --> 00:11:21,900
+这和我们习惯的透视投影是相反的
+this is opposed to like a perspective projection which is what we're kind of used to
+
+178
+00:11:21,900 --> 00:11:27,500
+看看如果我们在现实生活中拍一张照片，远处的物体实际上很小，比如
+seeing if we take a photograph in real life, where objects that are further away are actually small, like
+
+179
+00:11:27,500 --> 00:11:31,100
+这是我们用于3D渲染的东西，他对2D渲染很感兴趣
+that's something that we use for 3D rendering, which is interested in kind of 2D rendering he has
+
+180
+00:11:31,100 --> 00:11:33,366
+所以我们不需要这个功能
+so we don't need that functionality 
+
+181
+00:11:33,600 --> 00:11:36,966
+正交矩阵和透视投影本身就是一个话题
+orthographic and perspective projection is a bit of a topic in itself
+
+182
+00:11:37,666 --> 00:11:40,233
+我们肯定会讲那个并比较它们的不同之处
+we'll definitely cover that and compare the differences
+
+183
+00:11:40,533 --> 00:11:44,500
+那么另一个提醒就是，这个视频只是对这些的介绍
+so another reminder that, this video is just an introduction to all of this
+
+184
+00:11:44,666 --> 00:11:46,500
+我只是想做一个实用的介绍
+I just like to give a practical introduction
+
+185
+00:11:46,500 --> 00:11:48,466
+这样我们就能在屏幕上看到一些东西
+so that we can actually get something on the screen
+
+186
+00:11:48,866 --> 00:11:51,266
+你们可以修改这些数字，自己来玩吧
+you can tinker with the numbers and play around with it yourself
+
+187
+00:11:51,500 --> 00:11:53,900
+我们一定会深入研究这个东西的
+we will definitely dive into this stuff
+
+188
+00:11:53,900 --> 00:11:57,166
+可能会从下一期开始，还有所有这些东西，好了
+probably beginning with like the next episodes and all that stuff, okay
+
+189
+00:11:57,366 --> 00:12:00,166
+那么一旦我得到了这个proj，我需要在我的着色器中使用它
+so once I've got this proj, I need to use it in my shader
+
+190
+00:12:00,166 --> 00:12:01,533
+因为这是我真正想尝试做的
+because what I'm really trying to do
+
+191
+00:12:01,533 --> 00:12:04,533
+我当然可以在CPU端做乘法
+I could of course do the multiplication on the CPU side
+
+192
+00:12:04,533 --> 00:12:09,233
+实际上就是把所有这些顶点位置乘以这个矩阵
+and actually just multiply all of these vertex positions by this matrix
+
+193
+00:12:10,100 --> 00:12:14,400
+或者说把它们转化成vec2或者vec4
+or specifically convert these into basically vec2 or vec4
+
+194
+00:12:14,533 --> 00:12:17,033
+然后用这个矩阵做乘法
+and then do the multiplication with this matrix
+
+195
+00:12:17,033 --> 00:12:20,966
+不过我要在着色器中做这个，如果我去Basic.shader这儿
+however I'm actually going to do that in the shader, so if I go to my Basic.shader here
+
+196
+00:12:21,300 --> 00:12:26,333
+我要添加一个统一变量，这样我就可以把CPU的矩阵放到着色器里
+I'm going to add a uniform, so that I can take in that matrix from the cpu into our shader
+
+197
+00:12:26,866 --> 00:12:32,100
+我将它命名为，uniform mat4，那是类型，就是u_MVP
+I'm going to call it, uniform mat4, that's the type, u_MVP
+
+198
+00:12:32,133 --> 00:12:35,066
+这是我们的模型视图投影矩阵
+which is going to be our model view projection matrix
+
+199
+00:12:35,400 --> 00:12:40,100
+模型视图投影矩阵现在这个特定的部分只是包含一个投影矩阵
+model view projection matrix now this specific part of it were just including a projection matrix
+
+200
+00:12:40,166 --> 00:12:43,133
+不是视图矩阵或模型矩阵
+not a view matrix or a model matrix
+
+201
+00:12:43,266 --> 00:12:46,300
+我以后会讲到这些可爱的东西
+I'm gonna talk all about that lovely stuff in the future
+
+202
+00:12:46,300 --> 00:12:50,166
+我要做的就是用这个矩阵乘以我的顶点位置
+and what I'm going to do with this matrix is just multiply my vertex positions with it
+
+203
+00:12:50,166 --> 00:12:53,233
+我们在顶点着色器中，每个顶点运行一次
+we're in the vertex shader, this runs once per vertexed
+
+204
+00:12:53,300 --> 00:12:58,533
+我们要做的是我们要取这个顶点位置，它来自于顶点缓冲区
+and what we're going to do is we're going to take this vertex position, that comes in from our vertex buffer
+
+205
+00:12:58,766 --> 00:13:02,100
+然后把它和投影矩阵相乘
+and just multiply it with our projection matrix
+
+206
+00:13:02,166 --> 00:13:04,566
+将把它移到合适的空间
+that's going to move it into the appropriate space
+
+207
+00:13:04,966 --> 00:13:08,525
+基于我们提供的正交矩阵
+based on that orthographic matrix that we've actually provided
+
+208
+00:13:08,525 --> 00:13:10,900
+那么回到我们的源代码
+so back in our source code over here
+
+209
+00:13:11,366 --> 00:13:15,433
+我们需要一种方法来设置统一变量，所以我们有一个SetUniform4f
+we now need a way to actually set that uniform, so we have a SetUniform4f
+
+210
+00:13:15,433 --> 00:13:17,033
+这个对于vec4是合适的
+which is fine for a vec4
+
+211
+00:13:17,333 --> 00:13:24,466
+但我们真正需要的是，一个SetUniformMatrix4f或者叫Mat4f
+but what we really need is something, that is a SetUniformMatrix4f or just Mat4f I'll call it
+
+212
+00:13:24,766 --> 00:13:30,633
+我们要设置的统一变量的名称是u_MVP
+and this is going to be called, what the uniform is called you want to set is u_MVP
+
+213
+00:13:30,866 --> 00:13:33,366
+然后我想说的值就是这个glm矩阵
+and then the value that I want to say is just this glm matrix
+
+214
+00:13:33,366 --> 00:13:36,633
+那么我将传入proj，这是我们现在需要创建的函数
+so I'll just pass in proj, that's the function that we now need to create
+
+215
+00:13:37,133 --> 00:13:39,866
+所以当我们来到这里的着色器类
+so if we're going to our Shader class over here
+
+216
+00:13:40,466 --> 00:13:46,466
+我将添加函数SetUniformMat4f，我将保留这个const string& name
+I'm going to add that function SetUniformMat4f, I'll leave this const string name
+
+217
+00:13:46,466 --> 00:13:51,625
+然后我添加一个就像那样的const glm::mat4& matrix
+and then I'll just add a const glm::mat4 matrix just like that
+
+218
+00:13:51,625 --> 00:13:57,591
+我们向上滚动到顶部，像那样包含glm/glm.hpp
+and we'll scroll up to the top, and include glm/glm.hpp like that
+
+219
+00:13:57,900 --> 00:14:03,033
+好了，很酷，那么回到Shader的cpp文件
+okay, pretty cool, so back in our cpp file for our Shader
+
+220
+00:14:03,200 --> 00:14:07,466
+我们将把函数定义加到这里
+we're going to just add that function definition here
+
+221
+00:14:07,700 --> 00:14:10,133
+我只是在用VA获取签名
+I'm just using the visual assistant to get the signature
+
+222
+00:14:10,600 --> 00:14:18,566
+现在这个是glUniformMat4fv，这个v是，哦，实际上是Matrix4fv
+and now this is going to be glUniformMat4fv, the v kind of, oh, that's actually Matrix4fv
+
+223
+00:14:18,733 --> 00:14:21,233
+v的意思是我们在传入一个数组
+the v kind of just means that we're passing in an array
+
+224
+00:14:21,233 --> 00:14:23,400
+所以在这点上我们需要传入一个浮点数组
+so we need to pass in a float array at this point
+
+225
+00:14:24,133 --> 00:14:30,633
+所以我们可以提供统一变量的位置，就像我们对其他SetUniform函数所做的那样
+so we can provide the uniform location, as we do with all of our other SetUniform functions
+
+226
+00:14:30,633 --> 00:14:34,533
+我们在这里传入名字，计数是我们提供了多少矩阵
+we're taking the name here, the count is how many matrices we're providing
+
+227
+00:14:34,533 --> 00:14:39,066
+我们只提供了一个矩阵来实现转置这个矩阵
+we're providing just one matrix do we need to transpose the matrix 
+
+228
+00:14:39,266 --> 00:14:42,766
+如果你们的矩阵是行主矩阵，这意味着它在内存中的排列方式
+if your matrix was a row major matrix, which means that the way that it's laid out in memory
+
+229
+00:14:42,866 --> 00:14:46,633
+本质上是通过，仅仅通过行，而不是像glm那样通过列
+is essentially to by, just by the rows, not by the columns like glm does
+
+230
+00:14:46,700 --> 00:14:50,200
+你们需要把它转置或者你们可以把它们从这里传过去
+you need to transpose it either yourself or you can pass them through here
+
+231
+00:14:50,533 --> 00:14:54,800
+我们不需要转置它，因为我们用的是glm，它存储了它的矩阵
+we don't need to transpose it, because we're using glm, which stores its matrix
+
+232
+00:14:55,200 --> 00:14:58,400
+比如主列中的元素，这是OpenGL所期望的
+like elements in column-major, which is what OpenGL expects
+
+233
+00:14:58,466 --> 00:15:00,566
+所以我们可以在这里传入GL_FALSE
+so we can pass in GL_FALSE over here
+
+234
+00:15:01,166 --> 00:15:05,300
+这个值本质上是一个指向浮点数组的指针
+and the value is essentially a pointer to that float array
+
+235
+00:15:05,400 --> 00:15:08,933
+所以我们能做的就是传入矩阵的内存地址
+so what we can do here is just pass in the memory address of matrix
+
+236
+00:15:08,933 --> 00:15:15,100
+然后这个基本上就是表示第0列和第0列中的元素
+and then this basically just says column 0 and element 0 inside column 0
+
+237
+00:15:15,200 --> 00:15:18,666
+所以就那样，那就是glm存储数组的方式
+so that's it, that's the way the glm stores it is as an array
+
+238
+00:15:18,800 --> 00:15:21,966
+但是我们实际可以用这些索引运算符来得到第一个元素的位置
+but we can use these index operators to actually get the location of the first element
+
+239
+00:15:21,966 --> 00:15:24,733
+然后剩下的就会依次存储在内存中
+and then the rest will be stored sequentially in memory
+
+240
+00:15:24,933 --> 00:15:30,300
+那么我们继续，调用GLCall，那就是我们需要做的全部
+so there we go, let's around this with the GLCall, and that's really all we need to do
+
+241
+00:15:30,300 --> 00:15:32,000
+现在回到Application文件中
+so now back in Application
+
+242
+00:15:32,000 --> 00:15:35,000
+我们像在这里一样设置统一变量，一次就好
+we set the uniform as we do over here, just once is enough
+
+243
+00:15:35,000 --> 00:15:37,866
+我们可以每帧都设置它，就像我们对颜色做的那样
+we can set it every frame, if we want to like we do with color
+
+244
+00:15:38,066 --> 00:15:40,766
+但既然它没有变化，我们就没必要这样做
+but since it's not changing, there's no need for us to do that
+
+245
+00:15:41,066 --> 00:15:43,466
+如果我们按f5，现在希望它能运行
+if we hit f5, now hopefully this will work
+
+246
+00:15:43,466 --> 00:15:46,100
+你们可以看到我们得到了一个小得多的东西
+and you can see that we get something that's a lot smaller
+
+247
+00:15:46,100 --> 00:15:49,966
+但实际上它的纵横比是正确的，并且为了比较
+but it is in fact the right aspect ratio, and for comparison
+
+248
+00:15:49,966 --> 00:15:56,066
+如果我们到这里，也许我们可以把源图形矩阵改成-4，4，-3，3
+and if we go over here, maybe we change the source graphic matrix to be -4, 4 and -3, 3
+
+249
+00:15:56,066 --> 00:15:57,833
+我们仍然保持4:3的纵横比
+we're still keeping that 4:3 aspect ratio
+
+250
+00:15:57,833 --> 00:16:02,200
+但我们实际上把它扩大了一倍，实际的几何形状应该小得多
+but we've made it essentially twice as big, our actual geometry should be a lot smaller
+
+251
+00:16:02,200 --> 00:16:05,100
+你们可以看到我们创造了一个更小的ChernoLogo
+and you can see we have created a smaller ChernoLogo
+
+252
+00:16:05,200 --> 00:16:07,766
+所以我可以回到另一个，因为它有点太小了
+so I might revert back to the other one, because it's, this is a bit too small
+
+253
+00:16:07,966 --> 00:16:11,766
+但那本质上就是它的工作原理，通过指定这4个位置
+but that's essentially how it works, by specifying these 4 positions
+
+254
+00:16:11,766 --> 00:16:16,433
+我们基本上定义了窗口的4种边界
+we're basically specifying the 4 kind of boundaries of our window
+
+255
+00:16:16,433 --> 00:16:18,275
+那么左边是-2
+so left is -2
+
+256
+00:16:18,275 --> 00:16:22,766
+如果我们试着在-2处画一个顶点位置，实际上我们只是为了好玩
+if we try and draw a vertex position at -2, in fact let's just for fun
+
+257
+00:16:23,133 --> 00:16:25,266
+把这个变成-2，-2可能很难看到
+move one this to -2, -2 might be hard to see
+
+258
+00:16:25,266 --> 00:16:27,933
+因为无论我们是在一种颜色的纹理上，而这个纹理挺合适的
+because whether we're in a texture on a color, and the texture is our fit
+
+259
+00:16:28,100 --> 00:16:31,466
+但是如果我们把这个绘制成，如果我们把这个调成-2
+but if we draw this to, if we were to change this to -2
+
+260
+00:16:31,566 --> 00:16:35,766
+它会在实际窗口的非常非常左的边缘
+it would be at the very very left edge of our actual window
+
+261
+00:16:35,900 --> 00:16:39,633
+好了，但我会把它还原为0.5，这就是它的工作方式
+okay, but I'll put it back to 0.5, and then that's the way this works
+
+262
+00:16:39,633 --> 00:16:44,066
+那么那是左边，那是右边，那是下边，那是上边
+so that's the left edge, that's the right edge, that's the bottom edge, that's the top edge
+
+263
+00:16:44,066 --> 00:16:47,733
+然后这是近平面和远平面，这意味着如果我们尝试渲染一些东西
+and then this is the near and far plane, which means if we try and render something
+
+264
+00:16:47,733 --> 00:16:49,717
+那是在外面，这个会变冷的
+that's kind of outside, this it will get cold 
+
+265
+00:16:49,717 --> 00:16:53,400
+不管怎么说，讲所有这些，我几乎快把自己搞糊涂了
+anyway, I'm almost confusing myself, by talking about all of this
+
+266
+00:16:53,433 --> 00:16:57,700
+因为我们真的需要花20分钟在每个概念上
+because we really need to spend like 20min on each of these concepts
+
+267
+00:16:57,700 --> 00:16:59,633
+在接下来的几期中我们会接触到的
+which we will do in the following episodes
+
+268
+00:16:59,633 --> 00:17:03,000
+但我希望你们喜欢这种OpenGL数学入门
+but I hope you guys enjoyed this kind of introduction to maths in OpenGL
+
+269
+00:17:03,833 --> 00:17:08,700
+就这个主题而言，我还能看到10到20集
+I can just see like another 10 to 20 episodes just on this topic alone
+
+270
+00:17:08,733 --> 00:17:10,800
+让我知道什么是有意义的，什么是没有意义的
+let me know what made sense, what didn't make sense
+
+271
+00:17:10,800 --> 00:17:12,200
+你们想看到更多的是什么东西
+what you want to see more of
+
+272
+00:17:12,233 --> 00:17:15,733
+我可能会把一些演示放在一起，就像我在混合视频中做的那样
+I'm gonna probably put together some presentations, like I did with the blending video
+
+273
+00:17:15,733 --> 00:17:17,500
+因为那真的能帮我解释这些东西
+because that's really gonna help me explain this stuff
+
+274
+00:17:18,000 --> 00:17:19,766
+请在下面的评论中告诉我你们的想法
+let me know what you thoughts are in the comments below
+
+275
+00:17:19,933 --> 00:17:21,533
+如果你们喜欢这个视频，就点击这个喜欢按钮
+hit the like button, if you enjoyed this video
+
+276
+00:17:21,733 --> 00:17:24,750
+如果你们想支持本系列，请访问patreon.com/TheCherno
+if you want to support this series, you can go to patreon.com/TheCherno
+
+277
+00:17:24,750 --> 00:17:30,533
+早点拿到这些视频，然后在一个私人的discord服务器上讨论这些事情
+and get all these videos early, and get to talk about this stuff in a private kind of discord server
+
+278
+00:17:30,533 --> 00:17:35,066
+每个月都有机会在那里讨论这些系列的发展方向
+and get access to a monthly hangout where we talk about the direction of these series
+
+279
+00:17:35,066 --> 00:17:37,725
+以及你们想要在生活中看到的一切，所有那些东西
+and what you want to see in life, and all that stuff
+
+280
+00:17:37,725 --> 00:17:39,150
+真的有助于支持这个系列
+and it really does help support this series
+
+281
+00:17:39,150 --> 00:17:44,100
+所以，和往常一样，非常感谢所有的支持者，是你们让这一切成为可能
+so as always, huge thank you to all of my patreon supporters for making this possible
+
+282
+00:17:44,425 --> 00:17:49,033
+下次见，会有更多的数学知识哦，再见
+I will see you guys next time, with a lot more maths, goodbye
+

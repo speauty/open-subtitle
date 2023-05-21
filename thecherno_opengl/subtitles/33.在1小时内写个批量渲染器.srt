@@ -1,0 +1,1475 @@
+﻿1
+00:00:00,000 --> 00:00:07,000
+嘿，你们好，我是TheCherno，又继续做这些了，我今年不会这么做，但这就是我
+hey, what's up guys, my name is TheCherno, doing all this again, I was gonna not do that for the year, but it's just who I am
+
+2
+00:00:07,279 --> 00:00:13,500
+欢迎来到另一期一小时挑战视频，我们将在一小时内完成一些东西
+welcome to another one of these one hour challenge videos, where we are going to do something in one hour
+
+3
+00:00:15,375 --> 00:00:19,525
+这是我做任何事情的唯一方法，如果我给自己安排一个好时间，你们知道的，一个小时
+yeah it's the only way I get anything done is, if I set myself a good times, you know for an hour
+
+4
+00:00:19,525 --> 00:00:25,225
+所以你们可以看到，我们回到办公室，在我说布景之前，你们可能已经看过一点这个布景
+so as you can see, we are back here in the office, you've probably seen a little bit of this set before I say set
+
+5
+00:00:25,225 --> 00:00:32,750
+好像是一个电影布景，但这只是我的办公室，今天之所以在这里是因为这是我喜欢的电脑
+as if this is like a film set, but it's just it's just my office, and the reason we are here today is because this is my like desktop computer
+
+6
+00:00:32,750 --> 00:00:38,825
+这是我的主要工作环境，这是为了让你们更多地参与我的工作
+this is my primary work environment, and this is all an effort to get you guys a little bit more involved with what I do
+
+7
+00:00:38,825 --> 00:00:45,200
+我真的想开始制作更多的视频，这些视频仅仅是我最终完成的日常编程或工作
+I want to actually start making more videos of just kind of day-to-day programming or work that I end up doing
+
+8
+00:00:45,200 --> 00:00:52,525
+让你们更多地参与其中，所以现在在我的电脑显示器后面有一个摄像头正对着我
+and kind of involve you guys more in that, so the fact that there is a camera now set up behind my computer monitor looking right at me
+
+9
+00:00:52,525 --> 00:00:58,450
+我的显示器在这儿，键盘在这儿，所有这些都意味着希望，希望，也没有保证哦
+and my monitors here, and my keyboard is here, and all of that stuff means that hopefully, hopefully no guarantees
+
+10
+00:00:58,450 --> 00:01:03,600
+但也许只是我会制作更多的视频，你们知道的，在Youtube上全职实际上也是一种挑战
+but maybe just maybe I'll make more videos, man doing youtube full time is actually kind of challenging you know
+
+11
+00:01:03,675 --> 00:01:08,025
+好了，那么关于我们今天在这里做什么，说的已经差不多了，我想这可能是个好主意
+okay, so enough talking what are we doing here today, well I thought it would be a good idea
+
+12
+00:01:08,025 --> 00:01:13,600
+因为这个频道最近的主题就是批量渲染，所以实际上我们可以坐下来
+since the topic of this channel has somewhat been batch rendering lately for us to actually sit down 
+
+13
+00:01:13,600 --> 00:01:19,575
+在一个小时内编写一个完整的批量处理渲染器，首先，尽管我们有很多这样的视频
+and write a complete batch renderer within an hour just to show that, first of all, even though we have a lot of these videos
+
+14
+00:01:19,575 --> 00:01:25,450
+那么有点过于关注细节，这就是我在谈论我们为什么要做决定
+and they're kind of they go into details, and it's me kind of talking a lot about how like why we make decisions 
+
+15
+00:01:25,450 --> 00:01:30,880
+然后向你们展示如何一步一步地完成那个渲染器
+then actually showing you guys how to make everything step by step, the actual like at the end of the 
+
+16
+00:01:30,880 --> 00:01:34,375
+归根结底，实际的编程部分并没有那么复杂
+at at the end of the day the actual programming part of this is not that complicated
+
+17
+00:01:34,375 --> 00:01:40,775
+完全有可能在一小时内编写一种基础的批量处理渲染器，我今天将在这里证明这一点
+it's definitely possible to write a kind of basic batch renderer within an hour as I'm going to prove here today
+
+18
+00:01:40,775 --> 00:01:48,250
+可以说，这将是一个功能齐全的，我的意思是，我确信我必须对其进行改进优化
+and this is going to be kind of fully featured, so to speak, I mean I'm sure that there's going to be improvements that I'm going to have to make to it
+
+19
+00:01:48,250 --> 00:01:53,125
+因为这是一个小时，但归根结底还是，我实际上想要一个可以运行的批量渲染器
+because it's it's an hour, but still at the end of the day, I actually want kind of a working batch renderer that
+
+20
+00:01:53,125 --> 00:01:55,325
+我可以向它抛出任意数量的几何体
+I can throw any amount of kind of geometry at it
+
+21
+00:01:55,600 --> 00:02:01,300
+它会明白如何渲染它，我希望能够渲染不同颜色和不同纹理的四边形
+and it will figure out what to do with it, I want to be able to render quads of different colors as well as different textures 
+
+22
+00:02:01,350 --> 00:02:07,775
+基本上，我想在本期结束前拿出一些有用的东西，并且那就是今天的计划
+I basically want to come out with something that's going to be usable by the end of this, and that is the plan for today
+
+23
+00:02:07,775 --> 00:02:14,525
+但首先我要感谢Hostinger赞助这期视频，Hostinger在过去一个月中一直是主要的赞助商
+but first I want to thank Hostinger for sponsoring this video now Hostinger, I have been a great sponsor this past month sponsoring
+
+24
+00:02:14,525 --> 00:02:20,850
+所以才有这么多视频，我之所以喜欢，是因为他们很棒，我喜欢Hostinger
+so many videos and the reason why I love that is because they're just good, I like Hostinger
+
+25
+00:02:20,950 --> 00:02:27,000
+他们实际拥有的产品不仅仅是我在做广告的其他产品，因为我需要它们
+the actual product that they have is not just some other product that I'm just advertising, because I want them
+
+26
+00:02:27,000 --> 00:02:31,225
+不，Hostinger，它实际上是一个我相信是我喜欢使用的产品
+no, Hostinger, it is actually a product that I believe in is something that I like to use
+
+27
+00:02:31,225 --> 00:02:37,975
+因为它只是一个真正易于使用的全功能网站虚拟主机平台，所以也非常实惠
+because it's just a really easy to use fully featured web hosting platform, that is extremely affordable as well
+
+28
+00:02:38,080 --> 00:02:43,350
+现在我坚信，几乎每个人都应该有一个网站，因为一个网站，有点像你们的在线状态
+now I strongly believe that pretty much, everyone should have a website, because a website, it's kind of like your online presence
+
+29
+00:02:43,350 --> 00:02:46,700
+你们真的无法控制社交媒体档案
+you can't really control social media profiles as well as
+
+30
+00:02:46,700 --> 00:02:49,840
+可能就像我，你们可以制作Youtube频道，也可以制作Instagram页面
+you'd like I mean, you can make a youtube channel, you can make an instagram page
+
+31
+00:02:50,050 --> 00:02:53,850
+但它仍然不会像你们坐下来创建自己的网站那样给你们太多的控制权
+but it's still not going to give you as much control as if you sit down and make your own website
+
+32
+00:02:54,075 --> 00:03:00,100
+你们可以在一个地方链接所有社交媒体，可以部署所有项目，可以把它当作定制博客平台
+you could link all of your social media there in one place, you can have all of your projects there, you can treat it as a custom blog platform 
+
+33
+00:03:00,100 --> 00:03:03,519
+写下你们想写的任何东西，至少
+and just write about whatever it is you want to write about and at the very least 
+
+34
+00:03:03,519 --> 00:03:08,080
+你们可以在互联网上有一个专业的地方来保存关于你们的信息
+you can have a professional place on the internet to actually hold information about you
+
+35
+00:03:08,225 --> 00:03:11,650
+如果你们正在找工作或只是想与人交往，这一点非常重要
+which is really important, if you're looking for a job or just looking to network with people 
+
+36
+00:03:11,650 --> 00:03:18,480
+并且Hostinger是一个强大的网站虚拟主机平台主要在于他们的平台非常直观且易于使用
+and the reason why Hostinger specifically is such a great web host is because their platform is extremely intuitive and easy to use
+
+37
+00:03:18,575 --> 00:03:24,150
+除了界面非常简洁，简单和易于使用之外，它还具有内置的诊断功能
+apart from the UI just being extremely clean and simple and easy to use, it also has built-in diagnostics
+
+38
+00:03:24,150 --> 00:03:31,400
+那将帮助你们诊断实际设置中的问题，我喜欢Hostinger的另一个原因是它非常实惠
+that will help you diagnose problems with your actual setup the other thing that I love about Hostinger it is that it's extremely affordable
+
+39
+00:03:31,700 --> 00:03:38,275
+但它并不是为了达到目标而牺牲质量，它不仅仅是一个廉价的网络主机
+but it doesn't sacrifice quality to get there, it's not just a cheap web host cheap in the sense that it's just
+
+40
+00:03:38,400 --> 00:03:41,375
+不太好，Hostinger是个很好的虚拟主机，它设法保持价格合理
+it's not good, Hostinger manages to stay affordable
+
+41
+00:03:41,375 --> 00:03:45,650
+同时在一个非常好的安装包中为我提供了需要的特性
+whilst also giving me all the features that I need in a very well presented package
+
+42
+00:03:45,650 --> 00:03:53,200
+为此，我真找不到更好的选择，所以如果你们有兴趣，请查看下面描述中的链接
+and for that I honestly cannot find a better choice of web host, so if you guys are interested in Hostinger, check the link in the description below
+
+43
+00:03:53,325 --> 00:03:59,125
+如果你们使用Cherno编码，Hostinger已经为你们准备了多达91个离线站点托管计划
+if you use code cherno, Hostinger have been awesome enough to give you up to 91 off web hosting plans
+
+44
+00:03:59,225 --> 00:04:04,750
+非常感谢你们再次支持本月，让我们继续进行批量渲染挑战
+huge thank you again to Hostinger for being such a lovely sponsor this month, let's get on with this batch rendering challenge
+
+45
+00:04:04,750 --> 00:04:08,900
+你们知道这些挑战实际上非常有帮助，我觉得
+you know secretly these challenges are actually extremely helpful, I feel that
+
+46
+00:04:08,900 --> 00:04:14,925
+挑战自己在一个时间限制内实际做一些事情是锻炼我的编程技能的一个很好的方法
+challenging myself to actually do something within a time limit is a really good way to practice both my programming skills
+
+47
+00:04:14,925 --> 00:04:22,775
+但我想我喜欢坐下来思考技巧，事实上，在有限的时间内解决一个问题是一个很好的锻炼
+but also I guess my like thinking skills sitting down, and actually having to work through a problem in a finite time is a really good exercise
+
+48
+00:04:22,775 --> 00:04:28,900
+我想对几乎所有人来说，因为你们的时间有限，这意味着你不必像
+I think for pretty much everyone, because the fact that you have that finite time, means that you don't have to put this off as like
+
+49
+00:04:28,900 --> 00:04:31,875
+哦，我没有时间搞这个，因为，我的意思是你们给了自己一个时间限制
+oh, I don't have time to do this, because it's, I mean you've given yourself a time limit
+
+50
+00:04:31,875 --> 00:04:35,650
+只是一个小时，它不会占用你们整个晚上、一整天或有时
+it's one hour, it's not going to take over your whole evening or your whole day or sometimes
+
+51
+00:04:35,650 --> 00:04:39,725
+因为你们知道我过去做过这些挑战，很明显我在一个小时内就造出了一个粒子系统
+it's because you know I've done these challenges in the past, obviously I made a particle system in an hour 
+
+52
+00:04:39,725 --> 00:04:44,300
+看看那期视频，如果你们还没有看过的话，那是非常流畅的一期视频
+check out that video, if you haven't already, that that was such a smooth plug
+
+53
+00:04:44,725 --> 00:04:47,475
+我甚至不能像视频一样提及，我已经做了
+I can't even mention like a video, I've done without being like
+
+54
+00:04:47,825 --> 00:04:51,625
+无论如何，请查看YouTube直播的粒子系统视频
+check that video out anyway whatever youtuber live with the particle system video
+
+55
+00:04:51,625 --> 00:04:57,120
+我知道我可以轻松地花一整天的时间来写一个粒子系统，我的意思是你们绝对可以慢慢来
+I knew that I could easily spend a whole day writing a particle system, I mean you can definitely take it slow 
+
+56
+00:04:57,120 --> 00:05:01,520
+你们可以不断添加功能，你们可以用不同的东西来测试它，可以像
+you can keep adding features, you can test it out with different things, you can just play around with it as
+
+57
+00:05:01,520 --> 00:05:06,625
+就像到处都是有趣粒子的沙盒一样，你们可以玩上几个小时
+like a sandbox of fun particles everywhere like you could play with that stuff for hours
+
+58
+00:05:06,625 --> 00:05:11,350
+但事实上，我必须在一个小时内完成这项工作，而且我必须发送它，必须设个计时器
+but the fact that I had to do this within an hour, and I had to send it, I had to set a timer
+
+59
+00:05:11,525 --> 00:05:15,400
+并且我必须在摄像头前工作，完成所有那些东西
+and I had to actually work there kind of in front of the camera and get all that all of that stuff done
+
+60
+00:05:16,320 --> 00:05:22,300
+我认为这是一次非常酷的体验，所以事实上，你们看的可能不是油管主播
+that I think is just a really cool experience, so the fact that you guys watching are probably not Youtubers
+
+61
+00:05:22,300 --> 00:05:27,350
+那对我来说无关紧要，你们知道我们都是人，都可能是程序员
+that that doesn't matter me, and you you know we're both people, we're both likely programmers
+
+62
+00:05:27,840 --> 00:05:32,800
+坐下来，试着和我一起做这个挑战，它不一定是批量渲染挑战
+sit down and try and do this challenge along with me, it doesn't have to be a batch rendering challenge
+
+63
+00:05:32,800 --> 00:05:36,370
+因为你们可能不知道如何编写批量渲染器，当然那没什么问题
+because you might not know how to write a batch renderer, and of course that's totally fine
+
+64
+00:05:36,675 --> 00:05:42,575
+想出一些你们知道最有可能做的事情，即使你们不是百分之百确定
+come up with something that you know that you most likely can do, maybe even if it's something that you're not a hundred percent certain 
+
+65
+00:05:42,575 --> 00:05:49,000
+你们有必要的技能或经验来完成任务，还是坐下来，试着给自己一个时间限制
+you have the the necessary skills or experience to pull off still sit down and actually try and give yourself a time limit
+
+66
+00:05:49,250 --> 00:05:54,875
+并且尽可能快地完成一些事情，除了你们基本上可以保证在那方面有所提高之外
+and work on something as fast as you can, apart from the fact that you're basically guaranteed to improve in that area
+
+67
+00:05:55,450 --> 00:06:01,275
+你们也会有很多乐趣，可能会想出一些你们能做的事情，然后可能在将来有所改进，好吧
+you'll also have a ton of fun, and likely come out with something that you can, then maybe improve in the future, all right
+
+68
+00:06:01,650 --> 00:06:05,525
+我想我已经准备好了，我和妻子打算出去吃晚饭，也就是一些饺子
+I think I'm ready, my wife and I are planning to go out for dinner, we're going to grab some dumplings afterwards
+
+69
+00:06:05,525 --> 00:06:09,225
+所以那应该就是我坐下来完成这件事的足够动力
+so that should be motivation enough for me to sit down and get this done
+
+70
+00:06:09,425 --> 00:06:12,275
+让我们去实现这个批量渲染器吧，就像粒子系统一样
+let's do this batch renderer and just like with the particle system
+
+71
+00:06:12,275 --> 00:06:16,800
+我要给你们做一个事后分析，而不是向你们展示我是怎么做的
+I'm gonna give you guys a postmortem of how it went rather than trying to kind of show me making it
+
+72
+00:06:16,800 --> 00:06:22,160
+因为我认为这会有用得多，所以你们在屏幕上看到的只是结果
+because I think this is gonna be a lot more useful, so what you're seeing here on screen, now is just the result
+
+73
+00:06:22,160 --> 00:06:25,025
+我想在一会儿的直播中带你们过一下代码
+I want to kind of take you guys through the code in a minute live
+
+74
+00:06:25,025 --> 00:06:29,000
+所有这些都是基于我当前在频道上进行的批量渲染系列
+all of this is based on the batch rendering series that I currently have going on on my channel
+
+75
+00:06:29,000 --> 00:06:33,325
+你好，迈克，顺便说一下，如果你们还没看过，如果想知道这一切是怎么回事
+hello, Mike, by the way, so if you guys haven't checked that out, and if you want to know how all this works 
+
+76
+00:06:33,325 --> 00:06:38,675
+那么我真的鼓励你们看看这个系列，那里会有一个链接，因为这将带你们过一遍
+then I would really encourage you to check out that series, there'll be a link up there, because that's going to take you through
+
+77
+00:06:38,675 --> 00:06:42,800
+批量渲染的原理，以及如何实际地将其组合在一起，而这只是
+how batch rendering works, and how to actually put it together, whereas this is just going to be 
+
+78
+00:06:43,039 --> 00:06:47,375
+快速概述了我如何在一小时内编写完整的批量渲染器
+a fairly quick overview of how I actually wrote a complete batch renderer within an hour
+
+79
+00:06:47,375 --> 00:06:52,925
+让我们看看，很明显，这件事在一个小时内就完成了，我想我花了大约一个小时
+so let's check it out, so obviously with this being done like within an hour, and I think it took me right about an hour
+
+80
+00:06:52,925 --> 00:06:55,937
+我是说，老实对你们说，我并没有真的选择计时
+I mean to be completely, honest with you guys, I didn't actually end up timing this 
+
+81
+00:06:56,025 --> 00:07:00,650
+但从时间来看，现在好像是五点，我四点就开始了，已经一个小时了
+but judging by the time, like it's five o'clock now, I started at four o'clock, it's it's been an hour 
+
+82
+00:07:00,650 --> 00:07:05,775
+我认为我已经完成了这些挑战，现在反思和审视事实真的很有趣
+I think with me having done these challenges, now it's really interesting to reflect and look at the fact
+
+83
+00:07:05,775 --> 00:07:13,450
+如果我为批量渲染器分配了两周的时间，那么这项工作确实会扩展到你们分配的时间
+that work really does kind of expand to fill the time, that you have allocated for it, if I allocated two weeks for a batch renderer
+
+84
+00:07:13,700 --> 00:07:19,919
+我想这可能要花我两个星期的时间，但这就像一个只有一个小时来做这整个东西
+I think it probably would have taken me two weeks, but with this having like one just having one hour to do this whole thing
+
+85
+00:07:20,050 --> 00:07:25,200
+事实上，我为自己设定了这个任意的时间限制，很明显，我现在都在看时间
+the fact that I had set this arbitrary time limit for myself, and obviously the fact that I looked at the time every now
+
+86
+00:07:25,200 --> 00:07:31,675
+那意味着我花了整整一个小时，我想如果我设定一个半小时，我也会花那么长时间
+and then means that it took me pretty much exactly an hour, I think that if I had set an hour and a half, it would have taken that long
+
+87
+00:07:31,950 --> 00:07:40,560
+如果说45分钟，我想也可以在45分钟内完成，但由于一小时的限制，所以就花了一个小时
+if I had said 45 minutes, I think I think I could do it in 45 minutes, but with that one hour time limit, it just ended up taking one hour
+
+88
+00:07:40,560 --> 00:07:44,240
+因此那就非常有趣，我们这里有这样的一个场景
+so that's that's super interesting alright, so we have this kind of scene here
+
+89
+00:07:44,240 --> 00:07:50,560
+嗯，我想做这种网格，嗯，在这儿要看到所有正在渲染的四边形，那有点困难
+um I like to do this kind of grid uh thing here, it's a little bit difficult to see all the individual quads, that are being rendered
+
+90
+00:07:50,650 --> 00:07:58,720
+然而有6426个不同四边形，正如在ImGui面板所看到的，这些都在一个DrawCall指令中
+however there are 6426 different quads, and as you can see in this ImGui panel, all of that is inside one DrawCall
+
+91
+00:07:58,720 --> 00:08:05,950
+我们现在有多种颜色和两种不同的纹理，理论上这个系统最多可以支持31个纹理
+we have a variety of colors here as well as two different textures now, theoretically this system could support up to 31 textures 
+
+92
+00:08:05,950 --> 00:08:11,775
+然而我没有费心加载31个不同的纹理，尤其是在一小时内
+however I did not bother loading 31 different textures especially within an hour
+
+93
+00:08:11,775 --> 00:08:17,825
+因为我觉得那需要一个小时来设置，所以就只有cherno和hazel标志，但那也没关系
+because I feel like that would have taken like an hour to set up, so I only have this cherno logo and the hazel logo, but that's okay
+
+94
+00:08:17,825 --> 00:08:24,050
+我认为，如果有人想自己测试那个，那么他们完全可以做到，所以我相信这应该是可行的
+I think that if anyone wants to test this out themselves, then they can absolutely do, so I believe that it should work
+
+95
+00:08:24,050 --> 00:08:28,200
+像往常一样，我会在下面的描述中放代码的链接，因此如果你们想下载此代码的话
+and as always I'll have the link to the code in the description below, so if you want to download this code
+
+96
+00:08:28,200 --> 00:08:34,275
+如果你们想自己玩玩，那么只需查看下面描述中的链接，通常我会尽快将这些视频发布出来
+if you want to play around with it yourself, then just check the link in description below, usually I kind of get these videos out as soon as possible
+
+97
+00:08:34,575 --> 00:08:39,525
+然后第二天可能会上传代码，所以如果还没有的话，请确保以后再查看
+and then maybe upload the code the next day, so if it's not there, make sure you check back in the future
+
+98
+00:08:39,525 --> 00:08:44,125
+那么为了证明这实际上是动态的，我们还有一个可以控制的四边形位置
+and just to kind of demonstrate this actually being dynamic, we also have this quad position that we can control
+
+99
+00:08:44,125 --> 00:08:47,425
+所以我们基本上可以控制这个四边形的位置，虽然它是在一个批量渲染中完成的
+so we can basically control the position of this quad, it's all in one batch though
+
+100
+00:08:47,650 --> 00:08:53,325
+从理论上讲，我的意思是所有这些四边形都会在每一帧重新提交，所以它们是完全动态的
+and theoretically like I mean all of these quads are being resubmitted every single frame, so they are completely dynamic
+
+101
+00:08:53,325 --> 00:09:02,175
+让它们随机移动是一个很小的改变，正如我提到的，在一个DrawCall中有6400个四边形
+and making them all move randomly, for example would be a trivial change, now as I mentioned we do have 6400 quads here in one DrawCall
+
+102
+00:09:02,175 --> 00:09:07,700
+因为每次绘制最大四边形数，已经设置为10，现在我编写这个渲染器的方式，马上就会看到
+because the maximum quads per draw, I've set to be 10, now the way that I've written this renderer as we'll see in a minute 
+
+103
+00:09:07,975 --> 00:09:13,175
+这意味着我可以很容易地改变它，我可以让它只有1000个最大四边形数量
+means that I can easily kind of change that, I can just make this only have a thousand max quad count
+
+104
+00:09:13,175 --> 00:09:20,400
+意味着在一次DrawCall中只能绘制1000个四边形，如果重新运行这个，看看它是什么样子
+which means that only one thousand quads can be drawn in a single DrawCall, and if I relaunch this and we take a look at what that looks like
+
+105
+00:09:20,800 --> 00:09:22,775
+你们可以看到，现在我们有七次绘制
+you can see that now we have seven draws
+
+106
+00:09:23,050 --> 00:09:27,075
+所以我们有七次绘制组成了这个场景，看起来一样，显然表现仍然很好
+so we have seven draws making up this scene, it looks the same it still performs well obviously
+
+107
+00:09:27,500 --> 00:09:32,775
+但总的来说，我们有七次DrawCall调用，而不是之前的一次，当时的限制是10000
+but all in all, we have seven DrawCalls instead of the one that we had, when our limit was 10000
+
+108
+00:09:32,875 --> 00:09:37,600
+好了，让我们深入研究一下代码，现在我想在这里简单介绍一下
+okay, let's dive in and take a look at the code, now I do want to be quite brief here
+
+109
+00:09:37,600 --> 00:09:40,175
+我不打算讨论LoadTexture函数之类的内容
+I'm not going to cover things like this LoadTexture function
+
+110
+00:09:40,175 --> 00:09:46,150
+因为我认为那是不言自明的代码基础，顺便说一下，我开始使用的是基于OpenGL的仓库
+because I think that's self-explanatory the code base that I started with, by the way is the OpenGL based library
+
+111
+00:09:46,150 --> 00:09:51,000
+我已经制作了一期视频，你们可以查看，也可以自己下载仓库，然后从那上面开始
+I've made a video about that, that you can check out, and also download the base library for yourself, and kind of start on that
+
+112
+00:09:51,325 --> 00:09:57,200
+但基本上，我所做的是从我发布的最后一期批量渲染视频的基础开始
+but essentially what I did was I started with the base of the last batch rendering video that I put out
+
+113
+00:09:57,550 --> 00:10:03,775
+现在在我录制这期视频时，还没有完成索引缓冲区视频，
+now, as of me recording this video, I haven't done the index buffer video yet, 
+
+114
+00:10:03,775 --> 00:10:06,825
+所以最后一期视频实际上是关于动态几何视频
+so the last video was actually the dynamic geometry video 
+
+115
+00:10:06,825 --> 00:10:11,200
+所以那就是我开始的基础，然后从那里开始，我的意思是我必须把大部分清理干净
+so that's kind of the base that I started with, and then from there, I mean I had to wipe most of that clean
+
+116
+00:10:11,200 --> 00:10:16,160
+但是我已经加载了纹理，已经加载了着色器
+but I had like for example the textures already loaded, and I had the shader already loaded
+
+117
+00:10:16,160 --> 00:10:20,725
+但我必须修改着色器，你们马上就会看到，所以那就是我开始的基础
+but I had to modify the shader as you'll see in a minute, anyway, so that was kind of the base that I started off with 
+
+118
+00:10:20,725 --> 00:10:26,725
+然后我基本上从这里创建这个渲染器类开始，然后填充所有这那些内容
+and then I basically started by creating this renderer class here, and then just filling all of that out
+
+119
+00:10:27,175 --> 00:10:32,320
+那么让我们从整个设计和架构开始，首先，这是一个完全静态的类
+so let's start with the design and architecture of this whole thing, first of all, this is a completely static class
+
+120
+00:10:32,400 --> 00:10:40,400
+这儿绝对没有任何成员，我所做的只是基本上使用类，就像命名空间，将类分在一起
+there's absolutely no members whatsoever here, what I've done is just essentially used class as like a namespace kind of to group things together 
+
+121
+00:10:40,475 --> 00:10:46,950
+这正是我喜欢做的事情，它根本不是一个单例，因为从来没有渲染器的实例
+this is just something that I like doing, it's not a singleton at all, because there is no instance of renderer ever
+
+122
+00:10:46,950 --> 00:10:52,480
+所以不要被愚弄到认为是那样的，因为它不是，我们有一个Init和Shutdown函数
+so don't be fooled into thinking that, that's the case, because it's not, we have an init function a shutdown function 
+
+123
+00:10:52,480 --> 00:10:58,625
+然后是系统背后的部分，也就是BeginBatch和EndBatch，以及Flush函数
+and then kind of the meat of the system behind this, which is the begin and batch and also the flush function
+
+124
+00:10:58,880 --> 00:11:07,700
+然后这就是如何绘制，DrawQuad只需vec2& position，vec2 size，vec4& color或textureId
+and then this is how we can draw quads, the draw quad function simply takes in a vec2 position, a vec2 size and then a vec4 color, or a textureId
+
+125
+00:11:07,700 --> 00:11:13,175
+所以你们可以绘制一个单色四边形，也可以绘制纹理四边形，我们这里还有一些统计信息
+so you can either draw a flat colored quad, or you can draw a textured quad, we also have some stats here
+
+126
+00:11:13,175 --> 00:11:19,175
+这纯粹是为了ImGui面板，它显示了我们有多少个Draw，以及有多少个四边形
+this is purely for the ImGui panel, that shows how many draws we have, and how many quads we have
+
+127
+00:11:19,175 --> 00:11:24,850
+那就是它所做的，它实际上并没有被系统使用，好吧，让我们看看所有这些代码
+that's all it does, it's not actually used by the system whatsoever, okay, let's take a look at all this code
+
+128
+00:11:25,375 --> 00:11:29,750
+因为它是一个静态类，所以我在这里定义了一个名为RendererData的结构体
+so with it being a static class, what I've done is defined a struct here called RendererData
+
+129
+00:11:30,075 --> 00:11:33,875
+现在，这也可以是你们想要的任何类型的数据结构
+now this again could be any kind of data structure that you want
+
+130
+00:11:33,875 --> 00:11:36,675
+我的意思是你们可以将这些作为命名空间中的变量
+I mean you could just have these as variables inside a namespace
+
+131
+00:11:36,675 --> 00:11:40,875
+可以将它们作为静态变量，我喜欢创建一个名为RendererData的小结构
+you could just have them as static variables, I like making a little struct called RendererData
+
+132
+00:11:41,125 --> 00:11:48,450
+然后做一个静态实例，我的意思是它不是静态地在类中，它在这个翻译单元中就是静态的
+and then making a static kind of instance of this, I mean it's it's not statically inside a class, it's just static inside this translation unit
+
+133
+00:11:48,450 --> 00:11:54,150
+这意味着它是这个翻译单元的内部，但基本上这就像一些静态存储
+meaning that it's kind of internal to this translation unit, but basically this is like some static storage
+
+134
+00:11:54,150 --> 00:12:00,050
+那将包含渲染器实际需要的所有数据，我还准备了一些常量
+that will contain all of the data that we actually need for this renderer up here, I've also got a few constants
+
+135
+00:12:00,050 --> 00:12:05,800
+那基本上定义了MaxQuadCount，MaxVertexCount和IndexCount，以及纹理数量
+that basically define the MaxQuadCount, the MaxVertexCount, IndexCount, and how many textures we can have 
+
+136
+00:12:06,150 --> 00:12:10,475
+现在需要注意的是，目前我把这个设置为32，因为我知道
+now a few things to note is that at the moment I've written this as 32, because I know
+
+137
+00:12:10,475 --> 00:12:18,375
+我所在的平台至少有32个纹理槽，但是你们可能希望在更严格的设置中执行此操作
+the platform that I'm on has at least 32 texture slots, however what you would probably want to do in a more serious setting
+
+138
+00:12:18,375 --> 00:12:24,079
+在一个小时内你们没有写这个的时间，就是查询驱动程序，找出实际上有多少个纹理槽
+in which you're not writing this within an hour is query the driver to find out how many texture slots you actually have
+
+139
+00:12:24,200 --> 00:12:30,350
+我之前说过我们支持31个纹理插槽，那是因为其中一个纹理是由渲染器保留的
+now I did say earlier that we support 31 textures, that's because one of the textures is reserved by the renderer for something
+
+140
+00:12:30,350 --> 00:12:37,120
+正如在以后看到的，那么在RendererData中，基本上保存了实际需要的OpenGL标识
+as we'll see in the future, so in the RendererData, we basically hold OpenGL identifiers for things that we actually need
+
+141
+00:12:37,275 --> 00:12:43,279
+所以这些都是顶点数组，顶点缓冲区和索引缓冲区的ID，我们还有这个特殊的白色纹理
+so these are all the ids for the vertex array the vertex buffer and the index buffer, we also have this special white texture
+
+142
+00:12:43,279 --> 00:12:49,350
+我马上就会讲到，IndexCount是我们在实际刷新时需要绘制多少个索引
+which I will talk about in a minute, IndexCount is how many indices we need to draw when we actually flush 
+
+143
+00:12:49,350 --> 00:12:56,160
+然后这有两个原始指针，其中一个基本上是指针，一个指向四边形缓冲区开头的基指针
+then we have two raw pointers here, one of which is basically a pointer, a base pointer to the beginning of the quad buffer 
+
+144
+00:12:56,160 --> 00:13:02,575
+也就是一个CPU端缓冲区，包含所有顶点数据，然后我们有一个四边形缓冲区指针变量
+which is a CPU side buffer that contains all of our vertex data,  and then we have this kind of quad buffer pointer variable
+
+145
+00:13:02,575 --> 00:13:10,250
+这就是我们将数据复制到这个四边形缓冲区时的基本情况，这里还有一组纹理插槽
+which is basically where we're up to when we're copying data into this quad buffer, we also have an array of texture slots here
+
+146
+00:13:10,250 --> 00:13:17,125
+这基本上就是保持，哪个纹理插槽映射到什么OpenGL纹理id，所以它有点像一个映射
+so this is basically holding, which texture slot maps to what OpenGL texture id, so it's kind of like a map
+
+147
+00:13:17,450 --> 00:13:19,625
+我的意思是它是一个，它不需要是一个映射，它在一个
+I mean it's an, it doesn't need to be a map, it's in a
+
+148
+00:13:19,625 --> 00:13:24,825
+它是一个基于栈的数组，因为键就是这个数组的索引
+it's a stack based array here, because the key is just the index of this array
+
+149
+00:13:24,825 --> 00:13:30,000
+我们马上就会看到，TextureSlotIndex是我们可以将下一个纹理放入的索引
+and we'll see that in use in a minute, TextureSlotIndex is what index we can put our next texture into
+
+150
+00:13:30,350 --> 00:13:37,950
+然后我们在这里有一些统计，所以当初始化渲染器时，要做的第一件事实际上是分配内存
+and then we have some stats here, so what do we do when we initialize the Renderer, well the first thing we do is actually allocate memory
+
+151
+00:13:38,275 --> 00:13:45,775
+我提到的这个四边形缓冲区就是这个原始指针，它包含了我们的顶点缓冲区的CPU端存储
+so this quad buffer as I mentioned is just this raw pointer here, which contains our CPU side storage for our vertex buffer
+
+152
+00:13:45,775 --> 00:13:52,050
+所以在每一帧中，我们要做的基本上是将数据放入顶点缓冲区，也就是CPU端
+so during each frame, what we want to do is basically put data into that vertex buffer, that is on our CPU side
+
+153
+00:13:52,525 --> 00:13:57,350
+因此，无论何时我们想要渲染四边形，我们只需复制我们将创建的顶点数据
+and so anytime we want to render a quad, we simply copy the vertex data that we will we create
+
+154
+00:13:57,350 --> 00:14:03,200
+并将我们想要的顶点数据复制到这种缓冲区中，这种缓冲区是用C++保存在CPU上的
+and copy the vertex data that we want into this kind of buffer that we hold on the CPU in C++
+
+155
+00:14:03,625 --> 00:14:10,950
+然后在批量渲染结束时，我们要刷新数据，所以要做的是将其复制到GPU，到OpenGL
+and then at the end of that batch, we want to flash that data, so what we do is we copy it onto our GPU into OpenGL 
+
+156
+00:14:11,150 --> 00:14:17,725
+然后我们执行一个DrawCall，所以这种四边形缓冲区是所有这些顶点的CPU端存储
+and then we execute a DrawCall, so this kind of quad buffer is our CPU side storage for all of those vertices 
+
+157
+00:14:17,839 --> 00:14:22,875
+现在一些人对我在这使用new感到不安之前，让我解释一下，为什么要使用这个
+now before some of you get upset with me for using new here, let me just explain, why I'm using this
+
+158
+00:14:23,250 --> 00:14:28,725
+所以这个内存的生存期非常简单，当我们使用Init启动渲染器时
+so the lifetime of this memory is very simple, when we start up the renderer using Init
+
+159
+00:14:28,850 --> 00:14:31,925
+我们会为这个四边形缓冲区一次性分配内存
+we allocate the memory for this quad buffer once
+
+160
+00:14:32,050 --> 00:14:39,225
+然后如果在Shutdown函数中就释放内存，很简单，有Init和Shutdown函数
+and then if we go over here in the Shutdown function, we free that memory, it's very simple, we have our Init and we have our Shutdown
+
+161
+00:14:39,225 --> 00:14:46,550
+内存是由这两个函数显式控制的，如果你们很笨，例如，可以在一行中调用Init两次
+the memory is explicitly controlled by these two functions, if you are stupid, and you call init twice in a row for example
+
+162
+00:14:46,800 --> 00:14:53,475
+那么你们可能会在其他地方发生内存泄漏，比如在OpenGL中创建额外顶点数组
+then yes you will probably get a memory leak amongst other things, like creating extra vertex arrays in OpenGL
+
+163
+00:14:53,475 --> 00:14:58,325
+不要删除之前的内容，也不要丢失对它的引用，总之，基本上你们不应该调用Init两次
+and not deleting the previous ones, and losing references to it, anyway basically you should not call Init twice
+
+164
+00:14:58,325 --> 00:15:04,225
+要确保你们不这样做，一个非常简单的方法就是断言、返回或做一些事情
+and a really easy way to ensure that you don't is simply to assert or return or do something
+
+165
+00:15:04,225 --> 00:15:10,175
+如果你们注意到QuadBuffer不是空指针，并且因为如果它不是空指针，才调用这个
+if you notice for example that QuadBuffer is not null pointer, and you're calling this, because if it's not null pointer
+
+166
+00:15:10,175 --> 00:15:14,300
+那么很明显有什么操作过，很明显以前有什么东西调用了Init
+then well clearly something has said it, and clearly something has called Init before
+
+167
+00:15:14,700 --> 00:15:21,800
+无论如何，我们使用QuadBuffer是作为一个指针来复制内存，如果它是一个智能指针的话
+anyway the way that we use this QuadBuffer is as a pointer to copy memory into, if it was a smart pointer
+
+168
+00:15:21,850 --> 00:15:26,325
+从智能指针实际检索原始指针将是一个很大的障碍
+it would be quite a hindrance to actually retrieve the raw pointer from that smart pointer
+
+169
+00:15:26,325 --> 00:15:30,450
+然后将数据复制到内存位置，处理起来就容易多了
+and then actually copy data into that memory location, it's a lot easier to deal with this
+
+170
+00:15:30,450 --> 00:15:34,850
+如果它只是一个原始指针，就像你们在整个类中看到的那样，那么总结一下
+if it's just a raw pointer as you'll see throughout this class, so to summarize
+
+171
+00:15:35,040 --> 00:15:40,976
+是的，从技术上讲，你们可以把它做成一个唯一指针或类似的，但这将是一个完全隔离
+yes you could technically make this like a unique pointer or something like that, but it would be a complete hindrance
+
+172
+00:15:41,500 --> 00:15:47,850
+而且从技术上讲，你们必须手动释放它，或在Shutdown中重置它，这有违目的
+and also technically speaking, you would have to manually somehow free it, or reset it inside Shutdown, which kind of defeats the purpose
+
+173
+00:15:48,175 --> 00:15:53,400
+所以，是的，不要讨厌原始指针，现在我们创建顶点数组，非常简单
+so yeah don't hate the raw pointers, so moving on, now we create our vertex arrays, which is fairly straightforward
+
+174
+00:15:53,400 --> 00:15:58,925
+我们用MaxVertexCount创建顶点缓冲区，现在顶点本身是一个小结构
+we create a vertex buffer with the MaxVertexCount, now the vertex itself is a little struct here
+
+175
+00:15:58,925 --> 00:16:04,950
+那定义了顶点的结构，我们有一个位置，一个颜色纹理坐标和一个纹理索引
+that defines what our vertex looks like, we have a position a color texture coordinates and a texture index
+
+176
+00:16:05,075 --> 00:16:08,900
+我们在这里设置了所有顶点属性，以便OpenGL知道我们的内存布局是什么
+we set up all the vertex attributes here, so that OpenGL knows what our layout is
+
+177
+00:16:09,175 --> 00:16:14,350
+当然，我们实际上并没有将任何数据复制到这个顶点缓冲区中，只是将其标记为动态的
+and of course we don't actually copy any data to begin with into this vertex buffer, we just mark it as dynamic
+
+178
+00:16:14,350 --> 00:16:18,000
+然后我们每一帧都这样做，接下来我们要设置索引缓冲区
+and then we do that every frame next we set up the index buffer
+
+179
+00:16:18,000 --> 00:16:22,300
+所以这是一种012 230加上偏移量的模式
+so this is just kind of the pattern of zero one two two three zero plus whatever offset
+
+180
+00:16:22,300 --> 00:16:29,650
+我们只执行了个小循环，将达到MaxIndexCount，以实际使用可预测的索引填充索引缓冲区
+we're up to just a little for loop, that will go all the way up to MaxIndexCount to actually fill our index buffer with our predictable indices
+
+181
+00:16:29,775 --> 00:16:35,775
+然后我们当然会把它们发送到这里的GPU，最后，我们有了这种1x1的白色纹理
+and then we of course send them to the GPU here, and then finally, we have this kind of one by one white texture
+
+182
+00:16:36,025 --> 00:16:40,225
+这是什么，我在游戏引擎系列中谈到了这一点，我想我有一期视频
+what this is, and I actually talked about this in the game engine series, I think I have a video
+
+183
+00:16:40,225 --> 00:16:45,839
+我不确定它是什么，但我会把它链接挂到那里，那可能会更详细地解释这一点
+I'm not sure what it's called, but I'll link it up there, that will probably explain this a little bit in a little bit more detail
+
+184
+00:16:45,839 --> 00:16:53,275
+但本质上，这只是一个1像素的白色纹理，本质上根本没有纹理
+but essentially what this is is just literally a one by one pixel white texture, that essentially acts as no texture at all
+
+185
+00:16:53,275 --> 00:16:58,079
+这很好，因为我们基本上可以有一个没有分支或类似的着色器
+and this is good, because we can basically just have a shader with no branches or anything like that
+
+186
+00:16:58,200 --> 00:17:03,725
+那可以渲染带纹理的四边形，也可以只渲染平面四边形，因为如果我们不需要纹理
+that can render both a textured quad, and just a flat colored quad, because if we don't want a texture 
+
+187
+00:17:03,725 --> 00:17:09,300
+我们只使用白色的纹理，这意味着如果我们将其与任何颜色相乘
+we just use this texture which is white, meaning that if we multiply it with any color
+
+188
+00:17:09,300 --> 00:17:14,200
+它不会影响我们尝试渲染的颜色，然后将其设置到TextureSlots[0]
+it will not affect the color that we're trying to render, then we set it as TextureSlots[0]
+
+189
+00:17:14,200 --> 00:17:20,350
+换句话说，第一个纹理的纹理是白色纹理，然后我们有一个小循环
+so in other words, the first texture the texture at texas zero is this white texture, then we have this little for loop
+
+190
+00:17:20,350 --> 00:17:26,250
+在其中，我们遍历所有TextureSlots，然后将它们设置为零，这有点像memclear
+in which we go through all of our TextureSlots, and just set them to zero, that's just a little bit of like a memclear
+
+191
+00:17:26,250 --> 00:17:31,114
+老实说，我本可以使用memset，但那就是这个的原理，现在调用Shutdown会删除所有内容
+I could have just used a memset honestly, but that's the way that this works, now Shutdown deletes everything
+
+192
+00:17:31,400 --> 00:17:36,800
+除了笨拙地没有删除纹理，因为我忘了这么做
+except for uh awkwardly does not delete the um texture, because well I forgot to do that
+
+193
+00:17:37,050 --> 00:17:44,720
+让我们把它藏起来吧，请不要告诉我花了一个多小时写这个渲染器
+let's just uh just shove that under the rug, let's not say anything to me taking more than one hour to write this renderer please
+
+194
+00:17:44,825 --> 00:17:49,175
+那几乎就是我们所有的Init和Shutdown代码，好了
+and that's pretty much all of the initialization and shutdown code that we have, okay
+
+195
+00:17:49,175 --> 00:17:54,300
+让我们来看看如何更好地使用这个渲染器，因为它有点像一个小时，它不是完全独立的
+let's get into how we can use this renderer well, because it kind of was one hour, it's not completely self-contained
+
+196
+00:17:54,300 --> 00:17:59,679
+我们仍然有一个我们在这里实际设置的着色器，还有一大堆在该着色器中设置的采样器
+we still have a shader that we actually set up here, and also a whole bunch of samplers that we set in that shader
+
+197
+00:17:59,679 --> 00:18:03,475
+我实际上没有将着色器集成到渲染器中，因为如果我有更多时间的话
+because the shader I didn't actually integrate into the Renderer, if I had had more time
+
+198
+00:18:03,540 --> 00:18:09,825
+那可能是我应该完成的事情，但这样客户端就可以控制所使用的着色器以及所有那些
+that is probably something that I would have done, but this way the client kind of has control over the exact shader that's used and all of that
+
+199
+00:18:09,825 --> 00:18:17,225
+所以它确实有它的好处，但本质上需要做的是设置统一变量，并设置实际拥有的32个采样器
+so it does have its benefits, but essentially what we need to do here is set up a uniform and set all 32 samplers that we actually have
+
+200
+00:18:17,225 --> 00:18:22,400
+因此，如果我们快速看看着色器，顶点着色器非常简单，只需要引入一组顶点属性
+so if we take a look at the shader quickly, the vertex shader is super simple just takes in a bunch of vertex attributes
+
+201
+00:18:22,400 --> 00:18:27,950
+并将它们转发到片段着色器中，以及将gl_Position设置为你们期望的位置
+and forwards them into the fragment shader as well as setting the gl_Position to something that you would expect
+
+202
+00:18:28,425 --> 00:18:35,081
+片段着色器有一个统一变量的取样器数组，它有32个取样器2D，也就是我们的纹理
+and the fragment shader has this uniform sampler array, which has 32 sampler 2ds, which are our textures
+
+203
+00:18:35,200 --> 00:18:39,825
+然后检索要为该四边形或该片段渲染的纹理的索引
+we then retrieve the index of the texture that we want to render for this quad or for this fragment
+
+204
+00:18:39,825 --> 00:18:46,300
+然后我们将输出颜色设置为该纹理，我们从该纹理中采样，并与顶点颜色相乘
+and then we set our output color to be that texture, we're sampling from that texture, and multiplying with our vertex color 
+
+205
+00:18:46,375 --> 00:18:51,075
+因此这个原理是比较简单的，如果你们渲染texCoord，v_Color设置成1
+so the way that this works is pretty simple, if you're rendering a texCoord, color is set to one
+
+206
+00:18:51,075 --> 00:18:56,675
+意味着你们只需将纹理样本乘1，这意味着它什么都不做，反之亦然
+meaning that you just multiply the texture sample with one, meaning it does nothing and then vice versa 
+
+207
+00:18:56,675 --> 00:19:00,575
+如果你们要渲染彩色四边形，那么这个纹理就是个1x1的白色纹理
+if you're rendering a colored quad, then this texture is that one by one white texture
+
+208
+00:19:00,900 --> 00:19:05,075
+然后将其与所需的实际颜色相乘，因此纹理坐标不起任何作用
+and then you multiply that with the actual color that you want, so thus the texture coord does nothing
+
+209
+00:19:05,075 --> 00:19:10,650
+你们只剩下所需的颜色，下面是我们对着色器的快速过一下
+and you're just left with your desired color, so that's our quick tour of the shaders moving on
+
+210
+00:19:10,650 --> 00:19:16,000
+因此，我们将samplers设置为从0到31，然后初始化渲染器
+so this is us setting the samplers to just an ascending value 0 to 31, then we initialize the renderer
+
+211
+00:19:16,000 --> 00:19:21,850
+我们也在OnDetach调用了Shutdown，加载纹理就像我们在批量渲染系列中所做的那样
+and we also shut it down on the detach function here, we load our textures as we did in that batch rendering series
+
+212
+00:19:21,950 --> 00:19:28,350
+然后我们可以向下滚动到OnUpdate，并实际使用此渲染器，重置帧开始处的统计信息
+and then we can scroll down into OnUpdate, and actually use this Renderer, we reset the stats at the beginning of the frame
+
+213
+00:19:28,350 --> 00:19:35,450
+然后我们开始所有这些可爱的渲染，所以就是BeginBatch，将开始批量渲染
+and then we begin all this lovely rendering, so BeginBatch, we'll begin the batch big surprise
+
+214
+00:19:35,700 --> 00:19:39,200
+这很简单，只需将指针重置到开头
+this is pretty simple, all it does is just reset this pointer to the beginning
+
+215
+00:19:39,200 --> 00:19:45,475
+因此，该指针跟踪CPU端顶点缓冲区中当前将数据复制到的位置
+so this pointer keeps track of where we're currently copying data to in the CPU side vertex buffer 
+
+216
+00:19:45,475 --> 00:19:49,050
+所以，换句话说，如果想在批处理中渲染另一个四边形
+so in other words, if we want to render another quad in our batch
+
+217
+00:19:49,050 --> 00:19:53,950
+我们就需要将顶点数据复制到缓冲区中的特定位置
+we need to actually copy all the vertex data into a specific point in that buffer 
+
+218
+00:19:53,950 --> 00:19:59,975
+这个指针跟踪我们所处的位置，以便我们可以在批量渲染开始时将数据复制到该位置
+and this pointer keeps track of where we're up to, so that we can copy data into that location at the beginning of the batch
+
+219
+00:19:59,975 --> 00:20:07,225
+虽然我们显然将其重置为缓冲区的开头，因为我们现在需要用新数据覆盖以前的帧数据
+though we obviously reset this to the beginning of the buffer, because we need to now overwrite the previous frames data with our new data
+
+220
+00:20:07,225 --> 00:20:12,625
+回到这里，我们有一个for循环来渲染所有这些彩色四边形，这是非常基本的东西
+going back into here, we have a for loop that renders, all of these colored quads, this is pretty basic stuff
+
+221
+00:20:12,775 --> 00:20:18,750
+我们基本上只调用DrawQuad，现在它取x和y的位置，这是从for循环计算出来的
+we basically just call draw quad, now this takes in an x and y position, which is just calculated from this for loop
+
+222
+00:20:18,750 --> 00:20:25,300
+这里也有一个特定的大小，所以0.25是size，我可以很容易使它不是方形，或者改变尺寸
+a particular size here as well, so 0.25 is the size, I could easily make this not square, or change the size
+
+223
+00:20:25,300 --> 00:20:32,100
+事实上，如果在这加个空隙，那么我会使大小略小于这两个四边形之间的间距
+and in fact if I do something like add a gap here, so I'll make the size slightly smaller than the spacing between these two quads
+
+224
+00:20:32,325 --> 00:20:35,675
+现在你们应该可以更好地看到四边形了，好吧，它们在这儿
+and now you should be able to see the quads a little bit better, okay, so here they are
+
+225
+00:20:35,675 --> 00:20:38,275
+这些都是你们可以看到的被渲染的每个四边形
+these are all of the individual quads being rendered as you can see
+
+226
+00:20:39,440 --> 00:20:43,650
+我们调用的这个特殊函数是颜色变量，让我们看看它的原理
+this particular function we're calling is the color variant, let's take a look at how that works
+
+227
+00:20:43,950 --> 00:20:49,450
+因此，我们需要做的第一件事是检查我们的批量渲染中是否有空间容纳更多的四边形
+so the first thing we need to do is actually check to see if we have room inside our batch for more quads 
+
+228
+00:20:49,450 --> 00:20:57,025
+因为我们很有可能达到顶点缓冲区用完的程度，因为这里显然有一个最大计数
+because it's definitely possible that we get to the point where we have just run out of vertex buffer, because we obviously have a maximum count up here 
+
+229
+00:20:57,100 --> 00:21:02,475
+如果是那样的话，如果我们已经耗尽了缓冲区，我们基本上只需要重置所有内容
+and if that's the case if we have actually exhausted that buffer, we just basically need to reset everything
+
+230
+00:21:02,475 --> 00:21:05,225
+我们只需要结束批量渲染刷新我们现在拥有的内容
+we just need to end the batch flush what we have now
+
+231
+00:21:05,225 --> 00:21:08,100
+因此意味着将我们现在拥有的内容渲染为绘图和所有内容
+so meaning render what we have now as a draw and everything
+
+232
+00:21:08,240 --> 00:21:11,919
+然后开始新的批量渲染，然后其他所有的东西都会去那里
+and then just start a new batch, and then that that's where everything else will go
+
+233
+00:21:12,025 --> 00:21:18,000
+非常简单的东西，因为这是颜色变量，我们的纹理索引就是零
+so pretty simple stuff, now because this is the color variant our texture index is simply zero
+
+234
+00:21:18,000 --> 00:21:24,750
+意味着它是白色纹理，因为我们在这里做的是将零槽设置为白色纹理
+meaning it's that white texture, because what we did up here is we set that zero slot to be the white texture
+
+235
+00:21:24,750 --> 00:21:30,475
+所以那就是为什么我们在纹理索引GPU中设置为零，就像浮点数一样
+so that's why it's specifically zero that we set over here in our texture index gpus like floats 
+
+236
+00:21:30,600 --> 00:21:36,025
+那就是为什么我们在这里使用float而不是int，但这大概是你们可以不使用int的唯一原因
+that's why we're using a float here and not an int, but that's just about the only reason you could probably get away with using an int
+
+237
+00:21:36,025 --> 00:21:38,600
+那也很好，然后我们只需设置顶点数据
+that's fine as well, then we just set up our vertex data
+
+238
+00:21:38,600 --> 00:21:42,080
+这样你们就可以看到我们正在将所有这些数据复制到QuadBufferPtr中
+so you can see that we're copying all of this data right into the QuadBufferPtr
+
+239
+00:21:42,080 --> 00:21:48,100
+因为这指向了我们正在尝试绘制的四边形的下一个可用存储空间
+because that's pointing to our next kind of available storage space for our quad that we're trying to draw 
+
+240
+00:21:48,240 --> 00:21:54,550
+我们计算并复制构成此四边形的每个顶点的位置，颜色，纹理坐标和纹理索引
+we calculate and copy the position color texture coordinates and texture index for every vertex that makes up this quad
+
+241
+00:21:54,950 --> 00:21:57,000
+然后我们将索引计数提前加6
+and then we advance the index count by six
+
+242
+00:21:57,000 --> 00:22:02,800
+因为四边形当然是六个索引，所以我们也会在这里增加QudCount变量，以跟踪统计数据
+because the quad of course is six indices, we also increment our little QudCount variable here to keep track of our statistics
+
+243
+00:22:03,175 --> 00:22:10,850
+基本上就那样，好了，回到我们的SandboxLayer，就是那样，然后有一个非常相似的设置
+and that's pretty much it, okay, so going back to our SandboxLayer here, that is really it, and then we have a very similar looking setup here
+
+244
+00:22:10,850 --> 00:22:16,559
+但这会渲染ChernoTex或HazelTex的纹理，具体取决于for循环在此处的迭代
+but this renders textures either the ChernoTex or the HazelTex depending on what iteration our for loop is up to here
+
+245
+00:22:16,650 --> 00:22:22,640
+这个函数有点复杂，因为它必须处理所有这些纹理插槽的东西，所以在这里进入DrawQuad
+this function is a little bit more involved, because it has to deal with all of this texture slot stuff, so coming over here into DrawQuad
+
+246
+00:22:22,640 --> 00:22:27,300
+我们这里有一个类似的检查，但我们也检查是否有足够的纹理插槽来实际渲染
+we have a similar check here, but we also check to see if we have enough texture slots to actually render this 
+
+247
+00:22:27,300 --> 00:22:31,325
+因为如果纹理插槽用完了，我们想渲染31个以上的纹理
+because again if we're out of texture slots, and we want to render more than like 31 textures
+
+248
+00:22:31,325 --> 00:22:36,450
+它有31个其他纹理的原因是因为其中一个当然是白色纹理
+and the reason that it's 31 other textures is because one of them of course is this white texture
+
+249
+00:22:36,450 --> 00:22:38,950
+所以我们使用了白色纹理的纹理插槽
+so since we're using that texture slot for the white texture 
+
+250
+00:22:39,250 --> 00:22:45,150
+对于要渲染到四边形上的所有纹理，我们有31个可用的其他纹理槽
+we have 31 available other texture slots for all of our textures that we want to render onto our quads
+
+251
+00:22:45,425 --> 00:22:49,900
+因此，如果纹理槽用完了，那么再次结束批量刷新并开始
+so if we are out of texture slots, then again we just end the batch flush and begin again
+
+252
+00:22:49,900 --> 00:22:52,800
+来到这里，我们确实有这种颜色，实际上只是白色
+coming over here we do have this color that is in fact just white
+
+253
+00:22:52,800 --> 00:22:54,720
+因为我们正在尝试绘制一个有纹理的四边形
+because we're trying to draw a textured quad 
+
+254
+00:22:54,720 --> 00:23:00,200
+我们现在不需要任何颜色，理论上你们当然可以用它来着色纹理的颜色
+we don't want any kind of color now, theoretically of course you could use this to tint the color of a texture
+
+255
+00:23:00,200 --> 00:23:03,700
+因为如果我将其设置为非白色的值，它实际上会将其着色
+because if I set this to a value other than white, it will in fact tint it 
+
+256
+00:23:03,700 --> 00:23:08,675
+但是我没有添加任何类型的接口来支持这一点，所以这里我们有一种纹理槽机制
+but I didn't add any kind of api to support that, so here we have our kind of texture slot mechanism
+
+257
+00:23:08,825 --> 00:23:17,840
+因此，这会试图找出这个纹理是否已经用于另一个四边形，所以在我这里展示的示例中
+so what this does is tries to find if this texture has already been used for another quad, so in the example that I showed here
+
+258
+00:23:17,840 --> 00:23:23,350
+很明显，我是在重复使用纹理，我在这里多次使用cherno纹理和Hazel纹理
+I was obviously reusing textures, I was using the cherno texture many times here as well as the Hazel texture
+
+259
+00:23:23,350 --> 00:23:27,300
+那么很明显，我们不需要一直把它添加到纹理槽中
+so clearly, we don't need to keep kind of adding this into a texture slot 
+
+260
+00:23:27,300 --> 00:23:32,700
+因此占据了我们所有的纹理槽，所以这个for循环的作用是，它迭代了我们所有的纹理槽
+and thus kind of taking up all of our texture slots, so what this for loop does, is it iterates through all of our texture slots 
+
+261
+00:23:32,700 --> 00:23:38,900
+并查看尝试使用的纹理id是否已存在，因为如果已存在，就可以复制纹理槽
+and sees if that texture id of the texture that we're trying to use is already there, because if it is we can just grab that texture slot
+
+262
+00:23:39,175 --> 00:23:43,325
+很不错，它已经被添加为我们想要渲染的纹理位置之一
+and we're all good, it's already been added as one of the textures that we want to render a coord with
+
+263
+00:23:43,325 --> 00:23:47,840
+现在这确实是一种线性复杂性，你们可能需要使用哈希集之类的东西
+now this does kind of make it a linear complexity, you might want to use something like a hash set
+
+264
+00:23:47,840 --> 00:23:52,825
+也许我不认为那是必要的，因为同样有32个最大纹理槽
+maybe I don't think it's that necessary though, because again there are like 32 max texture slots
+
+265
+00:23:53,100 --> 00:23:59,175
+所以这并不是要迭代一千个或更多的元素，它非常小，所以我不认为那是一个问题
+so it's not like you're going to iterate through a thousand or more elements, it's really quite small, so I don't think that this is a problem whatsoever
+
+266
+00:23:59,325 --> 00:24:03,925
+最后如果你们没有找到它，对吧，那么如果纹理索引仍然为零，那就是白色纹理
+finally, if you didn't find it, right, so if the texture index is still zero meaning it's that white texture
+
+267
+00:24:03,925 --> 00:24:08,925
+这意味着那显然是无效的，因为你们可能希望在此处使用自己的纹理进行渲染
+which means that that's clearly not valid, because you you probably want to render with your own texture here
+
+268
+00:24:09,225 --> 00:24:11,100
+所以如果该索引为零
+so if that index is zero
+
+269
+00:24:11,100 --> 00:24:16,850
+我们只需将其指定给纹理槽索引，这是下一个可用的纹理槽索引
+we simply assign it to the texture slot index, which is the next available free texture slot index 
+
+270
+00:24:17,100 --> 00:24:22,750
+在这个数组中，我们将这个纹理id添加到该索引处的纹理槽数组中
+that is inside this array here, we then add this texture id into the texture slots array at that index
+
+271
+00:24:22,750 --> 00:24:27,625
+然后我们增加下一个纹理槽的索引，剩下的就照常了
+and then we increment the index for the next texture slot, then the rest is business as usual
+
+272
+00:24:27,625 --> 00:24:35,775
+当我们复制纹理索引而不是仅仅是一个零的平面纹理索引时，它在xcom中加上等于6的属性
+when our copying texture index instead of of course just a flat texture index of zero, and that's pretty much, it in xcom plus equal six and those stats
+
+273
+00:24:36,075 --> 00:24:38,175
+老实说，正如你们所看到的，就是那样
+and honestly as you can see, that's all, there is to it
+
+274
+00:24:38,175 --> 00:24:40,750
+这是一个非常简单的批量渲染器，它可以完成你们需要的所有操作
+it's a very simple batch renderer, it does everything you need
+
+275
+00:24:40,750 --> 00:24:43,840
+如果我们回到SandboxLayer，只需要200行代码
+it's like 200 lines of code, if we go back into SandboxLayer 
+
+276
+00:24:43,840 --> 00:24:49,520
+你们可以看到我对这个的用法，然后在呈现了这种大cherno文本之后，调用了EndBatch
+you can see my usage of this, I then simply call EndBatch after rendering that kind of big cherno text
+
+277
+00:24:49,600 --> 00:24:52,650
+其位置在此处也由ImGui动态控制
+whose position is also dynamically controlled by ImGui here
+
+278
+00:24:53,000 --> 00:24:58,425
+然后我就结束这个批量渲染，然后我就刷新，就那么简单，我还设置了这些统一变量
+then I just end the batch, and then I just flush, it's really as simple as that, I also set up these uniforms
+
+279
+00:24:58,559 --> 00:25:06,175
+但老实说，我不知道为什么会在这里，在这启用着色器之后，把它放在这可能更有意义
+but honestly I don't know why this is here, it probably makes more sense to just put it over here after I actually uh enable my shader here
+
+280
+00:25:06,300 --> 00:25:10,125
+就是那样，那就是批量处理渲染器，好吧，所以那就是它的全部内容
+that's kind of it, that's the batch renderer, all right, so that's pretty much all there is to it
+
+281
+00:25:10,125 --> 00:25:14,400
+可以理解，这很简单，我喜欢这一小时挑战的一个原因是
+it's understandably pretty simple, it's one of the things that I love about these one hour challenges is the fact that
+
+282
+00:25:14,475 --> 00:25:18,320
+这是一个小时，所以你们产出的东西会很简单
+well it's an hour, so the stuff you produce is going to be pretty simple 
+
+283
+00:25:18,320 --> 00:25:23,520
+因此很容易解释，希望你们也能很容易理解和学习新东西
+and thus easy to explain and hopefully easy for you guys to understand and kind of learn new things
+
+284
+00:25:23,650 --> 00:25:27,200
+现在我还没有对这一切的性能说太多，我知道那一点
+now I haven't spoken much about the performance of all of this, and I'm aware of that
+
+285
+00:25:27,200 --> 00:25:32,500
+很明显，这是我在一个小时内搞的东西，我想在未来的视频中做的实际上是压力测试
+it's obviously something that I've just done in an hour, what I want to do in a future video is actually stress test this 
+
+286
+00:25:32,500 --> 00:25:36,500
+并讨论一些优化策略，请在下面的评论区告诉我
+and also talk about some optimization strategies, let me know in the comment section below
+
+287
+00:25:36,500 --> 00:25:42,700
+如果你们想看那样的东西，我可能会在下周或下周的某个时候做，我也想提一下那个
+if you want to see something like that, I'll probably work on that sometime next week or the week after, I also want to mention that 
+
+288
+00:25:42,700 --> 00:25:49,075
+如果有什么我没有解释的，或者有什么我完全忘了提
+if there's anything that I did not explain, well or if there's something that I just completely forgot to mention
+
+289
+00:25:49,375 --> 00:25:52,240
+那么请在下面的评论区告诉我，我会尽量回复你们的
+then please let me know in the comment section below, and I'll try to reply to you
+
+290
+00:25:52,400 --> 00:25:55,575
+如果还有其他一小时的挑战，我们也可以讨论一下
+we can kind of talk about it also if there are any other one hour challenges
+
+291
+00:25:55,575 --> 00:26:01,525
+或者只是一般挑战，你们会喜欢看到我做，就在下面评论，就像我提到的，我喜欢做这些
+or just challenges in general that you would love to see me do, then just drop a comment below as I mentioned, I love doing these 
+
+292
+00:26:01,525 --> 00:26:05,520
+我绝对想在将来做更多这类事情，但在那之前我会做的
+and I absolutely want to do more of this kind of stuff in the future, but until then I do 
+
+293
+00:26:05,520 --> 00:26:10,975
+希望你们喜欢这期视频，如果喜欢的话，就为它点赞吧，因为那就是我在youtube上的原因
+hope you guys enjoyed the video, if you did, please hit that like button, because that's what keeps me going here on youtube
+
+294
+00:26:10,975 --> 00:26:14,880
+另外，不要忘记使用下面描述中的链接和代码，以及Hostinger
+and also don't forget to check out hostinger with that link and code in the description below
+
+295
+00:26:15,075 --> 00:26:20,475
+如果你们不介意的话，我就要和我美丽的妻子去吃一些漂亮的饺子，拜
+and if you'll excuse me, I am off to eat some beautiful dumplings with my beautiful wife, goodbye
+

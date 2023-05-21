@@ -1,0 +1,905 @@
+﻿1
+00:00:00,133 --> 00:00:06,500
+嘿，你们好，我是TheCherno，欢迎来到OpenGL系列，终于开始做这个系列了，太激动了
+hey, what's up guys, my name is TheCherno and welcome to OpenGL, finally doing an OpenGL series, really excited for this
+
+2
+00:00:06,500 --> 00:00:11,450
+这可能是我多年前就应该做的事情，但现在还是让我们来说说OpenGL吧
+this is something that I probably should have done years ago, but here we are, let's talk about OpenGL
+
+3
+00:00:11,666 --> 00:00:13,075
+那么在这期视频中，我们基本上只是介绍一下
+so in this video, we're basically just going to cover
+
+4
+00:00:13,075 --> 00:00:17,900
+OpenGL到底是什么，如何使用它，它能做什么，不能做什么
+what OpenGL actually is, how we can use it, what it can do for us, what it isn't
+
+5
+00:00:18,050 --> 00:00:22,800
+以及这个系列的实际内容，因此首先，如果你们听说过OpenGL，但不确定它是什么的话
+and also what this series is actually going to cover, so first of all, if you've heard of OpenGL, but you're not sure what it is
+
+6
+00:00:22,800 --> 00:00:28,400
+你们可能就会联想到图形，而那正是OpenGL，OpenGL是一种图形接口
+you're probably relating into graphics, and that's exactly what OpenGL is, OpenGL is a graphics api
+
+7
+00:00:28,400 --> 00:00:35,866
+现在API代表应用程序编程接口，基本上就是一堆函数，可以调用这些函数来做一些事情
+now api stands for application programming interface, and what it basically is, is a bunch of functions that we can call to do certain things
+
+8
+00:00:35,866 --> 00:00:40,575
+在这种情况下，由于OpenGL是一个图形接口，它允许我们通过显卡做一些事情
+in this case, since OpenGL is a graphics api, it allows us to do things with graphics
+
+9
+00:00:40,575 --> 00:00:47,500
+特别是OpenGL允许我们访问GPU，就是图形处理单元，也就是显卡(以后通称显卡)
+and specifically OpenGL allows us to actually access our GPU, our graphics processing unit, which is the graphics card
+
+10
+00:00:47,725 --> 00:00:51,711
+当然也就由于被称为显卡，它非常擅长绘制图形
+of course being called the graphics card, it's pretty good at drawing graphics
+
+11
+00:00:51,800 --> 00:00:58,375
+因此为了实际利用我们在计算机或手机等设备中拥有的这种强大的图形处理能力
+and so in order to actually utilize this massively powerful graphics process that we have in either a computer or a device like a phone
+
+12
+00:00:58,700 --> 00:01:03,175
+我们需要使用某种接口来访问实际的硬件
+we need to actually use some kind of api to get access to that actual hardware
+
+13
+00:01:03,175 --> 00:01:08,350
+OpenGL只是许多图形接口中的一个，它实际上允许我们访问显卡并告诉它该做什么
+and OpenGL is just one of many apis that actually allows us to access the graphics card and tell it what to do
+
+14
+00:01:08,700 --> 00:01:13,825
+我们还有其他的，如Direct3D、Vulcan、Metal，还有一些其他的
+we have other ones as well such as Direct3D, Vulcan, Metal, and there are a few others as well
+
+15
+00:01:14,000 --> 00:01:18,400
+总之，OpenGL允许我们在一定程度上控制显卡
+so in summary, OpenGL allows us to control our graphics card to a certain extent
+
+16
+00:01:18,850 --> 00:01:22,250
+那就让我们澄清人们对OpenGL的一些常见误解吧
+let's clear up some common misconceptions that people seem to have about OpenGL
+
+17
+00:01:22,250 --> 00:01:30,200
+首先很多人称OpenGL为引擎或类似的东西或框架，但它都不是那些
+first of all, a lot of people call OpenGL or an engine or something like that or a framework, it's none of those things
+
+18
+00:01:30,475 --> 00:01:39,875
+OpenGL本身的核心只是一个规范，在那方面，有点像C++规范，它实际上
+OpenGL by itself at its core is just a specification, it's kind of like a C++ specification in that regard, it's actually
+
+19
+00:01:39,875 --> 00:01:45,187
+它实际上没有定义任何代码或任何东西，它是什么，只是一个列出的规范，嘿
+it doesn't actually define any code or anything, what it is, is a specification that lists, hey
+
+20
+00:01:45,500 --> 00:01:49,500
+应该存在这个函数接收这些参数，并返回这个值
+this function should exist to take these parameters, that should return this value
+
+21
+00:01:50,000 --> 00:01:55,675
+它只是一个关于你们可以通过接口做什么的规范，没有任何实现等等
+it's just a specification of what you can do with the api, there's no implementation there what so ever
+
+22
+00:01:55,800 --> 00:02:02,975
+意味着它肯定不是库，因为OpenGL本身，没有OpenGL代码，只是个特殊的，只是个规范
+which means it is definitely not a library, because OpenGL itself, there's no code for OpenGL, is just a special, right, just a specification
+
+23
+00:02:03,550 --> 00:02:10,225
+因此考虑到那个，在哪儿下载OpenGL，那也是另一个非常常见的问题，答案是不需要下载
+so with that in mind, where do I download OpenGL, that's another really common question, and the answer is you don't really download it
+
+24
+00:02:10,225 --> 00:02:15,325
+OpenGL本身，再说一次，它只是个规范，那么谁真正实现了它呢
+OpenGL itself is again just a specification, so who actually implements it
+
+25
+00:02:15,600 --> 00:02:22,975
+当调用OpenGL函数时，谁写了被调用的代码，而这个问题的答案是你们的显卡制造商
+who actually writes the code that gets called, when you call an OpenGL function, and the answer to that is your GPU manufacturer
+
+26
+00:02:23,366 --> 00:02:27,675
+因此如果你们使用的是NVIDIA显卡，那么该显卡的驱动程序
+so if you're using an NVIDIA GPU, then the drivers for that GPU
+
+27
+00:02:27,675 --> 00:02:32,500
+也就是NVIDIA驱动程序实际上包含OpenGL的实现
+your NVIDIA drivers are what actually contain the implementation of OpenGL
+
+28
+00:02:32,500 --> 00:02:38,925
+也就是NVIDIA关于OpenGL的实现，并且每个显卡制造商，比如AMD，Inter等等
+and NVIDIA's implementation of OpenGL, and every graphics card manufacturer, AMD, Inter whatever
+
+29
+00:02:39,266 --> 00:02:45,825
+他们都有自己的实现，当然，NVIDIA不会真的与AMD协商，并决定
+they're gonna have their own implementations, and of course, NVIDIA don't really have a meeting with AMD, and decide
+
+30
+00:02:46,200 --> 00:02:48,950
+好吧，这就是我们编写代码的方式，那种场景是不会发生的，对吧
+yeah, this is how we're gonna write our code, that doesn't happen, right
+
+31
+00:02:48,950 --> 00:02:52,950
+所以他们对OpenGL的实现都会略有不同
+so everyone's implementation of OpenGL is gonna be slightly different
+
+32
+00:02:53,250 --> 00:02:58,925
+那就是为什么有一些游戏能在NVIDIA驱动程序，也就是NVIDIA显卡下运行的原因
+which is why in a lot of cases some things may work on NVIDIA drivers on an NVIDIA GPU
+
+33
+00:02:58,925 --> 00:03:04,800
+但同样的游戏在AMD显卡上跑起来可能就有点不同，或者可能有bug或类似的东西
+but that same game might look a little bit different on an AMD GPU, or maybe there are bugs or stuff like that
+
+34
+00:03:04,800 --> 00:03:09,225
+但无论如何，关键是OpenGL是由你们的显卡制造商编写的
+but anyway, the point is that OpenGL is written by your GPU manufacturer
+
+35
+00:03:09,850 --> 00:03:16,225
+那就可能会导致对OpenGL的下一个常见误解，它是开源的，人们从哪得到这个信息的呢
+which probably will lead on to the next common misconception about OpenGL, it's open source, where do people get this stuff
+
+36
+00:03:16,225 --> 00:03:23,025
+我知道它的名字里面有open，但它根本不是开源的，因为你们看不到OpenGL的代码
+I get that it has open in the name, but it's not open source at all, you cannot see the code for OpenGL
+
+37
+00:03:23,025 --> 00:03:28,225
+因为首先，那是由显卡制造商实现的，他们肯定不会发布驱动程序源码
+because first of all, is implemented by the GPU manufacturers, they certainly don't release their driver source code
+
+38
+00:03:28,675 --> 00:03:35,025
+当然也有一些OpenGL的开源实现，因为如果我不知道，如果我制造显卡
+some that do there are of course open source implementations of OpenGL, because if like I don't know, if I created graphics card
+
+39
+00:03:35,333 --> 00:03:38,125
+如果我想支持OpenGL，我就必须为它编写一个驱动程序
+and I wanted to support OpenGL, I have to write a driver for it
+
+40
+00:03:38,466 --> 00:03:41,850
+我可能会选择将其放在Github或其他平台上，并将其开源
+and I may choose to put that on Github or whatever, and have it be open source
+
+41
+00:03:42,375 --> 00:03:46,225
+但在你们计算机上的实现可能会运行
+ but the implementation that your computer is running probably
+
+42
+00:03:46,225 --> 00:03:52,500
+如果你们正在使用像NVIDIA显卡、AMD或Intel卡那些，将看不到该实现背后的源代码
+if you're using like an NVIDIA graphics card or an AMD or an Intel card, you're not gonna see the source code behind that implementation
+
+43
+00:03:52,500 --> 00:03:59,425
+所以OpenGL，OpenGL不可能真正是开源的，首先，因为它是一个规范，没有源码
+so OpenGL, OpenGL can't really be open source, first of all, because it's a specification, no no actual source code
+
+44
+00:03:59,866 --> 00:04:05,975
+但其次，你们使用的OpenGL实现很可能不是开源的
+but second of all, the implementation of OpenGL that you're using is most probably not open source
+
+45
+00:04:06,166 --> 00:04:09,425
+那么OpenGL到底提供了什么，让很多人兴奋不已
+what OpenGL does offer, which excites a lot of people
+
+46
+00:04:09,425 --> 00:04:16,575
+不幸的是，很多人会说，我们的OpenGL比其他任何东西都好，是因为它跨平台
+and causes a lot of people unfortunately to say, our OpenGL is so much better than anything else is because it's kind of cross platform
+
+47
+00:04:16,800 --> 00:04:19,475
+在处理了许多不同的图形接口之后
+and having dealt with many different graphics apis
+
+48
+00:04:19,475 --> 00:04:27,075
+同样的代码会在Windows、Mac、Linux、IOS、Android等平台上运行，对吧
+and that same code will run on Windows, Mac, Linux, IOS, Android, that kind of stuff for, right
+
+49
+00:04:27,075 --> 00:04:33,750
+所以人们立刻开始想，OpenGL比Direct3D好，因为它可以在所有平台上运行
+and so people immediately start to think, oh well OpenGL is superior to Direct3D, because it runs on all platforms
+
+50
+00:04:34,525 --> 00:04:40,150
+不，不，不要，请停止说那些，我刚刚意识到我的最后一句话
+no, no, don't, stop saying that please, I just realized with that last statement of mine
+
+51
+00:04:40,900 --> 00:04:46,675
+我可能应该说，因为这是一期欢迎的视频，所以这个系列是基于我的观点
+I should probably say, since this is the welcome video, this series is kind of gonna be based on my opinion
+
+52
+00:04:46,933 --> 00:04:51,200
+那只是我在制作这些视频，所以我会给出我的意见，你们可以选择不去关注它
+that's just I'm making these videos, so I'm gonna give my opinion, you can choose not to follow it
+
+53
+00:04:51,200 --> 00:04:54,075
+我可没有暗示我的观点就是事实
+I'm not in any way implying my opinion is fact
+
+54
+00:04:54,525 --> 00:05:02,300
+我只是说，根据我在业界从事EA核心技术工作的经验，特别是EA游戏引擎技术方面
+I'm just saying that for my experience in the industry working on central technology for EA, specifically game engine technology for EA
+
+55
+00:05:02,575 --> 00:05:05,650
+在处理了许多不同的图形接口之后
+and having dealt with many different graphics apis
+
+56
+00:05:06,325 --> 00:05:14,200
+我并不是OpenGL的狂热粉，只是考虑到，因为这个接口是跨平台的
+I'm not the biggest fan of OpenGL, and the concept of, the concept of, because this apis cross platform
+
+57
+00:05:14,600 --> 00:05:22,900
+你们很清楚，那没有任何意义，游戏引擎没有实现单一的图形接口，它们不是那样运行的
+it's kind of you know the best that, that doesn't make any sense, game engines do not implement a single graphics api, that's not how they work
+
+58
+00:05:23,266 --> 00:05:26,950
+如果游戏引擎是跨平台的，那就是它们不仅仅是为Xbox或其他平台而设计的
+if game engines across platform, that is they're not just made for an Xbox or something
+
+59
+00:05:26,950 --> 00:05:28,350
+或者它们不仅仅是为Windows而设计的
+or they're not just made for Windows
+
+60
+00:05:28,700 --> 00:05:33,966
+他们将实现，他们必须实现多个图形接口，因为现实问题就是
+they will implement, they have to implement multiple graphics apis, because the fact of the matter is
+
+61
+00:05:33,966 --> 00:05:39,775
+通常是为该平台制作的图形接口，例如Microsoft为Windows制作的Direct3D
+usually the graphics api that is made for that platform, for example Direct3D made for Windows by Microsoft
+
+62
+00:05:40,066 --> 00:05:44,600
+它将优于这种跨平台的接口
+it's gonna be superior to an api this kind of cross platform
+
+63
+00:05:45,000 --> 00:05:51,025
+现在记住，真正实现代码的人不是Microsoft，至于Microsoft，特别是Direct3D
+now remember the people actually implementing the code are not Microsoft, Microsoft specifically with Direct3D
+
+64
+00:05:51,025 --> 00:05:56,150
+他们实际上倾向于与显卡制造商合作，以获得更好的代码，？？？之类的东西
+Microsoft specifically with Direct3D, they actually tend to work with GPU manufacturers to get better code, diamonds stuff like that
+
+65
+00:05:56,500 --> 00:06:01,533
+但归根结底，像OpenGL之类的，NVIDIA有责任为其驱动程序实现OpenGL
+but at the end of the day, something like OpenGL, its NVIDIA's responsibility to implement OpenGL for their drivers
+
+66
+00:06:01,533 --> 00:06:03,287
+如果他们搞砸了，那就是那种
+and if they screw up, it's kind of one then
+
+67
+00:06:03,800 --> 00:06:08,825
+但事实是OpenGL的跨平台，因此优于Direct3D或Metal
+but the fact that OpenGL's cross platform, therefore is better than Direct3D or better than Metal
+
+68
+00:06:08,825 --> 00:06:16,025
+苹果在IOS和Mac上使用的是Metal，那是一个毫无意义的争论
+Metal is what Apple used for IOS and Mac, that's that argument is really kind of doesn't make any sense
+
+69
+00:06:16,525 --> 00:06:21,475
+因为通常平台本身的接口会更强大，更好
+because usually the thing that's native to the platform is going to be more powerful and better
+
+70
+00:06:21,475 --> 00:06:25,929
+OpenGL作为一种实际规范实际上非常简单
+that is to say that OpenGL as an actual specification is actually really simple
+
+71
+00:06:26,166 --> 00:06:31,200
+尤其是当你们将其与更低级的东西进行比较时，如DirectX 12 Direct3D 12和Vulcan
+especially when you compare it to something more low level, like DirectX12 Direct3D12 and Vulcan 
+
+72
+00:06:31,475 --> 00:06:37,699
+因此就OpenGL的复杂性而言，我认为OpenGL可能与Metal一样
+so in terms of the complexity of OpenGL, I think OpenGL is probably like with Metal as well
+
+73
+00:06:37,700 --> 00:06:40,575
+Metal的级别比OpenGL低一点，但也不比Vulcan高多少
+Metal is a little bit low level than OpenGL, but not quite Vulcan
+
+74
+00:06:41,125 --> 00:06:48,050
+我想说的是，OpenGL可能是你们现在可以学习的最简单的接口，因此OpenGL确实值得学习
+I would say that OpenGL is probably the easiest api that you can learn right now, so OpenGL is really definitely worth learning
+
+75
+00:06:48,750 --> 00:06:53,866
+Vulcan是另一个跨平台的接口，它仍然是新鲜和原始的
+Vulcan, which is another one of those cross platform apis, it's still kind of fresh and raw
+
+76
+00:06:53,866 --> 00:07:00,900
+而且驱动程序还需要做更多的工作，比如就在上周，我看到Vulcan重启了Android设备
+and the driver still need a bit more work, just last week for example, I've seen Vulcan restart Android devices 
+
+77
+00:07:00,900 --> 00:07:05,933
+因为你们调用了什么东西，然后崩溃了，而且Vulcan有点难接触
+because you've called something, and it crashed, and it's Vulcan's a bit difficult to get into
+
+78
+00:07:05,933 --> 00:07:10,666
+并且我只建议你们在2017年9月这个时候接触学习Vulcan
+and I would only really advise you get into Vulcan at this point in time, which is september 2017
+
+79
+00:07:11,225 --> 00:07:17,500
+如果你们真的只想玩得开心，但又或者喜欢玩它，或者出于某种原因必须实现它
+if you really want to just have fun, but or like play with it, or you have to implement it for some reason
+
+80
+00:07:18,200 --> 00:07:25,599
+但总的来说，如果我能避免这样的原因，我现在就不会在Vulcan上发布游戏
+but overall, I wouldn't really ship a game on Vulcan just yet if I can avoid it cause something like
+
+81
+00:07:25,600 --> 00:07:26,880
+OpenGL会更加稳定
+OpenGL is gonna be way more stable
+
+82
+00:07:27,075 --> 00:07:32,775
+不管如何，我有点抱怨，我有点这有点跑题了，我的观点是，这个系列将涵盖OpenGL
+anyway, I'm kind of ranting, I'm kind of this is kind of getting derailed, my point is that, this series is gonna cover OpenGL
+
+83
+00:07:32,775 --> 00:07:38,075
+我仍然认为OpenGL是你们可以学习的最好的图形接口，因为与其他接口相比，它非常简单
+I still think OpenGL is the best graphics api you can use for learning, because it's just so simple compared to the other ones
+
+84
+00:07:38,375 --> 00:07:44,175
+它仍然是一种非常简单的学习的接口，当然它也是跨平台的
+it's still, it's it's a really easy kind of simple one to learn, and of course it also is cross platform
+
+85
+00:07:44,175 --> 00:07:48,075
+所以如果你们不在游戏工作室，如果你们没有一个团队来制作游戏引擎
+so if you're not a game studio, if you don't have a team of people making a game engine
+
+86
+00:07:48,075 --> 00:07:51,150
+那么你们就会负担实际实现的资源
+and you can afford the resourcing for actually implementing
+
+87
+00:07:51,366 --> 00:07:56,225
+你们知道的，Windows的Direct3D，Mac的Metal，Android的OpenGL或Vulcan
+you know, Direct3D for Windows, Metal for Apple or whatever, OpenGL or Vulcan for Android
+
+88
+00:07:56,375 --> 00:07:59,866
+比如如果不能，如果你们没有这些可用的资源
+like if you can't, if you don't have those resources available
+
+89
+00:07:59,866 --> 00:08:04,200
+大多数观看此视频的人可能都没有那些，那么OpenGL就太棒了，因为它是跨平台的
+which most people watching this video, probably don't, then OpenGL's fantastic, because it is cross platform
+
+90
+00:08:04,200 --> 00:08:10,850
+如果你们想在多个平台上发布游戏，它将变得简单，跨平台，这将是迄今为止最简单的
+and it is going to its simple, its cross platform, it's going to be by far be the easiest, if you want to ship a game on multiple platforms
+
+91
+00:08:11,100 --> 00:08:18,166
+所以那就是为什么让学习OpenGL，因为我确实喜欢OpenGL，就像小型个人项目那种
+so that's why we're letting OpenGL, because I do like OpenGL, like for kind of small personal projects
+
+92
+00:08:18,166 --> 00:08:21,925
+但很明显，如果我是一家从事游戏引擎开发的3A工作室
+but obviously if I was a triple a studio working on a game engine
+
+93
+00:08:22,750 --> 00:08:25,850
+那么这可能是我最后一个选择使用真正的图形接口
+this probably be my last choice for an actual graphics api
+
+94
+00:08:25,850 --> 00:08:33,675
+因为接口首先不是很好，DirectX11，就设计而言，我最喜欢的图形接口可能是Direct3D 11
+because the api first of all, isn't that good, DirectX11, my favorite graphics api in terms of api design is probably Direct3D11
+
+95
+00:08:34,000 --> 00:08:37,875
+对于很多人来说，OpenGL最终会发生什么，尤其是如果他们正在编写游戏引擎的话
+and what ends up happening with OpenGL, for a lot of people, especially if they're writing a game engine 
+
+96
+00:08:37,875 --> 00:08:47,066
+一个合适的图形渲染引擎实际上倾向于编写Direct3D，类似于OpenGL中的包装器
+and a proper graphic rendering engine is they'll actually tend to basically write a Direct3D, kind of wrapper over up in OpenGL
+
+97
+00:08:47,066 --> 00:08:51,675
+所以换句话说，他们最终会编写一个框架，框架之下就是OpenGL
+so in other words, they'll kind of end up writing a framework, which calls OpenGL under the hood
+
+98
+00:08:52,000 --> 00:08:56,300
+但与实际的接口不同，那个框架将与Direct3D非常相似
+but unlike the actual api of that framework will be very similar to Direct3D
+
+99
+00:08:56,800 --> 00:09:03,825
+因为Direct3D 11是创建图形接口的一种非常好的方法，再说一次，只是我的观点
+because Direct3D11 specifically is a really good way of creating a graphics api, again, my opinion
+
+100
+00:09:03,925 --> 00:09:08,500
+但我与业内人士交谈过的大多数人都百分百同意
+but most people that I've talked to in the industry with this, hundred percent agree
+
+101
+00:09:08,866 --> 00:09:12,725
+所以是了，抛开那些，你们现在应该对一些常见问题有了答案
+so yeah, so with that aside, you now have some answers to some frequently ask questions
+
+102
+00:09:12,725 --> 00:09:18,750
+所以OpenGL是在你们图形驱动程序中实现的，只是一个允许我们控制显卡的规范
+so OpenGL is implemented in your graphics drivers, and it's just a specification for allowing us to control the graphics card
+
+103
+00:09:19,326 --> 00:09:23,150
+现在，在本系列中，我们将具体讨论现代OpenGL
+now in this series specifically, we are going to be dealing with modern OpenGL
+
+104
+00:09:23,150 --> 00:09:27,675
+现在你们可能也听说了很多关于现代OpenGL的东西
+now modern OpenGL is something that you might have heard a lot about as well
+
+105
+00:09:28,000 --> 00:09:31,525
+比如传统OpenGL和现代OpenGL之间的这种区别
+this kind of distinction between legacy OpenGL and modern OpenGL
+
+106
+00:09:31,850 --> 00:09:39,000
+区别之所以存在，是因为OpenGL是在90年代发布的，当时它与现在有很大的不同
+the reason that exists is because OpenGL was released in the 90s, and back then, it was very different to what it was now
+
+107
+00:09:39,266 --> 00:09:46,000
+那时，显卡还不支持编程，也不怎么灵活，我想你们无法像现在这样控制它们
+back then, GPUs weren't as programmable and as flexible, I guess you couldn't control them anywhere near as much as you can now 
+
+108
+00:09:46,000 --> 00:09:50,299
+尤其是有了这些较低级别的接口，现在人们最终给了我们如此多的控制
+especially with these lower level apis, now people are ultimately giving us so much control
+
+109
+00:09:50,300 --> 00:09:55,200
+或者我应该说，显卡制造商给了程序员和开发人员如此多的控制权
+or I should say manufacturers are giving so much control to the programmers and developers
+
+110
+00:09:55,200 --> 00:09:58,448
+当然很好，因为我们可以对此做更多的优化
+which of course is really good, because we can optimize further for that
+
+111
+00:09:58,900 --> 00:10:05,375
+但是OpenGL现在要多得多，我想是因为低级别，或者比以前提供了更多的控制
+but OpenGL right now is a lot more kind of, I guess because a low level or gives you a lot more control than it did back then
+
+112
+00:10:05,800 --> 00:10:08,500
+那时OpenGL就像一系列的过程
+back then it was like a set of process
+
+113
+00:10:08,866 --> 00:10:12,325
+换句话说，你们基本上画了个三角形
+so in other words, you basically draw a triangle
+
+114
+00:10:12,325 --> 00:10:15,733
+然后说，我想要光照，那么就是如何在三角形中添加光照
+and then you say, I want lighting, so how do you add lighting to the triangle
+
+115
+00:10:15,733 --> 00:10:22,949
+基本上就是光照等于真，启用OpenGL光照，然后告诉OpenGL，我希望光源在这里
+you basically say lighting equals true, you enable OpenGL a lighting, and then you tell OpenGL, I want my light to be here
+
+116
+00:10:23,200 --> 00:10:29,381
+就像它真的像一组预设，就像一组预设如何让我的显卡运行
+like it's it really is like a set of presets, it was like a set of presets to how do I get my graphics to work
+
+117
+00:10:29,600 --> 00:10:33,300
+正因为如此，它使用起来非常简单，就像我说的OpenGL，它非常容易使用
+and because of that, it was really simple to use, like I say OpenGL it's really easy to use
+
+118
+00:10:34,150 --> 00:10:40,250
+很遗憾，代码很少，但不幸的是，它没有给你们那么多的控制
+it's very the code is quite short and, but unfortunately with that, of course it doesn't give you as much control
+
+119
+00:10:40,950 --> 00:10:47,300
+我们确实需要控制，因为我们想在本系列中实现一些非常疯狂的图形功能
+and we do want control, because we want to implement some pretty crazy graphics things in this series
+
+120
+00:10:47,466 --> 00:10:51,950
+因此传统OpenGL和现代OpenGL之间最大的区别就是着色器
+so the biggest distinction between legacy OpenGL and modern OpenGL is shaders
+
+121
+00:10:52,400 --> 00:10:58,325
+这个术语着色器是你们可能听说过的，如果对图形感兴趣的话，可能会听说过
+this term shader is something that you might have heard, you probably would have heard, if you were at all interesting graphics
+
+122
+00:10:58,766 --> 00:11:05,300
+它可能有点像“阴影”或“光”，就像有些人可以把它比作“光照”或其他东西
+and it might kind of resemble the word shadow or light, like some people can compare it to lighting or something
+
+123
+00:11:06,004 --> 00:11:12,025
+忘记那个吧，着色器是程序，它是在显卡上运行的代码
+forget that, a shader is program, it's a code that runs on your GPU
+
+124
+00:11:12,200 --> 00:11:15,950
+那就是着色器，它是在你们显卡上运行的程序
+that's what a shader is, it's a program that runs on your GPU
+
+125
+00:11:16,133 --> 00:11:20,375
+因此，如果我们用C++或Java或C#或任何语言编写代码
+so if we write code in C++ or Java or C# or whatever language
+
+126
+00:11:20,766 --> 00:11:26,075
+它是在我们的处理器上运行的，对吧，但因为我们在很多时候都是专门处理图形
+it runs on our CPU, right, but since we're specifically dealing with graphics for a lot of the time
+
+127
+00:11:26,333 --> 00:11:33,050
+我们希望准确地控制显卡的功能，并可能将大量代码从处理器转移到显卡
+we want to control exactly what the GPU does, and probably move a lot about code from the CPU to the GPU
+
+128
+00:11:33,050 --> 00:11:36,675
+因为它在显卡上运行得更快，所以那就是着色器的作用
+because it's going to run faster on the GPU, so that's where shaders come in
+
+129
+00:11:36,675 --> 00:11:38,925
+着色器只是允许我们在显卡上编写代码
+shaders just allow us to write code on the GPU
+
+130
+00:11:38,925 --> 00:11:44,500
+在本系列中，我们肯定会实现那些，因为如果你们想解决一些复杂的光照算法
+and we definitely want to be doing that in this series, because if you want to work out some complex lighting algorithms for example
+
+131
+00:11:44,675 --> 00:11:49,100
+你们肯定希望在显卡上执行那个操作，而不是在处理器上执行你们过去必须执行的操作
+you definitely want to be doing that on the GPU instead of on the CPU, which you had to do in the past
+
+132
+00:11:49,366 --> 00:11:52,000
+因此可编程着色器就是这两者之间最大的区别
+so programmable shaders is the biggest kind of difference between the two
+
+133
+00:11:52,000 --> 00:11:55,975
+但也有许多其他差异，也会在本系列提到，但长话短说
+but there are also many other differences, as well as covering this series, but just stress is short
+
+134
+00:11:55,975 --> 00:11:57,703
+如果你们正在寻找现代OpenGL的教程
+if you're looking for a modern OpenGL series
+
+135
+00:11:58,450 --> 00:12:01,550
+这就是我们将介绍现代OpenGL的教程，我们将尽可能地现代化
+this is we're going to cover modern OpenGL, we're going to go as modern as we can
+
+136
+00:12:01,550 --> 00:12:05,925
+关于这个系列，我想提及的另一件重要的事情就是，我们不会制作游戏引擎
+the other important thing that I want to mention about this series is that, we're not going to be making a game engine
+
+137
+00:12:06,200 --> 00:12:12,622
+我们不会构建图形引擎、框架、库或其他类似的东西，我们将学习OpenGL
+we're not going to be making a graphics engine or a framework or a library or anything like that, we're going to be learning OpenGL
+
+138
+00:12:12,900 --> 00:12:18,558
+事实上，我将有另一个系列，希望在几周后开始，也就是如何制作一个游戏引擎
+I'm actually going to have another series, which I hope to start in a few weeks, which is going to be how to make a game engine
+
+139
+00:12:18,558 --> 00:12:22,400
+在那个系列中，我们将制作一个完整的游戏引擎，图形渲染所有那些
+and in that series, we are going to make a full on game engine, the graphics engine all of that
+
+140
+00:12:22,575 --> 00:12:25,500
+那个将会实现OpenGL，作为一个渲染接口
+which will implement OpenGL as one of its renderer apis
+
+141
+00:12:25,766 --> 00:12:29,800
+所以如果你们想在一个实际的引擎中看到OpenGL，一个游戏引擎，以及它是如何运行的
+so if you want to see OpenGL in an actual engine a game engine, and how that works
+
+142
+00:12:30,200 --> 00:12:35,625
+那么那个系列会更适合你们，但这个系列实际上我们将学习OpenGL是如何运行的
+then that series is going to be for you, but this series we're actually going to learn how OpenGL works
+
+143
+00:12:35,675 --> 00:12:40,400
+这样我们就可以用OpenGL编写渲染引擎和游戏引擎了
+so that we can write that rendering engine and that game engine with OpenGL
+
+144
+00:12:40,525 --> 00:12:46,347
+因此，在本系列中，我们不会浪费时间去编写材质系统之类的
+and so because of that, in this series, we're not going to be wasting time writing like a material system for example
+
+145
+00:12:46,666 --> 00:12:51,975
+我们将重点讨论原始OpenGL代码，这样就可以向你们展示OpenGL实际上是如何运行的
+we're just going to focus on the raw OpenGL code, so that I can show you how OpenGL actually works
+
+146
+00:12:51,975 --> 00:12:56,700
+以及如何实现你们想要的东西，然后将取决于你们在引擎中实际实现它
+and how you can achieve what you want, and then it's going to be up to you to actually implement that in your engine
+
+147
+00:12:56,933 --> 00:13:00,950
+或者如果你们不知道怎么做，那么当然首选我的游戏引擎系列，那个系列将在未来真正发布
+or if you don't know how to do that,  then of course my game engine series, which will come truly in the future
+
+148
+00:13:01,300 --> 00:13:05,250
+我们将介绍所有那些内容，但本系列我们只是特别关注OpenGL
+we'll cover all of that, but this series specifically we're going to be focusing on OpenGL
+
+149
+00:13:05,250 --> 00:13:10,982
+也就是为什么在我们的Main源文件中编写OpenGL代码的原因
+which is why in our main source file which we'll have, we're going to be writing OpenGL code
+
+150
+00:13:11,166 --> 00:13:14,799
+我们不会把它抽象出来或诸如此类的东西，这将是一些原始OpenGL代码
+we're not going to abstract that away or anything like that, this is going to be some raw OpenGL code
+
+151
+00:13:14,799 --> 00:13:22,025
+我们可能会编写，必须编写一些实用类，比如数学类，也比如加载着色器或纹理之类的类
+we're probably going to write, have to write some utility classes, like for maths, and also like loading shaders or textures and stuff like that
+
+152
+00:13:22,025 --> 00:13:25,025
+因为有很多复用的模板代码
+because there's a lot of boiler plate code that can kind of get repeated a lot
+
+153
+00:13:25,450 --> 00:13:28,925
+但当我们真的开始编写的时候
+but when we actually come time to, when it actually comes time to
+
+154
+00:13:29,250 --> 00:13:35,117
+你们知道的，让我们在屏幕上渲染一些东西，那将只是原始OpenGL代码，根本不会抽象它
+you know, let's render something on the screen, that's going to just be raw OpenGL code, we're not going to abstract that away at all
+
+155
+00:13:35,266 --> 00:13:40,434
+我们将用C++编写OpenGL，因为在我看来，那是最适合这项工作的语言
+we are going to be writing OpenGL in C++, because in my opinion, that's the best language for the job
+
+156
+00:13:41,175 --> 00:13:45,575
+它需要跨平台，我将尽最大努力确保它是跨平台的
+it is going to be caught cross platform, I'm going to try my best to ensure that it is cross platform
+
+157
+00:13:45,866 --> 00:13:48,875
+因此为了让任何人都可以在Mac、Linux和Windows上跟着学习
+so that anyone can follow along on Mac and Linux as well as Windows
+
+158
+00:13:48,875 --> 00:13:51,100
+我们将使用Windows和visual studio
+we are going to be using Windows and visual studio
+
+159
+00:13:51,100 --> 00:13:54,933
+因为那几乎是这个行业的每个人都在使用的，那也是我习惯用的
+because that is what pretty much everyone in the industry uses, that's what I'm used to
+
+160
+00:13:54,933 --> 00:13:59,375
+并且那也是我个人认为最好的工具集，你们可以用的最好工具链
+and that's what I personally believe is the best tool set, the best tool chain that you can actually use
+
+161
+00:13:59,500 --> 00:14:02,704
+就OpenGL将要涉及的实际主题而言
+in terms of actual topics that we're going to be covering for OpenGL
+
+162
+00:14:03,150 --> 00:14:06,500
+我们要实现2D图形，要实现非常快速的2D图形
+we're going to do 2D graphics, and we're going to do really really fast 2D graphics
+
+163
+00:14:06,500 --> 00:14:11,900
+并学习批量渲染和所有那些东西，以实际编写非常快速的2D渲染器
+and learn about batching and all of that stuff to actually write a very very fast 2D renderer
+
+164
+00:14:11,900 --> 00:14:16,766
+我们还将讨论3D，以及与那相关的所有内容，并实现一些很酷的事情
+we're also going to talk about 3D of course and everything to do with that, and implement some cool things
+
+165
+00:14:16,766 --> 00:14:22,000
+我们将实现光照、着色器、延迟渲染和基于物理的渲染
+we're going to implement lighting of course and shaders and deferred renderer and physically based renderer
+
+166
+00:14:22,000 --> 00:14:30,225
+还有一些后期处理，比如光晕，屏幕空间效果，屏幕空间，环境遮挡屏幕以及空间反射
+and just any post processing stuff, like bloom and screenspace effects, screen space, ambient occlusion screen, space reflections just
+
+167
+00:14:30,225 --> 00:14:33,599
+我们基本上能实现你们能想到的东西
+well we're gonna basically do everything that you guys can think of
+
+168
+00:14:33,600 --> 00:14:37,700
+请在评论中告诉我们吧，我很高兴实现我以前做过的几乎所有这些例子
+and leaving the comments, I'm happy to implement pretty much any of that I've done it before
+
+169
+00:14:38,066 --> 00:14:42,975
+能找到一些你们可以一起探索的例子，那应该很令人兴奋
+and it should be really exciting to kind of get a set of examples together, which you guys can explore
+
+170
+00:14:42,975 --> 00:14:46,575
+并且希望你们能在自己的引擎或游戏中实现之类的
+and hopefully implement in your own engines or in your own games or anything like that
+
+171
+00:14:46,900 --> 00:14:51,150
+所以我对这个系列感到非常兴奋，因为图形编程是我最喜欢的编程领域之一
+so I'm really excited for this series, because graphics programming is one of my favorite areas of programming
+
+172
+00:14:51,150 --> 00:14:54,175
+但请记住，在本系列中，我们不会重点讨论如何制作游戏引擎
+but just remember in this series, we're not gonna be focusing on how to make a game engine
+
+173
+00:14:54,175 --> 00:15:01,750
+我们将重点讨论如何在OpenGL中实现这一点，OpenGL只是用于图形编程的众多接口之一
+we're just going to be focusing on how can I achieve this in OpenGL, OpenGL is just one of the many apis that exist for graphics programming
+
+174
+00:15:01,900 --> 00:15:09,650
+本系列将专门介绍OpenGL的实际运行原理，如果你们像我一样兴奋，那么就为它点赞吧
+and this series is going to be specifically about how OpenGL actually works, if you guys are as excited as I am, then hit the like button
+
+175
+00:15:09,650 --> 00:15:14,428
+你们还可以通过访问patreon.com/thecherno来支持本系列和我的所有视频
+you can also support this series and all of my videos by going to patreon.com/thecherno
+
+176
+00:15:14,800 --> 00:15:20,400
+那将有助于确保这些视频更频繁地发布，并且我有更多的时间制作它们
+that's going to help ensure that these videos get get released more frequently, and that I have more time to make them
+
+177
+00:15:20,400 --> 00:15:24,150
+patreon即将推出一些与本系列相关的非常酷的奖励
+there are going to be some pretty cool rewards relating to this series, coming soon on patreon
+
+178
+00:15:24,150 --> 00:15:29,625
+所以一定要密切关注那个呀，至于这些视频的更新周期的话，至少保持每周一期吧
+so definitely definitely keep an eye out for that, in terms of how often these videos are going to come out, at least once a week
+
+179
+00:15:30,000 --> 00:15:34,500
+但我会尝试，尤其是在一开始，我会去尝试，并且更频繁地录制视频
+but I'm going to try especially in the beginning, I'm going to try and make them a lot more frequently
+
+180
+00:15:34,500 --> 00:15:40,266
+下期我们将实际开始编写一些代码，特别是我们将设置一个窗口
+next episode we're going to actually start writing some code, and specifically we're going to be setting up a window
+
+181
+00:15:40,266 --> 00:15:45,925
+并且实际在屏幕上得到一个三角形，希望在下一期视频中看到你们，拜
+and actually getting a triangle onto the screen, hopefully so I will see you guys in the next video, goodbye
+

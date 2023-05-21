@@ -1,0 +1,2525 @@
+﻿1
+00:00:00,133 --> 00:00:00,933
+嘿, 你们好
+hey, what's up guys
+
+2
+00:00:00,933 --> 00:00:04,100
+我是Cherno, 欢迎来到我的OpenGL系列教程
+my name is Cherno, and welcome back to my OpenGL series
+
+3
+00:00:04,533 --> 00:00:07,275
+那么, 今天我们要讲的是顶点数组
+so, today we're going to be talking all about vertex array
+
+4
+00:00:07,275 --> 00:00:09,000
+以及我们实际上如何抽象它们
+and how we can actually abstract them
+
+5
+00:00:09,366 --> 00:00:11,066
+如果你还不知道顶点数组是什么
+if you don't know what a vertex array is
+
+6
+00:00:11,066 --> 00:00:12,166
+就去看看我制作的那期视频
+check out the video that I made
+
+7
+00:00:12,166 --> 00:00:16,500
+解释了, 什么是顶点数组, 如何使用它们, 以及我们为什么需要使用它们
+explain what vertex arrays are, and how to use them, and why we need to use them
+
+8
+00:00:16,800 --> 00:00:20,133
+就像我在那期视频中提到的, 我想它们是可选的
+as I mentioned in that video, they are kind of optional to use I guess
+
+9
+00:00:20,133 --> 00:00:22,400
+但现在的趋势似乎是使用它们
+but the trend seems to be moving towards using them
+
+10
+00:00:22,600 --> 00:00:26,400
+所以, 抛开语义, 抛开细节
+so, sematics aside, details aside
+
+11
+00:00:26,500 --> 00:00:27,766
+让我们来看看这个
+let's actually get into this
+
+12
+00:00:27,766 --> 00:00:31,100
+并想办法在OpenGL中抽象一个顶点数组
+and figure out how we can abstract a vertex array in OpenGL
+
+13
+00:00:31,433 --> 00:00:36,333
+那么, 首先, 我们为什么要使用顶点数组
+so, first of all, what is it, why exactly should we be using a vertex array
+
+14
+00:00:36,433 --> 00:00:39,100
+这个抽象的目的是什么
+and what is this, what is the goal of this abstraction, right
+
+15
+00:00:39,633 --> 00:00:40,800
+为什么我们需要抽象
+why do we want to abstract
+
+16
+00:00:40,800 --> 00:00:43,566
+这是另一件你可以思考的事情, 当你抽象一些东西的时候
+this is another thing that you can actually think about, when you're abstracting something
+
+17
+00:00:43,850 --> 00:00:47,600
+这并不是必须的, 你知道的, 让我们把它移到我自己的类中
+it's not necessarily like, you know, let's just move this out into my own classes
+
+18
+00:00:47,600 --> 00:00:49,750
+但是你们为什么要把它转移到你们自己的类中, 对吧
+but why are you moving it into your own classes, right
+
+19
+00:00:49,750 --> 00:00:54,966
+为什么我必须为这种概念创建类, 对吧
+why do I have to create class specifically for this kind of concept, right
+
+20
+00:00:55,133 --> 00:00:57,300
+为什么我不直接用OpenGL的代码
+why can't I just use OpenGL code
+
+21
+00:00:57,366 --> 00:01:01,225
+很多时候, 这似乎只是因为我希望它在我自己的名称空间中
+a lot of the times, it seems to be just because I want it in my own namespace
+
+22
+00:01:01,225 --> 00:01:03,525
+我想说这是我自己的东西, 对吧
+and I want to call it my own thing, right
+
+23
+00:01:03,525 --> 00:01:06,833
+这并不是抽象事物的真正原因
+that's not really a reason for abstracting something
+
+24
+00:01:07,300 --> 00:01:09,400
+我是说在很多情况下都是这样
+I mean it can be in a lot of cases
+
+25
+00:01:09,400 --> 00:01:12,866
+因为你显然想要简化你的接口, 并保持一致
+because you obviously want to kind of streamline your api, and keep it consistent
+
+26
+00:01:12,900 --> 00:01:17,225
+所以有时候, 你只需要创建一个非常非常小的包裹, 它什么都不做
+so sometimes, you just end up creating a very very thin wrapper, that does nothing else
+
+27
+00:01:17,225 --> 00:01:19,666
+但主要是改变函数的名称
+but basically change the name of a function
+
+28
+00:01:19,800 --> 00:01:21,466
+而那也是可以的
+and that's also kind of okay
+
+29
+00:01:21,500 --> 00:01:23,833
+但是当你考虑顶点数组的时候
+but when you're thinking about vertex array
+
+30
+00:01:23,833 --> 00:01:26,700
+当你考虑所有这些OpenGL概念时, 想想看
+and when you think about all these OpenGL concepts, have a think about
+
+31
+00:01:27,100 --> 00:01:28,433
+为什么我要把它抽象出来
+why am I abstracting this
+
+32
+00:01:28,433 --> 00:01:30,266
+为什么我要把这个移到类中去
+why am I moving this out into a class
+
+33
+00:01:30,266 --> 00:01:31,300
+这样做的目的是什么
+what is the purpose of this
+
+34
+00:01:31,300 --> 00:01:33,333
+我希望通过这样做实现什么目标
+what do I hope to achieve with this
+
+35
+00:01:33,633 --> 00:01:37,966
+具体的目标是, 这样你就可以告诉自己
+and specifically the goal of that is, so that you can tell yourself
+
+36
+00:01:38,566 --> 00:01:42,266
+这是列表, 这是我在我的需求中做的功能列表
+this is the list, this is the list of features I made these in my requirements
+
+37
+00:01:42,333 --> 00:01:45,266
+现在, 让我们建立一些东西, 它们实际上可以促进这一点
+now, let's build something that, they can actually facilitate that
+
+38
+00:01:46,100 --> 00:01:49,233
+对于我们来说, 顶点数组需要做的
+for us, what a vertex array needs to be able to do
+
+39
+00:01:49,600 --> 00:01:55,633
+就是希望将顶点缓冲区与某种布局联系在一起, 对吧
+is hopefully tie together a vertex buffer with some kind of layout, right
+
+40
+00:01:55,800 --> 00:02:00,525
+所以顶点缓冲区就是有数据的缓冲区, 它们没有实际的概念
+so vertex buffers are just buffers with data, they have no actual concept of
+
+41
+00:02:00,525 --> 00:02:01,500
+比如你知道的
+like you know
+
+42
+00:02:01,500 --> 00:02:04,266
+前三个浮点数是位置, 它们是浮点型
+the first three floats are a position and they're floats
+
+43
+00:02:04,266 --> 00:02:06,066
+它们有这么大之类的
+and they're this big and all of that
+
+44
+00:02:06,166 --> 00:02:09,033
+没有类型或大小之类的概念
+there's no concept of types or size or anything like that
+
+45
+00:02:09,133 --> 00:02:11,633
+它只是实际数据的普通缓冲区
+it's just a plain buffer of actual data
+
+46
+00:02:11,633 --> 00:02:13,266
+我们会有一堆字节
+we would just have a bunch of bytes
+
+47
+00:02:13,400 --> 00:02:16,100
+所以比如像每个字节是什么
+so how like what is each byte
+
+48
+00:02:17,100 --> 00:02:19,933
+比如这些顶点有多大等等
+like how big is these vertex all of that kind of stuff
+
+49
+00:02:20,200 --> 00:02:21,900
+那些是顶点数组真正代表的
+that is what a vertex array is really for
+
+50
+00:02:21,900 --> 00:02:25,266
+它应该把缓冲区和实际布局联系在一起
+it's supposed to tie together that buffer with an actual layout
+
+51
+00:02:26,033 --> 00:02:29,500
+你可以添加一个索引缓冲区到里面, 做一些其他的事情
+and you can add an index buffer into that and do a bunch of other stuff
+
+52
+00:02:29,500 --> 00:02:30,866
+我们稍后会讨论的
+which we can talk about later
+
+53
+00:02:31,000 --> 00:02:34,100
+但这就是它们最初存在的基本原因
+but that's the basic idea of why they exist in the first place
+
+54
+00:02:34,100 --> 00:02:39,033
+顶点数组对象是OpenGL存储那种状态的方式
+and a vertex array object is OpenGL's way of kind of storing that state
+
+55
+00:02:40,000 --> 00:02:43,500
+那么当我们考虑创建这个接口时, 我们需要做的是
+so what we need to do, as we think about creating this api right now
+
+56
+00:02:43,766 --> 00:02:47,300
+我们需要一些东西来创建一个顶点数组
+is we need something that hopefully I can just create a vertex array
+
+57
+00:02:47,900 --> 00:02:51,133
+然后我可以给它一个特定的布局
+and then I can maybe give it a certain layout
+
+58
+00:02:51,600 --> 00:02:53,900
+然后添加一个缓冲区或者类似的东西
+and then add a buffer to it or something like that
+
+59
+00:02:54,066 --> 00:02:58,433
+或者我只是创建一个顶点数组, 它是一系列缓冲区, 可以是一个或多个
+or maybe I just create vertex array, which is a series of buffers can be one or more
+
+60
+00:02:58,766 --> 00:03:01,733
+然后告诉我创建的顶点数组
+and then I just tell the vertex array that I've made
+
+61
+00:03:02,333 --> 00:03:04,133
+嘿, 我想要这种布局
+hey, I want this kind of layout
+
+62
+00:03:04,475 --> 00:03:07,825
+希望这已经足够了就像我们要做的
+and hopefully that'll kind of be enough for like what we're trying to do
+
+63
+00:03:07,825 --> 00:03:10,500
+然后, 当我绑定顶点数组时
+and then later on, when I bind the vertex array
+
+64
+00:03:10,666 --> 00:03:15,100
+我应该能够调用顶点数组来绑定到我自己的对象上
+I should be able to just call like vertex array to bind on my own object
+
+65
+00:03:15,366 --> 00:03:17,066
+那应该会把所有的东西联系在一起
+and that should kind of tie everything together
+
+66
+00:03:17,166 --> 00:03:20,666
+实际上你知道用OpenGL绑定数组
+and actually you know bind the array in terms of OpenGL
+
+67
+00:03:21,466 --> 00:03:22,666
+所以就那样想想吧
+so think about it that way
+
+68
+00:03:23,266 --> 00:03:25,366
+当我开始提取这个的时候, 希望那更有意义
+hopefully that will make more sense, as I start extracting this
+
+69
+00:03:25,366 --> 00:03:27,966
+但真正对我们重要的是
+but the really the thing that is important for us
+
+70
+00:03:28,200 --> 00:03:30,900
+我们希望能够定义某种布局
+is we want to be able to define some kind of layout
+
+71
+00:03:30,900 --> 00:03:36,533
+这种布局也可能是我们希望在CPU端存在的东西
+and this layout may be something that we also want to have exist on the CPU side
+
+72
+00:03:36,733 --> 00:03:39,633
+这样我们就可以读取实际的顶点缓冲数据
+so that we can maybe read our actual vertex buffer data
+
+73
+00:03:39,633 --> 00:03:41,633
+对于调试, 这是另一个有用的东西
+this is another useful thing for debugging
+
+74
+00:03:41,633 --> 00:03:45,200
+我们并不是100%需要这样做, 因为有工具
+it's not like 100% necessary for us to do this, because there are tools
+
+75
+00:03:45,200 --> 00:03:47,366
+布局实际上是在显卡上调试数据
+the layout is actually debug data that's on the GPU
+
+76
+00:03:47,366 --> 00:03:49,833
+使用我们为显卡指定的布局
+using the layout we specified for the GPU and all that
+
+77
+00:03:50,000 --> 00:03:54,166
+但CPU方面, 有时候看到数据上面的顶点是很有用的
+but still CPU sides, sometimes it's useful to actually see our vertex above a data
+
+78
+00:03:54,300 --> 00:03:58,466
+能够读懂并理解它, 为此我们确实需要一个布局
+and actually be able to read it and like interpret it, and for that we do need a layout
+
+79
+00:03:58,466 --> 00:04:01,733
+所以我们确实需要一种方法来把这些东西存储在CPU上
+so we do need a way of actually storing the stuff on the CPU
+
+80
+00:04:02,300 --> 00:04:06,800
+就像我能想到的一个例子, 不只是为了调试
+like one example of that just off the top of my head is, like not just for debugging
+
+81
+00:04:06,833 --> 00:04:10,366
+但如果我们想要某种缓存的话
+but maybe if we wanted to like have like some kind of picking cache
+
+82
+00:04:10,533 --> 00:04:13,066
+这样我们就可以读出模型中的每个三角形
+so that we can actually read each triangle of our model
+
+83
+00:04:13,133 --> 00:04:17,666
+所以当用户想要点击的时候, 用鼠标按钮点击屏幕上的某个地方
+so that when the user like clicks, click somewhere on the screen with their mouse button
+
+84
+00:04:17,700 --> 00:04:20,866
+我们可以选择那个对象, 为此我们需要触发数组
+we can actually select that object, and for that we need to fire array
+
+85
+00:04:20,933 --> 00:04:24,600
+实际上, 看看它是否与模型中的三角形相交
+and actually see if it intersects the triangle that is part of our model
+
+86
+00:04:24,733 --> 00:04:26,766
+对此我们可能会喜欢
+and for that we might want to like
+
+87
+00:04:26,766 --> 00:04:29,200
+我们可能想要在CPU端存储顶点缓冲区
+we might want to actually store the vertex buffer from the CPU side
+
+88
+00:04:29,200 --> 00:04:33,725
+这样我们就可以对那个三角形做碰撞率测试
+so that we can actually you know do that rate kind of collision test against that triangle
+
+89
+00:04:33,725 --> 00:04:38,100
+这是我们为什么要那么做的一个例子, 但我的观点是
+so that's like one example of why we might want to do that, but my point being that
+
+90
+00:04:38,866 --> 00:04:42,533
+这对我们创建缓冲区布局对象很有用
+it's useful for us to actually create some kind of like buffer layout object
+
+91
+00:04:43,266 --> 00:04:45,500
+实际上, 这是我们今天要做的另一件事
+which is another thing that we'll actually do today
+
+92
+00:04:45,700 --> 00:04:48,333
+总之, 我知道我已经讲了5分钟了
+so anyway, I know I've been talking for like 5min now
+
+93
+00:04:48,533 --> 00:04:52,300
+那么我们把这些都剪掉, 我不会在视频中把它们都剪掉
+so let's just cut all that, I'm not gonna cut all it literally in the video
+
+94
+00:04:52,300 --> 00:04:54,000
+但我们现在要讲一些代码了
+but we are gonna jump into some code right now
+
+95
+00:04:54,000 --> 00:04:57,400
+我们会看到如何抽象这个顶点数组对象
+and we're gonna see how we can actually abstract this vertex array object stuff
+
+96
+00:04:57,400 --> 00:04:58,766
+那么看一下这里的代码
+so looking through our code over here
+
+97
+00:04:58,766 --> 00:05:01,900
+很大的部分, 我猜, 是顶点数组的一部分
+the big part that's kind of, I guess, part of our vertex array
+
+98
+00:05:02,100 --> 00:05:03,366
+真的只有这些吗
+is really just kind of this
+
+99
+00:05:03,733 --> 00:05:07,833
+但它还有这个, 对吧, 这可能看起来不是它的一部分
+but it's also this, right, this might not seem like it's part of it
+
+100
+00:05:07,833 --> 00:05:10,533
+因为我们不需要把这个和一个顶点数组联系起来
+because we don't necessarily need to tie this to a vertex array
+
+101
+00:05:10,666 --> 00:05:13,300
+我们可以只有一个顶点数组, 然后继续重置这个
+we could just have a single vertex array, and keep resetting this
+
+102
+00:05:13,700 --> 00:05:14,933
+关于这个, 我说了很多
+I talk a lot about this
+
+103
+00:05:15,166 --> 00:05:18,800
+我可能会专门制作一期视频来讨论这两者之间的区别
+I am probably gonna make a dedicated video talking about the differences between that two
+
+104
+00:05:18,800 --> 00:05:21,800
+因为我一直在解释, 也许我不该这么做
+because I keep explaining myself, I probably shouldn't be
+
+105
+00:05:22,766 --> 00:05:26,500
+但我们当然可以有一个全局顶点数组对象
+but we can of course either have one global vertex array object
+
+106
+00:05:26,500 --> 00:05:29,200
+并在绑定时不断改变每个缓冲区的布局
+and keep changing the layout of each buffer as we bind it
+
+107
+00:05:29,200 --> 00:05:31,566
+或者我们可以把所有东西都保存在顶点数组对象中
+or we can kind of keep everything in vertex array objects
+
+108
+00:05:31,566 --> 00:05:35,833
+我想顶点数组对象的视频已经讲过了, 只是顶点数组, 可以看看那个
+I think the vertex array object video covers that, so just vertex arrays, watch that
+
+109
+00:05:37,400 --> 00:05:39,633
+但无论如何, 这是把一切联系在一起的东西
+but anyway, this is kind of what ties everything together
+
+110
+00:05:40,400 --> 00:05:46,425
+或者更确切地说, 顶点数组是紧密的, 具有特定的顶点缓冲区和实际布局
+or rather vertex arrays are tight, with a certain vertex buffer and an actual layout
+
+111
+00:05:46,425 --> 00:05:48,475
+那么, 我可能要做的 对吧
+so what I what I might want to do, right
+
+112
+00:05:48,475 --> 00:05:50,533
+如果我随便写一些代码
+if I just kind of loosely just dropped up some code
+
+113
+00:05:50,533 --> 00:05:54,466
+基本上就是我可能想要表示VertexArray va, 对吧
+basically is I might want to be able to say VertexArray va, right
+
+114
+00:05:55,400 --> 00:05:57,333
+它没有必要接收任何参数
+it doesn't necessarily need to take anything
+
+115
+00:05:57,500 --> 00:06:02,600
+然后我们可能要添加一个缓冲区或其他东西, 我不知道, AddBuffer(vb)
+then we might want to like add a buffer or something, I don't know, AddBuffer vb
+
+116
+00:06:03,800 --> 00:06:07,433
+然后我们可能想要添加一个布局或类似的东西, 对吧
+and then we might want to add a layout or something like that, right
+
+117
+00:06:08,233 --> 00:06:12,633
+然后我们可以单独定义布局, 也许我会有一个类叫BufferLayout
+and then the layout we might define separately, maybe I'll have a class called BufferLayout
+
+118
+00:06:12,966 --> 00:06:17,900
+然后我可以定义, 你知道的可能是, 推送第一个东西
+and then I can maybe somehow define you know maybe, I push like the first thing
+
+119
+00:06:17,933 --> 00:06:22,300
+实际上, 我们只有浮点数, 也许我有三个浮点数或其他的
+well really we just have like float, so maybe I have like three floats or something
+
+120
+00:06:22,566 --> 00:06:25,866
+我实际上添加到那个中去, 不知道, 像那个的一些东西吧
+that I actually add to that, I don't know, something like that
+
+121
+00:06:25,900 --> 00:06:26,933
+然后添加这个布局
+and then I add the layout
+
+122
+00:06:26,933 --> 00:06:28,733
+所以这看起来很合理
+so this is looking pretty reasonable to me
+
+123
+00:06:30,033 --> 00:06:32,900
+AddBuffer可能需要一个索引
+AddBuffer might take in an index
+
+124
+00:06:32,900 --> 00:06:36,100
+在某个索引处设置一个缓冲区也很有用
+it might be useful to kind of set a buffer at a certain index as well
+
+125
+00:06:36,366 --> 00:06:39,700
+因为我们可以有多个缓冲区, 它们也可能与布局相关联
+because we can have multiple buffers, that might tie in with layouts as well
+
+126
+00:06:39,866 --> 00:06:42,500
+这里有很多非常复杂的事情你可以做
+there's a lot of really complicated things that you can actually do here
+
+127
+00:06:42,933 --> 00:06:45,166
+就像我说的, 在这个系列中
+as I said like, with this series
+
+128
+00:06:45,166 --> 00:06:48,310
+我们要做的就是, 随着我们的继续
+the way that we're kind of going to take it is just, as we go
+
+129
+00:06:48,310 --> 00:06:51,566
+所以当我需要一个功能时, 我将扩展接口来拥有它
+so when I require a feature, I will extend the api to have it
+
+130
+00:06:51,566 --> 00:06:56,325
+我不会马上写一个完整的接口
+I'm not going to try and write a complete api like just like straight away right now 
+
+131
+00:06:56,325 --> 00:06:58,725
+因为那基本上是不可能做到的
+because that's basically impossible to do
+
+132
+00:06:58,725 --> 00:07:01,866
+好了, 所以从这一点来看, 应该有足够的接口让一些东西运转起来
+okay, so judging from this, there should be enough to get something working
+
+133
+00:07:02,033 --> 00:07:04,600
+然后如果我想要绑定它之类的
+and then if I want to actually bind it and all of that
+
+134
+00:07:04,600 --> 00:07:07,233
+我可能只需要va.Bind()
+I could probably just do you know va.Bind()
+
+135
+00:07:08,266 --> 00:07:11,566
+最后对于这个绘制, 绘制代码将保持不变
+and finally with this drawer, the drawing code will kind of stay the same
+
+136
+00:07:11,566 --> 00:07:13,500
+因为这将由我们的渲染器处理
+because that'll be handled by our renderer, anyway
+
+137
+00:07:13,500 --> 00:07:15,166
+但是它是一种绑定顶点数组
+but it's kind of bind vertex array
+
+138
+00:07:15,433 --> 00:07:19,800
+代码应该会是像那样的va.Bind
+code kind of should be becoming va.Bind like that
+
+139
+00:07:19,800 --> 00:07:22,366
+好了, 让我们把这个va.Bind去掉
+okay, and let's actually just get rid of this va.Bind
+
+140
+00:07:22,475 --> 00:07:25,300
+好了, 根据我们刚才做的
+okay, so based on what we've just done here
+
+141
+00:07:25,300 --> 00:07:28,325
+我们来试着创建这个顶点数组
+let's try and actually create this vertex array right thing
+
+142
+00:07:28,325 --> 00:07:31,266
+那么右键点击这里, 去添加新项
+so I'm gonna right click here, go to add new item
+
+143
+00:07:31,933 --> 00:07:33,500
+现在我只是当着你们的面做这个
+now I'm just gonna do this live in front of you guys
+
+144
+00:07:33,500 --> 00:07:37,700
+实际上我之前还没准备好, 所以希望一切顺利
+I haven't actually prepared this earlier, so hopefully it goes well
+
+145
+00:07:38,200 --> 00:07:40,366
+然后, 不管如何, 就是class VertexArray
+then, anyway, so class VertexArray
+
+146
+00:07:41,366 --> 00:07:44,733
+就像我说的, 我希望能有一些缓冲
+as I said, I want to be able to have some kind of buffer thing
+
+147
+00:07:45,600 --> 00:07:48,266
+所以我可能想要的是
+so potentially what I might want is
+
+148
+00:07:48,300 --> 00:07:51,066
+我们需要一个构造方法和一个析构方法
+well, we'll have the constructor and a destructor
+
+149
+00:07:51,066 --> 00:07:55,166
+那基本上会触发OpenGL, 实际去做我们需要做的
+and that's going to basically just hit OpenGL, and actually do what we needed to do
+
+150
+00:07:56,400 --> 00:07:59,233
+当我们真正创建一个布局的时候, 我的意思是当你思考它的时候
+when we actually create a layout, I mean when you think about it
+
+151
+00:07:59,466 --> 00:08:04,400
+这个vertexAttribPointer应用于当前绑定的缓冲区
+this this vertexAttribPointer applies to the currently bound buffer
+
+152
+00:08:05,466 --> 00:08:08,166
+所以我们真正需要做的是, 我想我们确实需要
+so all we really need to do is, I guess we do need to
+
+153
+00:08:08,166 --> 00:08:11,433
+比如一旦我们创建了顶点缓冲区, 然后就添加它
+like once we actually create the vertex buffer, and we add it
+
+154
+00:08:12,733 --> 00:08:14,966
+我们确实需要将它绑定到特定的布局, 不是吗
+we do need to bind it to a certain layout, don't we
+
+155
+00:08:14,966 --> 00:08:17,366
+所以也许也许根本不值得
+so maybe maybe it's not even worth having
+
+156
+00:08:17,766 --> 00:08:23,066
+顶点数组实际上存储顶点缓冲区, 或对顶点缓冲区的引用
+the vertex array actually store vertex buffers, or references to vertex buffers
+
+157
+00:08:23,266 --> 00:08:27,766
+它可能会对我们有用, 让我们把某个布局绑定到顶点缓冲区
+it might just be useful for us to actually bind a certain layout with a vertex buffer
+
+158
+00:08:27,766 --> 00:08:28,700
+那是当前绑定的
+that's currently bound
+
+159
+00:08:29,066 --> 00:08:31,266
+如果这说得通的话, 那么, 我真的要这么做
+if that makes any sense, so I'm actually gonna do that
+
+160
+00:08:31,266 --> 00:08:33,500
+因为这对我们做起来更简单, 更快
+because it's gonna be a little bit easier and faster for us to do
+
+161
+00:08:33,766 --> 00:08:35,533
+而不是包含缓冲区之类的东西
+so instead of us containing buffers or anything
+
+162
+00:08:35,533 --> 00:08:40,066
+我们将要做的是包含一个潜在的布局
+what we are going to do is contain potentially a layout
+
+163
+00:08:40,766 --> 00:08:45,166
+事实上, 我可能会做的是我想做的一件随机的事情
+in fact, what I might do this is a bit of a random thing that I was thinking of doing
+
+164
+00:08:46,033 --> 00:08:48,200
+我们实际上可以做的是改变它
+what we actually might do is change this around
+
+165
+00:08:48,200 --> 00:08:51,933
+因此, 这个做的是在OpenGL状态上设置所有东西
+so that, what this literally does is just set everything up on OpenGL state
+
+166
+00:08:52,166 --> 00:08:54,666
+并没有在CPU上存储任何状态
+and not really store any state on the CPU at all
+
+167
+00:08:54,966 --> 00:08:57,866
+那么, 因为我们真正需要做的是
+so, because really what we need to do
+
+168
+00:08:58,333 --> 00:09:02,866
+比如这样做的好处是, 我们不需要每次都设置布局
+like the benefit of this is,  that we don't need to keep setting the layout every single time
+
+169
+00:09:02,866 --> 00:09:04,066
+因为顶点数组
+because the vertex array
+
+170
+00:09:04,433 --> 00:09:09,000
+这儿太热了, 顶点数组实际上为我们存储了状态
+so hot in here, the vertex array actually stores that state for us
+
+171
+00:09:09,000 --> 00:09:11,100
+所以我们需要做的基本上就是
+so what we just need to do is basically say
+
+172
+00:09:11,366 --> 00:09:14,466
+嘿, 这是缓冲, 这是布局, 让它一起工作
+hey, here's the buffer, here's a layout, make it work together
+
+173
+00:09:14,666 --> 00:09:17,433
+那么让我们至少从那个开始, 看看我们得到了什么
+so let's let's at least start with that, and we'll see where we get
+
+174
+00:09:17,466 --> 00:09:22,266
+那么我将写入void AddBuffer
+so I'm going to say void, I don't know, AddBuffer
+
+175
+00:09:22,600 --> 00:09:25,433
+我不擅长给东西命名, 这很难, 老兄很难
+I'm not great at naming things, it's hard, man it's hard
+
+176
+00:09:25,800 --> 00:09:31,000
+所以我们这里要做的就是接收一个VertexBuffer类型的参数vb
+so what we'll do is we'll take in a VertexBuffer here vb
+
+177
+00:09:31,000 --> 00:09:34,275
+然后我们也需要一个布局
+and then we'll also have a layout
+
+178
+00:09:34,275 --> 00:09:40,166
+那么就是VertexBufferLayout类型的参数layout
+so buffer vertex buffer layout also layout
+
+179
+00:09:40,766 --> 00:09:42,433
+好了, 那么, 需要创建两个东西
+all right, so two things that need to get created
+
+180
+00:09:42,433 --> 00:09:46,000
+那么首先, 我们已经有了VertexBuffer, 显然我可以在这里包含它
+so first of all, we already have VertexBuffer, obviously I can just include that here
+
+181
+00:09:47,133 --> 00:09:49,533
+当然, 我已经创建了这个, 注意, 要在源文件夹中
+and of course, I've gone ahead and created this, note in the source folder
+
+182
+00:09:49,533 --> 00:09:51,300
+所以让我们把那个移到源文件夹中
+so let's move that into the source folder here
+
+183
+00:09:52,833 --> 00:09:55,500
+好了, 很好, 我们有了顶点缓冲区, 那么然后
+okay, good, so we have vertex buffer, and then
+
+184
+00:09:58,066 --> 00:10:03,266
+这并不包括在内, 是的, 我猜这只是智能跟踪
+which is not being included, yes, it is just IntelliTrace, I guess
+
+185
+00:10:04,200 --> 00:10:06,733
+然后是VerticeBufferLayout, 我马上会在这儿创建它
+and then VerticeBufferLayout is something, I'll make here as well
+
+186
+00:10:08,666 --> 00:10:12,766
+那么就是VertexBufferLayout
+so we'll say, VertexBufferLayout
+
+187
+00:10:15,766 --> 00:10:18,100
+并且这就是我们的布局类
+and this is kind of going to be our layout class
+
+188
+00:10:18,466 --> 00:10:20,733
+这可能会有一些
+which will probably have some kind of
+
+189
+00:10:21,700 --> 00:10:23,033
+我可能就创建这个吧
+I might just make this
+
+190
+00:10:23,400 --> 00:10:27,066
+我实际上可能移动这个东西, 
+I'll probably move this thing actually, we'll need that though
+
+191
+00:10:27,300 --> 00:10:32,266
+那么就叫它VertexBufferElement吧, 或者LayoutElement之类的,  我不知道
+so we'll say vertex buffer element or layout element, or something like that, I didn't know
+
+192
+00:10:32,266 --> 00:10:33,566
+命名太难了, 伙计
+again names a hard man
+
+193
+00:10:33,766 --> 00:10:39,666
+所以这实际上就是用这些元素填充一个向量
+so what this is going to really do is just have a vector filled with these elements
+
+194
+00:10:40,566 --> 00:10:47,333
+VertexBufferElement, 就叫m_Elements
+VertexBufferElement, m_Elements
+
+195
+00:10:49,800 --> 00:10:54,666
+包含vector, 好了
+will include vector, okay
+
+196
+00:10:54,666 --> 00:10:59,600
+然后我们能用这个VertexBufferLayout()做的是
+and then what we can do with this VertexBufferLayout is really just
+
+197
+00:11:00,633 --> 00:11:03,000
+我会写一些东西, 它会是一个模板
+I'll write something and it'll be a template
+
+198
+00:11:06,633 --> 00:11:13,600
+我们可以把一些值放进去, 或者我们可以输入一个类型
+that we can actually just push some kind of value in, or rather we can push a type in
+
+199
+00:11:13,600 --> 00:11:14,966
+这就是为什么它是一个模板
+really that's why it's a template
+
+200
+00:11:15,066 --> 00:11:16,366
+你马上就会看到这个的原理了
+you'll see how this works in a minute
+
+201
+00:11:17,100 --> 00:11:19,050
+在这个例子中, 我们只用static_assert(false)
+for this case, we're just going to static_assert false
+
+202
+00:11:19,050 --> 00:11:23,050
+因为我们不处理这个, 这是如果类型还没匹配
+because we don't actually handle this, this is if basically the type is unmatched
+
+203
+00:11:23,050 --> 00:11:28,366
+因为我们接下来要做的是创建一堆模板专用
+because what we're about to do next is actually create a bunch of template specializations
+
+204
+00:11:28,366 --> 00:11:35,200
+这将是一个Push, 我们只需要浮点数, 我们可以把一些浮点数放进去
+so this will be a Push, for let's just a float, where we can push a number of floats in
+
+205
+00:11:37,166 --> 00:11:41,666
+然后这个要做的就是m_Elements.push_back()
+and then what this is really going to do is m_Elements push_back
+
+206
+00:11:44,433 --> 00:11:47,866
+我们要做的是, 让我们想想我们这里需要什么
+and what we'll do is, so let's think about what we actually need in this
+
+207
+00:11:47,866 --> 00:11:51,233
+我们看一看这个VertexAttribPointer, 需要一个索引
+if we look at VertexAttribPointer, we need an index
+
+208
+00:11:52,133 --> 00:11:58,100
+需要一个count, 那么我们已经有了, 我猜就是这儿指定的这个
+we need a count, so we've kind of got count, I guess count is what we specify here
+
+209
+00:11:58,266 --> 00:12:02,433
+这里我们肯定需要一个count, 我就创建一个unsigned int count
+so we definitely need a count here, I'll just make an unsigned int count
+
+210
+00:12:04,833 --> 00:12:10,266
+我们需要一个能够处理的类型, 和是否标准化以及一个步幅
+we need a type which we can handle, we need normalized, and we need a stride
+
+211
+00:12:10,266 --> 00:12:11,900
+并且我想我们也有了一个偏移量
+and I guess we also have an offset
+
+212
+00:12:11,900 --> 00:12:17,633
+所以我们真正需要的是在VertexBuffetElement中
+so really all we need here is inside VertexBuffetElement
+
+213
+00:12:17,766 --> 00:12:19,500
+我们只需要无符号整型count
+we just need unsigned int count
+
+214
+00:12:19,533 --> 00:12:23,000
+和一个也是无符号整型的type, 因为它是个OpenGL类型
+we need the type which is also an unsigned int, because it's a OpenGL type
+
+215
+00:12:23,166 --> 00:12:27,500
+最后我们还需要一个属性, 那就是它是否被标准化了
+and then finally we need one more thing, and that is whether or not it's normalized
+
+216
+00:12:27,500 --> 00:12:29,866
+所以就是布尔normalized
+so we'll say bool normalized
+
+217
+00:12:32,866 --> 00:12:39,933
+那么count和normalized, 就让它们保持那样吧
+so count and normalized, we'll leave in like that
+
+218
+00:12:41,100 --> 00:12:43,566
+我可能不会, 我的意思是对于浮点型之类的数据
+I might not, I mean for floats and stuff like that
+
+219
+00:12:43,566 --> 00:12:46,100
+真的不太需要normalized, 我们可以先不考虑normalized
+we don't really need normalized, we might just leave normalized out for a bit
+
+220
+00:12:46,466 --> 00:12:48,933
+那么push_back会推回其中一个
+so push_back is going to push back one of these
+
+221
+00:12:49,000 --> 00:12:51,866
+所以我们需要这个count
+so we're going to have the count which is just count
+
+222
+00:12:52,900 --> 00:12:56,100
+我们会有一个type, 我要把它移到第一个
+we're going to have the type, which I'm actually going to move to be the first thing
+
+223
+00:12:56,133 --> 00:12:58,233
+所以我们有type, count和normalized
+so we have type count and normalized
+
+224
+00:12:58,700 --> 00:13:02,033
+所以type在这里就是GL_FLOAT
+so the type is going to be in this case GL_FLOAT
+
+225
+00:13:02,033 --> 00:13:04,200
+因为这是个浮点型专业化
+because where this is the float specialization
+
+226
+00:13:04,433 --> 00:13:06,533
+那么就是GL_FLOAT, count就是count
+so GL_FLOAT, count going to be count
+
+227
+00:13:07,833 --> 00:13:10,866
+至于normalized, 我们暂时就用硬编码false吧
+and normalized, for now we're just going to hardcode to false
+
+228
+00:13:11,800 --> 00:13:14,266
+现在我们需要包含OpenGL来做这个
+now we are going to have to include OpenGL to actually do this
+
+229
+00:13:15,400 --> 00:13:17,533
+如果你处理的是多个接口
+you could just if you were dealing with multiple apis
+
+230
+00:13:17,533 --> 00:13:19,500
+而你不想包含OpenGL
+and you didn't want to include OpenGL
+
+231
+00:13:20,800 --> 00:13:23,100
+那么我认为这对我来说就是glew, 对吧
+then I think this is just to me of glew, right
+
+232
+00:13:23,533 --> 00:13:26,233
+然后你基本上就会有一些
+then you could just basically have some
+
+233
+00:13:26,600 --> 00:13:30,400
+你可以复制所有这些定义的实际定义
+you could just copy across the actual definitions of all of those defines right
+
+234
+00:13:30,400 --> 00:13:32,433
+那么GL_FLOAT就有一个数字值
+so GL_FLOAT has a numeric value
+
+235
+00:13:32,566 --> 00:13:34,833
+你可能会, 我的意思是, 如果我来到这儿
+you could be like, I mean, if I go into this
+
+236
+00:13:35,533 --> 00:13:39,233
+你知道的, 你可以复制一堆这些, 然后把它们放到你的源代码中
+you know, you could just copy a bunch of these, and literally put them into your source code
+
+237
+00:13:39,233 --> 00:13:41,666
+这样你就不会包含整个OpenGL头文件
+and so that you're not actually including the entire from OpenGL header
+
+238
+00:13:41,666 --> 00:13:44,133
+因为你可能没有访问权限, 并且仍然希望编译此代码
+because you might not have access to that, and you still want this code to compile
+
+239
+00:13:44,133 --> 00:13:47,733
+而可能有一些不支持OpenGL的平台, 这就是你可以做的一个例子
+and platforms that might not support OpenGL, that's an example of what you could do
+
+240
+00:13:48,333 --> 00:13:50,400
+因为我不想绑定这个OpenGL特定
+because I'm not trying to tie this  OpenGL specific
+
+241
+00:13:50,400 --> 00:13:52,066
+但在这里, 很明显它就是
+but in this case, obviously it is
+
+242
+00:13:52,533 --> 00:13:54,033
+所以就是那样
+so that's that
+
+243
+00:13:54,500 --> 00:13:56,033
+在这儿添加一些空格
+I'm just gonna make some space here
+
+244
+00:13:58,000 --> 00:14:01,900
+所以我们有了浮点型的Push, 让我们至少再试一个
+so we have float, let's try like one more at least
+
+245
+00:14:02,300 --> 00:14:04,366
+再说一次, 我是想到就这样做了
+again, I'm just gonna add these as they come in I think
+
+246
+00:14:04,600 --> 00:14:14,366
+那么搞一个unsigned int, 可能GL_UNSIGNED_INT作为type,  然后count和false, 没毛病, 这个非常基本
+so unsigned int, might be GL_UNSIGNED_INT as the type, count and false, right, this pretty basic
+
+247
+00:14:15,066 --> 00:14:18,533
+在这个例子中, 我可能还会做的一件事是
+one thing I might also do is, in the case, of like
+
+248
+00:14:19,100 --> 00:14:22,833
+让我们看看, 可能也需要无符号字符, 基本上就像字节
+let's just see, we have unsigned char as well, so like bytes basically
+
+249
+00:14:23,100 --> 00:14:25,566
+那些我们可能保持不变
+those may we may want to keep those
+
+250
+00:14:25,950 --> 00:14:28,825
+那么我基本上要做的就是改这个normalized
+normalized basically so I might do that
+
+251
+00:14:28,825 --> 00:14:30,400
+并且这个应该是UNSIGNED_BYTE
+and this would be UNSIGNED_BYTE
+
+252
+00:14:33,200 --> 00:14:36,700
+好了, 这只是一个例子, 我们如何实现这个自动化的例子
+okay, so just an example of, how we can basically automate this
+
+253
+00:14:36,700 --> 00:14:38,333
+现在我知道这可能有点让人困惑
+now I know this might seem a bit confusing
+
+254
+00:14:38,333 --> 00:14:40,733
+因为我只是在写代码, 可能并没有解释太多
+because I'm just writing code, and not really explaining much of it probably
+
+255
+00:14:41,800 --> 00:14:43,366
+但是所有的这些都要联系在一起
+but all this is going to tie in together
+
+256
+00:14:43,366 --> 00:14:46,000
+当我们在VertexArray类中
+when we actually are in the VertexArray class
+
+257
+00:14:46,000 --> 00:14:48,066
+实际上一切都是由我们自己来设置的
+actually setting everything up through ourselves
+
+258
+00:14:48,166 --> 00:14:49,100
+所以那就是布局
+so that's the layout
+
+259
+00:14:49,933 --> 00:14:52,766
+如果我们来到这儿, 首先我们需要一些东西
+if we go down here, we need a few things first of all
+
+260
+00:14:53,266 --> 00:14:58,066
+我们实际上需要一种获取步幅的方式, 所以一定要有GetStride
+we need a way to actually get the stride, right, so GetStride definitely needs to be a thing
+
+261
+00:14:59,166 --> 00:15:02,400
+我可能会跟踪它, 所以我就返回m_Stride
+and I'll probably keep track of that, so I'll just say return m_Stride
+
+262
+00:15:03,300 --> 00:15:10,933
+我们也需要获取这些实际的元素, 那么就是vector
+we also need a way to get these actual elements, so vector VertexBufferElement
+
+263
+00:15:12,200 --> 00:15:14,666
+抱歉, GetElements() const
+sorry, GetElements const
+
+264
+00:15:14,933 --> 00:15:18,866
+返回m_Elements, 有点长这行, 希望你们能看见
+return m_Elements, pretty long line, hopefully you can see it
+
+265
+00:15:19,925 --> 00:15:21,075
+所以stride方面
+so stride wise
+
+266
+00:15:21,075 --> 00:15:25,300
+我们可以维护一个stride, 那么就是unsigned int m_Stride
+we might just maintain a stride, so unsigned int m_Stride
+
+267
+00:15:26,966 --> 00:15:29,833
+我实际上会在头文件中实现这整个东西
+I'm actually just gonna implement this whole thing I think in the header file
+
+268
+00:15:31,166 --> 00:15:35,000
+所以我们会把步幅初始化为0, 然后每次我们这样做的时候
+so we'll set the stride to zero to begin with, and then every time we do this
+
+269
+00:15:35,766 --> 00:15:38,300
+基本上就是m_Stride加上
+we basically want to say m_Stride plus equals
+
+270
+00:15:38,300 --> 00:15:41,600
+我们推入的实际数据的字节大小
+the size of the actual thing that we're pushing back
+
+271
+00:15:41,933 --> 00:15:44,500
+所以, 在这里, 它就是四个字节
+so in this case, it's going to be four bytes
+
+272
+00:15:44,633 --> 00:15:51,166
+你可能需要做的就是编写某种函数来转换gl类型
+what you probably want to do is write some kind of function that converts a gl
+
+273
+00:15:51,833 --> 00:15:56,633
+你知道的, 比如类型id这些, 那么就是把一个GL类型转成实际字节大小
+you know, like type id thing, so a gl type one into an actual size
+
+274
+00:15:56,633 --> 00:16:00,500
+这样你基本上就像这样sizeof(GL_FLOAT), 那应该还是不错的
+so that you can basically just be like sizeof GL_FLOAT, and that'll be fine
+
+275
+00:16:01,633 --> 00:16:03,233
+但我们暂时采用硬编码写这个
+but we're just going to hard write this for now 
+
+276
+00:16:03,233 --> 00:16:09,533
+所以我猜你也可以写sizeof(float), 或者是像那样的sizeof(GLfloat)
+so you could also write sizeof float I suppose, or sizeof GLfloat like that
+
+277
+00:16:09,533 --> 00:16:10,633
+那可能是合理的
+that probably be reasonable
+
+278
+00:16:10,633 --> 00:16:15,733
+我想我们暂时就保持那样吧, 这里是GLuint
+we'll keep it as that for now I think, GLuint
+
+279
+00:16:17,466 --> 00:16:24,633
+以及这里会是GLbyte
+and this will be the GLbyte
+
+280
+00:16:26,400 --> 00:16:29,100
+好了, 酷, 所以这儿还是挺简单的
+okay, cool, so this is pretty simple here
+
+281
+00:16:29,133 --> 00:16:31,233
+我希望你们能理解这儿做了些什么
+I hope you kind of understand what's going on here
+
+282
+00:16:32,400 --> 00:16:38,400
+我们基本上只是维护了一大堆实际的元素, 那构成了我们顶点缓冲区
+we're just maintaining basically a bunch of actual elements, that make up our vertex buffer
+
+283
+00:16:38,400 --> 00:16:39,866
+或者说是我们维持了就像
+or rather we're maintaining like
+
+284
+00:16:39,866 --> 00:16:41,900
+你知道的这儿两个浮点型, 三个浮点型的
+you know, if we have two floats here three floats there
+
+285
+00:16:41,933 --> 00:16:45,133
+但我们得到了一个我们缓冲区的实际布局
+but we've got an actual layout for our buffer
+
+286
+00:16:45,133 --> 00:16:46,300
+我们能做的就像
+and what we can do, like
+
+287
+00:16:46,300 --> 00:16:50,133
+每个元素的索引很明显就是它在我们实际数组中出现的索引
+the index of each element is obviously the index has it appears in our actual vector
+
+288
+00:16:50,366 --> 00:16:52,300
+然后等到了绑定这些的时候
+and then when it comes time to bind all this
+
+289
+00:16:52,366 --> 00:16:55,700
+或者更确切地说, 是时候把顶点缓存和顶点布局结合起来了
+or rather when it comes time to bring a vertex buffer with a vertex layout
+
+290
+00:16:55,966 --> 00:17:00,200
+我们实际上可以在顶点数组中设置那个, 那么就让我们在这里做一下吧
+we can actually set that up in vertex array, so let's do that here
+
+291
+00:17:00,500 --> 00:17:04,466
+所以我会包含VertexBufferLayout
+so I'll include VertexBufferLayout
+
+292
+00:17:04,966 --> 00:17:08,833
+实际上, 我需要为我们的顶点数组创建一个cpp文件
+and I'll actually have to create a cpp file for our vertex array
+
+293
+00:17:09,500 --> 00:17:11,166
+所以让我们快速创建那个吧
+so let's just quickly create that
+
+294
+00:17:13,100 --> 00:17:16,900
+好吧, 就是那样, 完成了, 好了, 那么包含Vert吧
+well, that's right, done, okay, so include VertexArray
+
+295
+00:17:17,933 --> 00:17:18,666
+当我回到这儿
+if I go back here
+
+296
+00:17:18,666 --> 00:17:22,466
+就右键, 为一切方法创建具体实现
+I'm just going to right click, and create method implementations for everything
+
+297
+00:17:24,766 --> 00:17:27,100
+所以一开始, 我们不会从任何事情开始
+so the beginning, we won't start with anything really
+
+298
+00:17:27,300 --> 00:17:30,833
+然后在AddBuffer这里, 那个要做的就是绑定缓冲区
+and then AddBuffer really, all that's going to do is bind the buffer
+
+299
+00:17:31,333 --> 00:17:34,966
+然后它将基本上设置所有这些东西
+and then it's going to basically set all this stuff up
+
+300
+00:17:34,966 --> 00:17:37,600
+那么我们缓冲区的布局就是这两行代码
+so we have these two lines of code which is our buffer layout
+
+301
+00:17:37,600 --> 00:17:40,166
+复制那个, 然后粘贴到这儿
+I'm going to copy that, I'm going to paste that in here
+
+302
+00:17:41,133 --> 00:17:43,866
+接下来我们会包含, 我想可能是Renderer
+we're going to include, I guess the Renderer
+
+303
+00:17:44,733 --> 00:17:47,900
+这个包含了OpenGL和CLCall宏指令
+which will should include OpenGL and the GLCall macro
+
+304
+00:17:48,833 --> 00:17:52,466
+然后我要做的基本上就是在这儿使用const auto
+and then what I'm going to do is basically just use constant auto here
+
+305
+00:17:52,466 --> 00:17:54,200
+因为我不想写出完整的类型
+because I don't want to type out the whole type
+
+306
+00:17:54,300 --> 00:17:57,600
+就会得到我们的elements等于layout.GetElements()
+we'll get our elements equals layout.GetElements
+
+307
+00:17:58,233 --> 00:18:03,633
+然后就是循环elements中的每一个const auto element
+and then for each constant auto element in elements
+
+308
+00:18:04,800 --> 00:18:06,975
+实际上对它们都是进行这种处理
+we're going to actually do all this stuff 
+
+309
+00:18:06,975 --> 00:18:10,766
+所以我要把这变成一个一般的全循环
+so I'm actually gonna change this to be a normal full loop
+
+310
+00:18:10,966 --> 00:18:13,966
+所以就是 for (unsigned int i)
+so for i equals, it'll be an unsigned int
+
+311
+00:18:14,533 --> 00:18:20,666
+i = 0; i < elements.size(); i++
+unsigned int equals zero, is less than elements size, i++
+
+312
+00:18:22,266 --> 00:18:27,475
+const auto& element = elements[i]
+const auto element equals elements i
+
+313
+00:18:27,475 --> 00:18:33,850
+我只是在迭代我们在实际布局类中的元素向量
+so I'm just iterating through that vector of elements that we have over here in our actual layout class
+
+314
+00:18:33,850 --> 00:18:34,833
+这里就是这个东西
+this is this thing here
+
+315
+00:18:36,900 --> 00:18:40,833
+然后把i作为启用我们实际的VertexAttribArray()的参数
+and we're going to enable i as our actual VertexAttribArray
+
+316
+00:18:41,000 --> 00:18:42,633
+最后这里也是i
+and finally this is going to be i
+
+317
+00:18:42,833 --> 00:18:50,475
+这里是element.count, 这里是element.type
+this is going to be element.count, this is going to be element.type
+
+318
+00:18:50,475 --> 00:18:56,566
+这里是element.normalized, 那么如果它是标准化的, 对吧
+this is going to be element.normalized, so if it is normalized, right
+
+319
+00:18:56,566 --> 00:18:57,800
+因为这个实际上是个布尔
+because this is actually a bool
+
+320
+00:18:57,800 --> 00:18:59,066
+让我现在这里换下行
+and let me just drop this down online
+
+321
+00:18:59,066 --> 00:18:59,966
+看吧, 你们就会看到
+see, you guys can see
+
+322
+00:19:00,866 --> 00:19:03,033
+如果它是标准化的, 如果这是true
+if it's normalized, if that's setted true
+
+323
+00:19:03,300 --> 00:19:05,766
+我的意思是, 说实话, 我回到这里
+I mean, to be honest, I might just go back here
+
+324
+00:19:06,033 --> 00:19:07,633
+实际上把它作为一个整型或其他的存储
+and actually store it as an int or something
+
+325
+00:19:08,575 --> 00:19:09,225
+那么我们就是看到
+so we'll see
+
+326
+00:19:09,225 --> 00:19:14,100
+我改成了 unsigned char normalized, 我们不需要作为整型保存
+I'm unsigned emmm char normalized, we didn't need to store as an int
+
+327
+00:19:15,566 --> 00:19:18,166
+虽然, 在内存对齐下, 它可能是一个整型
+although, with a lime memory alignment, it probably will be an int
+
+328
+00:19:18,166 --> 00:19:20,600
+不论如何, 但不会影响到无符号字符normalized
+anyway, but doesn't matter unsigned char normalized
+
+329
+00:19:20,600 --> 00:19:27,500
+那么基本上我们这里就是GL_FALSE, 这里是GL_TRUE
+so basically we'll just have this to be GL_FALSE, GL_TRUE
+
+330
+00:19:30,566 --> 00:19:32,333
+这里也是GL_FALSE
+and this will be GL_FALSE as well
+
+331
+00:19:32,933 --> 00:19:35,866
+这样我们所要做的就是在顶点数组中
+and that way all we have to do is in vertex array
+
+332
+00:19:35,866 --> 00:19:39,300
+不用任何转换, 直接写上element.normalized
+we don't do any kind of transformation, we can just do add on element.normalized
+
+333
+00:19:40,166 --> 00:19:44,975
+现在这个就是stride, 那么这个就是layout.GetStride()
+now this is the stride, so this will be layout.GetStride()
+
+334
+00:19:44,975 --> 00:19:48,100
+然后这里就是offset, 所以我们实际上要在这儿计算这个offset
+and then this will be the offset, so the offset we can actually calculate here
+
+335
+00:19:48,366 --> 00:19:55,666
+那么就是unsigned int offset = 0, 把那个offset放在这儿
+so unsigned int offset equals zero, we pump that in here offset
+
+336
+00:19:56,000 --> 00:19:57,600
+然后我们就是简单地增加offset
+and then we simply increment the offset
+
+337
+00:19:57,600 --> 00:20:04,166
+所以就是 offset += element.count
+so offset plus equals element.type, sorry element.count
+
+338
+00:20:04,933 --> 00:20:06,933
+我们确实需要知道元素的大小
+and we do need to know the element size which
+
+339
+00:20:06,933 --> 00:20:09,233
+我不这么认为, 我实际上把它保存在这儿, 还是挺好的
+I don't think, I'm actually storing here, which is great
+
+340
+00:20:10,600 --> 00:20:14,600
+那么, 我们也需要把这个转换成常量空指针类型, 顺便说一下
+so, we also need to const cast this to a const void pointer, by the way
+
+341
+00:20:14,666 --> 00:20:15,933
+那个是错的, 好了
+that's that error, okay
+
+342
+00:20:15,933 --> 00:20:17,500
+那么我们需要知道每个类型的字节大小
+so we need to know the size of each type
+
+343
+00:20:17,500 --> 00:20:20,833
+所以我可能会做的就是做我说要做的事情
+so what I might do is actually do that thing, that I was talking about doing
+
+344
+00:20:21,000 --> 00:20:23,666
+在一个VertexBufferLayout里面
+which is inside a VertexBufferLayout
+
+345
+00:20:23,666 --> 00:20:25,800
+实际上, 我可能会在VertexBufferElement中
+I might actually even inside VertexBufferElement
+
+346
+00:20:25,933 --> 00:20:36,566
+创建一个static unsigned int GetSizeOfType()或其他方法
+I'll make a static unsigned int get size get size of type or something
+
+347
+00:20:36,900 --> 00:20:44,633
+然后这基本上就是无符号整型type, switch(type)
+and then this will basically be unsigned int type, switch on type
+
+348
+00:20:46,000 --> 00:20:49,900
+那么这个分支, 你知道的, GL_FLOAT, 就返回4
+and then case you know GL_FLOAT, return four
+
+349
+00:20:53,166 --> 00:20:55,666
+然后是GL_UNSIGNED_INT, 返回4
+unsigned int, four
+
+350
+00:20:56,666 --> 00:21:00,766
+我们唯一支持的另一个就是UNSIGNED_CHAR, 返回1
+and the only other one we support which is unsigned char, return one
+
+351
+00:21:02,166 --> 00:21:03,266
+抱歉, 应该是BYTE
+sorry I'll just byte
+
+352
+00:21:05,200 --> 00:21:08,333
+就是刚刚那里写的, 那很好, 好了, 酷
+which I might have just, yeah that's good, okay, cool
+
+353
+00:21:09,633 --> 00:21:13,033
+那么现在让我把这个东西对齐吧
+so now this becomes let me just align this stuff
+
+354
+00:21:14,100 --> 00:21:18,733
+返回0, 我们应该在这里断言false
+return zero, and we should assert false here
+
+355
+00:21:20,100 --> 00:21:22,833
+我想那个断言应该在我们的Renderer中
+and I guess that assertion stuff is inside our Renderer
+
+356
+00:21:22,833 --> 00:21:28,933
+那么让我包含这个Renderer吧, 好了, 酷, 那么我们继续
+whoops so let me just include the Renderer, okay cool, so there we go
+
+357
+00:21:29,166 --> 00:21:31,666
+我喜欢那样缩进这些
+I like to indent these a bit like that
+
+358
+00:21:32,566 --> 00:21:37,266
+但我们继续, 那么就是441, 显然, 这是为了确保你做对了
+but there we go, so four four and one, obviously this is make sure you get this right
+
+359
+00:21:37,266 --> 00:21:40,400
+确保你支持当前支持的所有类型, 你当前支持我们刚做的那三个类型
+and make sure you support all the types, that you currently support we're just doing three
+
+360
+00:21:40,633 --> 00:21:43,133
+当我们增加一些更多的类型时, 我们会扩展这个
+when we add some more types, we will expand all of this
+
+361
+00:21:43,800 --> 00:21:46,233
+GetSizeOfType, 我现在可以用这个
+GetSizeOfType, I can now use with this
+
+362
+00:21:46,233 --> 00:21:47,300
+那么为了代替这个
+so instead of this
+
+363
+00:21:47,533 --> 00:21:54,966
+那就是这个VertexBufferElement::GetSizeOfType()
+being that it'll just be buffer, sorry VertexBufferElement GetSizeOfType
+
+364
+00:21:56,075 --> 00:21:58,075
+然后这个type就是GL_FLOAT
+and then the type is GL_FLOAT
+
+365
+00:22:00,250 --> 00:22:03,500
+然后这个也是一样的, 除了GL_UNSIGNED_INT
+and then this will be the same, but for UNSIGNED_INT
+
+366
+00:22:06,600 --> 00:22:12,266
+这个也是一样的, 除了GL_UNSIGNED_BYTE, 好了, 看起来不错
+and then this will be the same but for UNSIGNED_BYTE, okay, looks pretty good to me
+
+367
+00:22:12,366 --> 00:22:14,566
+现在, 明显的是, 在我们的VertexArray中
+and now obviously inside our VertexArray
+
+368
+00:22:14,566 --> 00:22:17,166
+实际上, 我们可以看到, offset += element.count * 
+we can actually see, offset plus equals element.count
+
+369
+00:22:17,533 --> 00:22:24,633
+* VertexBufferElement::GetSizeOfType(element.type)
+times VertexBufferElement GetSizeOfType element.type
+
+370
+00:22:24,933 --> 00:22:28,300
+好了, 所以这就是我们的AddBuffer方法, 你可以看到, 它做了很多事情
+okay, so that is our AddBuffer function, you can see, it does quite a lot of things
+
+371
+00:22:28,300 --> 00:22:31,925
+但是它做的主要的事情还是, 绑定这个实际的顶点缓冲区
+but the main thing it does is, bind the actual vertex buffer
+
+372
+00:22:31,925 --> 00:22:33,900
+然后设置那个布局
+and then set up all that layout
+
+373
+00:22:33,900 --> 00:22:36,175
+现在, 明显的是, 我们实际上不得不创建这个顶点数组
+now, we have to actually create the vertex array, obviously
+
+374
+00:22:36,175 --> 00:22:37,200
+那么, 让我们就去做那个吧
+so let's do that
+
+375
+00:22:37,200 --> 00:22:38,400
+回到头文件(VertexArray)
+I'm going to go back to the header file
+
+376
+00:22:38,400 --> 00:22:43,066
+添加一个无符号整型成员m_RendererID, 就像那样
+added an unsigned int m_RendererID, just like that
+
+377
+00:22:43,966 --> 00:22:47,733
+我想我们就在这儿设置它吧, 那么让我们在这儿向下滑一点
+we're going to set it up here, I guess, so let's just go down here
+
+378
+00:22:47,733 --> 00:22:52,033
+从Application.cpp中复制我们需要的, 基本上就是这个代码
+and copy what we have from Application, which is basically this code
+
+379
+00:22:53,033 --> 00:22:58,700
+那么就把这个改成m_RendererID, 然后我们绑定它
+so we're going to m_RendererID here, and then we'll we'll bind it well
+
+380
+00:22:58,700 --> 00:23:00,433
+不过在这里, 我们没必要做绑定
+we don't have to bind it in this case
+
+381
+00:23:00,800 --> 00:23:11,033
+在析构方法中, 我会调用glDeleteVertexArrays(1, &m_RendererID)
+in the destructor, I will delete VertexArrays, one and then m_RendererID, like that
+
+382
+00:23:12,333 --> 00:23:13,400
+好了, 那看起来不错
+okay, that looks pretty good
+
+383
+00:23:13,400 --> 00:23:16,700
+然后在这儿, 我们应该绑定它, 那么我就会调用Bind()
+and then over here, we do we should bind it, so I'll just call Bind
+
+384
+00:23:17,800 --> 00:23:20,400
+不过现在我们这儿还没有Bind方法, 所以就让我们添加那个吧
+now we don't have a Bind function here, so let's add that
+
+385
+00:23:20,800 --> 00:23:25,066
+那么我们有个缓冲区, Bind() const 和 Unbind() const
+so we'll have a buffer, and Bind const and Unbind const
+
+386
+00:23:25,933 --> 00:23:28,100
+我再次使用assistx创建这些实现
+I'll make those using visual assistx again
+
+387
+00:23:30,166 --> 00:23:34,766
+然后(在Bind中)基本上就是调用glBindVertexArray(m_RendererID)
+and then we'll basically call glBindVertexArray m_RendererID 
+
+388
+00:23:35,633 --> 00:23:39,733
+对于Unbind, 我们只是绑定0就可以了
+and then for Unbind, we'll just bind zero
+
+389
+00:23:40,566 --> 00:23:45,100
+好了, 所以我们绑定了顶点数组, 那就是我们要处理的, 绑定了缓冲区
+okay, so we have where we bind the vertex array, we bind the buffer that we want to deal with
+
+390
+00:23:45,333 --> 00:23:48,533
+然后为它设置了布局, 那看起来挺不错的
+and then we set up a layout for it, and that looks pretty good to me
+
+391
+00:23:48,766 --> 00:23:53,533
+那么让我们来测试一下这个吧, 回到Application.cpp, 包含VertexArray
+so let's test this out, back in Application, I'm going to include VertexArray
+
+392
+00:23:55,400 --> 00:23:57,433
+然后下来到这里
+and then I'm going to go back down here
+
+393
+00:23:58,833 --> 00:24:01,700
+我们已经创建了VertexArray和VertexBuffer
+we make a VertexArray, we make a VertexBuffer
+
+394
+00:24:02,500 --> 00:24:04,566
+接着创建一个VertexBufferLayout
+we're going to make a VertexBufferLayout
+
+395
+00:24:05,766 --> 00:24:10,200
+现在在我们这个例子这儿, 我们所有的只有这个, 对吧
+now all we have in our example here is just this, right
+
+396
+00:24:10,233 --> 00:24:15,166
+那么从这个实际的GLCall中, 我们知道, 基本上就设置了这两个浮点数
+so we know that from this actual GLCall, we basically just set up two floats
+
+397
+00:24:15,166 --> 00:24:17,500
+所以在这儿, 我所做的就是把这个全部删除
+so all I have to do here is I can get rid of all this
+
+398
+00:24:17,833 --> 00:24:21,066
+然后要做的就是像那样的layout.Push(2)
+and just do layout.Push(two), like that
+
+399
+00:24:21,133 --> 00:24:28,533
+就是那样, 然后就是像那样的va.AddBuffer(vb, layout)
+that should be it, and then va.AddBuffer, vb and layout, just like that
+
+400
+00:24:28,900 --> 00:24:33,533
+好吧, 希望这是有意义的, 这很简单
+okay, so hopefully that makes sense, it is pretty straightforward
+
+401
+00:24:33,900 --> 00:24:38,900
+当我们下来到这儿, 为了替换BindVertexArray, 我们应该使用va.Bind()
+and if we go down here, instead of BindVertexArray, we should just be able to do va.Bind() and
+
+402
+00:24:38,900 --> 00:24:39,700
+一切都应该是正常的
+everything should be good
+
+403
+00:24:40,033 --> 00:24:42,233
+那么就让我们来运行一下这个吧, 希望一切正常
+so let's hit f5, and hopefully this works
+
+404
+00:24:42,233 --> 00:24:46,000
+因为我完全是即兴创作的, 好吧, 我们这里有一个错误
+because I just totally improvise all of that, okay, so we are getting an error here
+
+405
+00:24:46,000 --> 00:24:48,066
+这看起来几乎就是个警告, 真的
+this looks like almost a warning really
+
+406
+00:24:48,866 --> 00:24:52,266
+但我们基本上应该做的就是使用unsigned int count, 而不是int count
+but we basically should be having unsigned int count, and not int count
+
+407
+00:24:52,266 --> 00:24:57,100
+所以我这里就是把这个类型改成像那样的无符号就可以了
+so I'm just going to change this type to be unsigned like that
+
+408
+00:24:57,266 --> 00:25:01,166
+对于所有这些, 不论如何, 很明显, 我们的count不可能是负数
+for all of these, obviously we can't have a negative count, anyway
+
+409
+00:25:02,000 --> 00:25:04,566
+好了, 那应该没问题, 运行一下, 好了
+all right, that was good, f5, okay
+
+410
+00:25:04,566 --> 00:25:07,366
+得到了一个三角形, 那么我们没得到一个实际的正方形
+and we get a triangle, so we don't get an actual square
+
+411
+00:25:07,366 --> 00:25:09,166
+我可能写错了什么东西
+so maybe I've done something wrong
+
+412
+00:25:09,533 --> 00:25:12,633
+让我们回到这儿, 看看发生了什么
+let's go back to here, and see what's up
+
+413
+00:25:13,700 --> 00:25:18,700
+那么我们有四个顶点, 所以它没什么问题
+so we had, okay, our vertex buffer has four vertices, so it's pretty good
+
+414
+00:25:18,866 --> 00:25:23,600
+我们肯定绘制了六个, 那也没啥问题
+we're definitely drawing six still and that's all good
+
+415
+00:25:23,600 --> 00:25:29,866
+让我们调试一下这个吧, 我猜, 看看这个实际的layout
+let's actually debug this, I guess, so let's go into our actual layout here
+
+416
+00:25:30,233 --> 00:25:33,366
+在AddBuffer中, 我需要在这儿设置一个断点
+and inside AddBuffer, I'm just gonna place a break point here
+
+417
+00:25:33,600 --> 00:25:35,133
+关掉这个内存视图
+let's close this memory view
+
+418
+00:25:35,400 --> 00:25:39,766
+在这里多留点空间, f11进入这个函数, 然后
+make some more space here, f11 to step in, and then okay
+
+419
+00:25:39,766 --> 00:25:45,233
+那么我们一定绑定那个VertexArray, 它确实有个实际的RendererID
+so we definitely bind that VertexArray does have a it does have a real RendererID
+
+420
+00:25:45,500 --> 00:25:49,100
+VertexBuffer也绑定了那个, 关于元素, 我们有一个元素
+VertexBuffer bind will bind that, elements, we have one element
+
+421
+00:25:49,566 --> 00:25:52,866
+这也是我们字节大小的类型, 这个count是2, normalized是0
+it is the type as well of our sizes, the count is two, normalized is zero
+
+422
+00:25:52,866 --> 00:25:54,933
+到这里, 看起来都没啥问题
+looks pretty good to me so far
+
+423
+00:25:55,966 --> 00:25:59,400
+来到这儿, 当然, 我们启用了这个索引0
+step into here, we enable this index zero, of course
+
+424
+00:25:59,766 --> 00:26:05,633
+element.count是2, type是那个, normalized是那个
+element.count is two, type is that, normalized is that
+
+425
+00:26:05,733 --> 00:26:11,833
+layout.GetStride()就是stride, 就是4, 哈, 这就是问题所在了
+layout.GetStride() was to stride four, four seems, ah so there's the problem
+
+426
+00:26:11,833 --> 00:26:12,633
+这个步幅是4
+the stride is four
+
+427
+00:26:12,633 --> 00:26:15,866
+但显然应该4 * count, 而这里是2
+but it obviously should be four times the count, which in this case is two
+
+428
+00:26:16,266 --> 00:26:19,733
+所以我们要做的就是返回VertexBufferLayout, 确保那个stride就是
+so what we need to do is go back to VertexBufferLayout, and make sure that the stride is
+
+429
+00:26:19,733 --> 00:26:21,900
+实际上应该sizeof(type)*count
+actually the sizeof type times the count
+
+430
+00:26:22,166 --> 00:26:23,900
+所以我忘记了乘以count
+so I forgot to multiply by the count
+
+431
+00:26:24,266 --> 00:26:27,400
+致命错误啊, 伙计, 把那个count移到第一个来
+fatal, man, might move the move it and make the count first
+
+432
+00:26:28,166 --> 00:26:34,733
+那么就是count * stride, 好了, 继续, 接收的是2, 运行一下
+so count times the stride, allright there we go so take 2, f5
+
+433
+00:26:35,100 --> 00:26:40,600
+然后继续, 我们得到了像平时一样的实际的正方形, 好了, 所以就是这样
+and there we go, we get our actual square as usual, allright, so that's it
+
+434
+00:26:40,633 --> 00:26:42,266
+这就是整个实现
+that's gonna wrap up this implementation
+
+435
+00:26:42,266 --> 00:26:44,300
+我们很快就在顶点数组上组合起来了
+that we've quickly thrown together over vertex array
+
+436
+00:26:44,300 --> 00:26:46,333
+如何实际地抽象它以及布局部分
+how to actually abstract that as well as a layout part
+
+437
+00:26:46,433 --> 00:26:50,800
+这里最重要的是, 我想表达的是这个实际的布局想法, 对吧
+the big thing here, I guess capture is this actual layout idea, right
+
+438
+00:26:50,800 --> 00:26:54,466
+我们实际上提供了我们自己的高层次布局
+we're actually providing our own layout in a very kind of high-level sense
+
+439
+00:26:54,466 --> 00:26:55,800
+我们基本上就是这样表达了
+we're basically saying that 
+
+440
+00:26:56,000 --> 00:26:59,600
+嘿, 我这儿有两个浮点数, 处理一下它吧
+hey, I have two floats here, deal with it, OpenGL
+
+441
+00:26:59,600 --> 00:27:00,900
+那真的真的很有用
+and that's really really useful
+
+442
+00:27:00,900 --> 00:27:02,600
+因为如果你在使用
+because if you were if you were to use
+
+443
+00:27:02,700 --> 00:27:05,300
+像批量渲染接口和一个引擎等等
+like multiple rendering apis and an engine or whatever
+
+444
+00:27:05,333 --> 00:27:07,300
+你显然想有一个通用的表达方式
+you obviously would want to have a generic way of saying
+
+445
+00:27:07,300 --> 00:27:10,833
+这个就是我的缓冲区的布局, 那正是我们刚才在这儿做的
+this is the layout of my buffer, and that's exactly what we've done over here
+
+446
+00:27:10,833 --> 00:27:15,433
+很明显, 在这段代码中, 如果我们有几样东西, 也许我们有, 你知道的
+obviously with this code, if we had several kind of things, maybe we had, you know
+
+447
+00:27:15,633 --> 00:27:18,500
+一种3D位置, 然后是3D法线
+a 3D kind of position, then a 3D normal
+
+448
+00:27:18,500 --> 00:27:20,033
+然后像是2D纹理坐标
+and then like a 2D texture coordinate
+
+449
+00:27:20,033 --> 00:27:24,766
+我们可以这样做, 当我们实际添加数学、数学类型和其他东西时
+we could just do this, when we actually add maths and mathematical types and stuff
+
+450
+00:27:24,766 --> 00:27:27,100
+我们甚至可能有一些类似于math::vec2的东西
+we might even have something like math vec2
+
+451
+00:27:27,366 --> 00:27:29,966
+就能够这样表示, 这儿有一个vec2
+and just being able to say, we have one vec2 here
+
+452
+00:27:30,366 --> 00:27:33,166
+可能是一个vec3的实际位置或任何东西
+maybe one vec3 for the actual position or whatever
+
+453
+00:27:33,166 --> 00:27:34,066
+那也会非常有用
+that will be useful as well
+
+454
+00:27:34,166 --> 00:27:36,900
+我们真的可以在将来把它扩展到相当好的程度
+and we can really expand this to be pretty good in the future
+
+455
+00:27:36,900 --> 00:27:40,033
+好了, 因此你们有任何问题, 请在下面的评论区留言
+alright, so any questions that you guys have, leave them in the comments below
+
+456
+00:27:40,150 --> 00:27:43,033
+我觉得这一期和其他的有点不同
+this episode I think was a little bit different than all the other ones
+
+457
+00:27:43,033 --> 00:27:46,266
+我的意思是, 我在你们面前直播撸码
+I mean I kind of just programmed live in front of you guys
+
+458
+00:27:46,300 --> 00:27:48,933
+这感觉起来几乎就是个直播间
+this almost felt a little bit of like a livestream
+
+459
+00:27:48,933 --> 00:27:51,700
+一边解释着我实际在做什么
+and may actually explaining what I'm doing along the way
+
+460
+00:27:52,300 --> 00:27:54,333
+让我知道你对这种形式的看法
+let me know what you think of this kind of format
+
+461
+00:27:54,333 --> 00:27:56,766
+随着我们开始接触更为严格的OpenGL东西
+as we start to get into more serious OpenGL things
+
+462
+00:27:56,766 --> 00:27:58,933
+我不确定我能不能慢慢来, 我是说
+I'm not sure if I can take this slow, I mean like
+
+463
+00:27:58,933 --> 00:28:01,900
+现在我已经录了29分50秒了
+I've been recording for 29min 50 seconds at this point
+
+464
+00:28:02,366 --> 00:28:04,900
+就像, 这会是很长的一期
+like, it's this is gonna be a huge episode
+
+465
+00:28:04,900 --> 00:28:07,400
+我基本上是以最快的速度完成了这件事
+and I basically got through this stuff as quickly as I could
+
+466
+00:28:08,766 --> 00:28:10,800
+是的, 一定要让我知道你对这个的看法
+so yeah, definitely let me know what you think about this
+
+467
+00:28:10,800 --> 00:28:15,466
+如果你能跟得上这一切, 希望你能
+if you were able to follow along and all of that, hopefully hopefully you were
+
+468
+00:28:15,500 --> 00:28:17,900
+我就不需要做更多的解释了
+and I don't need to kind of explain too much more
+
+469
+00:28:18,133 --> 00:28:20,533
+希望大部分是有意义的, 除此之外
+hopefully most of this made sense, but other than that
+
+470
+00:28:20,533 --> 00:28:22,133
+如果你喜欢这个视频的话, 请留下你的赞吧
+leave a like if you enjoyed this video
+
+471
+00:28:22,566 --> 00:28:23,633
+如果你想帮助支持这个系列
+if you wanna help support this series
+
+472
+00:28:23,633 --> 00:28:25,633
+你可以通过patreon.com/TheCherno来支持我
+you can go to patreon.com/TheCherno
+
+473
+00:28:25,933 --> 00:28:30,400
+像往常一样对我所有的赞助人大声呼喊, 是你们让这一切成为可能
+huge shout out as always to all of my wonderful patrons that make this stuff possible
+
+474
+00:28:31,066 --> 00:28:32,300
+一定要帮助支持这个系列啊
+definitely helps support the series there
+
+475
+00:28:32,300 --> 00:28:34,166
+如果你喜欢我做的这些还想看到更多的话
+if you like what I'm doing here and want to see more
+
+476
+00:28:35,033 --> 00:28:38,300
+因为没有你们, 就没有这个系列
+because this stuff really wouldn't be here without all those wonderful people
+
+477
+00:28:39,166 --> 00:28:40,933
+下一期, 我们会说着色器
+next time, we're gonna talk about shaders
+
+478
+00:28:40,933 --> 00:28:42,233
+以及我们如何抽象那个
+and how we can actually abstract that
+
+479
+00:28:42,233 --> 00:28:45,233
+基本上, 我认为, 看看这个, 这就是我们剩下的一切
+that's basically I think, looking at this, that's like all we have left
+
+480
+00:28:45,233 --> 00:28:47,666
+我认为, 然后, 当然是渲染器啦
+I think, oh and then, of course the renderer
+
+481
+00:28:48,433 --> 00:28:51,766
+所以我们肯定会用我们方法抽象这个东西
+so we're definitely on our way to kind of abstructing a lot of this stuff
+
+482
+00:28:51,766 --> 00:28:54,700
+事实上, 当我在这里的时候, 我注意到我们仍然有这个顶点数组代码
+actually while I'm here, I noticed that we still have this vertex array code
+
+483
+00:28:54,700 --> 00:28:56,700
+那么让我们删除所有顶点数组代码
+so let's just remove all that vertex array code
+
+484
+00:28:56,900 --> 00:28:59,933
+所以我们有了这样一个漂亮的代码
+so we have this nice and to set up like that beautiful
+
+485
+00:29:00,100 --> 00:29:02,000
+然后是BindVertexArray(0)这些
+and then BindVertexArray(0) and all of that
+
+486
+00:29:02,000 --> 00:29:03,166
+我们不需要那个了
+we don't really need that there
+
+487
+00:29:03,200 --> 00:29:05,000
+所以我们就让它保持这样吧
+so we'll just kind of leave it as is
+
+488
+00:29:05,100 --> 00:29:07,400
+实际上, 当我们测试解绑一切时
+and in fact since we are kind of testing Unbinding everything
+
+489
+00:29:07,400 --> 00:29:11,466
+我可能基本上会调用va.Unbind()代替刚刚那个
+I might just call va.Unbind instead of which just does that basically
+
+490
+00:29:11,666 --> 00:29:13,466
+这期我确实写了不少代码
+now I did write quite a bit of code this episode
+
+491
+00:29:13,466 --> 00:29:15,130
+如果你想要这些源码
+if you would like access to the source code 
+
+492
+00:29:15,130 --> 00:29:17,833
+你可以通过访问patreon.com/TheCherno帮助这个系列
+that you could go to patreon.com/TheCherno helps the point series
+
+493
+00:29:18,000 --> 00:29:22,200
+你就会得到所有这些东西的源码, 一期接一期的
+and you will get access to episode by episode kind of source code for all this stuff
+
+494
+00:29:22,433 --> 00:29:23,225
+可能会比较有用
+could be useful 
+
+495
+00:29:23,225 --> 00:29:26,433
+因为当然, 我确实写了不少的代码, 如果你遇到了一些出错的
+because of course, I did write quite a bit of code, and if you got something wrong
+
+496
+00:29:26,433 --> 00:29:27,866
+它确实是个不错的比较方法
+it's a really good way to kind of compare
+
+497
+00:29:28,066 --> 00:29:30,350
+并且确保一切都是正常的
+and make sure that everything is working for you 
+
+498
+00:29:30,350 --> 00:29:32,225
+不论如何, 希望你们喜欢这期视频
+anyway, hope you guys enjoyed this episode 
+
+499
+00:29:32,225 --> 00:29:34,700
+下一期, 我们说说着色器, 在那之后可能就是渲染器
+next time, shaders, then after that probably renderer
+
+500
+00:29:34,700 --> 00:29:37,100
+在那之后, 我们真的就要添加数学库之类的东西了
+and then after that, we really have to add maths and stuff like that
+
+501
+00:29:37,200 --> 00:29:38,866
+然后我们就会接触到一些更令人兴奋的东西
+and then we'll move on to some more exciting things
+
+502
+00:29:38,866 --> 00:29:41,900
+像纹理, 以及像把显卡和这些东西实际联系起来
+like textures, and like actually getting graphics and stuff together
+
+503
+00:29:42,100 --> 00:29:43,100
+我们应该能够去探索发现
+we should be able to find
+
+504
+00:29:43,566 --> 00:29:46,366
+喔, 这个系列是, 它有相当多要做的
+oh, this series is, it's quite a bit of work
+
+505
+00:29:46,566 --> 00:29:49,866
+让我告诉你OpenGL吧, 不管如何, 下次见, 拜
+let me tell you OpenGL, anyway, see you guys next time, bye
+

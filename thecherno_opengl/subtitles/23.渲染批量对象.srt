@@ -1,0 +1,1410 @@
+﻿1
+00:00:00,133 --> 00:00:03,366
+嘿，你们好，我是TheCherno，欢迎回到我的OpenGL系列教程
+hey, what's up guys, my name is TheCherno, welcome back to my OpenGL series
+
+2
+00:00:03,500 --> 00:00:08,300
+那么今天我们要讲的是，如何在屏幕上渲染多个对象
+so today we're going to be talking about, how we can render multiple objects on the screen
+
+3
+00:00:08,300 --> 00:00:12,844
+到目前为止，我们所做的只是在屏幕上渲染了一次ChernoLogo
+so far all we've really done is we rendered that ChernoLogo on the screen once
+
+4
+00:00:12,844 --> 00:00:16,266
+并且我们还没有渲染过一个以上的对象
+and we haven't like, we haven't rendered more than one object
+
+5
+00:00:16,600 --> 00:00:20,733
+所以我们会讲，渲染另一个物体或相同的物体需要什么
+so we're going to talk about, what it takes to actually render another object or the same object
+
+6
+00:00:20,733 --> 00:00:23,166
+也许是在一个不同的位置或者一个全新的对象
+maybe at a different position or an entirely new object
+
+7
+00:00:23,300 --> 00:00:26,033
+以及我们如何渲染多个东西
+and how in general we can go about rendering multiple things
+
+8
+00:00:26,533 --> 00:00:29,666
+这将为以后设置一堆东西
+this is going to set up a bunch of things for the future
+
+9
+00:00:29,666 --> 00:00:33,733
+就像我所有的视频一样，不用担心100年后的结果
+as all of my videos seem to do, don't worry at the end in like 100 years from now probably
+
+10
+00:00:34,000 --> 00:00:38,900
+它会进入互联网，它会很好地连接起来，你们就会明白，一切都很顺利
+it'll come into an internet, it'll tie it nicely, and you'll understand, everything works hopefully
+
+11
+00:00:39,900 --> 00:00:43,766
+所以这对以后的事情很重要
+but yeah so this will be kind of important for things in the future
+
+12
+00:00:43,933 --> 00:00:47,566
+并且在我们开始讲之前先讲一下也是很好的
+and also it's just a good thing to kind of talk about initially before we dive into it
+
+13
+00:00:47,800 --> 00:00:50,400
+那么如果我们看一下我们的代码，我会很快地运行它
+so if we take a look at our code, I'm just gonna run it real quick
+
+14
+00:00:50,400 --> 00:00:53,466
+我们可以看看我们有什么，我们上次基本上添加了ImGui
+so we can see what we have, we basically added ImGui last time
+
+15
+00:00:53,466 --> 00:00:56,333
+所以我们有了这个精致的Debug窗口
+so that we had this kind of Debug overlay
+
+16
+00:00:56,333 --> 00:01:00,100
+顺便说一下，我解决了鼠标指针错位的问题
+by the way, I solved that whole mouse pointer kind of being in the wrong place problem
+
+17
+00:01:00,133 --> 00:01:03,625
+那是因为我在电脑里使用的是Inter显卡
+that was because I was using the Inter GPU inside my computer
+
+18
+00:01:03,625 --> 00:01:06,466
+我转到NVIDIA的显卡，它就可以了
+I switched to the NVIDIA one, and it works fine
+
+19
+00:01:06,466 --> 00:01:08,233
+所以很明显这和Intel的显卡驱动有关
+so clearly something to do with Intel's drivers
+
+20
+00:01:08,233 --> 00:01:12,366
+我以后可能会做个视频讲那个，但现在已经很完美了
+I might make a video in the future talking about that, but it's perfect now as you can see
+
+21
+00:01:13,266 --> 00:01:14,966
+不管怎样，我们已经渲染了这个ChernoLogo
+anyway, so we have this ChernoLogo being rendered
+
+22
+00:01:14,966 --> 00:01:20,100
+我们有这个模型矩阵，我们在这里用ImGui修改，一切看起来都很好
+and we've got this model matrix that we're modifying here using ImGui, and everything seems fine
+
+23
+00:01:21,100 --> 00:01:24,700
+基本上我们今天的目标是在不同的位置渲染另一个
+basically our goal for today's gonna be to render another one of these at a different position
+
+24
+00:01:24,700 --> 00:01:26,800
+我们来看看要怎么做
+and we'll see what it takes for us to actually do that
+
+25
+00:01:26,833 --> 00:01:30,733
+那么如果我们看一下代码，没有什么太复杂的
+so if we look at the code, nothing really too complicated is going on
+
+26
+00:01:30,866 --> 00:01:34,833
+但如果我们看一下真正绘制ChernoLogo的代码，就是这行代码
+but if we take a look at the code that actually draws that ChernoLogo, it's this line over here
+
+27
+00:01:35,100 --> 00:01:38,950
+那么我们执行renderer.Draw，如果我把它按下alt f12键
+so we do renderer.Draw, and if I just kind of alt f12 into that
+
+28
+00:01:39,200 --> 00:01:41,200
+你们可以看到两个，你们可以看到
+so you can see both, you can see that
+
+29
+00:01:41,733 --> 00:01:47,100
+我们绑定了着色器，绑定了顶点数组，绑定了索引缓冲区
+I'm we basically bind our shader, we bind our vertex array, we bind our index buffer
+
+30
+00:01:47,133 --> 00:01:52,400
+不是100%需要的，因为顶点数组已经绑定到索引缓冲区了
+which actually isn't 100% necessary, because the vertex array already has a bind into the index buffer
+
+31
+00:01:53,266 --> 00:01:56,433
+但不管怎么说，然后我们会发出DrawCall，也就是这行代码
+but anyway, and then we actually issue the DrawCall, which is this line over here
+
+32
+00:01:56,633 --> 00:01:59,600
+把ChernoLogo绘制到屏幕上的
+which draws that ChernoLogo onto the screen
+
+33
+00:01:59,900 --> 00:02:06,733
+现在有一个东西决定了在哪儿绘制这个ChernoLogo
+now here's a thing the thing that determines where this ChernoLogo gets drawn on
+
+34
+00:02:06,733 --> 00:02:09,900
+实际上，我们先来讨论这三行代码，以及它们的真正含义
+in fact, let's just discuss these three lines first of all, and what they actually mean
+
+35
+00:02:10,125 --> 00:02:12,350
+所以shader.Bind很重要
+so shader.Bind is important
+
+36
+00:02:12,350 --> 00:02:16,700
+因为它为我们的GPU绑定了一个用于渲染的程序
+because it binds a program for our GPU to actually use to render
+
+37
+00:02:16,833 --> 00:02:19,333
+不管我们渲染什么，那就是着色器
+whatever we're trying to render, that's the shader
+
+38
+00:02:19,633 --> 00:02:22,633
+至于着色器，很多人认为着色器很重要
+the shader, a lot of people again think of shaders is really important
+
+39
+00:02:22,633 --> 00:02:24,433
+这样你们就能真正理解着色器是什么
+that you are actually understand what shaders are
+
+40
+00:02:24,633 --> 00:02:30,100
+着色器也被OpenGL称为程序，字面上有一些着色程序
+shaders which are also called programs by OpenGL, are literally that there are shader program
+
+41
+00:02:30,200 --> 00:02:33,633
+有一些东西可以让我们说，一些东西将如何被渲染
+there's something that allows us to say, how something will be rendered
+
+42
+00:02:33,666 --> 00:02:37,400
+我们基本上是在告诉GPU该做什么，那非常重要
+we're basically telling the GPU what to actually do, that's really important
+
+43
+00:02:37,400 --> 00:02:41,766
+它会被录下来，这与光线或阴影之类的东西无关
+it goes tape, it's nothing to do with like lighting or shading or anything like that
+
+44
+00:02:41,933 --> 00:02:48,300
+这只是我们给GPU的指令，比如如何，在哪里，为什么等等
+it's literally just us giving instructions to the GPU, as to how and where and why and whatever
+
+45
+00:02:48,333 --> 00:02:50,800
+我们想绘制我们要绘制的东西
+we want to actually draw what we're trying to draw
+
+46
+00:02:50,800 --> 00:02:55,233
+那在第一步中非常重要，然后我们绑定顶点数组
+that's really important that step one, then we bind the vertex array
+
+47
+00:02:56,066 --> 00:03:01,400
+也就是，再说一次，包含所有实际数据的数组
+which is, again, the array that contains all of the actual data
+
+48
+00:03:01,600 --> 00:03:05,500
+所以程序或着色器会说，该如何处理这些数据
+so the program or the shader says, what to do with the data
+
+49
+00:03:05,600 --> 00:03:09,566
+这个顶点数组就是我们要用到的数据
+and this vertex array is the data that we're going to do stuff with
+
+50
+00:03:09,800 --> 00:03:13,900
+所以这包括我们的顶点缓冲区和索引缓冲区，那就是我们现在所有的
+so this includes our vertex buffer and our index buffer, that's all that we've got at the moment
+
+51
+00:03:14,000 --> 00:03:16,666
+顶点缓冲区当然包含了所有的顶点数据
+and vertex buffer of course contains all of the vertex data
+
+52
+00:03:16,666 --> 00:03:21,600
+包括我们试图渲染纹理坐标的每个点的位置
+including including the positions of each kind of point that we're trying to render texture coordinates
+
+53
+00:03:21,700 --> 00:03:25,200
+我想那就是我们现有的，但是如果我们绘制一些更复杂的东西
+I think that's what we've got, but if we were drawing something a bit more complex
+
+54
+00:03:25,200 --> 00:03:30,800
+我们可能还有其他的东西比如顶点颜色法向量，法向量，切线
+we might have other other things in there like vertex colors or normal or by normal or tangents or
+
+55
+00:03:31,100 --> 00:03:36,700
+在顶点数据中有很多东西，我们以后会讲到
+there's a lot of things that you can put into vertex data, which we will get into in the future
+
+56
+00:03:37,233 --> 00:03:45,333
+索引缓冲区当然包含顶点缓冲区的索引，这样就知道渲染是什么了
+the index buffer of course contains the indices into the vertex buffer, so that we actually know like what render
+
+57
+00:03:45,333 --> 00:03:48,200
+索引缓冲区包含顶点缓冲区的索引
+the index buffer contains the indices into the vertex buffer
+
+58
+00:03:48,200 --> 00:03:51,633
+因此我们可以选择我们真正想要渲染的顶点
+so that we can choose what which vertices we actually want to render
+
+59
+00:03:51,633 --> 00:03:55,729
+如何把它们组合在一起，最后绘制出元素
+and how to kind of assemble all them together, and then finally draw elements just says
+
+60
+00:03:55,729 --> 00:03:59,500
+嘿，你们知道的，用索引缓冲区访问顶点缓冲区
+hey, you know, using that index buffer access the vertex buffer
+
+61
+00:03:59,666 --> 00:04:03,100
+然后分别在所有这些顶点上调用着色程序
+and call the shader program on all of those vertices individually
+
+62
+00:04:03,200 --> 00:04:07,633
+让它绘制并最终将我们的对象恢复到屏幕上
+to actually get it to draw and eventually restoring our object onto the screen
+
+63
+00:04:07,950 --> 00:04:13,350
+所以那就是一种对之后渲染另一个ChernoLogo需要什么的总结
+so that's kind of a bit of a summary of what it takes to render that one kind of Cherno later
+
+64
+00:04:13,600 --> 00:04:20,133
+所以如果我们想渲染另一个，它看起来会完全一样
+so if we want to render another one in like with the, it'll look exactly the same
+
+65
+00:04:20,133 --> 00:04:22,725
+但我们希望它在屏幕上的其他地方
+but we want it to be somewhere else on the screen
+
+66
+00:04:23,425 --> 00:04:25,425
+我们要怎么做，我们需要改变什么
+how do we do that, and what do we actually need to change
+
+67
+00:04:26,200 --> 00:04:31,033
+好了，让我们考虑一下，首先，着色器需要改变一下
+well okay, let's think about it, first of all, the shader does that need to change well
+
+68
+00:04:31,366 --> 00:04:35,600
+这个着色器是，如果我们看一下我们的着色器是什么样的
+the shader is kind of, if we take a look at what our shader even looks like
+
+69
+00:04:35,600 --> 00:04:36,933
+就是这个东西
+it's just this thing over here
+
+70
+00:04:37,800 --> 00:04:43,300
+顶点着色器只是从顶点缓冲区中接收一些数据，也就是这里的这部分
+the vertex shader just takes in a bunch of data from the vertex buffer, which is this part over here
+
+71
+00:04:43,500 --> 00:04:47,000
+也可以直接从mat4作为统一变量
+and also just directly from mat4 as uniforms
+
+72
+00:04:47,500 --> 00:04:52,500
+然后就是设置gl_Position，也就是顶点的位置
+and then well set gl_Position, which in terms of where the vertices are going to be
+
+73
+00:04:52,733 --> 00:04:57,400
+然后将这个纹理坐标输出到着色器管道的下一个阶段
+and then also outputs this texture coordinate to the next stage of the shader pipeline
+
+74
+00:04:57,533 --> 00:04:59,466
+对于我们来说，就是片段着色器
+which for us is the fragment shader
+
+75
+00:05:00,366 --> 00:05:04,525
+基本上也就是接收，v_TextCoord就是来自顶点缓存区
+which basically takes in, that TextCoord from the vertex buffer
+
+76
+00:05:04,525 --> 00:05:06,825
+不好意思，来自顶点着色器
+sorry, from the vertex shader
+
+77
+00:05:07,400 --> 00:05:10,800
+然后还从CPU拿到了两个统一变量
+and then also takes in two uniforms from the CPU
+
+78
+00:05:11,233 --> 00:05:14,400
+然后使用纹理坐标，对纹理进行采样
+and then just basically samples the texture, using the texture coordinate
+
+79
+00:05:14,400 --> 00:05:20,900
+然后输出它从纹理采样中得到的颜色到这个output color
+and outputs the color that it retrieves from that texture sampling into this output color over here
+
+80
+00:05:20,966 --> 00:05:22,300
+在我们最后这个片段缓冲区中
+in our final frame buffer
+
+81
+00:05:22,300 --> 00:05:24,633
+所以那就是着色器的作用
+so that is how that's what our shader does
+
+82
+00:05:24,633 --> 00:05:29,966
+如果我们认为着色器是特定于任何位置的，不
+so if we think about the shader is a specific to any kind of position, well no
+
+83
+00:05:30,100 --> 00:05:33,033
+因为它以某种方式获取到了了位置，不是吗
+because it takes the position in from some way, doesn't it
+
+84
+00:05:33,366 --> 00:05:35,433
+我们看看它从哪里得到这个位置
+well, let's look at where it gets the position from
+
+85
+00:05:35,600 --> 00:05:37,366
+所以你们可能注意到的第一个东西就是那个，是的
+so the first thing you might notice is that, yes
+
+86
+00:05:37,366 --> 00:05:42,433
+上面这里有一个position属性，意思是这个来自顶点缓冲区
+we have a position attribute up here, which means that this is coming in from the vertex buffer
+
+87
+00:05:42,633 --> 00:05:47,200
+那么我们可以做的，做为实现这个的其中一种方法是
+so what we could do, as just one of the ways that we could do this is
+
+88
+00:05:47,333 --> 00:05:49,800
+我们可以提供不同的顶点位置
+we could supply different vertex positions
+
+89
+00:05:50,433 --> 00:05:55,000
+现在那需要一个额外的顶点缓冲区
+now what that would require is having an additional vertex buffer
+
+90
+00:05:55,000 --> 00:05:58,266
+因为我们需要创建第二个顶点缓冲区
+because we would need to create a second vertex buffer
+
+91
+00:05:58,300 --> 00:06:02,533
+它包含了ChernoLogo的第二个实例的所有位置
+which contains all of the positions of the second instance of the ChernoLogo
+
+92
+00:06:02,666 --> 00:06:05,433
+然后我们可以用那个把它们放在某个地方
+and then we could use that to actually put them somewhere
+
+93
+00:06:05,733 --> 00:06:08,066
+并且这是可行的，很好，这是实现这个的一种方法
+and that will work, that's fine, that's one way to do things
+
+94
+00:06:08,133 --> 00:06:09,225
+我们看一下，如果有其他的方法
+let's see, if there's another way
+
+95
+00:06:09,225 --> 00:06:11,525
+那么实际上发生在这儿的另一件事
+so the other thing that actually happens here
+
+96
+00:06:11,525 --> 00:06:14,866
+你们可以看到这个位置也乘上了这个统一变量
+you can see that this position also gets multiplied with this uniform
+
+97
+00:06:14,966 --> 00:06:16,800
+也就是我们的模型视图投影矩阵
+which is our model view projection matrix
+
+98
+00:06:16,800 --> 00:06:21,133
+那么除了改变属性和那个顶点缓冲区，我们还可以做的是
+so what we could also do instead of changing that attribute and that vertex buffer is
+
+99
+00:06:21,133 --> 00:06:24,566
+我们可以就改变那个模型视图投影矩阵统一变量，对吧
+we could just change that model view projection matrix uniform, right
+
+100
+00:06:24,566 --> 00:06:28,750
+我们基本上可以给它一个矩阵，它应用了不同的变换
+we could basically just provide it with a matrix, that had a different transformation applied 
+
+101
+00:06:28,750 --> 00:06:31,000
+本质上就像一个不同的模型矩阵
+like a different model matrix essentially
+
+102
+00:06:31,275 --> 00:06:34,425
+它将我们的对象放置在场景中的其他地方
+which positioned our objects somewhere else in the scene
+
+103
+00:06:34,766 --> 00:06:39,633
+然后当它与现有的顶点属性相乘时
+and then when that got multiplied with that existing kind of vertex attributes that we have
+
+104
+00:06:39,633 --> 00:06:43,166
+那些现有的位置，它就会把它们放在屏幕的其他地方
+those existing positions, it would put them somewhere else in the screen
+
+105
+00:06:43,300 --> 00:06:47,800
+所以那就是两种方法，或者说另外两种我们可以修改的数据
+so that's kind of the two ways right now, or other two pieces of data that we could actually modify
+
+106
+00:06:47,966 --> 00:06:52,100
+以便让两个ChernLogo出现在屏幕上的不同位置
+in order to get two ChernLogo to show up in different places on the screen
+
+107
+00:06:52,433 --> 00:06:56,333
+所以在这种情况下，我要做的是，不去管顶点缓冲区
+so in this case, what I would do is, I would leave the vertex buffer alone
+
+108
+00:06:56,600 --> 00:07:01,033
+事实上，现在我认为，它被设定为(100, 200)，或者它没有被标准化
+and in fact, right now I think, it's set to like (100, 200), or like it's not kind of normalized
+
+109
+00:07:01,033 --> 00:07:04,900
+我可能会把它调成0左右
+I'd probably just set it up to be scented around zero
+
+110
+00:07:05,100 --> 00:07:11,966
+然后我会提供两个不同的模型视图矩阵，模型视图投影矩阵
+and then I would just provide two different model view matrix, model view projection matrices
+
+111
+00:07:11,966 --> 00:07:13,900
+把它们放在屏幕的其他地方
+to actually position them somewhere else in the screen
+
+112
+00:07:14,150 --> 00:07:19,650
+因为有两个顶点缓冲区是我们GPU中不必要的内存使用
+because having two vertex buffers is an unnecessary kind of memory usage that we have in our GPU
+
+113
+00:07:19,650 --> 00:07:25,425
+我们还需要重新绑定它们，这并不像提供一个不同的统一变量那么快
+and also we need to rebind them, which is not as fast as just providing a different uniform
+
+114
+00:07:25,575 --> 00:07:32,300
+事实上，每次绘制时提供一整个不同的统一变量是很常见的
+in fact, it's pretty common to just provide a whole set of different uniforms every time you draw
+
+115
+00:07:32,400 --> 00:07:33,766
+然而对于顶点缓冲区
+whereas a vertex buffer
+
+116
+00:07:34,366 --> 00:07:36,366
+在这种情况下，我们不需要改变它
+we don't necessarily need to change it in this case
+
+117
+00:07:36,366 --> 00:07:38,300
+所以我们不需要担心那个
+so we don't need to actually worry about that
+
+118
+00:07:38,300 --> 00:07:39,975
+顺便说一下，我刚才说过
+by the way, I did just say
+
+119
+00:07:39,975 --> 00:07:42,566
+重新绑定一个不同的顶点缓冲区要比设置统一变量慢
+that rebinding a different vertex buffer is slower than uniforms
+
+120
+00:07:42,566 --> 00:07:46,166
+其实不是这样的，把统一变量交给GPU实际上涉及到
+that's not actually true, sending uniforms over to the gpu actually involves
+
+121
+00:07:46,266 --> 00:07:47,933
+将数据从CPU传输到GPU
+transferring data from the CPU to the GPU
+
+122
+00:07:47,933 --> 00:07:51,366
+所以我并不是说，这样做会更快
+so I didn't actually mean, it's physically faster to do that
+
+123
+00:07:51,700 --> 00:07:52,800
+我只是在讨论事实
+I'm just talking about the fact
+
+124
+00:07:52,800 --> 00:07:56,766
+我们不需要有两个冗余的数据集来绑定它们
+that we don't need to have two redundant sets of data that we need to bind between
+
+125
+00:07:56,766 --> 00:07:59,733
+并且它让我们感觉我们有两个不同的对象
+and basically it makes it feel like we have two different objects
+
+126
+00:07:59,766 --> 00:08:05,366
+在这种情况下，我们只需提供一个不同的模型视图矩阵就容易得多
+in this case, it's a lot easier for us just to provide a different model view metrics
+
+127
+00:08:05,366 --> 00:08:07,466
+并那就是模型视图投影矩阵
+and that's it a model view projection metrics
+
+128
+00:08:07,533 --> 00:08:09,333
+就是这样，让我们来看看，我们怎么做
+and that's it, so let's take a look at, how we might do that
+
+129
+00:08:09,600 --> 00:08:13,066
+那么如果我返回Application.cpp
+so if I go back to our Application.cpp
+
+130
+00:08:13,066 --> 00:08:16,266
+实际上我首先要做的是，关闭这个renderer
+what I'm actually gonna do first of all, close this renderer thing
+
+131
+00:08:17,366 --> 00:08:21,300
+我只需要考虑我在这里提供的这些位置
+emmm is, I'm just going to like think about these positions that I've actually supplied here
+
+132
+00:08:21,300 --> 00:08:24,866
+那么这些都是纹理坐标它们被填满了，不管任何需求，不用担心它们
+so these are all texture coordinates they're filled with whatever need, don't worry about them
+
+133
+00:08:24,866 --> 00:08:28,900
+但这里我们有一个100×100的像素或单位
+but what we have here is we have a 100 by 100 pixel or unit
+
+134
+00:08:29,266 --> 00:08:33,166
+在这个例子中，一个单位就是一个像素，这儿这个正方形
+in this case, one unit is one pixel, a square here
+
+135
+00:08:33,166 --> 00:08:38,125
+所以我要做的就是让它以(0, 0)为中心
+so what I'm going to do is, I'm going to make it so that it's centered around (0, 0)
+
+136
+00:08:38,375 --> 00:08:42,466
+因为现在它从100到200，那不是很大
+because right now it kind of goes from 100 to 200, and that's not great
+
+137
+00:08:43,666 --> 00:08:46,533
+因为这意味着如果我们提供任何形式的变换
+because it means that if we provide any kind of translation to it
+
+138
+00:08:46,533 --> 00:08:48,800
+它将从这个作为原点
+it's going to be from this as the origin
+
+139
+00:08:48,800 --> 00:08:53,433
+所以我们没有原点，它实际上是0，我希望原点是0
+so we don't have an origin, that's actually zero, and I would like our origin to be zero
+
+140
+00:08:53,833 --> 00:08:57,033
+所以我要做的是，因为它需要是100×100
+so what I'm going to do is, because it needs to be 100 by 100
+
+141
+00:08:57,166 --> 00:09:03,125
+因为我要让左界和下界都是-50，然后右边的边界是50
+as I'm going to make the kind of left bound and the bottom bound -50, and then the right bound 50
+
+142
+00:09:03,125 --> 00:09:07,333
+因为这是一个100x100的正方形，所以我要改变这个
+because that gives us a 100 by 100 square, so I'll change this
+
+143
+00:09:07,333 --> 00:09:12,366
+基本上任何100的值都要改成-50
+basically anything that is 100 needs to be changed to be -50
+
+144
+00:09:12,366 --> 00:09:15,733
+所有的200都要改成50，好了
+and everything that is 200 needs to be changed to be 50, okay
+
+145
+00:09:16,066 --> 00:09:21,366
+所以这里是-50，这里也是-50
+so this is going to become -50, and this is also going to be -50
+
+146
+00:09:21,566 --> 00:09:25,300
+我把所有的100换成-50，就像那样
+I'll change all the 100 right now to be -50, just like that
+
+147
+00:09:25,366 --> 00:09:27,133
+然后这些就变成了50
+and then these are going to become 50
+
+148
+00:09:27,133 --> 00:09:30,533
+我在这里腾出一个空间，这样所有的东西都能完美地对齐
+and I'll just relieve a space here, so that everything kind of lines up perfectly
+
+149
+00:09:31,633 --> 00:09:35,400
+好了，完成，如果我们按f5来看这个
+okay, there we go, done, so if we just hit f5 to look at this
+
+150
+00:09:35,466 --> 00:09:40,266
+我们应该看到的是因为(0, 0)是屏幕的左下角
+what we should see is because (0, 0) is the bottom left of our screen
+
+151
+00:09:40,266 --> 00:09:43,166
+如果我设置它的位置为(0, 0)
+if I set the position of this to (0, 0)
+
+152
+00:09:43,366 --> 00:09:45,833
+它应该以零点为中心
+what it should be is kind of centered around our zero point
+
+153
+00:09:45,833 --> 00:09:50,466
+现在它有点难以看到，另外，我认为我们有一个相机变换应用
+now it's a bit hard to see, and additionally I think we have a camera transformation applied
+
+154
+00:09:50,466 --> 00:09:52,633
+如果我快速点击这里的停止键
+so if I just hit stop here real quick
+
+155
+00:09:52,900 --> 00:09:56,333
+我看了看它提供的模型视图投影矩阵
+and I take a look at the model view projection matrix that it were actually supplying
+
+156
+00:09:56,675 --> 00:10:01,500
+这是我们的视图矩阵，可以看到它被平移了-100，我不用担心这个
+so this is our view matrix, you can see that it's translated -100, I'm not going to worry about that
+
+157
+00:10:01,633 --> 00:10:06,033
+现在我要对相机做的就是让它的平移为0
+what I'm going to do for now for the camera is just leave it to be a translation of zero
+
+158
+00:10:06,033 --> 00:10:11,233
+所以我把这些代码都留在这里，有点多余，因为显然我们没有任何平移
+so I'll kind of leave all this code here, it is a bit redundant, because obviously we have no translation
+
+159
+00:10:11,233 --> 00:10:15,866
+所以这个矩阵只是一个单位矩阵，这意味着我们可以不乘它
+so this matrix is just an identity matrix, which means that we might as well not multiply it at all
+
+160
+00:10:15,866 --> 00:10:19,100
+但我们以后会改变这些东西，那就是为什么我要留下代码
+but we'll change this stuff in the future, that's why I'm leaving the code
+
+161
+00:10:19,966 --> 00:10:23,866
+所以我们有这个，只是外面变得更黑了
+so we have this over here, and it just got a lot darker outside
+
+162
+00:10:23,866 --> 00:10:29,066
+现在下雨了，如果这个视频里的灯光变了，我很抱歉
+and now it's raining, so if the lighting in this video changes, I'm sorry 
+
+163
+00:10:29,933 --> 00:10:35,300
+但墨尔本的天气就是这样的，这个视图矩阵基本上就是
+but that's how Melbourne weather works, okay, so this view matrix is basically just
+
+164
+00:10:36,033 --> 00:10:38,266
+我们的相机没有任何平移
+we don't have any transmission applied to our camera
+
+165
+00:10:38,766 --> 00:10:43,100
+它在中间，在默认位置，也就是0 0 0
+it's just in the kind of middle, it's in the default position, which is just 0 0 0
+
+166
+00:10:43,433 --> 00:10:46,600
+所以如果我们现在看这个，现在我们没有那个变换
+so if we look at this now, now that we don't have that transformation
+
+167
+00:10:46,766 --> 00:10:53,166
+如果我把这个设置为(0, 0)，你们可以看到这个ChernoLogo是居中的
+if I just set this to (0, 0), you can see that basically this ChernoLogo is kind of centered
+
+168
+00:10:53,166 --> 00:10:55,000
+中心点是(0, 0)
+the center point is that zero is zero
+
+169
+00:10:55,000 --> 00:10:59,350
+当然外面的x和y都是- 50
+of course it goes negative to 50 outside in both x and y
+
+170
+00:10:59,350 --> 00:11:02,633
+所以那就是我们现在要讲的内容，这样我们就能达成共识了
+so that's where we're out right now, just so that we're on the same page
+
+171
+00:11:03,000 --> 00:11:08,433
+所以现在我要做的是渲染这个东西两次
+so now what I'm going to do is I'm going to render this thing twice
+
+172
+00:11:08,833 --> 00:11:13,733
+我要改变这儿模型视图投影的统一变量
+except what I'm going to do is change that model view projection uniform here
+
+173
+00:11:13,733 --> 00:11:17,433
+所以至于颜色，我们可以保留相同的颜色，这一点无关紧要
+so the color, we can leave the same color, does not matter at this point
+
+174
+00:11:17,433 --> 00:11:21,533
+不论如何我们在渲染一个纹理，不会用这个颜色或其他什么来吸引它
+because we're rendering a texture anyway, and we're not tempting it by this color or whatever
+
+175
+00:11:21,533 --> 00:11:23,700
+所以这还不如不存在
+so this is just might as well not exist
+
+176
+00:11:24,200 --> 00:11:27,966
+事实上，我可能会停止设置它，因为它在代码方面令人困惑
+in fact I'm probably gonna stop setting it, because it's just confusing in terms of code
+
+177
+00:11:28,200 --> 00:11:30,833
+所以我现在需要绑定着色器，你们会注意到
+so I need to bind the shader now, you'll note that
+
+178
+00:11:30,866 --> 00:11:33,433
+当然，渲染一个绘制确实需要绑定着色器
+of course render a drawer does actually bind the shader
+
+179
+00:11:33,433 --> 00:11:36,166
+那挺好的，但我们需要去设置统一变量
+that's all fine, but we need to set up uniforms
+
+180
+00:11:36,166 --> 00:11:39,400
+并且为了设置统一变量，我们需要激活一个已绑定的着色器
+and in order to set uniforms, we need to have an active shader bound
+
+181
+00:11:39,400 --> 00:11:41,633
+这样我们就把它们绑定到右边的这个统一变量上
+so that we can bind them to the right uniforms
+
+182
+00:11:41,650 --> 00:11:44,525
+或者这样我们就可以将统一变量绑定到正确的着色器上
+or so that we can bind the uniforms to the right shader
+
+183
+00:11:44,825 --> 00:11:48,000
+所以基本上就可以绘制了
+so we need to basically and draw
+
+184
+00:11:48,000 --> 00:11:52,200
+那么首先，我们知道绑定的着色器已经在这里被激活了
+so first of all, we know that shader bind already is activated here
+
+185
+00:11:52,200 --> 00:11:56,400
+所以我们不需要再绑定了，基本上我要做的就是绑定我的着色器
+so we don't need to bind again, so what I'm basically going to do is I'm going to bind my shader
+
+186
+00:11:56,400 --> 00:12:00,733
+然后在我绘制之前，我要像这样设置这个统一变量两次
+and then before I draw, I'm just going to set this uniform twice like this
+
+187
+00:12:00,833 --> 00:12:04,725
+对吧，所以在每次绘制之前，我都要设定一个模型视图投影统一变量
+right, so before every draw, I'm setting out a model view projection uniform 
+
+188
+00:12:04,925 --> 00:12:09,000
+在我设置第二个之前，我实际上需要做的当然就是改变它
+now what I need to do before I set the second one is of course actually change it
+
+189
+00:12:09,266 --> 00:12:10,966
+所以我要做的就是
+so what I'm going to do is
+
+190
+00:12:11,233 --> 00:12:16,100
+我们有这个模型矩阵，这是我们的第一个translation
+we have this model matrix here, which is kind of our well our first translation
+
+191
+00:12:16,400 --> 00:12:20,433
+我要对translation做的就是到上面这里，复制并粘贴它
+what I'm going to do is go up here to translation, copy and paste that
+
+192
+00:12:20,833 --> 00:12:23,666
+我把这个叫做translationA和translationB
+I'm going to call this translation a and translation b
+
+193
+00:12:24,566 --> 00:12:31,900
+我把这个x设为400而不是200，然后如果我往下看
+I'm going to put this one maybe at 400 x instead of 200 x, and then if I go down here
+
+194
+00:12:32,000 --> 00:12:35,566
+我要用translationA来得到这儿的第一个模型矩阵
+I'm going to use translation a to get the first model matrix here
+
+195
+00:12:36,000 --> 00:12:40,933
+并且那就是我们要发送的，事实上，为了让这个保持更清晰一些
+and that's what we're going to actually send, and in fact, just to just to keep this a bit cleaner
+
+196
+00:12:41,133 --> 00:12:47,966
+我将把这个和SetUniformMap4像那样一起包含在这个作用域中，好了
+I'm actually going to enclose this in a scope along with that SetUniformMap4 just like that, okay
+
+197
+00:12:50,233 --> 00:12:52,833
+所以那就是我们设定的第一个统一变量
+and so that's basically our setting the first uniform
+
+198
+00:12:52,833 --> 00:12:54,633
+也许我会把drawer放进这个作用域中
+and maybe I'll even put the drawer into the scope
+
+199
+00:12:54,633 --> 00:12:57,500
+这样就讲得通了，这是一种绘图操作
+so that it kind of makes sense, this is kind of one operation to draw
+
+200
+00:12:57,500 --> 00:13:01,333
+并且现在我要对这里做同样的事情
+and now I'm going to do the exact same thing to what we have over here
+
+201
+00:13:01,766 --> 00:13:06,366
+只是我们要用translationB来代替，所以是一样的
+it's just that we're going to use translation b instead, so identical same thing
+
+202
+00:13:06,366 --> 00:13:09,100
+只是我们用的是translationB
+it's just that we're using translation b instead
+
+203
+00:13:09,575 --> 00:13:13,700
+好了，只有在第一次运行这个循环时，我们才需要这个绑定的着色器
+okay, and we need this shader of bind really only for the first time we run through this loop
+
+204
+00:13:13,700 --> 00:13:16,550
+因为drawer会绑定那个着色器，永远不会解绑它
+because drawer will bind that shader, and never unbind it anyway
+
+205
+00:13:16,550 --> 00:13:18,566
+并且因为我们没有绑定其他着色器
+and since we're not binding additional shaders
+
+206
+00:13:18,566 --> 00:13:21,333
+这一切就都可以了，你们想让这个代码更稳健一点
+this will all work, you want to make this code a bit more robust
+
+207
+00:13:21,333 --> 00:13:23,633
+更明智的做法是把它搬到这里来
+it would be wiser to actually move that into here
+
+208
+00:13:25,633 --> 00:13:28,033
+再说一次，如果你们在已绑定的着色器上调用BindShader
+again, if you call BindShader on the shader that's already bound
+
+209
+00:13:28,066 --> 00:13:31,300
+这有点多余，有点慢，有点浪费性能
+that's a bit redundant, that's a bit slow, that's a bit of a waste of performance
+
+210
+00:13:31,533 --> 00:13:35,433
+通常是在更复杂的设置中，如真实游戏引擎或图像引擎
+usually in more complicated setups, such as a natural game engine or a graphics engine
+
+211
+00:13:35,700 --> 00:13:39,233
+你们会有一个缓存系统，那就像挂起一分钟
+you would have a some kind of cache system, that would be like hang on a minute
+
+212
+00:13:39,233 --> 00:13:41,100
+你们试图绑定已绑定的着色器
+you're trying to bind the shader that's already bound
+
+213
+00:13:41,133 --> 00:13:44,300
+那是多余的，我不会运行那个OpenGL调用
+that's redundant, I'm just not gonna run that OpenGL call
+
+214
+00:13:44,700 --> 00:13:48,500
+显然，我们没有像那样的任何设置，但对于这个例子来说，还是不错的
+we don't have anything like that set up obviously, but it'll be fine for this example
+
+215
+00:13:48,500 --> 00:13:50,975
+好了，所以translation A和B的设置不同
+okay, so translation a and b set up differently
+
+216
+00:13:50,975 --> 00:13:54,066
+并且现在我要做的就是修复这些ImGui错误
+and now what I'm going to do here is as I fix these ImGui errors
+
+217
+00:13:54,066 --> 00:13:57,125
+我要确保我们有一个translationA
+I'm actually going to make sure that we have translation a 
+
+218
+00:13:57,125 --> 00:14:00,500
+并且我还会添加translationB到这个ImGui窗口
+and I'm also going to add translation b into this ImGui window as well
+
+219
+00:14:00,500 --> 00:14:06,200
+所以我们有像那样的a和b，现在按f5，看看我们得到了什么
+so we'll have a and b just like that, now let's hit f5, and see what we get alright
+
+220
+00:14:06,200 --> 00:14:09,866
+看看这个，我们有两个ChernoLogos，让我把这个移开
+check this out, so we have two ChernoLogos, let me just move this out of the way
+
+221
+00:14:10,100 --> 00:14:12,950
+并且如果我修改第一个，你们可以看到，它动了
+and if I modify that first one, you can see, it moves
+
+222
+00:14:12,950 --> 00:14:16,300
+第一个移到这里，我可以上下左右移动
+the first one over here, and I can move it up and down or left right
+
+223
+00:14:16,600 --> 00:14:22,566
+然后这里的第二个也是通过我们这里的2D滑块修改的
+and then also the second one over here is modified via that 2D slider that we have over here
+
+224
+00:14:22,666 --> 00:14:27,066
+很酷的东西，所以基本上就那样，那就是你们渲染两个对象的方式
+pretty cool stuff, so that's basically it, that's how you render two objects
+
+225
+00:14:27,066 --> 00:14:31,800
+实际上，我们在这里所做的是，渲染了相同的对象两次
+really all we're doing here is, we're rendering the exact same object twice
+
+226
+00:14:32,100 --> 00:14:37,025
+我们没有改变任何东西，除了一个统一变量，我们这样做的原因是
+we're not changing anything except for a single uniform, and the reason we're doing that is
+
+227
+00:14:37,025 --> 00:14:40,600
+因为我们想在实际屏幕上显示两个不同的位置
+because we wanted to show up in two different positions on our actual screen
+
+228
+00:14:41,566 --> 00:14:46,850
+现在你们可能会想，好了，好吧，酷，那就是我渲染多个对象的方式
+now you might be thinking okay, well, cool, that's how I ran to multiple objects 
+
+229
+00:14:46,850 --> 00:14:52,100
+所以如果我想要放弃一些贴图地图，也许我可以创造一款2D游戏
+so if I want to surrender some kind of tile map, maybe I'm making like a game, 2D game
+
+230
+00:14:52,333 --> 00:14:55,033
+我有像这样的层次，这只是一个贴图地图
+and I have like this kind of level, that's just a tile map
+
+231
+00:14:55,166 --> 00:14:57,733
+我想我只要写一个for循环就可以直接实现这个了
+I guess I just write a for loop that goes ahead and does this
+
+232
+00:14:58,600 --> 00:15:02,366
+不，这并不是渲染所有内容的解决方案
+no, this isn't the solution to rendering everything
+
+233
+00:15:02,366 --> 00:15:03,575
+因为如果你们那样做的话
+because if you do that
+
+234
+00:15:03,575 --> 00:15:06,666
+如果你们有一个渲染1000个贴图在屏幕上的满循环
+if you just have a full loop that renders 1000 tiles on the screen
+
+235
+00:15:07,033 --> 00:15:10,933
+那将会非常慢，因为这是1000个绘制调用，并且就是那样的
+that's gonna be pretty slow, because that's 1000 draw calls, and you it's just that
+
+236
+00:15:10,933 --> 00:15:16,000
+它一点都不会快，你们可能会注意到非常低的帧率
+there's no, it's not gonna be fast at all, you'll probably notice very poor frame rates
+
+237
+00:15:16,000 --> 00:15:19,400
+我的意思是，在不错的硬件上，它仍然可能是60
+I mean it still probably will be about 60 on decent hardware
+
+238
+00:15:19,433 --> 00:15:24,500
+因为在这里没有太多的渲染在机器上的1000次绘制调用，难道不可怕吗
+because there's nothing much to render here in 1000 draw calls on a pc, isn't awful
+
+239
+00:15:24,833 --> 00:15:30,800
+但你们实际可以做些叫做批处理的在一个单独的绘制调用中绘制它
+but you can actually draw that in a single draw call by doing something called batching
+
+240
+00:15:30,800 --> 00:15:35,266
+也就是把所有的贴图都塞进一个顶点缓冲区
+which is where you actually shove all of your tiles into one vertex buffer
+
+241
+00:15:35,433 --> 00:15:39,075
+然后不像我在这里做的那样
+and then have kind of instead of doing it the way that I did it here
+
+242
+00:15:39,075 --> 00:15:41,100
+就是我只修改统一变量
+which is I'm just changing the uniform
+
+243
+00:15:41,633 --> 00:15:46,533
+你们实际上可以用我提到的另一种方法，基本上也就是
+you can actually do the other method that I mentioned, which is basically instead of having
+
+244
+00:15:47,766 --> 00:15:50,750
+我们基本上是在改变顶点缓存中的顶点位置
+we're basically changing the vertex positions that are in the vertex buffer
+
+245
+00:15:50,750 --> 00:15:51,900
+并且如果你们把那个设置好了的话
+and if you set that up
+
+246
+00:15:51,900 --> 00:15:53,675
+但不是有两个不同的顶点缓冲区
+but instead of having two different vertex buffers
+
+247
+00:15:53,675 --> 00:15:55,425
+而是你们把它们都塞进一个顶点缓冲区
+you shove it all into one vertex buffer
+
+248
+00:15:55,733 --> 00:15:59,966
+然后你们就可以一次渲染所有的东西，所有的点都已经在那里了
+and then you kind of just render everything all in one go, and all the dot is already there
+
+249
+00:16:00,000 --> 00:16:04,666
+因为顶点缓冲区非常大，它包含了你们拥有的每个贴图的所有位置
+because the vertex buffer is very large, and it contains all the positions for every single tile you have
+
+250
+00:16:05,000 --> 00:16:09,066
+那比你们直接去绑定一个着色器要快1000倍
+that would be 1000 times faster than if you go ahead and you bind a shader
+
+251
+00:16:09,066 --> 00:16:12,766
+修改统一变量，在1000个贴图中添加更多元素
+you change the uniform and you do greater elements for 1000 tiles
+
+252
+00:16:12,933 --> 00:16:18,846
+好了，并且我们肯定会探索使用这种批处理渲染方法
+okay, and we are absolutely going to explore doing that kind of batching rendering method
+
+253
+00:16:18,846 --> 00:16:23,066
+因为这是就像2D游戏，有大量2D的渲染，这是必须的
+because it's like for 2D games, it's a lots of 2D rendering, it's a must
+
+254
+00:16:23,066 --> 00:16:24,500
+即使你们渲染的是布局
+even if you're rendering like layouts
+
+255
+00:16:24,500 --> 00:16:28,925
+或者像你们知道的文本之类的东西，对于文本来说，这是至关重要的
+or like kind of you know text stuff like that, for text, it's vital 
+
+256
+00:16:28,925 --> 00:16:33,213
+因为你们在文本中渲染的每一种字符都是一个单独的绘制调用
+because every kind of character that you render in text is a separate draw call
+
+257
+00:16:33,213 --> 00:16:35,213
+或者它是一个单独的，比如方形
+or it's a separate like quad
+
+258
+00:16:35,366 --> 00:16:38,533
+并且我们不希望它们是独立的绘制调用，所以这就是
+and we don't want them to be separate draw calls, so this is
+
+259
+00:16:38,800 --> 00:16:41,025
+我们很快就会讲到它
+we'll definitely cover it in the future very soon probably
+
+260
+00:16:41,025 --> 00:16:44,600
+但我这样做的原因是，这可能是一种合理的方式
+but the reason I did it this way is because this is kind of probably the way that makes sense
+
+261
+00:16:44,600 --> 00:16:47,866
+并且这可能是最简单的方法，也非常非常有用
+and it's probably the most simple way, and it's also really really useful
+
+262
+00:16:47,866 --> 00:16:53,825
+如果在一个相当复杂的3D对象下，这就是100%，我们实际上会怎么做
+if we were under a 3D objects that were quite complex, this is 100%, how we would actually do that
+
+263
+00:16:54,275 --> 00:16:59,300
+此外，它还引入了我们需要讨论的最重要的东西之一
+and additionally it opens up one of the most important things that we need to talk about
+
+264
+00:16:59,300 --> 00:17:02,966
+这两个对象的不同之处仅仅是统一变量
+which is the thing that is different about these two objects is just the uniforms
+
+265
+00:17:03,266 --> 00:17:06,366
+所以我们最终需要研究的是一种叫做材质的东西
+so what we need to eventually get into is something called a material
+
+266
+00:17:06,600 --> 00:17:09,433
+材质其实就是一个着色器和一堆统一变量
+and a material is really just a shader and a bunch of uniforms
+
+267
+00:17:09,666 --> 00:17:11,333
+并且我们以后会讲到那个的
+and we'll get into that in the future
+
+268
+00:17:11,333 --> 00:17:14,933
+所以如果你们想让我继续说这两个东西的话，可以在下方留言
+so leave a comment below as to if you want me to continue with this kind of two stuff
+
+269
+00:17:14,933 --> 00:17:18,233
+以及在下一期中介绍批处理渲染器，因为我可能会这样做
+and cover the batch renderer in the next episode, because I'll probably end up doing that
+
+270
+00:17:18,233 --> 00:17:21,200
+我想，但除此之外，我们可以谈谈材质
+I think, but otherwise, we might talk about materials and
+
+271
+00:17:21,200 --> 00:17:25,266
+开始做一些更令人兴奋的事情，这两个主题都很重要
+start getting into some more exciting things like that, both topics are very important
+
+272
+00:17:25,300 --> 00:17:27,366
+无论如何，我们都要讲到它们的，它们真的很常见
+and we'll have to cover them, anyway, and they're very seeing
+
+273
+00:17:27,400 --> 00:17:31,366
+那么可以在下方留言，并为任何提到你们赞同的评论点赞
+so just leave a comment below, and thumbs up any comments that mentioned which one you agree with
+
+274
+00:17:31,666 --> 00:17:34,233
+我们将在下一期看到我们会做什么
+and we'll see what we can do for the next episode
+
+275
+00:17:34,833 --> 00:17:37,666
+无论如何，我希望你们喜欢这个视频，如果喜欢，那就为它点个赞吧
+anyway, I hope you guys enjoyed this video, if you did, hit the like button
+
+276
+00:17:37,700 --> 00:17:40,625
+也可以通过访问patreon.com/TheCherno来帮助支持这个系列教程
+you can also help support the series by going to patreon.com/TheCherno
+
+277
+00:17:40,625 --> 00:17:43,100
+像往常一样，非常感谢我的支持者们
+huge thank you as always to all my lovely supporters
+
+278
+00:17:43,100 --> 00:17:46,500
+每期视频的所有源码都是为支持者提供的
+all the source code for every single video is up for patrons
+
+279
+00:17:46,500 --> 00:17:47,966
+所以一定要支持这个系列教程
+so definitely support this series
+
+280
+00:17:47,966 --> 00:17:49,650
+如果你们对获取源代码感兴趣的话
+if you're interested in getting the source code
+
+281
+00:17:49,650 --> 00:17:53,100
+并且还有很多为了感谢你们的支持的其他奖励
+and there's also a bunch of other awards to thank you for your support
+
+282
+00:17:54,033 --> 00:17:56,033
+下次见，拜拜
+I will see you guys next time, goodbye
+

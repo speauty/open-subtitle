@@ -1,0 +1,2105 @@
+﻿1
+00:00:00,100 --> 00:00:00,900
+嘿，你们好
+hey, what's up guys
+
+2
+00:00:00,900 --> 00:00:03,466
+我是Cherno，欢迎回到我的OpenGL系列教程
+my name is Cherno, welcome back to my OpenGL series
+
+3
+00:00:03,600 --> 00:00:05,833
+所以今天我们会讨论索引缓冲区
+so today we're gonna be talking all about index buffers
+
+4
+00:00:05,833 --> 00:00:07,933
+上一次我们也讨论了着色器
+last time we talked about shaders and also
+
+5
+00:00:08,400 --> 00:00:09,700
+在那之前是顶点缓冲区
+before that vertex buffers
+
+6
+00:00:09,700 --> 00:00:11,433
+如果你还没看过的话，去找到那些视频看看吧
+check out those videos, if you haven't already
+
+7
+00:00:11,633 --> 00:00:13,733
+但今天我们会关注一个新东西
+but today we're gonna be focusing on something new
+
+8
+00:00:13,733 --> 00:00:15,566
+它叫索引缓冲区
+something called an index buffer
+
+9
+00:00:16,133 --> 00:00:16,933
+现在
+now
+
+10
+00:00:17,400 --> 00:00:19,833
+在我定义什么是索引缓冲区之前
+before I kind of define what an index buffer actually is
+
+11
+00:00:19,833 --> 00:00:21,133
+然后我们开始讨论
+and we get into talking about
+
+12
+00:00:21,133 --> 00:00:23,366
+为什么我们需要用它们，以及它们到底是什么
+why we want to use them, and what they actually are
+
+13
+00:00:23,600 --> 00:00:26,200
+让我们先考虑一个基础的问题
+let's think of...let's just think of a basic problem
+
+14
+00:00:26,200 --> 00:00:28,033
+我们可能在图形编程中
+that we might have in graphics programming
+
+15
+00:00:28,333 --> 00:00:29,500
+我们想去画一个正方形
+we want to draw a square
+
+16
+00:00:29,566 --> 00:00:31,800
+直到现在，我们都只是画了一个三角形
+up until now, we've just been drawing a triangle
+
+17
+00:00:31,800 --> 00:00:34,066
+那就是，它只是显示在屏幕上的一个独立的三角形
+that's it just one single triangle on the screen
+
+18
+00:00:34,175 --> 00:00:35,366
+一切正常
+everything's been fine
+
+19
+00:00:35,700 --> 00:00:36,233
+它看起来像是
+it looks like
+
+20
+00:00:36,266 --> 00:00:39,766
+我们在我们代码中实现的那种方式非常高效
+the way that we're kind of doing that in our code is pretty efficient
+
+21
+00:00:39,900 --> 00:00:42,833
+然后，让我们尝试画一个正方形吧
+however, let's try and draw a square
+
+22
+00:00:43,100 --> 00:00:45,375
+所以我们实际上要做的就是去画一个正方形
+so what do we need to do to actually draw a square well
+
+23
+00:00:45,375 --> 00:00:47,633
+我们显卡实际上做的一切东西
+everything that our GPU actually does
+
+24
+00:00:47,766 --> 00:00:49,300
+都可以归结到三角形
+comes down to triangles
+
+25
+00:00:50,000 --> 00:00:51,966
+我们稍后可能会讨论为什么会是那样
+we might talk later about why that is
+
+26
+00:00:51,966 --> 00:00:54,600
+但对于现在, 只需要绘制一个三角形, 差不多
+but for now, just picture a triangle, as pretty much
+
+27
+00:00:55,000 --> 00:00:57,066
+使用最少的顶点吧
+the smallest number of vertices
+
+28
+00:00:57,066 --> 00:00:58,833
+我们需要展示一个平面
+we need to represent one flat
+
+29
+00:00:58,833 --> 00:01:00,633
+有法线的平面
+kind of plane with a normal that is
+
+30
+00:01:00,933 --> 00:01:03,433
+和一个曲面的法线, 指向一个方向
+with a surface normal that is pointing in a single direction
+
+31
+00:01:03,433 --> 00:01:06,366
+因为显卡倾向于使用三角形作为
+because of that GPU tend to kind of use triangles as
+
+32
+00:01:06,366 --> 00:01:08,533
+它们渲染一些原始的东西, 对吧
+they're rendering kind of primitive, right
+
+33
+00:01:08,933 --> 00:01:10,566
+所以一切都基于三角形
+so everything's based on triangles
+
+34
+00:01:10,633 --> 00:01:12,966
+所以当我们试着画两个正方形的时候或者
+so when we try and draw two squares or rather
+
+35
+00:01:13,000 --> 00:01:14,700
+抱歉, 当我们画正方形的时候
+sorry, when we try and draw a square
+
+36
+00:01:14,966 --> 00:01:16,700
+它真的只是一个三角形
+it's really just a triangle
+
+37
+00:01:16,966 --> 00:01:18,900
+对吧, 或者两个三角形
+right, or specifically two triangles
+
+38
+00:01:19,025 --> 00:01:21,000
+我们画的任何东西都是由三角形组成的
+anything we draw is made up of triangles
+
+39
+00:01:21,200 --> 00:01:24,433
+所以正方形就是两个三角形, 对吧, 1  2
+so a square is just two triangles, right, 1 2
+
+40
+00:01:24,466 --> 00:01:25,900
+那就是它, 两个三角形
+that's it, two triangles
+
+41
+00:01:26,200 --> 00:01:29,666
+所以让我们试着用当前的设置来做, 并且
+so let's try and do that with our current setup, and
+
+42
+00:01:29,666 --> 00:01:30,666
+看看会发生什么
+see what happens
+
+43
+00:01:30,733 --> 00:01:31,400
+所以在这里
+so over here
+
+44
+00:01:31,400 --> 00:01:34,066
+我们这里基本上有一组顶点
+we have basically this set of vertices here for you
+
+45
+00:01:34,066 --> 00:01:34,866
+但是让我们
+but let's just
+
+46
+00:01:35,266 --> 00:01:36,300
+让我们运行这个应用程序
+let's just run this application
+
+47
+00:01:36,300 --> 00:01:37,266
+看看我们到底得到了什么
+see what we've actually got
+
+48
+00:01:37,400 --> 00:01:38,600
+我们在这儿看到了这个三角形
+we've got this triangle here
+
+49
+00:01:39,400 --> 00:01:40,433
+漂亮的蓝色三角形
+nice blue triangle
+
+50
+00:01:40,700 --> 00:01:41,733
+如果我们看一下代码
+if we take a look at the code
+
+51
+00:01:41,733 --> 00:01:44,733
+我们有这三个顶点, 如果我们画一个正方形
+we've got these three vertices, if we try and draw a square
+
+52
+00:01:44,733 --> 00:01:46,166
+好吧, 让我们想一下
+well, let's think about that for a minute
+
+53
+00:01:46,166 --> 00:01:47,200
+我在这儿直接打开illustrate(Adobe的一款工业标准矢量插画软件)
+I'm just gonna open illustrate here
+
+54
+00:01:47,200 --> 00:01:48,533
+所以我可以给你们画个图解
+so I can draw you a diagram
+
+55
+00:01:48,900 --> 00:01:51,500
+而不是我们像这样画我们的三角形
+instead of us kind of drawing our triangle like this
+
+56
+00:01:51,500 --> 00:01:52,766
+就像现在这样
+which is what it is right now
+
+57
+00:01:53,066 --> 00:01:54,766
+我们想画一个正方形
+we want to kind of draw a square
+
+58
+00:01:55,133 --> 00:01:56,000
+在两个三角形外
+out of two triangles
+
+59
+00:01:56,000 --> 00:01:57,466
+而我们可以实现那个的方式就是通过
+and the way we can do that is just by
+
+60
+00:01:57,500 --> 00:01:58,900
+像那样画两个三角形
+drawing two triangles like that
+
+61
+00:01:59,333 --> 00:02:01,333
+明白吧, 所以我们在这儿有了一个三角形
+right, so we kind of have one triangle over here
+
+62
+00:02:01,600 --> 00:02:03,100
+以及在这儿的一个三角形
+and one triangle over here
+
+63
+00:02:03,266 --> 00:02:05,233
+那么分别画出这两个三角形
+and drawing those two triangles separately
+
+64
+00:02:05,233 --> 00:02:06,933
+有点像那样, 那么然后像这样
+kind of like that, and then like that
+
+65
+00:02:07,000 --> 00:02:08,266
+或者你想怎么做都行
+or however you want to do it
+
+66
+00:02:08,266 --> 00:02:10,233
+实际上, 我们可能会像这样去实现它
+in fact, we're probably going to do it like this
+
+67
+00:02:10,933 --> 00:02:12,233
+并且然后像那样
+and then like that
+
+68
+00:02:12,766 --> 00:02:13,766
+所以这就是我们实际上如何
+so that's how we're going to actually
+
+69
+00:02:13,766 --> 00:02:14,666
+构成那个正方形
+make up that square
+
+70
+00:02:14,666 --> 00:02:17,225
+所以我们来讨论一下这些可能是什么位置
+so let's talk about which positions these might actually be
+
+71
+00:02:17,225 --> 00:02:18,233
+所以这里的这个
+so this one over here
+
+72
+00:02:18,233 --> 00:02:21,233
+我们知道xy都会是-0.5
+we know is kind of going to be -0.5 in both x and y
+
+73
+00:02:21,233 --> 00:02:23,500
+那就是我们在这里得到的, 对吧
+that's kind of what we've got over here, right
+
+74
+00:02:23,700 --> 00:02:25,033
+我们来看下一个
+the next one if we come over here
+
+75
+00:02:25,033 --> 00:02:27,566
+我们把它画成逆时针的形式
+we kind of draw this in an anti clockwise fashion
+
+76
+00:02:27,933 --> 00:02:29,700
+然后我们先画出这个顶点
+then we're going to be drawing this vertex first
+
+77
+00:02:29,766 --> 00:02:32,033
+然后是这个顶点, 然后是这个顶点, 对吧
+then this vertex, then this vertex, right
+
+78
+00:02:32,033 --> 00:02:33,066
+所以当我们回到我们的源码
+so if we go back to our source
+
+79
+00:02:33,066 --> 00:02:36,166
+那么那里的xy基本上都是-0.5
+so that's basically going to be -0.5 in x and y
+
+80
+00:02:36,500 --> 00:02:38,400
+这个顶点的x就是0.5
+this one's going to be positive 0.5
+
+81
+00:02:38,500 --> 00:02:42,733
+而然后y还是保持-0.5
+and then still keeping negative 0.5 for y
+
+82
+00:02:42,966 --> 00:02:45,500
+那么然后我们将y提升到0.5
+and then we're going to lift y up to positive 0.5
+
+83
+00:02:45,500 --> 00:02:46,833
+并且也像那样保持x
+and also keep x like that
+
+84
+00:02:47,133 --> 00:02:48,900
+所以如果我们现在运行这个程序
+so if we just run this program now
+
+85
+00:02:49,100 --> 00:02:52,433
+我们应该画出第一个三角形, 你可以看到那就是我们得到的
+we should have that first triangle drawn, and you can see that's what we get
+
+86
+00:02:52,533 --> 00:02:54,500
+好的, 所以现在我们需要画第二个三角形
+okay, so now we need to draw the second triangle
+
+87
+00:02:54,666 --> 00:02:56,433
+所以让我们在这儿先画出这个顶点
+so let's start off with drawing this vertex here
+
+88
+00:02:56,533 --> 00:02:57,500
+然后这个顶点在这儿
+then this vertex here
+
+89
+00:02:57,500 --> 00:03:00,833
+然后这个顶点继续逆时针运动
+then this vertex here to kind of keep going in a counter clockwise fashion
+
+90
+00:03:00,866 --> 00:03:01,900
+所以回到我们的代码
+so back to our code
+
+91
+00:03:01,900 --> 00:03:03,266
+而我们要在这里添加一些顶点
+and we're going to add some vertices here
+
+92
+00:03:03,266 --> 00:03:04,633
+我要把这个6去掉
+I'm just going to get rid of this six here
+
+93
+00:03:04,633 --> 00:03:06,100
+这样我们就能有我们需要的
+so that we can have as many as we need
+
+94
+00:03:06,100 --> 00:03:08,133
+我将复制并粘贴这个顶点位置
+I'm going to copy and paste this vertex position
+
+95
+00:03:08,133 --> 00:03:09,700
+因为它们是完全一样的
+because it's going to be exactly the same
+
+96
+00:03:09,700 --> 00:03:12,233
+当然, 这两个顶点实际上是一样的
+of course, these two vertices are actually the same
+
+97
+00:03:12,700 --> 00:03:16,833
+然后我再添加一个顶点, 也就是左上角
+and then I'm going to add one more vertex for that'll be the top left corner
+
+98
+00:03:17,033 --> 00:03:20,950
+它的x是-0.5, y是0.5
+which is going to be -0.5 x and positive 0.5 y
+
+99
+00:03:20,950 --> 00:03:25,233
+那么然后最后, 这个顶点也和这个顶点是一样的
+and then finally, this vertex over here is also kind of the same as this vertex
+
+100
+00:03:25,500 --> 00:03:27,700
+所以那和第一个是一样的
+so that'll be the same as the very very first one here
+
+101
+00:03:27,700 --> 00:03:29,566
+所以现在我们有六个顶点
+so now we have six vertices
+
+102
+00:03:29,566 --> 00:03:30,666
+如果我下来到这儿
+if I come down over here
+
+103
+00:03:30,666 --> 00:03:32,825
+我们需要调整顶点缓冲区的大小
+we need to adjust the size of our vertex buffer 
+
+104
+00:03:32,825 --> 00:03:34,966
+这样它实际上就可以接收所有的内存
+so that it can actually take in all of this memory
+
+105
+00:03:35,166 --> 00:03:37,100
+所以我想做的而不是只把这个改成12
+so I'm going to instead of just changing this to be 12
+
+106
+00:03:37,100 --> 00:03:40,400
+我想把它写成这样, 6*2*sizeof(float)
+I want to make it six times two time sizeof float
+
+107
+00:03:40,400 --> 00:03:42,256
+因为, 当然, 在这儿的每个顶点
+because, of course, each vertex here
+
+108
+00:03:42,256 --> 00:03:44,833
+都是两个浮点型大小, 并且我们有六个顶点
+is a size of two floats, and we have sex vertices 
+
+109
+00:03:44,833 --> 00:03:46,333
+这只是读起来容易一些
+it's just a little bit easier to read
+
+110
+00:03:46,533 --> 00:03:47,433
+如果我滚动到这里
+if I scroll down here
+
+111
+00:03:47,433 --> 00:03:48,500
+我需要改动的另一件事
+the other thing I need to change
+
+112
+00:03:48,500 --> 00:03:49,966
+就是代替只绘制三个顶点
+is instead of just drawing three
+
+113
+00:03:50,266 --> 00:03:51,666
+我们当然需要绘制六个顶点
+we of course need to draw six
+
+114
+00:03:51,666 --> 00:03:53,000
+所以在我的glDrawArrays函数
+so in my glDrawArrays
+
+115
+00:03:53,000 --> 00:03:54,100
+我会把它改成6
+I'm going to change this to six
+
+116
+00:03:54,100 --> 00:03:55,133
+那么然后这里是5
+and then here at five
+
+117
+00:03:55,166 --> 00:03:56,266
+好了, 很酷
+all right, there we go pretty cool
+
+118
+00:03:56,266 --> 00:03:58,433
+所以现在我们有了一个正方形
+so we've got an actual square now well
+
+119
+00:03:58,433 --> 00:03:58,966
+具体地说
+specifically
+
+120
+00:03:58,966 --> 00:04:01,266
+这是一个长方形, 因为我们的窗口是
+this is a little bit rectangular, because our window is
+
+121
+00:04:01,266 --> 00:04:02,900
+实际上不是正方形的
+actually not not square
+
+122
+00:04:02,900 --> 00:04:04,000
+这看起来很好
+so that seems pretty good
+
+123
+00:04:04,000 --> 00:04:05,333
+我的意思是我们已经画出了一个正方形
+I mean we've managed to draw a square
+
+124
+00:04:05,333 --> 00:04:06,966
+它并不太难
+it wasn't too difficult
+
+125
+00:04:06,966 --> 00:04:08,466
+但是有些东西
+but there is something
+
+126
+00:04:08,800 --> 00:04:10,033
+有点不太理想
+a little bit sub optimal
+
+127
+00:04:10,033 --> 00:04:12,033
+关于我们画这个正方形的方式
+about the way that we're actually drawing this square
+
+128
+00:04:12,033 --> 00:04:14,766
+并且特别地, 让我们看一下我们的顶点
+and specifically let's take a look at our vertices
+
+129
+00:04:14,766 --> 00:04:18,700
+所以回到这里, 在我们实际的顶点数组中
+so back over here, in our actual vertex kind of array that we have here
+
+130
+00:04:19,133 --> 00:04:20,700
+你可以看到我们实际上在做的是
+you can see that what we're actually doing is
+
+131
+00:04:20,700 --> 00:04:22,100
+我们在自我重复
+we're repeating ourselves
+
+132
+00:04:22,133 --> 00:04:25,066
+我们在这里有两个顶点, 对吧
+we've got this vertex over here twice, right
+
+133
+00:04:25,266 --> 00:04:26,266
+并且我们得到了这个
+and we've got this one
+
+134
+00:04:26,266 --> 00:04:28,566
+第一个和最后一个也是完全一样的
+this first and last one is also exactly the same
+
+135
+00:04:28,966 --> 00:04:30,366
+这些并不是完全唯一的
+these aren't completely unique
+
+136
+00:04:30,366 --> 00:04:31,866
+也就是说我们现在做的是
+which means what we're actually doing is
+
+137
+00:04:31,866 --> 00:04:33,433
+我们在复制我们的内存
+we're kind of duplicating our memory
+
+138
+00:04:33,433 --> 00:04:38,633
+我们在显存中存储相同顶点位置的相同字节
+we're storing these same bytes of the same vertex positions in our GPU memory
+
+139
+00:04:38,933 --> 00:04:41,333
+存储了多次, 而那个有点浪费
+multiple times, and that's a little bit wasteful
+
+140
+00:04:41,333 --> 00:04:46,266
+因为显存并不是无限的, 而我们想要降低它的内存使用
+because well GPU memory isn't just infinite, and we do want to keep that down
+
+141
+00:04:46,833 --> 00:04:50,633
+所以我们能做的就是使用一个叫做索引缓冲区的东西
+so what we can actually do is use something called an index buffer
+
+142
+00:04:50,633 --> 00:04:53,900
+这允许我们重用现有的顶点
+which allows us to reuse existing vertices
+
+143
+00:04:54,066 --> 00:04:55,366
+因为如果你仔细想想
+because if you think about it
+
+144
+00:04:55,366 --> 00:04:56,700
+我们确实想说的
+what we really want to say
+
+145
+00:04:57,133 --> 00:05:00,700
+就是像这样绘制这三个顶点
+is draw kind of these three vertices like this
+
+146
+00:05:01,166 --> 00:05:01,833
+并且然后可能
+and then maybe
+
+147
+00:05:01,833 --> 00:05:05,633
+绘制这三个顶点来组成第二个三角形, 这很简单
+draw these three vertices to make up the second triangle, this is much easy
+
+148
+00:05:05,633 --> 00:05:06,400
+这样就简单多了
+this is gonna be much easier
+
+149
+00:05:06,400 --> 00:05:07,766
+如果我就用图解来像你们展示这个
+if I just show you on this on diagram
+
+150
+00:05:07,766 --> 00:05:08,700
+我不知道我为什么要这么做
+I don't know why I'm doing this
+
+151
+00:05:08,866 --> 00:05:10,133
+所以让我们回到illustrator
+so let's go back to illustrator
+
+152
+00:05:10,200 --> 00:05:11,300
+这将是美妙的
+it'll be fantastic
+
+153
+00:05:11,300 --> 00:05:15,633
+如果我们只是说, 让我把这里的颜色可能换成红色
+if we could just say, and let me just change my color over here to maybe red
+
+154
+00:05:15,800 --> 00:05:18,133
+如果我们只是说我想画出这个顶点
+if we could just say I want to draw this vertex
+
+155
+00:05:18,233 --> 00:05:19,500
+然后我需要绘制这个顶点
+then I want to draw this vertex
+
+156
+00:05:19,500 --> 00:05:21,000
+然后我需要绘制这个顶点
+then I want to draw this vertex
+
+157
+00:05:21,233 --> 00:05:23,066
+并且然后我也需要绘制这个顶点
+and then I want to draw this vertex again
+
+158
+00:05:23,566 --> 00:05:25,100
+在这儿这个新顶点
+this new vertex over here
+
+159
+00:05:25,133 --> 00:05:27,400
+并且然后再是第一个顶点, 对吧
+and then this first vertex again, right
+
+160
+00:05:27,666 --> 00:05:31,066
+因为这就是我们画这部分所需要的
+because that would be all we would need to really say to draw this part
+
+161
+00:05:31,366 --> 00:05:34,566
+然后像那样把那部分也画出来, 好了
+and then just draw that part as well like that, okay
+
+162
+00:05:34,633 --> 00:05:37,566
+所以我们要避免自我重复
+so we want to avoid kind of repeating ourselves
+
+163
+00:05:37,566 --> 00:05:40,866
+或者更确切地说, 就是多次使用相同的内存
+or specifically just having the exact same memory multiple times
+
+164
+00:05:40,866 --> 00:05:42,033
+那真的很浪费内存
+that's very wasteful
+
+165
+00:05:42,033 --> 00:05:45,066
+现在显然对于正方形, 或者矩形来说
+now obviously for a square, or for a rectangle
+
+166
+00:05:45,066 --> 00:05:47,200
+它可能看起来并不浪费
+it might not seem wasteful
+
+167
+00:05:47,425 --> 00:05:49,600
+因为它没有太多的东西
+because there's not much to it
+
+168
+00:05:49,600 --> 00:05:53,533
+我的意思是, 是的, 我们的顶点缓冲区中有50%的数据
+I mean, yes, we do have 50% more data in our vertex buffer
+
+169
+00:05:53,800 --> 00:05:56,800
+因为我们存储了两个额外的顶点而不是四个
+because we're storing two extra vertices instead of storing four
+
+170
+00:05:56,800 --> 00:05:57,933
+实际上我们存储了六个顶点
+we're storing six
+
+171
+00:05:58,066 --> 00:06:00,833
+然而, 当你想到3D模型时, 对吧
+however, when you think about a 3D model, right
+
+172
+00:06:00,833 --> 00:06:05,600
+也许你的游戏中有一个角色, 一艘宇宙飞船, 或者其他什么, 对吧
+maybe you've got a character in your game, or a spaceship, or whatever it may be, right
+
+173
+00:06:05,950 --> 00:06:10,066
+每一个组成那个飞船或那个角色的独立三角形
+every single triangle that makes up that ship or that character
+
+174
+00:06:10,600 --> 00:06:13,533
+会被连接到另一个三角形, 对吧
+is going to be connected to another triangle, right
+
+175
+00:06:13,766 --> 00:06:17,400
+这意味着你已经立马重复了至少两个顶点
+which means that you're immediately already repeating at least two vertices
+
+176
+00:06:17,466 --> 00:06:19,333
+并且然后也许那儿上面还有一个三角形
+and then maybe there's another triangle up there
+
+177
+00:06:19,866 --> 00:06:20,666
+对吧, 所以
+right, so
+
+178
+00:06:21,266 --> 00:06:24,166
+你可以看到这是如何逐渐失控的
+you can kind of see how this just kind of escalates out of control
+
+179
+00:06:24,166 --> 00:06:26,433
+并且你可能有很多遍历
+and you might have so many traverses
+
+180
+00:06:26,433 --> 00:06:27,300
+并不只是那样
+not only that
+
+181
+00:06:27,333 --> 00:06:28,433
+但是当你实际渲染
+but when you're actually rendering
+
+182
+00:06:28,433 --> 00:06:30,966
+渲染丝线图形和潜在的类似
+rendering thready graphics and potentially in like
+
+183
+00:06:31,066 --> 00:06:33,666
+也许你用的是基于物理的渲染
+maybe you're using something like physically based rendering
+
+184
+00:06:34,000 --> 00:06:35,733
+你的顶点可能很大
+your vertices might be pretty big
+
+185
+00:06:35,733 --> 00:06:37,300
+你可能有顶点位置
+you might have vertex positions
+
+186
+00:06:37,300 --> 00:06:40,566
+由法线切线颜色组成的正常的纹理坐标
+normally texture coordinates by normal tangents colors
+
+187
+00:06:40,600 --> 00:06:43,066
+它们可能都在一个顶点上
+you might that might all be in one vertex
+
+188
+00:06:43,066 --> 00:06:46,300
+那么如果你不得不复制整个缓冲区
+and if you have to duplicate that entire kind of buffer
+
+189
+00:06:47,000 --> 00:06:50,166
+它一次又一次地构成了那个实际的顶点
+that makes up that actual vertex again and again and again
+
+190
+00:06:51,166 --> 00:06:53,300
+那是完全不现实的, 对吧
+that's just going to be completely unrealistic, right
+
+191
+00:06:53,300 --> 00:06:57,966
+只用一个简单的索引会更快更有效
+just having a simple index instead is going to be much quicker and much more efficient
+
+192
+00:06:58,133 --> 00:06:59,133
+所以让我们
+so let's let's just
+
+193
+00:06:59,133 --> 00:07:01,600
+让我们来转换一下这种顶点缓冲
+let's just convert this kind of vertex buffer that we have
+
+194
+00:07:01,600 --> 00:07:04,700
+现在让我们给它添加一个索引缓冲区, 并删除那些
+now let's add an index buffer to it, and remove those
+
+195
+00:07:04,700 --> 00:07:07,633
+重复的冗余内存
+kind of that duplicate redundant memory
+
+196
+00:07:08,100 --> 00:07:09,933
+所以当我回到我的源码
+so if I go back to my source code over here
+
+197
+00:07:10,266 --> 00:07:12,533
+我要做的是创建一个索引缓冲区, 所以
+what I'm going to do is make an index buffer, so
+
+198
+00:07:12,766 --> 00:07:15,133
+我们做这个的方法, 好吧
+the way that we do this in kind of well
+
+199
+00:07:15,766 --> 00:07:17,166
+这儿有其他去思考它的方法, 真的
+here's another way to think about it really
+
+200
+00:07:17,300 --> 00:07:20,600
+当我们去掉这个数组中所有多余的东西, 对吧
+if we get rid of all of the redundant stuff inside this array, right
+
+201
+00:07:20,600 --> 00:07:23,900
+所以这里只有唯一的顶点位置
+so that we only have unique vertex positions here
+
+202
+00:07:24,166 --> 00:07:26,100
+我将做的就是去掉这个
+what I'll do is I'll get rid of this one
+
+203
+00:07:26,133 --> 00:07:27,066
+因为它是重复的
+because it's the duplicate
+
+204
+00:07:27,066 --> 00:07:30,033
+并且我把最后一个去掉, 因为它也是重复的, 对吧
+and I'll get rid of that last one, because it's the duplicate, right
+
+205
+00:07:30,200 --> 00:07:33,033
+所以现在我们的数组基本上就是这样
+so now what we have is basically this
+
+206
+00:07:33,100 --> 00:07:34,633
+而当我回到illustrator, 这样的话
+and if I go back to illustrator, just so
+
+207
+00:07:34,633 --> 00:07:36,533
+你们可以想象这多么简单
+you guys can visualize this a little bit easier
+
+208
+00:07:36,533 --> 00:07:38,966
+当我让它变成绿色或类似颜色的时候
+when I make this color green or something like that
+
+209
+00:07:38,966 --> 00:07:43,300
+对吧, 这是我们的索引0, 这是索引1
+right, this this is our index zero, this is index one
+
+210
+00:07:43,366 --> 00:07:46,700
+这是索引2, 以及这个是索引3, 好了
+this is index two, and this is index three, okay
+
+211
+00:07:46,966 --> 00:07:52,033
+所以0 1 2 3, 在这儿每行一个
+so 0 1 2 3 each line over here
+
+212
+00:07:52,033 --> 00:07:53,666
+我把它分离成一行一行的
+I've kind of divided it line by line
+
+213
+00:07:53,733 --> 00:07:55,433
+每行就是一个独立的顶点, 并且当然
+is a single vertex, and of course
+
+214
+00:07:55,666 --> 00:07:58,400
+如果我们从0开始给这些顶点编号
+if we kind of number these vertexes starting from zero
+
+215
+00:07:58,400 --> 00:08:00,066
+我们得到了一个索引的排序
+we get a sort of index
+
+216
+00:08:00,166 --> 00:08:01,333
+所以当我创建
+so if I was to create
+
+217
+00:08:01,433 --> 00:08:04,466
+一个无符号整型数组在这儿, 就叫indices, 并且
+an unsigned int array here, called indices, and
+
+218
+00:08:04,466 --> 00:08:09,833
+我基本上只是想画出和之前一样的正方形, 我可以说的就是
+I just wanted to basically draw that same square that I had before, what I could say is
+
+219
+00:08:10,066 --> 00:08:11,933
+使用第一个和第二个顶点
+use the first vertex the second
+
+220
+00:08:12,000 --> 00:08:16,566
+以及第三个顶点, 就像那样得到第一个三角形
+and the third vertex, to kind of get this first triangle over here like that
+
+221
+00:08:16,800 --> 00:08:19,075
+所以那会是0 1 2
+so that will be zero one and two
+
+222
+00:08:19,075 --> 00:08:24,266
+如果我们像这样引用顶点, 如同它们的索引
+if we kind of refer to our vertices like this, as if they were indexed which they are
+
+223
+00:08:24,333 --> 00:08:27,066
+我们得到了这个顺序, 对吧, 0 1 2
+we kind of get this order, right, so 0 1 2
+
+224
+00:08:27,166 --> 00:08:32,533
+那么然后, 对于第二个三角形, 我需要2 3 0这样的顺序索引, 对吧
+and then, for the second triangle, I want to do two three and zero, right
+
+225
+00:08:32,600 --> 00:08:37,666
+因为那是这个位置2, 对吧, 然后是3和0
+because that's this position two, right,z three and zero
+
+226
+00:08:37,666 --> 00:08:41,666
+这就是我们如何画这个三角形, 第二个三角形的
+which is how we can kind of draw this triangle, the second one
+
+227
+00:08:41,800 --> 00:08:47,433
+所以就是2 3 0, 并且那实际上就是一个索引缓冲区
+so 2 3 and zero, and that is actually an index buffer
+
+228
+00:08:47,433 --> 00:08:50,475
+我们刚刚创建了准确的数据, 我们需要说明
+we've just created exactly the data, we need to tell
+
+229
+00:08:50,475 --> 00:08:53,700
+OpenGL, 如何去渲染这个三角形或者是这个正方形
+OpenGL, how to render this triangle or either this square
+
+230
+00:08:53,800 --> 00:08:55,766
+而不是使用而不是给它提供
+without using, without providing it
+
+231
+00:08:55,766 --> 00:09:00,133
+冗余或重复的顶点位置, 所有这些所有的顶点
+with redundant or duplicate vertex positions, and all of that all vertices
+
+232
+00:09:00,200 --> 00:09:01,600
+我刚才应该说, 因为很明显
+I should just say, because obviously
+
+233
+00:09:01,733 --> 00:09:03,466
+在这个例子中, 我们只有位置
+in this case, we've just got positions
+
+234
+00:09:03,466 --> 00:09:04,333
+但它们会是
+but they could be
+
+235
+00:09:04,500 --> 00:09:05,966
+它们里面可能有更多的数据
+they could be a lot more data in there
+
+236
+00:09:05,966 --> 00:09:07,466
+所以现在剩下的就是
+so now all that remains is
+
+237
+00:09:07,466 --> 00:09:09,166
+实际上取代它的数据就是
+actually instead of having this data here
+
+238
+00:09:09,166 --> 00:09:10,766
+这些在CPU上的indices
+these indices here on the CPU
+
+239
+00:09:10,766 --> 00:09:12,700
+我们实际上需要把它们发送到显卡上
+we want to actually send them to the GPU
+
+240
+00:09:12,800 --> 00:09:15,533
+并且然后, 告诉OpenGL用它们去渲染, 明白吧
+and then, tell OpenGL to render using them, okay
+
+241
+00:09:15,700 --> 00:09:17,700
+而我们实现那个的方式
+and the way that we do that is very
+
+242
+00:09:17,700 --> 00:09:19,766
+非常非常像我们实际上创建一个顶点缓冲区的方式
+very similar to the way that we actually make a vertex buffer
+
+243
+00:09:19,766 --> 00:09:20,700
+所以让我们复制这个
+so let's copy this
+
+244
+00:09:20,933 --> 00:09:23,500
+我要把这个放在顶点属性后面
+I'm gonna put this after our kind of vertex attribute stuff
+
+245
+00:09:23,500 --> 00:09:24,433
+就把它粘贴在这儿吧
+just paste it here
+
+246
+00:09:24,666 --> 00:09:26,033
+我把这个重命名为ibo
+I'm gonna rename this ibo
+
+247
+00:09:26,033 --> 00:09:28,133
+代表了索引缓冲区对象
+which stands for index buffer object
+
+248
+00:09:28,200 --> 00:09:30,466
+因为它有点儿像我们的id或者是我们的对象
+because it's kind of like our id or our object
+
+249
+00:09:30,466 --> 00:09:32,766
+表示这个特定的索引缓冲区
+which represents this particular index buffer
+
+250
+00:09:32,800 --> 00:09:33,975
+我们去生成一个缓冲区
+we're going to generate a buffer
+
+251
+00:09:33,975 --> 00:09:38,100
+和我们生成普通缓冲区的方法一样, 这儿唯一真正的区别
+the exact same way that we generate a normal buffer, the only real difference here
+
+252
+00:09:38,300 --> 00:09:40,533
+就是代替把它作为一个数组缓冲区绑定
+is that instead of binding this as an array buffer
+
+253
+00:09:40,533 --> 00:09:42,033
+或者具体地说是那个插槽
+or specifically to that slot
+
+254
+00:09:42,033 --> 00:09:43,766
+就是那个GL_ARRAY_BUFFER插槽
+to that GL_ARRAY_BUFFER slot
+
+255
+00:09:43,933 --> 00:09:46,566
+我们会把它绑定到一个GL_ELEMENT_ARRAY_BUFFER
+we're binding it to a GL_ELEMENT_ARRAY_BUFFER
+
+256
+00:09:46,566 --> 00:09:48,933
+好了, 那么当我们确定了我现在做的那些
+okay, and once we'll just make sure that I'm doing that
+
+257
+00:09:48,933 --> 00:09:50,833
+就是绑定缓冲区和缓冲区数据
+for both the bind buffer and buffer data
+
+258
+00:09:51,033 --> 00:09:52,466
+我们现在绑定的缓冲区就是, 当然
+the buffer that we're binding is, of course
+
+259
+00:09:52,466 --> 00:09:54,100
+就是这个我们刚生成的ibo
+this ibo that we've just generated
+
+260
+00:09:54,100 --> 00:09:55,933
+并且最后当我们提供给它数据
+and finally when we supply it with data
+
+261
+00:09:55,933 --> 00:09:57,766
+而不是提供给它positions
+instead of supplying it with positions
+
+262
+00:09:57,766 --> 00:09:59,466
+我们提供给它这些indices
+we supply it with these indices
+
+263
+00:09:59,466 --> 00:10:01,033
+所以我就写indices
+so I'll just write indices
+
+264
+00:10:01,533 --> 00:10:03,000
+那么然后, 当然, 它们的大小是
+and then of course the size of them is
+
+265
+00:10:03,233 --> 00:10:06,233
+在这个例子中就是六个无符号整型
+in this case going to be six unsigned ints
+
+266
+00:10:07,166 --> 00:10:10,633
+现在, 记住那个, 这里我选择使用无符号整型
+now, keep in mind that, I've chosen to use unsigned ints here
+
+267
+00:10:10,700 --> 00:10:13,333
+因为将来我们可能会使用无符号整型
+because we'll probably likely be using unsigned int in the future
+
+268
+00:10:13,333 --> 00:10:16,533
+但是, 你可以只使用无符号字符或无符号短整型
+however, you can just use unsigned char or unsigned short
+
+269
+00:10:16,533 --> 00:10:17,866
+如果你想设置字符的内存
+if you want to kind of set memory char
+
+270
+00:10:17,866 --> 00:10:20,133
+当然是一个字节, 短整型的是两个字节
+of course being one byte, short being two bytes
+
+271
+00:10:20,133 --> 00:10:25,433
+整型是四个字节, 所以它们比一个字符需要更多的内存, 然后
+integers are four bytes, so they are a lot more memory than say a char, however
+
+272
+00:10:25,866 --> 00:10:28,075
+显然, 你会受到限制, 如果你使用一个字符
+obviously you have the restrictions of, if you use a char
+
+273
+00:10:28,075 --> 00:10:30,133
+你只有一个无符号字符
+you only have an unsigned char
+
+274
+00:10:30,266 --> 00:10:32,033
+你只有0到255个数字
+you only have zero to two fifty five
+
+275
+00:10:32,033 --> 00:10:35,169
+所以你只能有256个不同的indices
+so you can only have 256 different different indices
+
+276
+00:10:36,266 --> 00:10:38,333
+我们将在所有这些例子中使用无符号整数
+we're going to use unsigned ints for all these examples
+
+277
+00:10:38,333 --> 00:10:42,333
+因为在这种情况下不会有任何可衡量的性能差异
+because there's not going to be any measurable performance difference in this case
+
+278
+00:10:42,400 --> 00:10:43,133
+并且在以后
+and in the future
+
+279
+00:10:43,133 --> 00:10:48,300
+当我们有相当复杂的模型时, 我们可能希望使用无符号整型, 不管如何
+when we have pretty complex models, we'll likely want to be using unsigned ints, anyway
+
+280
+00:10:48,533 --> 00:10:51,533
+这儿的关键就是它必须是无符号的
+the key here is that it has to be unsigned
+
+281
+00:10:51,533 --> 00:10:54,400
+你不能使用一个符号类型, 明白吧
+you cannot use a signed type, okay
+
+282
+00:10:54,400 --> 00:10:57,433
+后面还会有更多关于它必须是无符号的内容, 所以在这里
+it has to be unsigned more on that later, so down here
+
+283
+00:10:58,333 --> 00:11:01,200
+所有这些验证了我们确实有6倍无符号整型大小
+all this verify that we do have six times unsigned ints
+
+284
+00:11:01,200 --> 00:11:03,166
+这就是我们在实际数组中得到的
+which is exactly what we've got in our actual array
+
+285
+00:11:03,166 --> 00:11:05,233
+那么然后我们当然把它放到这里
+and then we're of course taking it in over here
+
+286
+00:11:05,666 --> 00:11:07,066
+看起来很不错, 对吧
+so looks pretty good, right
+
+287
+00:11:07,066 --> 00:11:08,300
+那么我们还需要改变什么
+so what else do we need to change
+
+288
+00:11:08,366 --> 00:11:10,933
+好吧, 我们最需要改变的最后一个东西便是我们真正的DrawCall
+well, the last thing we need to change is our actual DrawCall
+
+289
+00:11:11,066 --> 00:11:13,066
+而不是glDrawArrays
+instead of being glDrawArrays
+
+290
+00:11:13,066 --> 00:11:15,200
+它变成了glDrawElements
+it becomes glDrawElements
+
+291
+00:11:15,300 --> 00:11:18,100
+并且这里的模式和我们画三角形是一样的
+and the mode here is the same with we're drawing triangles
+
+292
+00:11:18,233 --> 00:11:20,100
+这个count就是6
+the count is going to be six
+
+293
+00:11:20,100 --> 00:11:21,766
+因为我们要绘制六个索引
+because we're drawing six indices
+
+294
+00:11:21,833 --> 00:11:24,000
+这是我们绘制索引的数量
+this is the number of indices we're drawing
+
+295
+00:11:24,000 --> 00:11:25,733
+而不是我们绘制顶点的数量
+not the number of vertices we're drawing
+
+296
+00:11:25,733 --> 00:11:29,100
+这个type就是在索引缓冲区中数据的类型
+the type is the type of data that is in the index buffer
+
+297
+00:11:29,100 --> 00:11:31,666
+在这个例子中是GL_UNSIGNED_INT
+which in this case is GL_UNSIGNED_INT
+
+298
+00:11:31,966 --> 00:11:35,475
+而最后这是指向那个索引缓冲区的一个指针
+and finally this is a pointer to that index buffer
+
+299
+00:11:35,475 --> 00:11:36,900
+现在因为我们得到了一个绑定
+now because we've got a bound
+
+300
+00:11:37,500 --> 00:11:38,733
+在这个插槽里
+in this actual slot here
+
+301
+00:11:38,733 --> 00:11:42,433
+我们实际上, 你可以看到glBindBuffer(GL_ELEMENT_ARRAY_BUFFER)
+we've actually you can see glBindBuffer GL_ELEMENT_ARRAY_BUFFER
+
+302
+00:11:42,433 --> 00:11:45,266
+这个GL_ELEMENT_ARRAY_BUFFER就是一个索引缓冲区的插槽
+this GL_ELEMENT_ARRAY_BUFFER is a slot for index buffers
+
+303
+00:11:45,433 --> 00:11:47,400
+并且我们已经把我们的ibo绑定到那儿了
+and we've bound our ibo to there
+
+304
+00:11:47,600 --> 00:11:51,133
+我们实际上不需要在这里放任何东西, 所以我可以写一个空指针
+we don't actually have to put anything here, so I can just write an null pointer
+
+305
+00:11:51,466 --> 00:11:52,166
+就是这样
+and that's it
+
+306
+00:11:52,166 --> 00:11:52,900
+这就是我们所得到的
+that's all we've got
+
+307
+00:11:52,900 --> 00:11:55,300
+这是绘制我们三角形的实际DrawCall指令
+this is the actual DrawCall that draws our triangle
+
+308
+00:11:55,400 --> 00:11:57,300
+使用六个这种顶点, 对吧
+using six kind of vertices, right
+
+309
+00:11:57,300 --> 00:11:59,233
+但你明显可以看到我们的顶点缓冲
+but you can see obviously our vertex buffer
+
+310
+00:11:59,300 --> 00:12:02,925
+实际上只有四个顶点, 然后我们把它编入索引
+only actually has four vertices, and then we've indexed into that
+
+311
+00:12:02,925 --> 00:12:04,933
+所以我们按f5来运行这个程序
+so let's hit f5 to run this program
+
+312
+00:12:05,066 --> 00:12:07,700
+然后你可以看到我们得到了一个漂亮的矩形
+and you can see we get a beautiful rectangle
+
+313
+00:12:08,000 --> 00:12:08,900
+现在那真是太棒了
+now that's great
+
+314
+00:12:09,133 --> 00:12:11,933
+我没有提到这些必须是无符号的一些原因
+I didn't mention something about these having to be unsigned
+
+315
+00:12:12,100 --> 00:12:14,800
+这将会很好地引导到OpenGL系列的下一期
+and this is actually going to lead it great into the next OpenGL episode
+
+316
+00:12:14,800 --> 00:12:17,200
+但让我们还是故意犯一些错误吧
+but let's just deliberately make some kind of mistake
+
+317
+00:12:17,200 --> 00:12:18,733
+这很容易在不经意间做出来
+that's pretty easy to accidentally make
+
+318
+00:12:19,033 --> 00:12:21,766
+让我们不写GL_UNSIGNED_INT, 因为某些原因
+let's just say that instead of writing GL_UNSIGNED_INT, for some reason
+
+319
+00:12:21,766 --> 00:12:24,733
+我在这儿写GL_INT, 好了
+here I wrote GL_INT, okay
+
+320
+00:12:25,133 --> 00:12:26,700
+看起来很无恶意, 我是说
+looks pretty harmless, I mean
+
+321
+00:12:26,800 --> 00:12:29,466
+是的, 无符号整型在这儿真的有那么大的区别
+yeah, unsigned int is there really that much of a difference
+
+322
+00:12:29,466 --> 00:12:30,400
+我的意思是, 很明显这里是
+I mean obviously there is
+
+323
+00:12:30,400 --> 00:12:32,133
+但是假设我们不知道这个
+but let's just say that we didn't know that
+
+324
+00:12:32,333 --> 00:12:34,166
+按f5, 看一下
+let's hit f5 and look at that
+
+325
+00:12:34,200 --> 00:12:35,600
+我们看到了一个黑窗口
+we get a black screen
+
+326
+00:12:36,000 --> 00:12:38,500
+我们没有看到任何东西在这个终端打印
+we get absolutely nothing printing in the console
+
+327
+00:12:38,500 --> 00:12:40,000
+除了OpenGL版本
+except for that OpenGL version
+
+328
+00:12:40,833 --> 00:12:42,100
+那个还在这儿
+that what's going on here
+
+329
+00:12:42,100 --> 00:12:46,600
+你所做的是你用了无效的, 你用了整型
+well what you've done is you've used an invalid, you've used int
+
+330
+00:12:46,766 --> 00:12:50,033
+然而这个缓冲区或任何索引缓冲区
+whereas this buffer or any index buffer
+
+331
+00:12:50,033 --> 00:12:52,566
+必须由无符号整型组成
+has to be made up of unsigned integers
+
+332
+00:12:52,633 --> 00:12:53,933
+不是符号整型
+not signed integers
+
+333
+00:12:54,100 --> 00:12:55,233
+无符号整型
+unsigned integers
+
+334
+00:12:55,525 --> 00:12:57,666
+所以, 在我们的例子我们当然知道问题是什么
+so, of course in our case we know what the problem is
+
+335
+00:12:57,666 --> 00:12:58,800
+我们把这个还原回来
+we could just bring this back
+
+336
+00:12:58,800 --> 00:13:01,600
+但你可以想象, 有些人是如何做的
+but you can imagine, how some people
+
+337
+00:13:01,600 --> 00:13:03,666
+当他们写这段可能犯错的代码时
+when they write this code might make the mistake
+
+338
+00:13:03,666 --> 00:13:06,166
+我以前做过, 可能有好几百次了
+I've made it before, hundreds of times probably
+
+339
+00:13:06,566 --> 00:13:08,533
+而我想知道为什么我的屏幕是黑色的
+and I've wondered why do I have a black screen
+
+340
+00:13:08,966 --> 00:13:10,666
+这将引导我们进入下一期
+this is going to lead us into our next episode
+
+341
+00:13:10,666 --> 00:13:12,925
+那是关于OpenGL错误的
+which is going to be about OpenGL errors
+
+342
+00:13:12,925 --> 00:13:16,333
+以及特别是我们能做什么来处理OpenGL中的错误
+and specifically what we can do to deal with errors in OpenGL
+
+343
+00:13:16,333 --> 00:13:19,325
+因为你可以看到, 如果我给它一个无效的枚举(整型)
+because you can see, if I just give it an invalid enum
+
+344
+00:13:19,325 --> 00:13:21,325
+就像我刚才做的那样, 对吧然后
+like I just did, right, right then
+
+345
+00:13:21,500 --> 00:13:23,100
+它什么都不会告诉我们
+it's not gonna say anything to us
+
+346
+00:13:23,133 --> 00:13:24,766
+我们不知道自己做错了什么
+we have no idea what we've done wrong
+
+347
+00:13:24,933 --> 00:13:27,300
+相反, 我们得到了一个黑屏, 什么都不能用
+instead we get a black screen and nothing's working
+
+348
+00:13:27,300 --> 00:13:30,466
+诊断调试绝对是一场噩梦
+that can be an absolute nightmare to diagnose a debug
+
+349
+00:13:30,666 --> 00:13:32,333
+尤其是OpenGL新手
+especially if you're new to OpenGL
+
+350
+00:13:32,500 --> 00:13:35,066
+所以下次我们会讲到错误, 以及
+so next time we're going to talk about errors, and
+
+351
+00:13:35,266 --> 00:13:36,350
+我们对它们能做些什么呢
+what we can do about them
+
+352
+00:13:36,350 --> 00:13:41,166
+我们如何才能最好地从OpenGL获得错误报告
+how we can best kind of get error reporting back from OpenGL
+
+353
+00:13:41,266 --> 00:13:44,875
+并且就像, 基本上就是在OpenGL中充分利用错误
+and like, basically just make the best of errors in OpenGL
+
+354
+00:13:44,875 --> 00:13:47,633
+这样我们就能立刻知道, 当一些东西错了的时候
+so that we can know immediately, when something goes wrong
+
+355
+00:13:47,633 --> 00:13:49,166
+并且特别是哪里出了问题
+and specifically what goes wrong
+
+356
+00:13:49,766 --> 00:13:51,666
+那将会造成很多糟糕的情况
+that's going to be making a lot of a bad situation
+
+357
+00:13:51,666 --> 00:13:55,346
+因为OpenGL告诉你, OpenGL调试非常非常糟糕
+because OpenGL just telling you right now, OpenGL debugging is very very bad
+
+358
+00:13:55,346 --> 00:13:57,900
+不管怎样, 我们来重述一下索引缓冲区
+anyway, just to recap index buffers
+
+359
+00:13:58,100 --> 00:13:59,350
+我们实际上做的是
+what we've actually done is 
+
+360
+00:13:59,350 --> 00:14:03,525
+我们已经删除了我们这里的任何重复顶点
+we've removed any kind of duplicate vertices that we may have here
+
+361
+00:14:03,525 --> 00:14:07,366
+我们在这个顶点缓冲区中得到了完全唯一的顶点
+we've just got absolutely completely unique vertices in this vertex buffer
+
+362
+00:14:07,366 --> 00:14:11,250
+现在我们所做的就是在顶点缓冲区中创建了一个索引
+now what we've done is we've created an index into that vertex buffer
+
+363
+00:14:11,250 --> 00:14:14,900
+这样我们就可以多次绘制顶点
+to allow us to kind of draw vertices more than once
+
+364
+00:14:14,900 --> 00:14:18,900
+然后我们用这段代码把索引缓冲区发送给显卡
+and then we've actually sent that index buffer to the GPU using this code here
+
+365
+00:14:18,900 --> 00:14:20,100
+用我们创建的东西
+with what we've created one
+
+366
+00:14:20,100 --> 00:14:21,933
+然后我们把这些数据发送给显卡
+and then we've actually sent this data to the GPU
+
+367
+00:14:21,933 --> 00:14:22,966
+使用这行代码
+using this line here
+
+368
+00:14:23,333 --> 00:14:24,100
+并且然后最终
+and then finally
+
+369
+00:14:24,100 --> 00:14:29,266
+我们使用glDrawElements绘制使用实际的元素缓冲区或索引缓冲区
+we're using glDrawElements to draw using an actual element buffer or an index buffer
+
+370
+00:14:29,266 --> 00:14:30,666
+因为它们更常被称为(索引缓冲区)
+as they're more commonly called
+
+371
+00:14:31,566 --> 00:14:32,933
+而不是glDrawArrays
+instead of glDrawArrays
+
+372
+00:14:32,933 --> 00:14:35,733
+这个是顺序绘制顶点的
+which is just going to kind of draw vertices sequentially
+
+373
+00:14:35,733 --> 00:14:36,300
+就这样
+and that's it
+
+374
+00:14:36,300 --> 00:14:39,366
+这就是我们如何在OpenGL中使用索引缓冲区绘制正方形
+that's how we can draw a square in OpenGL using an index buffer
+
+375
+00:14:39,366 --> 00:14:41,300
+并且这基本上就是你在这里看到的
+and that basically what you see there
+
+376
+00:14:41,300 --> 00:14:45,200
+这个设置, 顶点缓冲区, 索引缓冲区, 以及glDrawElements的调用
+this setup, vertex buffer, index buffer, and glDrawElements call
+
+377
+00:14:45,666 --> 00:14:51,533
+那可能就是在我们屏幕和OpenGL东西中看到的90%吧
+that is probably how we read a 90% of our stuff onto our screen and OpenGL
+
+378
+00:14:51,600 --> 00:14:54,133
+即使是在全面的职业游戏中, 如triple-a游戏
+even in a full-on professional, like triple-a game
+
+379
+00:14:54,466 --> 00:14:55,266
+那就是你实现它要做的
+that's how you do it
+
+380
+00:14:55,266 --> 00:14:58,900
+glDrawElements是使用最多的函数
+glDrawElements is the function to be using most of the time 
+
+381
+00:14:59,325 --> 00:15:00,566
+不管怎样, 我希望你们喜欢这个视频
+anyway, I hope you guys enjoyed this video
+
+382
+00:15:00,566 --> 00:15:02,050
+如果你喜欢的话, 你可以点击那个喜欢按钮
+if you did, you can hit that like button
+
+383
+00:15:02,050 --> 00:15:03,700
+如果你想帮助支持这个系列
+if you want to help support this series
+
+384
+00:15:03,700 --> 00:15:06,466
+而且要确保新视频尽可能多地完成制作
+and make sure the new episodes come out as often as possible
+
+385
+00:15:06,466 --> 00:15:09,666
+同时还能得到一堆很酷的奖励
+as well as get a bunch of really cool rewards
+
+386
+00:15:09,666 --> 00:15:11,700
+前往pateron.com/TheCherno
+head on over to pateron.com/TheCherno
+
+387
+00:15:11,700 --> 00:15:14,933
+像往常一样, 向所有精彩的支持者大声喊出来
+massive shout out as always to all of the wonderful supporters
+
+388
+00:15:15,066 --> 00:15:16,600
+是让这个视频成为可能
+which make this video possible
+
+389
+00:15:16,933 --> 00:15:18,500
+没有他们什么都不是, 所以再次
+would be nothing without them, so again
+
+390
+00:15:18,700 --> 00:15:20,733
+感谢你们, 你们可以继续讨论
+thank you, you can keep talking about
+
+391
+00:15:20,733 --> 00:15:24,925
+我在本期视频中提到的内容, 通过登录TheCherno.com/discord
+what I've just mentioned in this video, by going to TheCherno.com/discord
+
+392
+00:15:24,925 --> 00:15:26,300
+或者在下方留言
+or just leave a comment below
+
+393
+00:15:26,700 --> 00:15:30,466
+你们用索引缓冲区吗, 因为你们应该没问题, 我是说
+do you guys use index buffers, because you should be okay, I mean
+
+394
+00:15:30,466 --> 00:15:34,333
+我喜欢参与社区, 在这些视频的最后, 我想说
+I like to kind of engage the community, so to speak at the end of these videos, and be like
+
+395
+00:15:34,333 --> 00:15:35,700
+嘿, 你们在干嘛
+hey, what do you guys do
+
+396
+00:15:36,133 --> 00:15:37,900
+但在这种情况下, 显然你喜欢
+but in this case obviously you like
+
+397
+00:15:37,900 --> 00:15:40,875
+我的意思是, 你应该对几乎所有的东西都使用索引缓冲区
+I mean, you should be using index buffers with pretty much everything
+
+398
+00:15:41,140 --> 00:15:43,825
+很难想象有什么东西不应该使用索引缓冲区
+hard to think of anything that shouldn't be using an index buffer
+
+399
+00:15:43,825 --> 00:15:44,400
+说实话
+to be honest
+
+400
+00:15:44,433 --> 00:15:46,166
+所以这是一个真正的问题
+so this is an even really a question
+
+401
+00:15:46,366 --> 00:15:48,000
+如果你需要使用索引缓冲区
+if you need to be using index buffers
+
+402
+00:15:48,133 --> 00:15:49,066
+它们的存在是有原因的
+they're there for a reason
+
+403
+00:15:49,566 --> 00:15:51,266
+并且它们是极好的
+and they're wonderful
+
+404
+00:15:51,850 --> 00:15:53,533
+不管怎样, 希望你们喜欢这个视频
+anyway, hope you guys enjoyed the video
+
+405
+00:15:53,533 --> 00:15:54,533
+下一期我们会
+next time we're going to
+
+406
+00:15:54,533 --> 00:15:58,466
+深入研究OpenGL错误, 以及看看我们如何正确处理它们
+dive into OpenGL errors, and see how we can handle them properly
+
+407
+00:15:58,700 --> 00:16:01,600
+并且我觉得这一期应该比较多争议
+and that's that should be quite a fight episode I think
+
+408
+00:16:01,600 --> 00:16:03,533
+因为我看到的第一件事
+because the No.1 thing I see
+
+409
+00:16:03,800 --> 00:16:07,400
+对于OpenGL新手, 我看到的第一件事
+the No.1 thing I see with people who are new to OpenGL
+
+410
+00:16:07,633 --> 00:16:11,333
+他们总是在抱怨, 因为有些东西对他们不起作用
+and they're always complaining, because something isn't working for them
+
+411
+00:16:12,533 --> 00:16:13,333
+那是因为
+it's because
+
+412
+00:16:13,933 --> 00:16:15,966
+他们没有正确处理自己的错误
+they're not dealing with their errors correctly
+
+413
+00:16:15,966 --> 00:16:17,850
+而他们得到的是黑屏
+and what they get is the black screen 
+
+414
+00:16:17,850 --> 00:16:19,600
+并且一切都是最糟糕的
+and everything's the worst
+
+415
+00:16:19,633 --> 00:16:21,600
+而他们不知道发生了什么, 这很公平
+and they have no idea what's going on and fair enough
+
+416
+00:16:21,600 --> 00:16:23,866
+OpenGL根本不能很好地处理这个
+OpenGL doesn't handle this well at all
+
+417
+00:16:24,000 --> 00:16:26,733
+但是你们要为自己设置一些基本的调试工具
+but setting up some basic debugging tools for yourself
+
+418
+00:16:26,733 --> 00:16:30,650
+并且一些调试代码也能很好地确保这一点
+and some debug code as well can really go a long way into making sure that
+
+419
+00:16:30,650 --> 00:16:33,100
+你们会立马发现它
+you will alert it immediately
+
+420
+00:16:33,333 --> 00:16:35,266
+当一些东西出错时候, 所以下次再见
+when something is wrong, so I'll see you guys next time
+
+421
+00:16:35,400 --> 00:16:36,200
+拜
+goodbye
+

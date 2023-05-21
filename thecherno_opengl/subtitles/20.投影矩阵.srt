@@ -1,0 +1,1450 @@
+﻿1
+00:00:00,133 --> 00:00:03,866
+嘿，大家好，我是TheCherno，欢迎回到我的OpenGL系列教程
+hey, what's up guys, my name is TheCherno, welcome back to my OpenGL series
+
+2
+00:00:04,033 --> 00:00:06,800
+那么上次我们讨论了数学，已经开始接触数学
+so last time we talked about maths, and we started getting into maths
+
+3
+00:00:06,800 --> 00:00:09,333
+以及所有以后会涉及到与数学相关的话题
+and all the math like topics that will come in the future
+
+4
+00:00:09,333 --> 00:00:13,100
+在这个OpenGL系列教程和你们的图形编程之旅中
+in this OpenGL series and in your graphics programming journey
+
+5
+00:00:13,275 --> 00:00:17,277
+今天我们将特别关注其中的一小部分，也就是投影矩阵
+today we're going to be specifically focusing on one small part of that, which is projection
+
+6
+00:00:17,277 --> 00:00:20,725
+投影矩阵是我们需要处理的最大的实际问题之一
+projection is one of the biggest actual things that we need to solve
+
+7
+00:00:20,725 --> 00:00:24,766
+当涉及到在屏幕上渲染图形时，它就是变换管道的一部分
+when it comes to rendering graphics on the screen, is part of the transformation pipeline
+
+8
+00:00:24,766 --> 00:00:27,633
+我们将在接下来的几周里继续探讨这些
+which we will continue to explore over the coming weeks
+
+9
+00:00:28,066 --> 00:00:32,033
+但今天我只想重点讲投影矩阵，这一期不会很长
+but today I just want to focus on projection, and this is not going to be a super long episode
+
+10
+00:00:32,033 --> 00:00:35,533
+因为我不想把这个东西复杂化，让你们摸不着头脑
+because I don't want to overcomplicate this for you, and have you scratching your head
+
+11
+00:00:35,533 --> 00:00:38,800
+我们不打算讨论太多关于数学原理的技术细节
+we're not going to talk too much about the technical details on how the maths works
+
+12
+00:00:38,800 --> 00:00:42,633
+因为对99%的例子来说，这是完全相关的
+because that is completely relevant, for 99% of cases
+
+13
+00:00:42,800 --> 00:00:45,500
+我知道你们很多人可能对它的原理感兴趣
+I know they're probably a bunch of you interested in how it actually works
+
+14
+00:00:45,500 --> 00:00:49,866
+这样你们就能从头开始写你们自己版本的OpenGL
+so that you can kind of write your own version of OpenGL from scratch or something
+
+15
+00:00:50,033 --> 00:00:51,900
+我们以后可能会讲到那个
+we might cover that in the future
+
+16
+00:00:52,000 --> 00:00:56,633
+但今天实际上讲投影矩阵和OpenGL是怎么运行的
+but today practically speaking what is projection and OpenGL how does it work
+
+17
+00:00:56,633 --> 00:01:00,250
+以及我们为什么要用它，所以简单地说，投影矩阵只是
+and why do we use it, so to put it simply, projection is just
+
+18
+00:01:00,250 --> 00:01:06,233
+我们如何得到3D或2D世界中的任意坐标系统
+how we go from having some kind of arbitrary coordinate system in our 3D world or 2D world
+
+19
+00:01:06,233 --> 00:01:10,600
+没关系，我的意思是2D世界就是3D世界，不管怎样，就OpenGL而言
+doesn't matter, I mean 2D worlds are really 3D, anyway, as far as looking OpenGL is concerned
+
+20
+00:01:10,800 --> 00:01:14,500
+这就是我们如何从空间中的坐标或顶点位置开始
+it's how we go from having coordinates or vertex positions in that space
+
+21
+00:01:14,900 --> 00:01:17,433
+以某种方式将它们映射到我们的窗口
+to being able to somehow map them to our window
+
+22
+00:01:17,433 --> 00:01:19,866
+我们在电脑屏幕上渲染的地方
+where we're actually rendering on our computer screen
+
+23
+00:01:20,266 --> 00:01:24,100
+所以我们要把它们投射到这个表面上
+so we have to project them somehow onto this to surface
+
+24
+00:01:24,233 --> 00:01:30,233
+你们可能会有一个巨大的3D世界，有山丘、地形和角色等等
+you might have this massive 3D world, with hills and terrain and characters and all of that
+
+25
+00:01:30,500 --> 00:01:33,600
+最后也很明显，这些山只是一堆三角形
+which in the end obviously just hills down to a bunch of triangles
+
+26
+00:01:34,200 --> 00:01:36,266
+就是由顶点位置组成的
+which are made up of vertex positions
+
+27
+00:01:36,300 --> 00:01:43,200
+但最终3D世界必须以某种方式出现在我们的2D显示器和窗口中
+but in the end that 3D world has to somehow be rambled onto our 2D monitor and into our window
+
+28
+00:01:43,733 --> 00:01:45,300
+那就是投影矩阵
+that is what projection is
+
+29
+00:01:45,400 --> 00:01:51,350
+它本质上是一种数学，将空间中的所有3D点
+it is essentially the maths that converts all of those 3D points in space
+
+30
+00:01:51,350 --> 00:01:54,600
+转换成2D窗口中的东西
+into something that is in a 2D kind of window
+
+31
+00:01:55,466 --> 00:01:59,666
+这就是投影矩阵，所以忘掉所有你们的知道关于投影矩阵的知识吧
+that is what projection is, so forget everything you know about projection or whatever
+
+32
+00:01:59,800 --> 00:02:05,766
+就是这样，就是那么简单，那么转换成位置是什么意思
+that's all it is, it is as simple as that, now what do I mean by convert into positions
+
+33
+00:02:05,766 --> 00:02:10,925
+投影矩阵的实际变换是什么意思
+what does that even mean the actual transformation that happens with a projection matrix
+
+34
+00:02:10,925 --> 00:02:13,266
+我们在上次的数学视频中已经讲过了
+which we kind of talked about last time in a math video
+
+35
+00:02:13,266 --> 00:02:14,900
+我们今天也会讲到
+and we will touch on today as well
+
+36
+00:02:15,433 --> 00:02:20,833
+就是我们把所有那些位置，转换成所谓的标准设备坐标
+is we just convert all of those positions that we have into something called normalized device coordinates
+
+37
+00:02:20,833 --> 00:02:25,633
+也就是某种标准化的空间，然后映射到我们的窗口
+which is basically some kind of normalized space that we can, then map to our window
+
+38
+00:02:25,800 --> 00:02:34,766
+标准空间意味着在每个xyz轴上都有一个-1和1之间的坐标系统
+now a normalized space means that literally a coordinate system between -1 and 1 in every axis x y and z
+
+39
+00:02:35,233 --> 00:02:40,566
+对吧，所以我想说的是，一个窗口的图像分辨率在点上无关紧要
+right, so what I'm saying is, the picture that you have a window does not resolution does not matter at this
+
+40
+00:02:40,800 --> 00:02:42,966
+对吧，不管你们的窗口有多大
+right, doesn't matter what size your window is
+
+41
+00:02:43,366 --> 00:02:47,400
+我们只知道我们的左边窗口，让我们看看，我们在雨滴屏中
+all that we know is that the left side of our window, let's just see, we're in rainfall screen
+
+42
+00:02:47,500 --> 00:02:55,633
+那么左边是-1，右边是1，下面是-1，上面是1
+so the left side will be -1, the right side will be 1, the bottom will be -1 and the top will be 1
+
+43
+00:02:55,766 --> 00:03:03,233
+在这一点上，我们不用太担心z轴，因为它不像x和y那样重要
+let's not worry too much about z at this point, because that's not as important to visualize as x and y
+
+44
+00:03:03,933 --> 00:03:07,633
+所以就是那样，我们有了电脑显示器，我们打开了窗口
+so that's it, we have our computer monitor, we have our window open
+
+45
+00:03:07,666 --> 00:03:12,000
+我们实际渲染所有的图形，在-1和1之间
+where we're actually rendering all of our graphics, and that is between -1 and 1
+
+46
+00:03:12,666 --> 00:03:18,900
+那就是我们需要的所有顶点位置所在的空间
+that is how we, that is the space that we need to have all of our vertex positions in
+
+47
+00:03:19,166 --> 00:03:22,069
+这样我们就可以开始在屏幕上绘制东西
+so that we can actually start cauterizing stuff onto the screen
+
+48
+00:03:22,266 --> 00:03:26,533
+但是我们拥有的是3D世界，或者屏幕上的2D对象
+however what we have is like this 3D world, or maybe this 2D object somewhere in our screen
+
+49
+00:03:26,666 --> 00:03:30,300
+我们需要把它转换到那个空间，那就是投影矩阵的作用
+and we need to convert it into that space, that's what a projection matrix does 
+
+50
+00:03:30,300 --> 00:03:36,100
+并且事实上，直到上一期，我们还没有用到投影矩阵
+and in fact, up until really last episode, we've just we have not been using a projection matrix
+
+51
+00:03:36,100 --> 00:03:40,100
+这就是为什么你们可能听到我说空间在-1和1之间
+which is why you probably heard me say that our space is between -1 and 1
+
+52
+00:03:40,100 --> 00:03:44,800
+换句话说，当我们在纹理视频中制作ChernoLogo作为一个例子
+in other words, when we actually made that ChernoLogo in the textures video as an example
+
+53
+00:03:45,100 --> 00:03:48,425
+我们绘制了那个几何图形，就像我们那儿实际使用的顶点位置一样
+we plotted that geometry, like the vertex positions that we actually used there
+
+54
+00:03:48,850 --> 00:03:50,566
+一定在-1和1之间
+ had to be between a -1 and 1
+
+55
+00:03:50,566 --> 00:03:54,866
+我想我写的是-0.5或0.5之类的
+and I think I wrote something like -0.5 and 0.5 or something like that
+
+56
+00:03:55,125 --> 00:03:59,900
+因为没有投影矩阵，我们就没有
+because without a projection matrix, we have nothing to
+
+57
+00:04:00,250 --> 00:04:02,750
+我们没有一个实际的矩阵
+we don't have an actual matrix
+
+58
+00:04:02,750 --> 00:04:07,700
+来将顶点位置转换成标准设备坐标空间
+to convert our vertex positions into that normalized device kind of coordinate space
+
+59
+00:04:08,233 --> 00:04:11,500
+所以我们必须一开始就提供，因为如果我们不提供
+so we have to provide it initially, because if we don't
+
+60
+00:04:11,566 --> 00:04:14,733
+如果我们在那个坐标空间之外
+if we're going to be well outside of that coordinate space
+
+61
+00:04:15,000 --> 00:04:16,533
+那么屏幕上就什么都看不到了
+then we're not going to see anything on the screen
+
+62
+00:04:16,533 --> 00:04:18,233
+因为就屏幕而言
+because as far as the screen is concerned
+
+63
+00:04:18,300 --> 00:04:20,900
+也就是在窗口中渲染的内容
+as far as what actually gets rendered onto our window
+
+64
+00:04:21,033 --> 00:04:24,833
+它必须在-1和1之间
+that has to be between -1 and 1, it has to be
+
+65
+00:04:25,733 --> 00:04:31,433
+但这对我们来说有点难处理，它总是-1到1
+but it's a bit difficult for us to deal with something, that's just constantly -1 to 1
+
+66
+00:04:31,633 --> 00:04:34,100
+我的意思是举个例子，假设我们正在渲染一个正方形
+I mean as an example, let's just say we're rendering a square
+
+67
+00:04:34,233 --> 00:04:38,400
+但我们的窗口不是正方形的，它是4×3或16x9
+but our window is not square, it's 4 by 3 or it's 16 by 9
+
+68
+00:04:39,166 --> 00:04:42,633
+我们不能，我的意思是，理论上我们可以做所有的映射
+we can't just, I mean we could theoretically do all the maps
+
+69
+00:04:42,666 --> 00:04:47,633
+每次我们计算顶点位置的时候，我想每次都在做映射
+every time we calculate vertex positions, and I guess keep doing the maps every time
+
+70
+00:04:47,800 --> 00:04:52,300
+这样我们就得到了一个正方形，但是这样不是更简单吗
+so that we do get a square, but wouldn't it be easier to just kind of be able to say
+
+71
+00:04:52,366 --> 00:04:57,800
+好了，那么屏幕的左边呢，也许是0，屏幕的右边就是宽度
+okay, well, how about the left side of our screen, maybe is 0, the right side of our screen is width
+
+72
+00:04:57,800 --> 00:05:04,900
+也许我的窗口是1280x720，假设左边是0，右边就是1280
+so maybe my window is 1280 by 720, so let's just say that the left side is 0, right side is 1280
+
+73
+00:05:05,166 --> 00:05:06,933
+我可以渲染在这之间的任何地方
+I can render anywhere in between there
+
+74
+00:05:07,100 --> 00:05:11,633
+之后我们再考虑将其转化为-1到1的数学问题
+and then we'll worry about the maths of actually converting that into -1 to 1 later
+
+75
+00:05:12,200 --> 00:05:15,133
+所以那就是投影矩阵的作用
+so that is essentially what a projection can do for you
+
+76
+00:05:15,333 --> 00:05:19,600
+它让你们决定你们的坐标空间是什么，这样你们就可以渲染对象
+it lets you decide what your coordinate space is, so that you can render objects
+
+77
+00:05:19,600 --> 00:05:23,633
+不管你们喜欢它们是在空间内，还是在屏幕外
+however you like whether they be inside the space, maybe they are outside of the screen
+
+78
+00:05:23,633 --> 00:05:27,433
+因为我们要处理的是某种相机系统，它只能部分地显示场景
+because we're dealing with some kind of camera system, that only shows the scene partially
+
+79
+00:05:28,100 --> 00:05:32,966
+那就是一个投影矩阵，让我们来做这些，对于3D，这是特别重要的
+that's a projection, let's do all that, and for 3D, it's especially important
+
+80
+00:05:33,175 --> 00:05:36,633
+因为如果你们想一下3D场景是什么样的
+because if you think about what a 3D scene looks like
+
+81
+00:05:36,833 --> 00:05:42,300
+它不像把投影矩阵从-1转换成1那么简单
+it's not just as simple as kind of converting your projection from -1 to 1
+
+82
+00:05:42,300 --> 00:05:48,566
+和狼一样，将它从一个值，从一个大的值，缩放到-1到1
+and like wolf, scaling it rather, from a value, from a large kind of value, into -1 to 1
+
+83
+00:05:48,866 --> 00:05:54,066
+我刚才举的从0到1280的例子就是我的投影矩阵
+so as that example that I just gave from 0 to 1280 is my kind of projection matrix
+
+84
+00:05:54,066 --> 00:05:57,600
+我把那个缩小成-1到1
+I'm scaling that down into something that is -1 to 1
+
+85
+00:05:57,950 --> 00:06:00,433
+你们可能会觉得那很简单，你们知道的
+that's might seem to you like oh that's easy, you know
+
+86
+00:06:00,433 --> 00:06:04,433
+我把它除以1280然后再乘以2或者减去1什么之类的
+I'll just divide this by like 1280 and like multiply but two or whatever subtract 1
+
+87
+00:06:04,900 --> 00:06:06,933
+你们知道的，简单，右边就好了
+you know, easy, right done
+
+88
+00:06:06,933 --> 00:06:09,166
+但是如果你们考虑一个透视投影
+but if you think about a perspective projection
+
+89
+00:06:09,166 --> 00:06:12,133
+这是在3D世界中通常使用的
+which is what to is typically use in a 3D world
+
+90
+00:06:12,933 --> 00:06:16,166
+如果你们只是拍一张某物的照片，看一看物体
+if you just take a photo of something, and you take a look at objects
+
+91
+00:06:16,266 --> 00:06:20,000
+距离更远的物体会变小，比照片上的要小，对吧
+objects that are further away actually become smaller, that'd be smaller than the photograph, right
+
+92
+00:06:20,033 --> 00:06:23,133
+甚至不需要拍照，你们可以用自己的眼睛看
+and you don't even have to take a photo for this, you can just look with your own eyes
+
+93
+00:06:23,166 --> 00:06:25,900
+你们可以看到，嗯，你们知道我可以
+and you can see, huh that you know I can
+
+94
+00:06:26,266 --> 00:06:29,566
+你们知道，那边的山离这里只有这么大
+that you know, mountain over there is really just this big from here
+
+95
+00:06:29,950 --> 00:06:32,733
+因为那就是透视的原理
+because of the way that perspective works
+
+96
+00:06:32,800 --> 00:06:36,366
+因为越远的物体看起来越小
+because objects that are further away tend to look smaller
+
+97
+00:06:37,200 --> 00:06:41,333
+那也是一个需要应用的实际投影
+that is also a an actual projection that needs to be applied
+
+98
+00:06:41,333 --> 00:06:45,333
+如果你们正在处理的是3D场景，那就是投影矩阵的作用
+if you're dealing with a 3D scene, and that's what a projection matrix can do
+
+99
+00:06:45,600 --> 00:06:51,000
+它会观察z的值，然后说好吧，有较大z值的对象
+it will essentially look at the z value and say okay, well objects with a larger z value
+
+100
+00:06:51,000 --> 00:06:58,025
+如果你们用一个正z的坐标系，就像这些物体
+if you use a coordinate system where positive z is like far those objects
+
+101
+00:06:58,025 --> 00:07:01,800
+或者那些z值较低或z值较高的顶点
+or those vertices with a lower with a higher z value
+
+102
+00:07:02,033 --> 00:07:05,100
+最终会更靠近镜头中间
+will actually end up being closer to the middle of the camera
+
+103
+00:07:05,100 --> 00:07:10,533
+会让它们变小，所以那也很重要
+which essentially will just make them smaller, so that's really important as well
+
+104
+00:07:10,533 --> 00:07:15,300
+当我们讲到3D的时候，你们就会发现，透视投影是多么的重要
+and when we get into 3D these stuff, you'll see, how important a perspective projection is
+
+105
+00:07:15,633 --> 00:07:19,133
+但不管怎样，如果我们看一下我准备的这个幻灯片
+but anyway, if we just take a look at this little powerpoint slide that I prepared here
+
+106
+00:07:19,400 --> 00:07:21,875
+我们这里有两种主要的投影类型
+we have two different main types of projection here
+
+107
+00:07:21,875 --> 00:07:24,725
+我们有正交投影和透视投影
+we have orthographic projection and perspective projection
+
+108
+00:07:25,166 --> 00:07:32,500
+所以正交投影通常用于2D渲染，当我说“通常”时，请记住
+so orthographic projection is usually used for 2D rendering, now when I say usually, keep in mind
+
+109
+00:07:33,400 --> 00:07:38,600
+首先，虽然正交投影通常用于2D，但它并不总是用于2D
+first of all, while orthographic is usually used for 2D, it's not always used for 2D
+
+110
+00:07:38,600 --> 00:07:42,566
+在3D中使用正交投影是完全可以的，这实际上是很常见的
+it's totally fine to use orthographic for 3D, that's actually done quite commonly
+
+111
+00:07:42,733 --> 00:07:44,166
+因为它呈现了一个稍微不同的视图
+because it presents a slightly different view
+
+112
+00:07:44,166 --> 00:07:48,033
+这可能对关卡编辑器或3D建模程序等有用
+that might be useful for something, like a level editor or a 3D modeling program
+
+113
+00:07:48,966 --> 00:07:53,700
+透视投影通常用于3D，但我的意思是所有东西都是3D的
+perspectives usually use for 3D, but I mean everything is 3D anyway
+
+114
+00:07:53,700 --> 00:07:55,133
+因为这里有z的概念
+because there is the concept of z
+
+115
+00:07:55,466 --> 00:07:58,100
+所以如果你们考虑的是2D平台游戏
+so if you're thinking of a 2D platformer
+
+116
+00:07:58,366 --> 00:08:02,700
+那实际上可能是使用透视投影，因为可能还有更远的元素
+that might actually be using a perspective projection, because there might be elements further away
+
+117
+00:08:02,966 --> 00:08:06,900
+比如《雷曼兄弟》这款新游戏
+if you look at a game such as Rayman, like the new Rayman games
+
+118
+00:08:06,933 --> 00:08:08,666
+他们有深度的概念
+they have that concept of depth
+
+119
+00:08:08,666 --> 00:08:14,033
+即使你们只能在一个2D平面上移动一个2D轴
+even though you can really only move on what is mostly kind of a 2D plane a 2D axis
+
+120
+00:08:14,300 --> 00:08:16,300
+所以不要把这些当做
+so don't take these as like
+
+121
+00:08:16,300 --> 00:08:19,633
+好吧，透视投影只用于3D，正交投影只用于2D，那是错的
+okay, perspective 3D, orthographic 2D, not true
+
+122
+00:08:19,700 --> 00:08:24,433
+它可以在两种情况下使用，但通常当我们想到正交投影时
+it can be used in both cases, but usually when we think of an orthographic projection
+
+123
+00:08:24,600 --> 00:08:29,933
+我们会想到渲染UI(用户界面)，或者2D游戏之类的东西
+we think of rendering something like UI, or something maybe a 2D game or something like that
+
+124
+00:08:30,166 --> 00:08:34,333
+然而，当我们想到透视投影时，我们想到的是第一视角
+whereas when we think, when we think of perspective, we think of like a first person shooter
+
+125
+00:08:34,400 --> 00:08:37,633
+或者类似的东西，在那里我们实际上有一个我们正在渲染的3D世界
+or something like that, where we actually have a 3D world that we're rendering
+
+126
+00:08:37,633 --> 00:08:39,900
+但那并不是它们的全部用途
+but that's not necessarily all they used for
+
+127
+00:08:40,633 --> 00:08:43,500
+不管怎样，对于这个正交投影，我们会说
+anyway, what we'd say over here with this orthographic projection
+
+128
+00:08:43,966 --> 00:08:47,166
+就是离得越远的物体实际上
+is that objects to the further away are not actually
+
+129
+00:08:47,166 --> 00:08:49,233
+它们不会像透视那样变得更小
+they don't get smaller like they do with perspective
+
+130
+00:08:49,233 --> 00:08:51,933
+你们可以看到这些立方体，它们看起来离得更远
+you can see these cubes, they look like they're further away
+
+131
+00:08:52,466 --> 00:08:55,000
+因为它们更小，我们的眼睛已经习惯了那个
+because they're smaller and our eyes are used to that
+
+132
+00:08:55,000 --> 00:08:56,700
+因为那就是我们在现实世界中看到的
+because that's how we see in the real world
+
+133
+00:08:56,933 --> 00:08:59,700
+而这两个立方体，它们的距离是一样的
+whereas these two cubes here, they're the same distance
+
+134
+00:08:59,700 --> 00:09:03,833
+我的意思是，从所有的意图和目的来看，你们在这两张图中看到了什么
+I mean for all intents and purposes, what you see in these two diagrams 
+
+135
+00:09:04,133 --> 00:09:07,766
+我用了5秒的时间做了一个幻灯片，用的是形状
+that I just literally made in 5 seconds and powerpoint using the shapes thing
+
+136
+00:09:08,000 --> 00:09:11,366
+总之，它们提供的是更远的东西
+anyway, they're offering these things that are further away
+
+137
+00:09:11,866 --> 00:09:15,133
+它们的顶点位置和这里的一样
+they have the same vertex positions as these ones here
+
+138
+00:09:15,433 --> 00:09:19,666
+只是这些用的是正交投影，这些都是用透视投影
+it's just that these are using orthographic projection, and these are using perspective projection
+
+139
+00:09:19,759 --> 00:09:21,300
+因为你们知道的
+because you know
+
+140
+00:09:21,300 --> 00:09:25,950
+这些立方体确实有相同的宽度，相同的高度，相同的深度
+these cubes do have the same width, the same height, the same depth
+
+141
+00:09:25,950 --> 00:09:27,066
+所有这些，对吧
+all of that, right
+
+142
+00:09:27,066 --> 00:09:31,700
+它们刚好在一个更远的z值上，而透视投影
+they just happen to be at a further z value, and the perspective projection maths that
+
+143
+00:09:31,700 --> 00:09:36,372
+实际上，当我们用投影矩阵乘以这些顶点时
+actually goes on, when we multiply these vertices with our projection matrix
+
+144
+00:09:36,900 --> 00:09:40,433
+那就是它们变小的原因，因为它们的z值很高
+that is what makes them smaller, because they have a high z value
+
+145
+00:09:40,466 --> 00:09:41,733
+但归根结底
+but at the end of the day
+
+146
+00:09:41,733 --> 00:09:47,700
+所有这些立方体中的每一个顶点位置都会映射到-1到1之间的空间中
+every single vertex position of all of these cubes gets mapped into a space that is between -1 and 1
+
+147
+00:09:47,733 --> 00:09:50,666
+那就是标准设备坐标
+and that's what the normalized device coordinates are
+
+148
+00:09:50,833 --> 00:09:56,166
+这就是在-1和1之间的空间，任何超出这个范围的东西
+there are space that are between kind of -1 and 1, anything that is outside of that
+
+149
+00:09:56,166 --> 00:10:00,966
+那么举个例子，如果我有一个顶点，它最终计算出来是-2
+so for example, if I have a vertex, that ends up being calculated to be -2
+
+150
+00:10:01,733 --> 00:10:02,833
+它不会被渲染
+that does not get rendered
+
+151
+00:10:02,833 --> 00:10:07,400
+它会变得不易发现，因为它在我们的视图之外，超出了我们的视野
+it gets cold, because it's outside of our actual view, it's outside of our frosting
+
+152
+00:10:08,033 --> 00:10:10,800
+现在我们肯定会讨论更多关于，你们是知道的
+now we're definitely going to talk more about, you know
+
+153
+00:10:11,333 --> 00:10:13,700
+当我们开始使用这些投影时
+these projections as we start to use them
+
+154
+00:10:13,966 --> 00:10:16,333
+但让我们在代码中看看它们
+but let's take a look at them in our code base
+
+155
+00:10:16,400 --> 00:10:23,833
+如果我回到这里的OpenGL代码，我有我创建的这个投影矩阵
+if I go back to my OpenGL code over here, I have this projection matrix that I'm creating
+
+156
+00:10:23,966 --> 00:10:27,300
+那么我在这里看到的是一个正交投影
+so what I'm doing here is I'm seeing I have an orthographic projection
+
+157
+00:10:27,475 --> 00:10:35,000
+x的-2到2，y的-1.5到1.5，这就是表示远近的z
+between -2 and 2 in x, and -1.5 and 1.5 in y, and then this is just the z the near far
+
+158
+00:10:35,000 --> 00:10:40,433
+所以我们现在不太担心这个，我渲染的任何东西，任何顶点位置
+so we're not going to worry too much about that for now, anything that I render, any vertex position
+
+159
+00:10:40,700 --> 00:10:42,266
+这些是顶点位置
+these are my vertex positions
+
+160
+00:10:42,450 --> 00:10:47,266
+任何在这个范围之外的顶点位置，这些绑定的都不会出现
+any vertex position that lies outside of this, these bounds will not appear
+
+161
+00:10:47,450 --> 00:10:51,900
+因为这是最左边的x界，这是最右边的x界
+because this is the left most x bound, this is the right most x bound
+
+162
+00:10:51,966 --> 00:10:59,733
+即使我调整这些x坐标，比如-2.5或5或100
+so if I was to adjust any of these x coordinates to be say -2.5 or 5 or 100
+
+163
+00:10:59,866 --> 00:11:01,633
+它们实际也不会渲染
+they're not actually going to render
+
+164
+00:11:01,866 --> 00:11:07,766
+因为那是我的视图，那是我所看到的一切，归根结底
+because that is my view, that is all that I see, and at the end of the day
+
+165
+00:11:07,933 --> 00:11:12,300
+这个正交投影与这些顶点的位置相乘
+this orthographic projection when multiplied with these vertex positions
+
+166
+00:11:12,300 --> 00:11:16,700
+将它们转换成-1到1的空间
+is going to convert them to be in that -1 to 1 space
+
+167
+00:11:17,133 --> 00:11:21,266
+那么举个例子，既然我们选了-2到2
+so as an example, since we have chosen -2 to 2
+
+168
+00:11:21,666 --> 00:11:26,800
+那意味着0实际上是屏幕的中心
+that means that 0 is in fact the center the middle of our actual screen
+
+169
+00:11:27,133 --> 00:11:32,133
+如果我有一个-0.5的顶点，你们可以从中间判断出来
+if I have a vertex of -0.5, you can tell that that's kind of from the middle
+
+170
+00:11:32,200 --> 00:11:34,950
+它在最左边边界的1/4处
+it's a quarter of the way towards the left most bound
+
+171
+00:11:34,950 --> 00:11:38,200
+因为0.5是2的1/4
+because 0.5 is a quarter of 2
+
+172
+00:11:38,500 --> 00:11:44,433
+那么因为这个正交矩阵将把这个位置转换成-1和1之间的位置
+so since this orthographic matrix is going to convert this position to be between -1 and 1
+
+173
+00:11:44,466 --> 00:11:51,075
+然后0和-1之间的1/4是0.25，我们可以通过目测知道
+then what is a quarter between 0 and -1, it's 0.25, so we can just tell just by eyeballing this
+
+174
+00:11:51,075 --> 00:11:53,766
+因为这个投影矩阵很简单
+because this projection matrix is so simple
+
+175
+00:11:54,233 --> 00:12:00,733
+在实际屏幕上这个会变成0.25，如果我们按f5
+that this will become 0.25 on our actual screen, and if we do hit f5
+
+176
+00:12:00,900 --> 00:12:02,266
+这就有点难说了
+it'll be a little bit hard to tell
+
+177
+00:12:02,266 --> 00:12:07,075
+因为我相信我们实际上是在渲染一个部分透明的纹理
+because I believe we are actually rendering a texture which is like partially transparent in fact
+
+178
+00:12:07,075 --> 00:12:09,733
+我要把它删掉，如果我去我的着色器
+yeah I'm just gonna get rid of that, if I go to my shader
+
+179
+00:12:09,933 --> 00:12:13,633
+我要让它，这样我们输出而不是输出纹理颜色
+I'm just going to make it, so that we output instead of outputting the texture color
+
+180
+00:12:13,900 --> 00:12:17,966
+我们只输出白色，所以就是vec4(1.0)，如果我们现在看这个
+we're just gonna output white, so just vec4(1.0), and if we look at this now
+
+181
+00:12:18,133 --> 00:12:20,533
+你们就可以看到，如果目测一下这个
+you can see that, if you kind of eyeball this
+
+182
+00:12:20,533 --> 00:12:22,933
+你们就会知道这是屏幕的中心
+you know this is the center of the screen here
+
+183
+00:12:23,300 --> 00:12:31,100
+这条从正方形开始的最左边的边是向左的1/4
+and this left most kind of edge that we have from our square is a quarter of the way to the left
+
+184
+00:12:31,100 --> 00:12:36,833
+因为它变成了0.25，这里是-0.25，这里是-1
+because it becomes 0.25, where this or -0.25, where this is -1
+
+185
+00:12:36,900 --> 00:12:38,766
+希望你们能理解这块
+hopefully this mess is kind of making sense to you
+
+186
+00:12:38,766 --> 00:12:41,266
+我并不想深入研究，开始绘制图表之类的
+I don't really want to dive in, and start drawing diagrams or anything
+
+187
+00:12:41,266 --> 00:12:44,233
+因为在实践中，注意它并不是很有用
+because it's not really that useful to notice in practice
+
+188
+00:12:44,533 --> 00:12:47,433
+你们只需要知道投影矩阵的作用是什么
+you just have to know that what the projection matrix does is
+
+189
+00:12:47,433 --> 00:12:53,333
+它把它转换成-1到1的正常设备坐标空间，这就是发生的一切
+it converts it into that normal device coordinate space of -1 to 1, that's really all that's happening
+
+190
+00:12:53,333 --> 00:12:57,866
+这只是一个简单的数学运算，投影矩阵没什么好想象的
+it's just a simple maths operation, there's nothing to fancy about projection matrixes
+
+191
+00:12:58,000 --> 00:13:01,666
+到这里，我要做的是在我的Application中
+if we go over here, and what I'm actually going to do is, in my Application
+
+192
+00:13:02,100 --> 00:13:08,700
+我不把它画成640x480，我把它转换成960x540
+I'm going to instead of drawing it at 640 by 480, what I convert this to be 960 by 540
+
+193
+00:13:09,033 --> 00:13:11,933
+现在我要做的是，按下f5，看看会发生什么
+and what I'm going to do now, well let's just hit f5 and see what happens
+
+194
+00:13:12,066 --> 00:13:15,300
+记住我们仍然有相同的投影矩阵，所以它看起来还是一样的
+remember we still have the same projection matrix, so it still kind of looks the same
+
+195
+00:13:15,333 --> 00:13:18,300
+我的意思是它看起来被拉长了，因为我们改变了窗口的分辨率
+I mean it looks stretched out, because we've changed the resolution of our window
+
+196
+00:13:18,300 --> 00:13:19,900
+但是投影矩阵保持不变
+but kept the projection matrix the same
+
+197
+00:13:20,066 --> 00:13:24,900
+它不再是，我们的正方形不再是正方形，它是一个矩形
+it's no longer, our square is no longer a square, it's kind of a rectangle
+
+198
+00:13:25,200 --> 00:13:29,966
+如果我们回到正交投影，我们在这个问题上做一些讨论
+if we go back to our orthographic projection, let's play a little bit around with this
+
+199
+00:13:30,000 --> 00:13:32,733
+所以我要做的就是我之前提到的
+so what I'm going to do is what I mentioned earlier
+
+200
+00:13:33,400 --> 00:13:38,733
+在我的例子中，它只是改变它在像素空间中，也就是1到1像素的映射
+in my example, which is just changing it to be basically in pixel space, so 1 to 1 pixel mapping
+
+201
+00:13:38,833 --> 00:13:43,633
+要做到这一点，我将左边最边设为0，右边最边设为960
+so to do that, I'm going to make 0 in my left most edge, 960 my right most edge
+
+202
+00:13:43,633 --> 00:13:45,500
+因为那是水平分辨率
+because that's the horizontal resolution
+
+203
+00:13:45,766 --> 00:13:51,466
+下面是0，上面是540
+I'm then going to make 0 in my bottom, and 540 in my top and
+
+204
+00:13:52,066 --> 00:13:56,566
+我想我得把它设为浮点数，因为这有点悲哀
+I guess I will have to make this a float, because this is a bit sad
+
+205
+00:13:57,375 --> 00:14:02,700
+好了，酷，按f5，很好，所以什么都看不到
+okay, cool, so let's hit f5, all right, cool, so we don't see anything at all
+
+206
+00:14:03,166 --> 00:14:07,233
+这是因为，我的意思是我们确实很难看到，因为当然
+and that would be because, well I mean we do it's hard to see, because of course
+
+207
+00:14:07,333 --> 00:14:11,733
+如果我们在像素空间中，那么这个正方形是1×1像素
+if we are in pixel space, then this square is 1 by 1 pixel
+
+208
+00:14:11,766 --> 00:14:16,533
+很明显只有一个像素，非常小，所以我们可以把它放大
+which is obviously one pixel which is tiny, so what we can do is just boost this
+
+209
+00:14:16,533 --> 00:14:21,033
+所以我可以把它设为10.5，而不是0.5
+so I might just set this to be like 10.5 instead of 0.5
+
+210
+00:14:21,066 --> 00:14:23,933
+这里加一个1，只是为了保持简单
+I'll just add a 1 here just to keep it simple still
+
+211
+00:14:24,566 --> 00:14:27,800
+如果我们按f5，你现在可以看到它了
+and if we hit f5, you can now kind of begin to see it
+
+212
+00:14:27,800 --> 00:14:30,266
+但它在左下角
+but it's over here in the bottom left
+
+213
+00:14:30,475 --> 00:14:36,566
+因为我们所做的就是把底部做成像
+because what we've done of course is we've made the bottom the like
+
+214
+00:14:36,700 --> 00:14:41,500
+(0,0)坐标在窗口的左下角
+our (0,0) coordinate to be the bottom left of our window
+
+215
+00:14:41,500 --> 00:14:45,725
+如果我们向上滚动，我要做的就是重写这个
+so if we scroll back up, what I'm going to do is just rewrite this
+
+216
+00:14:45,725 --> 00:14:52,133
+我只是想修改一下，但是我们重写一下，让这个是100x
+I was just going to modify it, but let's just rewrite it, let's make this 100 by well
+
+217
+00:14:52,466 --> 00:14:54,366
+我们从100x100开始
+we'll start at 100 by 100
+
+218
+00:14:54,700 --> 00:15:00,600
+然后我想我们是逆时针的，看起来是顺时针的
+and then I think we go anti clockwise, and looks like we are going clockwise
+
+219
+00:15:00,600 --> 00:15:04,900
+给我一点时间，好的，我们就写100x100
+give me a second here, okay, cool, so we'll just say 100 by 100
+
+220
+00:15:05,066 --> 00:15:12,566
+然后逆时针向右走，所以是200x100
+then we go anti clockwise to the right, so we'll say 200 by still 100
+
+221
+00:15:13,966 --> 00:15:16,266
+然后去掉这些0.5
+and I'll just get rid of these 0.5
+
+222
+00:15:17,366 --> 00:15:29,066
+然后x是200，这里是100，然后这个变成200x200，好了
+and then we'll say 200 again for x and 100 here, and then this will become 200 200, okay
+
+223
+00:15:29,066 --> 00:15:32,666
+如果我们现在按f5，有了这些新的坐标
+so if we hit f5 now, with these new coordinates that we have here
+
+224
+00:15:32,866 --> 00:15:35,900
+我们应该在某处看到一个正方形，是的，我们看到了
+we should see a square somewhere and yes we do
+
+225
+00:15:35,900 --> 00:15:44,066
+如果我回到我的着色器，把这个变成我们实际的纹理
+and if I go back to my shader and I change this to be a to be our actual texture
+
+226
+00:15:44,666 --> 00:15:46,633
+然后你们可以看到我们得到了这个渲染
+then you can see we get this rendering here
+
+227
+00:15:46,766 --> 00:15:49,033
+所以我们在这里所做的是，你们可以看到
+so what we've done here is you can see that really
+
+228
+00:15:49,100 --> 00:15:51,366
+我们只是稍微处理了一下坐标系
+we've just played with the coordinate system a little bit
+
+229
+00:15:51,366 --> 00:15:56,500
+我们改变了投影矩阵x在0到960之间，y在0到540之间
+we've changed our projection matrix to be between 0 and 960 for x, 0 and 540 for y
+
+230
+00:15:56,500 --> 00:15:57,900
+所以本质上我们改变了
+so essentially we've changed
+
+231
+00:15:58,066 --> 00:16:02,366
+我们根据窗口的分辨率把它改成了每像素
+we've changed it to be per pixel based on out on the resolution of our window
+
+232
+00:16:02,700 --> 00:16:03,700
+正因为如此
+and then because of that
+
+233
+00:16:03,700 --> 00:16:07,866
+我们需要调整几何图形的位置使其在那个空间中
+we've had to adjust the positions of our geometry to actually be in that space
+
+234
+00:16:07,866 --> 00:16:11,100
+所以不是-0.5 0.5
+so rather than be like -0.5 0.5
+
+235
+00:16:11,100 --> 00:16:16,933
+实际上，我们不得不把它们改大一点，比如101，200等等
+we've actually had to change them to be something a bit bigger like 101,200 and all of that
+
+236
+00:16:17,100 --> 00:16:22,666
+因为现在我们重新定义了顶点位置的空间
+because now we've redefined what space we actually define vertex positions in
+
+237
+00:16:23,566 --> 00:16:25,366
+但归根结底
+but at the end of the day
+
+238
+00:16:26,033 --> 00:16:31,400
+这些顶点的位置与我们的矩阵相乘
+what happens is these vertex positions get multiplied with our matrix
+
+239
+00:16:31,466 --> 00:16:36,500
+这就把它们变成了-0.5x0.5
+and that is what converse them back into being -0.5 by 0.5
+
+240
+00:16:36,500 --> 00:16:38,133
+让我们看看另一个例子
+let's take a look at another example
+
+241
+00:16:38,366 --> 00:16:42,266
+那么为了把这个弄得更清楚，这是100×100
+so just to make this absolutely clear, we have this 100 by 100
+
+242
+00:16:42,400 --> 00:16:45,666
+我要做的就是保留我的proj矩阵
+what I'm going to do is I'll keep my proj matrix
+
+243
+00:16:45,700 --> 00:16:50,033
+但我会创建一个glm::vec4 vp，也就是顶点位置
+but I'll make a glm vec4 and I'll call this vp, vertex position
+
+244
+00:16:50,400 --> 00:16:55,666
+我在这里创建一个vec4，它的坐标是100 100，然后是0 1
+and I'll just create a vec4 here, that has the coordinate 100 by 100 and then 0 1
+
+245
+00:16:55,900 --> 00:16:57,733
+好了，我们没有一个z坐标
+okay, so we don't have a z coordinate
+
+246
+00:16:57,733 --> 00:17:00,666
+对于1和w，我们指定1
+and for 1 and for w we're just going to specify 1
+
+247
+00:17:01,200 --> 00:17:06,633
+接下来我要做的是输入glm::vec4 result = proj*vp
+what I'm going to do then is type in glm vec4 result equals proj times vp
+
+248
+00:17:06,966 --> 00:17:10,900
+所以实际上我自己在CPU上做乘法
+so I'm actually doing that multiplication myself right here on the CPU
+
+249
+00:17:11,133 --> 00:17:14,300
+看看结果是什么，这样我们就能看到了
+just to see what the result is, so that we can actually see
+
+250
+00:17:14,633 --> 00:17:18,166
+记住我说过的，我们现在要做的是
+now remember what I said, what we're doing here is
+
+251
+00:17:18,166 --> 00:17:22,633
+这个proj矩阵应该取我们的坐标和顶点位置
+this proj matrix is supposed to take our coordinate our vertex position
+
+252
+00:17:22,666 --> 00:17:26,233
+然后把它转换成-1到1之间的空间
+and convert it into a space that is between -1 and 1
+
+253
+00:17:26,233 --> 00:17:28,600
+按下f5，看看这个
+so if I hit f5 and I take a look at this
+
+254
+00:17:28,833 --> 00:17:31,600
+如果我们看一下实际的proj矩阵，它看起来有点疯狂
+if we look at our actual proj matrix, it looks a bit wild
+
+255
+00:17:31,600 --> 00:17:34,900
+我的意思是，这是0，不管怎样，我们真的不需要看它
+I mean this is like 0.00, whatever, we don't really need to look at that
+
+256
+00:17:35,400 --> 00:17:37,100
+我们的顶点位置会当然是100
+our vertex position is of course a hundred
+
+257
+00:17:37,100 --> 00:17:41,133
+100 0 1，如果我按f10来做这个计算
+a hundred zero and one, if I hit f10 here to do this calculation
+
+258
+00:17:41,333 --> 00:17:44,169
+看看我们的结果，现在可能有点难看出来
+take a look at our result, now it might be a little bit hard to see
+
+259
+00:17:44,933 --> 00:17:47,666
+我可以判断它是否有效，但你们可以看到
+I'll really tell if it's worked or not, but you can see that
+
+260
+00:17:47,766 --> 00:17:51,166
+x和y当然一直是0 w一直是1
+the x and y is that of course was always 0 w has been a remain 1
+
+261
+00:17:51,233 --> 00:17:59,766
+但x和y从100变成了-0.79和-0.62
+but x and y have changed from being 100 100 to -0.79 and -0.62
+
+262
+00:18:00,366 --> 00:18:07,200
+记住这两个值-0.79和-0.62，如果我们看看这个
+if we go to, so remember those two values -0.79 and -0.62, if we look at this
+
+263
+00:18:07,400 --> 00:18:12,800
+我们看一下左下角最左边的坐标，这说得通，不就是这样的吗
+and we take a look at the bottom left most coordinate, that kind of makes sense, doesn't it like this
+
+264
+00:18:13,133 --> 00:18:18,800
+如果我们改变映射不再使用投影矩阵，我们得到-1到1
+if we were to change our mapping to not use the projection matrix anymore, and we had -1 to 1
+
+265
+00:18:19,166 --> 00:18:26,133
+你们可以把它想象成从中间到右边的70%的距离
+you can kind of imagine this as being around 70% of the way to there from the middle right
+
+266
+00:18:26,500 --> 00:18:33,966
+所以它所做的就是把100×100变成了-1到1的空间
+so what it's done clearly is it has converted our 100 by 100 to be in that -1 to 1 space
+
+267
+00:18:34,366 --> 00:18:37,666
+那就是投影在2D和3D中的作用
+and that is what projection does in both 2D and 3D
+
+268
+00:18:37,666 --> 00:18:40,166
+所以换句话说，正交矩阵或透视矩阵
+so in other words, orthographic or perspective
+
+269
+00:18:40,166 --> 00:18:43,900
+同样与2D或3D无关，这就是人们通常联想到的东西
+again nothing to do with 2D or 3D, is just what people commonly associate them with
+
+270
+00:18:44,266 --> 00:18:47,833
+所以在透视矩阵和正交矩阵中，没有关系，结果是一样的
+so in perspective and orthograph projecting, doesn't matter, the same thing happens
+
+271
+00:18:47,866 --> 00:18:50,700
+你们所做的一切就是告诉你们的电脑
+all you're doing is you're telling your computer
+
+272
+00:18:50,866 --> 00:18:54,666
+如何从你们正在处理的空间转换
+how to convert from whatever space you're currently dealing with
+
+273
+00:18:54,666 --> 00:19:00,866
+就是你们在-1到1的标准设备坐标空间中定义的一些东西
+which is something that you define yourself to that -1 to 1 normalized device coordinate space
+
+274
+00:19:00,999 --> 00:19:04,766
+那就是所有在OpenGL中的投影
+and that is all there is to projection in OpenGL
+
+275
+00:19:04,766 --> 00:19:07,966
+不管怎样，我希望你们喜欢这个视频，如果喜欢的话，可以点赞
+anyway, I hope you guys enjoyed this video, if you did, you can hit the like button
+
+276
+00:19:07,966 --> 00:19:11,666
+你们也可以访问patreon.com/TheCherno来帮助支持本系列
+you can also help support this series by going over to patreon.com/TheCherno
+
+277
+00:19:11,733 --> 00:19:14,533
+让我知道你们对这些更典型的视频有什么看法
+let me know what you think of these kind of more typical videos
+
+278
+00:19:14,733 --> 00:19:17,166
+一方面，我真的很喜欢制作它们，因为我认为
+on one hand, I really like making them, because I think that
+
+279
+00:19:17,166 --> 00:19:20,533
+比如像我这样的人可能会感兴趣
+like people like me probably would be interested to
+
+280
+00:19:20,633 --> 00:19:25,000
+我希望有人能像我今天这样简单地解释它
+I wish like someone explained it as simple as I hopefully did here today
+
+281
+00:19:25,366 --> 00:19:26,733
+当我学习这些东西的时候
+when I was learning this kind of stuff
+
+282
+00:19:26,833 --> 00:19:30,166
+但另一方面，我知道你们中有些人可能想在屏幕上看到更多的东西
+but on the other hand, I know that some of you probably want to see more things on the screen
+
+283
+00:19:30,166 --> 00:19:32,300
+想要看到更多的进展，想要得到有趣的东西
+and want to see more progress, and want to get to the fun stuff
+
+284
+00:19:32,500 --> 00:19:34,666
+所以请告诉我你们的想法，如果你们对这个还Ok的话
+so let me know what your thoughts are on this, if you're okay with this
+
+285
+00:19:34,666 --> 00:19:39,000
+如果你们想让我做一些更实际的事情，也许以后再回来讲理论
+if you want me to do more practical things, and maybe come back and do the theory later
+
+286
+00:19:39,400 --> 00:19:40,200
+但无论哪种方式
+but either way
+
+287
+00:19:40,800 --> 00:19:43,633
+如果你们想支持这个系列，可以通过访问patreon.com/TheCherno
+if you're gonna have support the series, by going to patreon.com/TheCherno
+
+288
+00:19:43,633 --> 00:19:47,375
+非常感谢所有让这些视频成为可能的赞助人
+huge thank you to all the patrons who make these videos possible
+
+289
+00:19:47,375 --> 00:19:48,733
+没有你们，我们就不会在这里相遇
+would not be here without you guys
+
+290
+00:19:48,733 --> 00:19:52,366
+所以非常感谢大家，下次见，拜
+so thank you so much, I will see you guys next time, goodbye
+

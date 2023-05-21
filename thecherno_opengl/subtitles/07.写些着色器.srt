@@ -1,0 +1,3830 @@
+﻿1
+00:00:00,100 --> 00:00:00,933
+嘿, 你们好
+hey, what's up guys
+
+2
+00:00:00,933 --> 00:00:03,633
+我是Cherno, 欢迎回到我的OpenGL系列教程
+my name is Cherno, welcome back to my OpenGL series
+
+3
+00:00:03,633 --> 00:00:05,300
+所以, 上次, 我们讨论了关于着色器的一切
+so, last time, we talked all about shaders
+
+4
+00:00:05,300 --> 00:00:07,166
+并且我们基本上讲了什么是着色器
+and we basically just went through what shaders are
+
+5
+00:00:07,166 --> 00:00:08,100
+以及着色器的原理
+and how they work
+
+6
+00:00:08,433 --> 00:00:10,000
+一定要看看那集视频
+definitely check out that video
+
+7
+00:00:10,000 --> 00:00:11,533
+如果你没看过的话, 这个链接已经在那里了
+if you haven't, already this link up there
+
+8
+00:00:11,533 --> 00:00:13,200
+你需要知道着色器的原理
+you're gonna need to know how shaders work
+
+9
+00:00:13,200 --> 00:00:16,100
+因为今天, 我们将要写一些着色器
+because today, we're going to write some shaders
+
+10
+00:00:16,100 --> 00:00:17,150
+并且我真的很高兴
+and I'm actually really happy 
+
+11
+00:00:17,150 --> 00:00:20,175
+我们上个视频专门讨论了着色器
+that we dedicate last video to just talking about what shaders
+
+12
+00:00:20,175 --> 00:00:22,266
+实际上要求我今天不必做太多讨论的内容
+actually asked that I don't have to do much talking today
+
+13
+00:00:22,375 --> 00:00:23,800
+而我就可以去写一些代码了
+and I can actually write some code
+
+14
+00:00:23,933 --> 00:00:25,166
+所以我们要开始了
+so we're gonna just jump in
+
+15
+00:00:25,166 --> 00:00:26,500
+那么我们要开始写代码了
+and we're gonna start writing some code
+
+16
+00:00:26,500 --> 00:00:29,166
+如果你还没有我们现在写的所有代码
+if you don't have all of the code that we've written up to this point yet
+
+17
+00:00:29,166 --> 00:00:31,400
+你可以在播放列表中浏览所有的视频
+you can either go through all of the videos in the playlist 
+
+18
+00:00:31,400 --> 00:00:33,533
+并确保你的一切都是最新的
+and just make sure you've got everything up to date
+
+19
+00:00:33,533 --> 00:00:36,933
+或者你实际上也可以访问patreon.com/TheCherno, 帮助支持这个系列
+or you can actually go to patreon.com/TheCherno helps support the series
+
+20
+00:00:36,933 --> 00:00:40,300
+然后获得一集接一集所有的最新代码
+and get access to all the code episode by episode up to this point
+
+21
+00:00:40,300 --> 00:00:42,233
+并且以后也是如此
+and going on into the future as well
+
+22
+00:00:42,633 --> 00:00:44,466
+让我们开始写一些着色器代码吧
+let's dive in and write some shader code
+
+23
+00:00:44,466 --> 00:00:45,600
+所以就快速过一遍
+so just to quickly go through
+
+24
+00:00:45,600 --> 00:00:47,100
+到目前为止, 我们写的所有代码
+all the code that we've kind of got so far
+
+25
+00:00:47,100 --> 00:00:48,250
+或者至少是比较重要的部分
+or at least the important parts
+
+26
+00:00:48,250 --> 00:00:50,725
+在我们配置好OpenGL之类的东西之后
+after we kind of finish like OpenGL and all that
+
+27
+00:00:50,725 --> 00:00:52,433
+基本上, 我们是在创建一个顶点缓冲区
+we're basically creating a vertex buffer
+
+28
+00:00:52,433 --> 00:00:55,000
+这些顶点位置是连续的
+which is consistent of these vertex positions
+
+29
+00:00:55,000 --> 00:00:58,100
+位置是我们当前指定的唯一属性 
+positions are the only attributes that we're currently specifying
+
+30
+00:00:58,100 --> 00:01:00,266
+然后我们指定该缓冲区的布局
+we then specify the layout of that buffer
+
+31
+00:01:00,266 --> 00:01:02,950
+以及绑定这些属性到一个特定的索引, 索引0
+as well as kind of bind these attributes to a certain index, 
+
+32
+00:01:02,950 --> 00:01:06,700
+在本例中, 索引0访问一个顶点属性指针
+index zero in this case, by a vertex attribute pointer
+
+33
+00:01:06,866 --> 00:01:08,200
+然后在渲染循环中
+and then inside our render loop
+
+34
+00:01:08,200 --> 00:01:09,800
+基本上, 我们只是清除屏幕
+we basically just clear the screen
+
+35
+00:01:10,066 --> 00:01:13,000
+画出当前绑定的缓冲区, 也就是这里的这个
+draw the currently bound buffer, which is this one over here
+
+36
+00:01:13,325 --> 00:01:15,466
+然后我们交换缓冲区, 就是这样
+and then we just swap the buffers, and that's it
+
+37
+00:01:15,466 --> 00:01:16,950
+我们不需要绑定任何东西
+we don't bother on binding anything 
+
+38
+00:01:16,950 --> 00:01:18,533
+或者我们真的不需要的任何东西
+or anything like that we don't really need to
+
+39
+00:01:18,666 --> 00:01:19,866
+我们做的一切就在清除
+all we're doing is we're clearing
+
+40
+00:01:19,866 --> 00:01:21,533
+然后画这个三角形
+and we're drawing this triangle
+
+41
+00:01:21,533 --> 00:01:23,333
+现在让我们来写一个着色器
+now let's go ahead and actually write a shader
+
+42
+00:01:23,533 --> 00:01:24,650
+实际上, 我们需要做的第一件事
+the first thing we actually need to do
+
+43
+00:01:24,650 --> 00:01:25,866
+这有点无聊
+this is a little bit tedious
+
+44
+00:01:25,866 --> 00:01:28,800
+所以我想尽快过一遍
+which is why I kind of want to run through this as quickly as possible
+
+45
+00:01:28,800 --> 00:01:30,966
+但基本上, 我们要在这里定义一个新函数
+but basically, we're going to define a new function here
+
+46
+00:01:31,266 --> 00:01:32,700
+它基本上是静态的
+which is basically it's going to be static
+
+47
+00:01:32,700 --> 00:01:36,300
+因为我不希望它链接到其他翻译单元或c++文件
+because I don't want it to link into other translation units or c++ files
+
+48
+00:01:36,425 --> 00:01:37,966
+它会返回一个整数
+it's going to return an integer
+
+49
+00:01:37,966 --> 00:01:40,666
+并且它会被称为CreateShader
+and it's going to be called CreateShader
+
+50
+00:01:40,666 --> 00:01:42,266
+我们实际上要传入两个字符串
+and we're actually going to take in two strings
+
+51
+00:01:42,266 --> 00:01:45,250
+const std::string& vertexShader
+const std string vertexShader
+
+52
+00:01:45,250 --> 00:01:49,850
+和const std::string& fragmentShader
+and const std string fragmentShader 
+
+53
+00:01:50,700 --> 00:01:51,700
+在函数里面
+and inside here
+
+54
+00:01:51,733 --> 00:01:55,350
+我们要编写编译这两个着色器所需的代码
+we're going to write the code necessary to compile these two shaders 
+
+55
+00:01:55,350 --> 00:01:56,466
+现在，在这种情况下
+now, in this case
+
+56
+00:01:56,466 --> 00:02:01,800
+我们要做的就是, 传入着色器实际的源码作为这些实际的字符串
+all we're doing is, we're taking in the actual source code of the shaders as these actual strings
+
+57
+00:02:01,800 --> 00:02:02,866
+所以我们需要提供两个着色器
+so we're providing two shaders
+
+58
+00:02:02,866 --> 00:02:04,600
+一个顶点着色器和一个片段着色器
+a vertex shader and a fragment shader
+
+59
+00:02:04,700 --> 00:02:07,925
+这些字符串只是实际的源代码
+these strings are just meant to be the actual source code 
+
+60
+00:02:07,925 --> 00:02:10,266
+现在着色器可以来自不同地方的变体
+now shaders can come from a variety of different places
+
+61
+00:02:10,266 --> 00:02:12,733
+我们可以照字面地直接写一个字符串
+we could literally just write a string
+
+62
+00:02:12,733 --> 00:02:14,600
+在我们实际的c++应用中
+in our actual c++ application
+
+63
+00:02:14,700 --> 00:02:15,733
+这包含了我们地着色器
+which contains our shader
+
+64
+00:02:15,733 --> 00:02:16,900
+这就是我们今天要做的事情
+which is what we're going to do today
+
+65
+00:02:16,900 --> 00:02:18,366
+为了简单起见
+just for simplicity's sake
+
+66
+00:02:18,475 --> 00:02:20,933
+但你也可以从文件中读取它们
+but you can also read them in from a file
+
+67
+00:02:21,000 --> 00:02:23,100
+你可以从网上下载
+you can download them from the internet
+
+68
+00:02:23,133 --> 00:02:24,900
+你可以把它们作为二进制数据读入
+you can read them in as kind of binary data
+
+69
+00:02:24,900 --> 00:02:28,133
+有很多不同的方式, 你可以编译着色器
+there's a lot of different ways that you can actually kind of compile shaders and
+
+70
+00:02:28,500 --> 00:02:30,266
+进入着色器编译阶段
+get to the shader compilation stage
+
+71
+00:02:30,733 --> 00:02:31,500
+在本例中
+in this case
+
+72
+00:02:31,500 --> 00:02:33,066
+我们会为OpenGL提供一个字符串
+we're going to provide OpenGL with a string
+
+73
+00:02:33,066 --> 00:02:35,933
+归根结底, 你还是需要为OpenGL提供一个字符串
+at the end of the day, you still need to provide OpenGL with a string
+
+74
+00:02:35,933 --> 00:02:37,366
+那是你的着色器源码
+which is your shader source code
+
+75
+00:02:37,550 --> 00:02:40,333
+通常,  你会想要从文件中获取这些
+usually, like you might want to be taking that in from a file
+
+76
+00:02:40,333 --> 00:02:41,166
+或者类似的东西
+or something like that
+
+77
+00:02:41,400 --> 00:02:42,733
+但现在, 我们只能
+but for now, we're just going to be
+
+78
+00:02:42,733 --> 00:02:44,400
+我们将把它们作为字符串读入
+we're just going to be reading them in as strings
+
+79
+00:02:44,400 --> 00:02:45,233
+我们要把它们写出来
+and we're going to write them
+
+80
+00:02:45,233 --> 00:02:46,666
+在我们的c++应用中
+in our c++ application
+
+81
+00:02:46,866 --> 00:02:47,833
+我想下一集
+I think next episode
+
+82
+00:02:47,833 --> 00:02:48,900
+我们实际上要看一下
+we're actually going to take a look at 
+
+83
+00:02:48,900 --> 00:02:52,133
+在一个更专业的应用中, 我喜欢如何处理着色器
+how I like to deal with shaders in a more professional application
+
+84
+00:02:52,266 --> 00:02:56,050
+我们会写一些代码来简化更多的着色器
+and we'll kind of write some code to basically simplify the further shaders
+
+85
+00:02:56,050 --> 00:02:57,906
+我们将 在这个系列中写的
+that we're going to write in this series
+
+86
+00:02:57,906 --> 00:02:59,150
+但现在, 我们只关注
+but for now, we're just focusing on 
+
+87
+00:02:59,150 --> 00:03:00,600
+如何实际创建着色器
+how to actually create shaders
+
+88
+00:03:00,600 --> 00:03:03,333
+所以也是这个函数的主要目的
+so basically the purpose of this function is to do
+
+89
+00:03:03,600 --> 00:03:06,133
+有几件事, 但基本上
+well a couple of things, but fundamentally
+
+90
+00:03:06,333 --> 00:03:09,666
+我们需要向OpenGL提供我们实际的着色器源代码
+we need to provide OpenGL with our actual shader source code
+
+91
+00:03:09,666 --> 00:03:10,866
+我们的着色器文本
+our shader text
+
+92
+00:03:11,433 --> 00:03:14,500
+我们想让OpenGL编译那个程序
+and we want OpenGL to compile that program
+
+93
+00:03:14,500 --> 00:03:17,533
+将这两个链接到一个独立的着色器程序
+link these two together into a single shader program
+
+94
+00:03:17,700 --> 00:03:21,466
+然后给我们一些那个着色器返回的唯一标识符
+and then give us some kind of unique identifier for that shader back
+
+95
+00:03:21,766 --> 00:03:24,666
+这样我们就能绑定那个着色器并使用它
+so that we can actually bind that shader, and use it
+
+96
+00:03:24,666 --> 00:03:26,933
+和顶点缓存区一样
+the same as like we did with our vertex buffer
+
+97
+00:03:26,933 --> 00:03:28,400
+就是我们实际上生成了缓冲区
+what we actually generated buffer
+
+98
+00:03:28,400 --> 00:03:29,666
+并且我们获得了它返回的id
+and we get an id back
+
+99
+00:03:29,666 --> 00:03:31,366
+当我们想要绑定它的时候
+and then whenever we want to bind it
+
+100
+00:03:31,366 --> 00:03:33,466
+我们可以绑定那个缓冲区id
+we can just bind that buffer id
+
+101
+00:03:33,525 --> 00:03:34,866
+所以如果我们回到这里
+so if we scroll back over here
+
+102
+00:03:34,866 --> 00:03:36,433
+让我们开始写代码
+let's start writing that code
+
+103
+00:03:36,500 --> 00:03:38,500
+所以我们要做的第一件事就是创建一个程序
+so the first thing we need to do is create a program
+
+104
+00:03:38,500 --> 00:03:40,200
+现在这里, 我们生成的缓冲区方式
+now here, we kind of generated buffers
+
+105
+00:03:40,200 --> 00:03:42,125
+基本上和这里一样的
+that's basically the equivalent here
+
+106
+00:03:42,125 --> 00:03:45,133
+我们基本上只需要输入glCreateProgram
+we basically just type in glCreateProgram
+
+107
+00:03:45,300 --> 00:03:48,466
+再说一次, 这是迷人的OpenGL, 它是不一致的
+now again, this is lovely OpenGL being completely inconsistent
+
+108
+00:03:48,500 --> 00:03:52,400
+这个函数不需要传入整数引用之类的东西
+this function doesn't take in the reference to an integer or anything like that
+
+109
+00:03:52,400 --> 00:03:53,733
+或指定的整数
+or appointed to an integer
+
+110
+00:03:53,766 --> 00:03:56,233
+它实际上会返回一个无符号整数
+it actually returns an unsigned integer
+
+111
+00:03:56,366 --> 00:03:58,366
+所以我们需要做的就是, 在开头这里
+so what we're going to do is, at the beginning
+
+112
+00:03:58,366 --> 00:04:02,225
+这里写上 unsigned int program = glCreateProgram()
+this write unsigned integer program equals glCreateProgram
+
+113
+00:04:02,225 --> 00:04:05,733
+继续, 不知道他们为什么决定他们的api如此不一致
+again, no clue why they've decided to be so inconsistent with their api
+
+114
+00:04:05,733 --> 00:04:07,166
+但是, 嘿, 这就是OpenGL
+but, hey, this is OpenGL
+
+115
+00:04:07,266 --> 00:04:10,700
+所以, 我们接下来需要做的就是, 创建我们的两个着色器对象, 所以
+so, the next thing we need to do is, create our two shader objects, so
+
+116
+00:04:11,166 --> 00:04:12,200
+就是顶点着色器和片段着色器
+vertex shader and fragment shader
+
+117
+00:04:12,200 --> 00:04:14,733
+并且这基本上又是OpenGL的模板代码
+and this is basically just kind of some OpenGL boilerplate code again
+
+118
+00:04:14,733 --> 00:04:17,733
+unsigned int, 我们就叫这个vs吧
+unsigned int, we'll call this one vs
+
+119
+00:04:17,733 --> 00:04:20,900
+就是等于glCreateShader()
+which is going to just be equal to glCreateShader
+
+120
+00:04:21,633 --> 00:04:22,733
+并且这里将是
+and this is going to be
+
+121
+00:04:23,166 --> 00:04:24,166
+着色器的类型
+what the type of the shader
+
+122
+00:04:24,166 --> 00:04:26,900
+它在这种情况下就是GL_VERTEX_SHADER
+which in this case is going to be GL_VERTEX_SHADER
+
+123
+00:04:27,166 --> 00:04:29,300
+现在实际上, 将会有很多重复的代码
+now, a lot of code is actually going to be the same
+
+124
+00:04:29,300 --> 00:04:32,333
+因为总的来说, 我们只是在尝试编译两种不同类型的着色器
+because basically, we're just trying to compile two different types of shaders
+
+125
+00:04:32,433 --> 00:04:36,166
+但给OpenGL提供我们源码的处理之类的操作, 实际上
+but the process of giving OpenGL our source code and all that stuff is actually
+
+126
+00:04:36,766 --> 00:04:38,766
+在顶点和片段着色器之间非常非常像
+very very similar between vertex and fragment shaders
+
+127
+00:04:38,766 --> 00:04:42,475
+所以实际上, 我将去把它抽象到它自己的函数中
+so I'm actually going to just abstract this out into its own function
+
+128
+00:04:42,475 --> 00:04:44,400
+这样我就可以调用那个函数两次
+so that I can call that function two times
+
+129
+00:04:44,400 --> 00:04:46,366
+而不是写一大堆重复的代码
+and not have a bunch of code duplication
+
+130
+00:04:46,466 --> 00:04:47,525
+所以我在这儿上面
+so I'm going to go up here
+
+131
+00:04:47,525 --> 00:04:51,775
+就写 static unsigned int CompileShader()
+and I'm going to go static unsigned int CompileShader
+
+132
+00:04:51,775 --> 00:04:55,525
+并且第一个参数就是 const std::string& source
+and it's going to be const std::string source
+
+133
+00:04:55,525 --> 00:04:59,400
+以及我相信GL_VERTEX_SHADER实际上就是
+and I believe GL_VERTEX_SHADER is actually
+
+134
+00:04:59,600 --> 00:05:00,866
+它就是一个整数
+it's just an integer
+
+135
+00:05:00,966 --> 00:05:02,966
+我不认为他们真的需要
+I don't think they really need to
+
+136
+00:05:02,966 --> 00:05:05,525
+让我们看看glCreateShader()需要什么参数, 一个GLenum类型的
+let's just see what glCreateShader takes in, GLenum
+
+137
+00:05:05,525 --> 00:05:09,200
+并且我认为如果搜索这个GLenum, 在这儿, 只用了vs的辅助工具
+and I think if I search for GLenum, here, just using visual assist
+
+138
+00:05:09,566 --> 00:05:10,800
+它是一个无符号整型
+it's an unsigned int
+
+139
+00:05:10,800 --> 00:05:13,766
+所以, 我这里(CompileShader第二个参数)就是unsigned int type
+so, I'm just going to write unsigned int type
+
+140
+00:05:13,766 --> 00:05:18,433
+现在因为一些原因, 我真的不喜欢用OpenGL的内置类型
+now I don't really like using OpenGL's built-in kind of types for several reasons
+
+141
+00:05:18,433 --> 00:05:19,633
+但主要只是因为
+but mainly just because
+
+142
+00:05:19,633 --> 00:05:22,066
+我倾向于使用多种图形接口
+I tend to use multiple graphics apis
+
+143
+00:05:22,066 --> 00:05:24,466
+那么如果我开始为一切(数据)使用OpenGL的类型
+and if I start using OpenGL's types for everything
+
+144
+00:05:24,466 --> 00:05:27,725
+我可能需要到处包含OpenGL, 诸如此类的操作
+that I kind of need to include OpenGL everywhere, and all that stuff
+
+145
+00:05:27,725 --> 00:05:31,775
+所以如果你看到我在这种情况下使用无符号整型, 而不是GL
+so if you're seeing me kind of use unsigned int in these cases instead of GL
+
+146
+00:05:31,775 --> 00:05:34,966
+而不是使用GLuint
+instead of kind of what is it a GLuint
+
+147
+00:05:35,133 --> 00:05:36,733
+我想是这样写的
+it was just written like this, I think
+
+148
+00:05:36,966 --> 00:05:39,100
+对, 我不喜欢使用这样的类型
+yeah, I don't like using types like this
+
+149
+00:05:39,100 --> 00:05:42,400
+我更喜欢使用c++类型, 不论在哪儿
+I much preferred just using they're all c++ types which they are anyway 
+
+150
+00:05:42,900 --> 00:05:44,666
+那只是因为我更倾向于处理多种图形接口
+that's just because I tend to deal with multiple apis
+
+151
+00:05:44,666 --> 00:05:45,466
+并且这就是我习惯的
+and that's what I'm used to
+
+152
+00:05:45,466 --> 00:05:47,233
+记住这一点, 你以前可能见过
+just keep that in mind, you might have seen that before
+
+153
+00:05:47,333 --> 00:05:48,966
+这绝对是我建议你做的
+it's definitely what I would recommend doing
+
+154
+00:05:49,033 --> 00:05:50,366
+好吧, 如果我们回到这里
+okay, so if we scroll back up here
+
+155
+00:05:51,633 --> 00:05:52,266
+就是CompileShader()
+CompileShader
+
+156
+00:05:52,266 --> 00:05:54,633
+让我们移动我们之前在这写的这个代码吧
+let's just move this code that we've got over here
+
+157
+00:05:54,633 --> 00:05:57,025
+实际上, 我可能把这个glCreateShader()移到这里
+actually I might just move this glCreateShader over here
+
+158
+00:05:57,025 --> 00:05:58,100
+然后再做
+and then just make
+
+159
+00:05:58,200 --> 00:06:02,833
+让我们看看, unsigned int id = glCreateShader()
+let's see, unsigned int id equals glCreateShader
+
+160
+00:06:02,833 --> 00:06:05,833
+好了, 同样, 我们可以CompileShader()赋值给这个(vs)
+okay, common, we can kind of assign this to be CompileShader
+
+161
+00:06:05,966 --> 00:06:07,400
+这就是顶点着色器
+this will be the vertex shader
+
+162
+00:06:07,400 --> 00:06:10,400
+以及我将指定它就是我们的GL_VERTEX_SHADER
+and I'll specify that it is our GL_VERTEX_SHADER
+
+163
+00:06:10,933 --> 00:06:12,766
+实际上, 我想我会重新排列这些参数
+I actually think I'm going to reorder these arguments
+
+164
+00:06:12,766 --> 00:06:15,066
+因为实际上, 指定第一个参数为类型(type)可能更有意义一点
+because probably makes more sense to actually specify the type first
+
+165
+00:06:15,066 --> 00:06:16,733
+然后这个实际的源码
+and then the actual source code
+
+166
+00:06:16,733 --> 00:06:18,566
+所以让我们很快重新排列这些
+so let's just reorder these real quick
+
+167
+00:06:18,566 --> 00:06:19,566
+没什么大问题
+no big deal
+
+168
+00:06:20,200 --> 00:06:21,900
+好了, 好了, 酷
+there we go, all right, cool
+
+169
+00:06:21,900 --> 00:06:24,500
+让我们继续写我们的CompileShader函数
+so let's continue one with our CompileShader function
+
+170
+00:06:24,500 --> 00:06:25,325
+我可以做的一个事情就是
+one thing that I can do is
+
+171
+00:06:25,325 --> 00:06:26,700
+事实上, 我想要的是
+actually gonna to want to expect is
+
+172
+00:06:26,700 --> 00:06:30,075
+而不是我们实际上提供C++数据字符串
+instead of us actually providing a c++ data string
+
+173
+00:06:30,075 --> 00:06:31,533
+实际上它需要一个原始字符串
+it's actually going to want a raw string
+
+174
+00:06:31,533 --> 00:06:35,325
+所以我就这么写, const char* src, 表示source;
+so I'm just going to write const char src for source
+
+175
+00:06:35,325 --> 00:06:37,966
+然后让它等于source.c_str()
+and then just set this equal to source dot c string
+
+176
+00:06:38,433 --> 00:06:39,500
+我们可以这样写
+which we can write like this
+
+177
+00:06:39,500 --> 00:06:41,200
+这只返回一个指针, 正如你所见
+this just returns a point, as you can see
+
+178
+00:06:41,200 --> 00:06:42,150
+它实际上在注释中说了
+it actually says in a comment 
+
+179
+00:06:42,150 --> 00:06:44,466
+返回一个以null结尾的不可变数组的指针
+return pointer to null-terminated immutable array
+
+180
+00:06:44,700 --> 00:06:47,133
+所以不可变肯定意味着你不应该改变这个
+so immutable definitely means that you shouldn't be changing this
+
+181
+00:06:47,233 --> 00:06:50,866
+但同时, 这只是指向我们数据开始的指针
+but also, this is just a pointer to the beginning of our data
+
+182
+00:06:50,866 --> 00:06:53,825
+我们也可以编写这样(&source[0])的代码
+we could have also written code like this
+
+183
+00:06:53,825 --> 00:06:56,600
+你以前可能见过这种代码
+you might have seen this kind of code before
+
+184
+00:06:56,600 --> 00:06:59,700
+基本上, 这只是查找字符串中的第一个字符
+basically this is just looking out the very first character in the string
+
+185
+00:06:59,700 --> 00:07:04,133
+然后返回它的内存地址, 最后返回这个
+and then returning the memory address of it which, ends up returning this
+
+186
+00:07:04,600 --> 00:07:07,633
+因为字符串接口已经给我们提供了c_str()
+because the string api does provide us with c_str
+
+187
+00:07:08,133 --> 00:07:09,400
+我更喜欢写这个代码
+I prefer to write this code
+
+188
+00:07:09,400 --> 00:07:10,500
+我需要指出一件事情
+one thing I want to point out
+
+189
+00:07:10,500 --> 00:07:11,866
+这更多是一个C++的东西
+this is more of a c++ thing
+
+190
+00:07:11,866 --> 00:07:14,833
+但在这个例子中, 你可以做一些疯狂的事情
+but just in case, you do something crazy
+
+191
+00:07:15,300 --> 00:07:18,266
+source在这个指针位置需要存在, 对吧
+source needs to exist at this point, right
+
+192
+00:07:18,466 --> 00:07:20,100
+这个字符串需要存在
+this string needs to exist
+
+193
+00:07:20,100 --> 00:07:23,866
+这不用复制数组, 或着也不用返回一个新数组给你
+this doesn't copy the array, or return to you a new kind of array
+
+194
+00:07:23,900 --> 00:07:27,433
+这个只返回一个在标准字符串中指向数据的指针
+this returns a pointer to the data inside std string
+
+195
+00:07:27,433 --> 00:07:28,666
+这意味着如果你有
+meaning that if you have
+
+196
+00:07:29,166 --> 00:07:30,958
+如果这个字符串已超出范围
+if string has gone out of scope 
+
+197
+00:07:30,958 --> 00:07:34,433
+或者别的什么, 而你仍然持有这个实际的字符指针
+or something and you're still holding on to this actual char point
+
+198
+00:07:34,433 --> 00:07:36,466
+它将指向垃圾内存
+it's going to point to rubbish memory
+
+199
+00:07:36,633 --> 00:07:38,175
+并且这个代码将不会运行
+and this code isn't going to work 
+
+200
+00:07:38,175 --> 00:07:41,966
+所以只要确保你的source字符串仍然有效
+so just make sure that your source string is actually still alive
+
+201
+00:07:41,966 --> 00:07:44,200
+在你编译这个代码的时候
+at the time of you kind of compiling this code
+
+202
+00:07:44,466 --> 00:07:46,100
+有些时候, 我看见有些人可能
+sometimes, I see people kind of
+
+203
+00:07:46,233 --> 00:07:49,066
+你知道的, 对就是字符串, 他们说字符串或其他可以这么写
+you know, yes string, they'll say string or something like that
+
+204
+00:07:49,100 --> 00:07:50,466
+这种代码非常危险的
+this kind of code is very dodgy
+
+205
+00:07:50,466 --> 00:07:55,375
+我可能会为这个特定的实践做一期c++视频
+I might actually make a c++ episode on this specific kind of practice
+
+206
+00:07:55,375 --> 00:07:57,700
+因为看起来有很多人这样做
+because it seems to kind of throw off a lot of people
+
+207
+00:07:57,700 --> 00:07:58,566
+而我也知道原因
+and I can see why
+
+208
+00:07:58,566 --> 00:08:00,666
+如果你需要用C++，这是很容易漏掉的
+it's easy to miss if you need to c++
+
+209
+00:08:00,766 --> 00:08:03,733
+但根本上, 如果这只返回一个临时字符串
+but basically, if this just returns kind of a temporary string
+
+210
+00:08:03,900 --> 00:08:05,400
+并且你用它获取c字符串
+and you get the c string from it
+
+211
+00:08:05,700 --> 00:08:08,575
+然后那个字符串可能已经被清除了
+then that string might have gotten cleaned up
+
+212
+00:08:08,575 --> 00:08:09,933
+可能已经
+might have gotten kind of well
+
+213
+00:08:10,100 --> 00:08:11,000
+可能已经超出范围了
+might have gone out of scope 
+
+214
+00:08:11,000 --> 00:08:12,400
+当我们达到这行代码的时候
+by the time we reach this line
+
+215
+00:08:12,666 --> 00:08:13,933
+这意味着这个
+which means that this
+
+216
+00:08:14,400 --> 00:08:17,425
+这个指针指向的这块内存早已被释放了
+this kind of pointer is pointing to memory that's been freed already
+
+217
+00:08:17,425 --> 00:08:18,700
+那么你就会得到一些错误之类的
+and you'll get errors and stuff like that
+
+218
+00:08:19,000 --> 00:08:21,033
+这就是我建议那样做的原因
+which is why my recommendation is also to kind of
+
+219
+00:08:21,100 --> 00:08:22,333
+如果你有一个函数
+if you've got a function which
+
+220
+00:08:22,400 --> 00:08:24,575
+它实际上返回一个字符串去
+which returns a string to actually kind of
+
+221
+00:08:24,575 --> 00:08:26,800
+创建一个在它之外的实际值
+create an actual l value out of it
+
+222
+00:08:26,800 --> 00:08:28,966
+然后再处理那个
+and then deal with that again
+
+223
+00:08:29,133 --> 00:08:32,266
+可能是对c++系列的一个评论
+probably probably probably a comment for the c++ series
+
+224
+00:08:32,266 --> 00:08:34,300
+但我只是想把它扔到这里, 为什么不呢
+but just wanted to throw it in here, why not
+
+225
+00:08:34,300 --> 00:08:37,000
+抱歉, 回到我们的实际代码, 让我们回到正轨
+sorry, back to our actual code, let's get that on track
+
+226
+00:08:37,000 --> 00:08:37,900
+我们已经有了source
+we've got our source
+
+227
+00:08:37,900 --> 00:08:40,533
+我们已经有了一个指针指向实际source的字节数据
+we've got a pointer to the actual source character data
+
+228
+00:08:40,533 --> 00:08:43,466
+我们要做的下一件事情, 实际上就是调用glShaderSource()
+the next thing we're going to do is actually call glShaderSource
+
+229
+00:08:43,466 --> 00:08:45,700
+这是指定我们着色器的源码
+which specifies the source of our shader
+
+230
+00:08:45,766 --> 00:08:47,466
+你可以看到, 我们需要的第一个参数就是着色器
+you can see the first thing we want is the shader
+
+231
+00:08:47,466 --> 00:08:49,100
+基本上就是这个id
+which is just basically the id
+
+232
+00:08:49,166 --> 00:08:51,333
+下一个需要的参数是count
+the next thing we want is count
+
+233
+00:08:51,333 --> 00:08:54,533
+所以我们指定的源码有多少呢, 只有一个
+so how many source codes are we specifying, just one
+
+234
+00:08:54,666 --> 00:08:56,533
+它需要的下一个参数就是, 一个实际的
+the next thing it wants is an actual
+
+235
+00:08:56,533 --> 00:08:58,375
+现在你注意到这儿需要两个指针
+now you'll notice there are kind of two pointers here
+
+236
+00:08:58,375 --> 00:08:59,733
+它实际上需要一个指针
+it actually wants a pointer
+
+237
+00:09:00,033 --> 00:09:00,966
+这是一个双精度指针
+this is a double pointer
+
+238
+00:09:00,966 --> 00:09:03,366
+它基本上就是需要一个指针指向实际的指针
+it basically just wants a pointer to the actual pointer
+
+239
+00:09:03,366 --> 00:09:04,366
+所以我们实际上不得不
+so we actually have to
+
+240
+00:09:04,366 --> 00:09:08,025
+实际上我们不得不给它那个source变量的内存地址
+we actually have to give it the memory address of that source variable
+
+241
+00:09:08,025 --> 00:09:09,700
+并且然后就是这个比较重要的length
+and then the length, that's important
+
+242
+00:09:09,766 --> 00:09:11,666
+如果你真的不想它使用这个完整的字符串
+if you don't really want it to use the whole string
+
+243
+00:09:11,666 --> 00:09:12,933
+或者你可以在这里指定的任何东西
+or anything you can specified here
+
+244
+00:09:13,100 --> 00:09:14,600
+但它会被转换为空指针(nullptr)
+but it's gotten cast in the null pointer
+
+245
+00:09:14,600 --> 00:09:17,225
+再说一次, 我鼓励你们实际上去docs.gl
+again I encourage you guys to actually go to docs.gl
+
+246
+00:09:17,225 --> 00:09:19,733
+然后看看这些函数
+and check out all of these kind of functions
+
+247
+00:09:19,966 --> 00:09:21,333
+并且确定你实际上已经懂了
+and make sure that you actually understand
+
+248
+00:09:21,333 --> 00:09:22,266
+你正在运行的这些代码
+kind of the code that you're running
+
+249
+00:09:22,266 --> 00:09:23,750
+我已经提醒了很多, 关于这个
+I am mentioning a lot about
+
+250
+00:09:23,750 --> 00:09:25,733
+这些函数的原理
+how these kind of functions work
+
+251
+00:09:25,766 --> 00:09:27,266
+在这个系列中, 只是经验之外的
+in this series, just out of experience
+
+252
+00:09:27,300 --> 00:09:31,733
+但请记住, 比如, 你可以将null传给length
+but remember knowing for example that you can pass null into length
+
+253
+00:09:32,066 --> 00:09:33,250
+就像, 如果lenghth是null
+like if length is null
+
+254
+00:09:33,250 --> 00:09:35,700
+每个字符串就会被认为都以null结尾, 诸如此类
+each string is assumed to be null terminated, stuff like that
+
+255
+00:09:35,966 --> 00:09:38,033
+阅读docs.gl网站真的很有帮助, 那么我会做
+really does help to read the docs, and I would be
+
+256
+00:09:38,033 --> 00:09:39,400
+并且如果我曾经真的想学习OpenGL
+and if I was actually trying to learn OpenGL
+
+257
+00:09:39,400 --> 00:09:41,533
+可能就像, 我认为你们大多数人都需要
+probably like, I assume most of you guys are
+
+258
+00:09:42,300 --> 00:09:44,233
+保持这个网站打开, 在你们跟着这些视频学习的时候
+keep this open, as you go along with these videos
+
+259
+00:09:44,233 --> 00:09:45,900
+并且在当你们确定输入这段代码的时候
+and as you type this code certainly
+
+260
+00:09:45,900 --> 00:09:47,700
+以便于你了解正在发生的事情
+so that you know kind of what's going on
+
+261
+00:09:47,700 --> 00:09:50,175
+OpenGL在某种意义上是非常脆弱的
+OpenGL tends to be very flaky in the sense
+
+262
+00:09:50,175 --> 00:09:52,800
+就是如果你真的弄错了一点小细节
+that if you actually get a little minor detail wrong
+
+263
+00:09:52,800 --> 00:09:53,900
+你可能只看见一个黑窗口
+you might just see a black screen in
+
+264
+00:09:53,900 --> 00:09:54,733
+它可能一点也无法运行
+it might not work at all
+
+265
+00:09:54,733 --> 00:09:56,833
+很快很快, 我们就会有一期视频关于
+very very soon, we're gonna have an episode about
+
+266
+00:09:56,833 --> 00:09:58,700
+OpenGL的错误以及如何处理它们
+OpenGL errors and how to deal with them
+
+267
+00:09:58,700 --> 00:10:00,133
+以及我处理它们的策略
+and my strategy for dealing with them
+
+268
+00:10:00,133 --> 00:10:01,333
+所以, 那就快到了
+so that's coming up soon
+
+269
+00:10:01,933 --> 00:10:02,733
+我们真的没有
+we don't really
+
+270
+00:10:02,733 --> 00:10:04,166
+我还没完成它
+I haven't done it yet
+
+271
+00:10:04,166 --> 00:10:06,300
+因为我们只是在画一些东西, 像三角形一样微不足道
+because we're just drawing something, as trivial as a triangle
+
+272
+00:10:06,300 --> 00:10:06,966
+并且真的
+and really that
+
+273
+00:10:06,966 --> 00:10:08,466
+你不会认为这会出错的
+that you wouldn't expect that to go wrong
+
+274
+00:10:08,466 --> 00:10:10,166
+你会不会, 我的意思是会的
+would you, I mean will
+
+275
+00:10:10,166 --> 00:10:13,066
+并且对你们很多人来说, 这可能会出错
+and it can can probably will for a lot of you go wrong
+
+276
+00:10:13,366 --> 00:10:15,800
+但很快, 当我们开始接触一些有趣的东西的时候
+but very soon, when we start to get into more kind of fun stuff
+
+277
+00:10:15,800 --> 00:10:18,075
+我会制作一期关于OpenGL错误的视频
+I am gonna make an episode about OpenGL errors
+
+278
+00:10:18,075 --> 00:10:18,866
+话虽如此
+but that being said
+
+279
+00:10:19,300 --> 00:10:20,850
+还是要保持打开文档, 去阅读它
+keep the documentation open, read it
+
+280
+00:10:20,850 --> 00:10:25,833
+对于接口, 像OpenGL一样脆弱, 当事情出错时, 这对你几乎没有帮助
+with an api, as fragile as OpenGL, that gives you so little help, when things go wrong
+
+281
+00:10:25,900 --> 00:10:28,400
+你需要基本上掌握文档
+you've want to basically master the dog master the documentation
+
+282
+00:10:28,400 --> 00:10:30,550
+如果你真的想擅长OpenGL
+if you want to actually be good at OpenGL
+
+283
+00:10:30,550 --> 00:10:31,800
+好了, 回到这儿来
+okay, so going back here
+
+284
+00:10:32,033 --> 00:10:33,733
+我们已经指定了着色器源码
+we've specified the shader source code
+
+285
+00:10:33,833 --> 00:10:36,966
+我们需要做的下一件事情, 实际上就是调用 glCompileShader()
+the next thing we need to do is basically just say glCompileShader
+
+286
+00:10:36,966 --> 00:10:38,866
+以及我们需要指定要编译的对象
+and we need a specify whichever we want to compile
+
+287
+00:10:38,866 --> 00:10:40,733
+在这个例子中就是着色器的id
+which in this case is just the shader id
+
+288
+00:10:40,733 --> 00:10:44,450
+并且这就是为了编译实际着色器我们需要写的所有代码
+and that is actually all the code that we need to write to compile the actual shader
+
+289
+00:10:44,450 --> 00:10:45,833
+所以我们可以返回这个id
+so we can return the id
+
+290
+00:10:45,833 --> 00:10:47,133
+并且一切正常
+and everything is good
+
+291
+00:10:47,133 --> 00:10:49,700
+现在, 我们没有做任何的错误处理
+now, we're not doing any kind of error handling
+
+292
+00:10:49,950 --> 00:10:51,500
+所以我们一定需要
+so we definitely need to
+
+293
+00:10:51,666 --> 00:10:54,233
+基本上就是语法错误之类的
+basically just syntax errors and stuff like this
+
+294
+00:10:54,333 --> 00:10:57,700
+我们需要为了这个实际的着色器做一些错误处理
+we need to do some kind of error handling for this actual shader
+
+295
+00:10:57,766 --> 00:10:59,633
+去看看, 可能我们只是意外地
+to see, maybe we just accidentally
+
+296
+00:10:59,733 --> 00:11:03,233
+在我们着色器源码中忘了分号之类的一些事情
+you know miss semicolon or something like that in our shader source code
+
+297
+00:11:03,533 --> 00:11:05,300
+我们可以很快搞定, 明白了吧
+we can handle all that in a minute, okay
+
+298
+00:11:05,300 --> 00:11:06,700
+所以回到我们的CreateShader()
+so going back to our CreateShader
+
+299
+00:11:06,700 --> 00:11:08,133
+复制这一行代码
+we're going to duplicate this line of code
+
+300
+00:11:08,166 --> 00:11:10,066
+叫它fs, 代表我们的片段着色器
+call it fs, for our fragment shader
+
+301
+00:11:10,566 --> 00:11:11,966
+输入GL_FRAGMENT_SHADER
+type in GL_FRAGMENT_SHADER
+
+302
+00:11:11,966 --> 00:11:14,633
+并且在那里传给它片段着色器的源码
+and give it the fragment shader source code over here
+
+303
+00:11:14,633 --> 00:11:15,400
+一旦我们完成了这个
+once we've done that
+
+304
+00:11:15,400 --> 00:11:19,166
+我们基本上就需要把这两个着色器附加到我们的程序上
+we basically need to attach both of these shaders to our program
+
+305
+00:11:19,300 --> 00:11:21,933
+因此, 这几乎就像编译C++代码
+so think of this almost like compiling c++ code
+
+306
+00:11:21,933 --> 00:11:23,566
+我们有两个不同的文件
+we've got two different files
+
+307
+00:11:23,800 --> 00:11:27,225
+那么现在我们基本上需要把它们链接到一个程序中
+and now we want to basically link them into kind of one program
+
+308
+00:11:27,225 --> 00:11:29,566
+因此我就可以同时使用它们
+so that we can well use both of them
+
+309
+00:11:29,900 --> 00:11:32,133
+所以我们就输入glAttachShader()
+so we're going to type in glAttachShader
+
+310
+00:11:32,766 --> 00:11:35,566
+我们将指定需要附加到的程序
+we're going to specify the program that we want to attach to
+
+311
+00:11:35,733 --> 00:11:37,200
+然后就是实际的着色器
+and then the actual shader
+
+312
+00:11:37,200 --> 00:11:40,100
+所以我们需要做两次, 每个着色器一次
+so we're going to do this two times, one for each shader
+
+313
+00:11:40,166 --> 00:11:41,700
+顶点着色器和片段着色器
+vertex shader and fragment shader
+
+314
+00:11:41,700 --> 00:11:45,233
+然后我们将调用glLinkProgram()链接我们的程序
+then we're going to link our program by calling glLinkProgram which
+
+315
+00:11:45,400 --> 00:11:47,000
+我们只传入程序的名字
+if we just take into the name of the program
+
+316
+00:11:47,100 --> 00:11:48,966
+不是名称, 而是id
+or rather not the name but the id
+
+317
+00:11:48,966 --> 00:11:51,766
+并且最后, 我们将输入glValidateProgram()
+and finally we're going to type in glValidateProgram
+
+318
+00:11:53,200 --> 00:11:54,900
+并且这些函数也是
+and these functions again are 
+
+319
+00:11:54,900 --> 00:11:57,066
+你应该在文档中了解的一些东西
+something that you should read about in the documentation
+
+320
+00:11:57,066 --> 00:11:59,233
+如果你真的想要明白它们是做什么的
+if you actually want to understand what they do
+
+321
+00:11:59,800 --> 00:12:02,000
+你可以看到, 这个基本上是做什么的, 好吧
+you can kind of see the basically what this does is,  well
+
+322
+00:12:02,133 --> 00:12:04,533
+对实际程序的验证
+performs validation on the actual program
+
+323
+00:12:04,533 --> 00:12:06,333
+以及一些验证的状态
+and the kind of status of the validation
+
+324
+00:12:06,333 --> 00:12:08,666
+同样也会作为一部分被保存在程序对象状态中
+again will be stored as part of the program's object state
+
+325
+00:12:08,666 --> 00:12:11,275
+你实际上也可以调用glGetProgram()
+which you can actually call kind of glGetProgram
+
+326
+00:12:11,275 --> 00:12:12,500
+然后查询这个实际的结果
+and query what the actual result is
+
+327
+00:12:12,500 --> 00:12:13,333
+和所有的东西
+and all that stuff
+
+328
+00:12:13,625 --> 00:12:15,600
+再说一次, 我鼓励你们去阅读这个文档
+again I encourage you guys to read the documentation
+
+329
+00:12:15,600 --> 00:12:18,000
+我现在不打算解释太多
+I'm not going to explain these too much right now
+
+330
+00:12:18,066 --> 00:12:20,333
+因为有些代码你只写过一次就忘了
+because there's kind of code you write once and forget about
+
+331
+00:12:20,333 --> 00:12:23,150
+所以我真的认为谈论它们太多并不重要
+so I don't really think it's important to talk about them too much
+
+332
+00:12:23,150 --> 00:12:24,733
+但一定要看看这个文档
+but definitely can see the documentation
+
+333
+00:12:24,733 --> 00:12:26,800
+特使你的着色器有问题的时候
+especially if you have problems with your shader
+
+334
+00:12:26,900 --> 00:12:30,033
+或者你只是想了解更多, 成为最终的OpenGL大师
+or you just want to understand more, and be the ultimate OpenGL master
+
+335
+00:12:30,033 --> 00:12:31,900
+最后我们实际上现在可以删了我们的着色器
+finally we can actually delete our shaders now
+
+336
+00:12:31,900 --> 00:12:33,733
+这是因为它们已经被链接到一个程序中
+that's because they've been linked into a program
+
+337
+00:12:34,100 --> 00:12:37,175
+所以我们可以删除这些中间文件, 如果你在使用c++
+so we can kind of delete the intermediates, if you will in c++
+
+338
+00:12:37,175 --> 00:12:38,100
+当我们编译一些东西时
+when we compile something
+
+339
+00:12:38,100 --> 00:12:40,066
+我们得到了一些中间obj文件
+we get intermediate obj files
+
+340
+00:12:40,066 --> 00:12:42,533
+当我们在使用微软编译器时, 它就是对象文件
+object files when we're dealing with microsoft's compiler
+
+341
+00:12:42,566 --> 00:12:44,266
+并且最后, 我们可以删除那些中间文件
+and at the end, we can kind of delete that
+
+342
+00:12:44,266 --> 00:12:46,100
+因为我们实际上已经得到了一个实际的程序
+because we've actually got an actual program
+
+343
+00:12:46,100 --> 00:12:47,600
+现在它们已经存储在程序中了
+now they're stored inside the program
+
+344
+00:12:47,700 --> 00:12:51,733
+所以我们实际上将对vs和fs调用glDeleteShader()
+so we're actually going to call glDeleteShader with vs and fs
+
+345
+00:12:52,233 --> 00:12:55,633
+这儿也有一些像glDetachShader之类的函数
+there are some other functions like glDetachShader and stuff like that
+
+346
+00:12:55,633 --> 00:12:57,266
+这些实际上可以删除源码
+which will actually delete the source code
+
+347
+00:12:58,100 --> 00:13:00,800
+我不喜欢调用这些函数的原因
+the reason I don't like to touch those functions
+
+348
+00:13:00,800 --> 00:13:02,233
+有一些原因, 首先
+there's a few reasons, first of all
+
+349
+00:13:02,233 --> 00:13:04,800
+它们真的没有必要去清理
+they're not really that necessary to even clean that up
+
+350
+00:13:04,800 --> 00:13:08,833
+因为它占用的内存量很小
+because it's it's takes a trivial amount of memory anyway
+
+351
+00:13:09,200 --> 00:13:13,600
+但是保留源码的着色器是非常重要的
+but having the shader of source code still around is very important
+
+352
+00:13:13,600 --> 00:13:16,000
+当你在处理像图形深度实体的时候
+when you kind of deal with things like graphics deep body
+
+353
+00:13:16,000 --> 00:13:18,176
+因为如果你删除了来自显卡的着色器
+because if you kind of delete the shader from the GPU
+
+354
+00:13:18,176 --> 00:13:20,100
+来自显卡的着色器源码
+the shade of source code from the GPU
+
+355
+00:13:20,300 --> 00:13:21,200
+你无法验证
+you can't verify
+
+356
+00:13:21,200 --> 00:13:23,233
+并且你不能在着色器中设置断点
+and you can't kind of breakpoint it step through your shader
+
+357
+00:13:23,233 --> 00:13:25,300
+就像你可以使用某些NVIDIA工具那样做
+like you can with certain NVIDIA tools
+
+358
+00:13:25,333 --> 00:13:26,433
+我们将进入其中
+which we will get into
+
+359
+00:13:26,533 --> 00:13:28,866
+如果你分离着色器并交付源代码
+if you kind of detach your shaders and deliver the source codes
+
+360
+00:13:28,866 --> 00:13:30,633
+因此, 你会失去很多
+so that, you're gonna lose a lot of that
+
+361
+00:13:30,866 --> 00:13:33,333
+很多调试能力, 并且说实话
+a lot of that debugging ability, and to be honest
+
+362
+00:13:33,833 --> 00:13:36,733
+就像很多游戏引擎一样, 它们甚至都不需要调用glDetach头
+like a lot of game engines don't even bother call glDetach header
+
+363
+00:13:36,733 --> 00:13:38,533
+因为它实现是太小了
+because it's so such a minimal
+
+364
+00:13:39,100 --> 00:13:41,333
+就像游戏, 根本不值得那样做
+like game that it's just it's not worth it
+
+365
+00:13:41,333 --> 00:13:42,400
+并且这就是我们要做的一切
+and that's really all we have to do
+
+366
+00:13:42,400 --> 00:13:43,866
+我们终于可以返回我们的程序了
+we can finally return our program
+
+367
+00:13:43,866 --> 00:13:44,666
+现在你可能已经注意到了
+now you might have noticed
+
+368
+00:13:44,666 --> 00:13:46,066
+我们实际上返回了一个整型
+that we're actually returning an int
+
+369
+00:13:46,066 --> 00:13:48,066
+而这个程序是一个无符号整数
+whereas this program is an unsigned int
+
+370
+00:13:48,066 --> 00:13:49,175
+所以我要清理这个片段
+so I'm just going to clean this episode 
+
+371
+00:13:49,175 --> 00:13:52,533
+因此, 它实际上返回一个无符号整数, 并且那就是我们的着色器
+so that it actually returns an unsigned int, and that is our shader
+
+372
+00:13:52,666 --> 00:13:54,133
+让我们快速做一下这个错误处理吧
+let's quickly do this error handling
+
+373
+00:13:54,133 --> 00:13:54,975
+因为我有一种感觉
+because I have a feeling 
+
+374
+00:13:54,975 --> 00:13:57,266
+当我实际上在这个着色器的时候
+when I actually write this shader in a minute here
+
+375
+00:13:58,200 --> 00:13:59,200
+它可能会出一些问题
+it's just gonna be wrong
+
+376
+00:13:59,266 --> 00:14:00,366
+并且我会犯个错误
+and I'm just gonna make a mistake
+
+377
+00:14:00,366 --> 00:14:02,200
+然后我会像什么都没做一样
+and then I'm gonna be like create nothing works
+
+378
+00:14:02,200 --> 00:14:04,600
+最后我不得不写这个错误处理代码
+and I'm gonna have to end up writing this error handling code 
+
+379
+00:14:05,966 --> 00:14:06,933
+不管如何, 所以让我们现在就写它吧
+anyway, so let's just write it now
+
+380
+00:14:06,966 --> 00:14:10,566
+比如我们刚刚看到的glValidateProgram, 就像一些状态
+much like we just read about glValidateProgram setting, like some kind of state
+
+381
+00:14:10,566 --> 00:14:11,766
+然后我们就能检索它
+and then we can retrieve it
+
+382
+00:14:11,900 --> 00:14:14,366
+我们还可以检索此编译的结果
+we can also retrieve the result of this compilation
+
+383
+00:14:14,366 --> 00:14:16,666
+编译着色器实际上不会返回任何东西
+compiled shader doesn't actually return anything
+
+384
+00:14:16,866 --> 00:14:20,066
+然而, 如果有任何东西出错了的话, 我们无法检索它去找出问题
+however, we can't query it to find out if anything's wrong
+
+385
+00:14:20,066 --> 00:14:23,750
+那么我们可以通过调用glGetShaderiv的方式
+and the way we do that is by calling glGetShaderiv
+
+386
+00:14:23,750 --> 00:14:27,350
+这是我们对I和V以及所有这些的第一种介绍
+now this is our first kind of introduction to I and V and all this
+
+387
+00:14:27,350 --> 00:14:29,566
+因为glGetShare真的是个函数
+because glGetShare is really the function
+
+388
+00:14:29,600 --> 00:14:32,566
+iv基本上是它需要的类型
+iv is basically the types that it needs
+
+389
+00:14:32,766 --> 00:14:34,366
+所以, 首先, 我们输入id
+so, first of all, we type in the id
+
+390
+00:14:34,600 --> 00:14:37,800
+然后采用GLenum的形式输入参数名称
+then we type in the parameter name in the form of an actual GLenum
+
+391
+00:14:37,800 --> 00:14:39,433
+我们知道这是无符号整型
+which we know as an unsign integer
+
+392
+00:14:39,433 --> 00:14:41,333
+基本上这里就是一个常量
+basically this is just going to be a constant here
+
+393
+00:14:41,566 --> 00:14:42,933
+在OpenGL中定义的
+that's defined by OpenGL
+
+394
+00:14:43,000 --> 00:14:45,066
+在这里, 我们要获得编译状态(GL_COMPILE_STATUS)
+in this case, we're getting the compile status
+
+395
+00:14:45,466 --> 00:14:47,300
+然后是整型参数
+and then the int parameter
+
+396
+00:14:47,300 --> 00:14:48,966
+我们知道它只是一个整型指针
+which we know is just an int pointer
+
+397
+00:14:48,966 --> 00:14:51,133
+所以我将输入int result
+so I'm going to type in an int result
+
+398
+00:14:51,366 --> 00:14:53,733
+然后传入那个result的内存地址
+and then passing the memory address of that result
+
+399
+00:14:54,133 --> 00:14:57,300
+我基本上指定了一个整数
+I basically specifies that we are specifying an integer
+
+400
+00:14:57,466 --> 00:14:59,500
+v指定了它需要一个矢量
+v kind of specifies that it wants a vector
+
+401
+00:14:59,500 --> 00:15:00,633
+所以数组就是这个
+so an array kind of one
+
+402
+00:15:00,633 --> 00:15:02,800
+在这种情况下, 它实际上只意味着一个指针
+in this case, it really just means that once a pointer
+
+403
+00:15:03,066 --> 00:15:05,133
+然后我们检查result是否等于false
+then we check to see if the result is equal to false
+
+404
+00:15:05,133 --> 00:15:07,600
+所以如果result等于result
+so if result equals GL_FALSE
+
+405
+00:15:07,600 --> 00:15:11,200
+现在你可能注意到了这个GL_FALSE, 如果我在这儿按alt和f12
+now you might notice the GL_FALSE, if I just hit alt f12 here
+
+406
+00:15:11,433 --> 00:15:13,166
+GL_FALSE就是找到一个0
+GL_FALSE is just to find a zero
+
+407
+00:15:13,266 --> 00:15:14,400
+所以如果你想, 你可以
+so you could if you want
+
+408
+00:15:14,500 --> 00:15:18,200
+还可以用带有解释标记(!)的结果指定它
+also kind of specify it for results with an explanation marked
+
+409
+00:15:18,200 --> 00:15:19,850
+将result保存为false
+save for result as false in
+
+410
+00:15:19,850 --> 00:15:21,300
+我经常做这种事
+I usually do stuff like that
+
+411
+00:15:21,300 --> 00:15:22,466
+不过我不喜欢在这里做
+I don't like doing it here though
+
+412
+00:15:22,466 --> 00:15:24,300
+因为我们是在特指使用GL_FALSE检查
+because we're specifically checking with GL_FALSE
+
+413
+00:15:24,300 --> 00:15:26,400
+而不是使用false或之类的东西
+and not just kind of false or anything like that
+
+414
+00:15:27,500 --> 00:15:28,900
+这可能会更有意义一点
+this kind of just makes a little bit more sense
+
+415
+00:15:28,900 --> 00:15:30,066
+我想观众也是这样
+I think to people watching as well
+
+416
+00:15:30,066 --> 00:15:30,966
+所以我就保持那样做了
+so I'll keep it as that
+
+417
+00:15:30,966 --> 00:15:34,066
+所以如果result是false的话意味着着色器编译失败了
+so if the result was false means that shader did not compile successfully
+
+418
+00:15:34,233 --> 00:15:37,333
+现在我们实际上想做的就是获得这个错误信息
+what we actually want to do now is get the error message
+
+419
+00:15:37,500 --> 00:15:38,566
+并且我们做那个的方式
+and the way we can do that
+
+420
+00:15:38,566 --> 00:15:41,333
+就是基本上先检索到错误信息的长度
+is basically query the error message to length first
+
+421
+00:15:41,700 --> 00:15:47,250
+因此我这里输入int length, 然后glGetShaderiv(id)
+so if I type in int length, and then glGetShaderiv id
+
+422
+00:15:47,250 --> 00:15:49,400
+GL_INFO_LOG_LENGTH
+GL_INFO_LOG_LENGTH
+
+423
+00:15:49,400 --> 00:15:51,800
+你可以看到为何我喜欢OpenGL的接口
+you can see why I just love OpenGL's api
+
+424
+00:15:51,800 --> 00:15:54,466
+因为它就是太棒了
+because really it's just it's just great
+
+425
+00:15:54,466 --> 00:15:56,700
+然后我们指定length的内存地址
+and then we'll specify the memory adress of length
+
+426
+00:15:56,700 --> 00:15:58,300
+这样它就可以存储这些数据了
+so that it can store that data then
+
+427
+00:15:58,300 --> 00:15:59,200
+一旦我们有了这个
+once we have that
+
+428
+00:15:59,200 --> 00:16:03,066
+我们实际上可以在这里构造一种堆栈分配的字符
+we can actually construct just a stack allocated kind of char right here
+
+429
+00:16:03,200 --> 00:16:06,133
+那么这个message, 它的长度就是这个length
+so a message, I'll say with the parameter length
+
+430
+00:16:06,600 --> 00:16:08,633
+现在
+now, now
+
+431
+00:16:09,133 --> 00:16:11,300
+我们在这儿遇到了一点小问题
+we get a little bit of a problem here
+
+432
+00:16:12,033 --> 00:16:13,200
+我也不喜欢这样
+that I don't like either
+
+433
+00:16:13,500 --> 00:16:17,766
+但是, 你可以看到我不能在这里创建一个堆栈分配长度
+but, you can see if I can't just create a stack allocated length here
+
+434
+00:16:18,600 --> 00:16:21,666
+因为length实际上是一个变量, 而不是一个常量
+because length is actually a variable and not a constant
+
+435
+00:16:21,666 --> 00:16:22,566
+并且因为一些原因
+and for some reason
+
+436
+00:16:22,566 --> 00:16:26,725
+在某些情况下, c++不能以任意的大小来生成栈
+c++ just cannot grow the stack by an arbitrary size in some cases
+
+437
+00:16:26,725 --> 00:16:27,433
+我们不会
+we're not gonna
+
+438
+00:16:27,433 --> 00:16:29,500
+但我们很好
+we're we're good though
+
+439
+00:16:29,766 --> 00:16:32,475
+我们已经超越了这种喜剧水平
+we're above this kind of level of comedy
+
+440
+00:16:32,475 --> 00:16:34,833
+所以我们实际上要侵入这个
+so we're actually going to hack this
+
+441
+00:16:34,900 --> 00:16:36,833
+我仍然希望在堆栈上定义它
+I still want this to be defined on the stack
+
+442
+00:16:36,833 --> 00:16:37,900
+我可以使用一些东西
+I could use something
+
+443
+00:16:38,233 --> 00:16:39,833
+我可以
+I could just 
+
+444
+00:16:39,833 --> 00:16:42,333
+大多人人解决这个可能是通过在堆上创建它
+most people probably solve this just by making this a heap allocation
+
+445
+00:16:42,333 --> 00:16:44,100
+然后稍后再删除它
+and then kind of deleting it later
+
+446
+00:16:44,100 --> 00:16:45,700
+或者将其指定为唯一指针
+or maybe assigning it to a unique pointer
+
+447
+00:16:45,700 --> 00:16:46,566
+或者类似的
+or something like that
+
+448
+00:16:46,766 --> 00:16:47,966
+我不是大多人
+I am not most people
+
+449
+00:16:48,166 --> 00:16:49,166
+我不喜欢这样做
+I don't like this
+
+450
+00:16:49,200 --> 00:16:52,933
+我仍然希望它只是在堆栈上分配的普通字符
+I still want this to just be a normal char allocated on the stack
+
+451
+00:16:52,933 --> 00:16:56,033
+以我要做的就是把它设为等于alloca
+so what I'm going to do is actually set this equal to alloca
+
+452
+00:16:57,566 --> 00:17:00,533
+这个大小就是length*sizeof(char)
+the size being just length times the size of char
+
+453
+00:17:01,533 --> 00:17:04,033
+char, 当然一种像这样小写的char
+char being of course a low case char like that
+
+454
+00:17:04,366 --> 00:17:06,966
+好的, 我们将把这个结果转换回一个字符指针
+okay, and we're gonna cast this result back to a char pointer
+
+455
+00:17:06,966 --> 00:17:08,533
+我们就得到了一个这样的指针
+and we're gonna get a pointer to that like that
+
+456
+00:17:08,966 --> 00:17:10,525
+alloca是一个c函数
+alloca is a function that c
+
+457
+00:17:10,525 --> 00:17:11,266
+实际上会给你
+actually gives you
+
+458
+00:17:11,266 --> 00:17:13,300
+它允许你在堆栈上动态分配
+which lets you allocate on stack dynamically
+
+459
+00:17:13,300 --> 00:17:14,866
+就像我们现在做的, 明白吧
+like what we've done right now, okay
+
+460
+00:17:15,233 --> 00:17:16,900
+根据你的意愿使用
+use at your kind of discretion
+
+461
+00:17:17,566 --> 00:17:19,100
+很多人不喜欢用这种东西
+a lot of people don't like using stuff like this
+
+462
+00:17:19,100 --> 00:17:20,633
+但这没理由不用它
+there's no reason for not using it
+
+463
+00:17:20,633 --> 00:17:21,433
+真是个不错的函数
+it's a nice function
+
+464
+00:17:21,433 --> 00:17:23,733
+我喜欢在这种情况下使用它, 这是完全必要的
+I like using it in this case, it's totally necessary
+
+465
+00:17:23,733 --> 00:17:24,700
+那么我们继续
+and let's continue
+
+466
+00:17:24,700 --> 00:17:27,133
+我可能会专门为此制作一期遗漏的视频
+I might actually make a super lost episode about this specifically
+
+467
+00:17:27,133 --> 00:17:31,533
+因为它并不像它应该的那样广为人知
+because it's not as well known as it probably should be
+
+468
+00:17:31,625 --> 00:17:35,933
+好了, 我们要做下一件事情就是输入glGetShaderInfoLog
+okay, the next thing we'll do is glGetShaderInfoLog
+
+469
+00:17:36,125 --> 00:17:39,566
+着色器的id, 缓冲区大小的length
+shader id, the buffer size being length
+
+470
+00:17:39,800 --> 00:17:42,800
+然后它需要一个指针形式的实际长度
+then it wants an actual length in the form of a pointer
+
+471
+00:17:42,800 --> 00:17:43,600
+因为一些原因
+for some reason
+
+472
+00:17:43,700 --> 00:17:45,533
+我想这可能就是输出长度
+this is going to be the output length I guess maybe
+
+473
+00:17:45,650 --> 00:17:47,333
+再说一次, 应该阅读文档
+again should read the documentation
+
+474
+00:17:47,333 --> 00:17:50,333
+最后需要一个指向实际缓冲区的指针
+and then finally wants a pointer to that actual buffer
+
+475
+00:17:50,333 --> 00:17:52,000
+所以我们就这样输入message
+so we'll just type in message like that
+
+476
+00:17:52,266 --> 00:17:54,500
+然后我们将把message打印到控制台上
+then we're going to actually print the message to the console
+
+477
+00:17:54,500 --> 00:17:57,066
+在这种情况下, 我将使用std::cout
+I'm just going to use std cout in this case
+
+478
+00:17:57,066 --> 00:17:58,466
+所以, cout << message
+so cout message
+
+479
+00:17:58,766 --> 00:17:59,933
+以及 endl
+and end line
+
+480
+00:18:00,133 --> 00:18:02,700
+在我们真的这么做之前, 我可能会打印一个
+before we actually do that, I might print a kind of
+
+481
+00:18:02,833 --> 00:18:06,125
+failed to compile shader
+failed to compile shader
+
+482
+00:18:06,125 --> 00:18:09,066
+现在我们不知道它在这一点上编译失败的是哪种着色器
+now we don't know which kind of shader it failed to compile at this point
+
+483
+00:18:09,333 --> 00:18:10,966
+所以我们实际能做的就是, 如果我们
+so what we actually could do, if we were
+
+484
+00:18:10,966 --> 00:18:12,166
+如果我们真的冷静
+if we were really cool
+
+485
+00:18:12,233 --> 00:18:14,866
+基本上就是检查着色器的类型
+is basically just check to see what type the shader was
+
+486
+00:18:15,033 --> 00:18:15,866
+在这个例子中, 我们知道
+in this case, we know
+
+487
+00:18:15,866 --> 00:18:18,000
+我们只编译顶点或片段着色器
+we're only compiling either a vertex or fragment shader
+
+488
+00:18:18,033 --> 00:18:19,133
+所以我能做的就是
+so what I could do is
+
+489
+00:18:19,133 --> 00:18:21,333
+如果我像这样把代码分开
+if I just kind of separate this code out like this
+
+490
+00:18:21,833 --> 00:18:24,166
+我要做的就是
+what I could do is right
+
+491
+00:18:24,533 --> 00:18:27,533
+type=GL_VERTEX_SHADER
+type equals GL_VERTEX_SHADER
+
+492
+00:18:27,800 --> 00:18:28,933
+如果那是真的
+if that's true
+
+493
+00:18:29,000 --> 00:18:30,166
+我要把它移到这里
+I'm going to actually move it down here
+
+494
+00:18:30,166 --> 00:18:31,100
+所以你就可以看到我在写什么了
+so you can see what I'm typing
+
+495
+00:18:31,100 --> 00:18:33,950
+如果那是真的, 我们就写vertex
+if that's true, we're going to write vertex
+
+496
+00:18:33,950 --> 00:18:36,450
+如果它是假的, 我们就写fragments
+if it's false, we're going to write fragments again
+
+497
+00:18:36,450 --> 00:18:37,400
+这还是有点小愉快的
+this is a little bit happy
+
+498
+00:18:37,400 --> 00:18:40,275
+因为我们可有不止这两种着色器类型
+because we could have more than just these two shader types
+
+499
+00:18:40,275 --> 00:18:42,333
+但我认为这可能完全没问题
+but I think that's probably totally fine
+
+500
+00:18:42,333 --> 00:18:44,675
+我要把这行带回到这一行上
+I'm going to kind of bring this line back to being on one line 
+
+501
+00:18:44,675 --> 00:18:46,133
+但实际上我已经打开了包裹
+but I've actually got wrapping turned on
+
+502
+00:18:46,133 --> 00:18:47,533
+所以你还是可以看到一些
+so you can see a bit of it anyway
+
+503
+00:18:47,633 --> 00:18:48,200
+好吧, 酷
+all right, cool
+
+504
+00:18:48,200 --> 00:18:49,400
+所以我们可以打印一条信息
+so we're printing a message saying
+
+505
+00:18:49,400 --> 00:18:51,450
+我们编译失败的着色器类型
+that we failed to compile our type of shader
+
+506
+00:18:51,450 --> 00:18:52,800
+然后我们再打印这个message
+and then we're printing the message
+
+507
+00:18:52,866 --> 00:18:56,600
+最后, 我们应该通过写glDeleteShader()来处理这个结果
+finally, we should kind of handle this result by writing glDeleteShader
+
+508
+00:18:56,900 --> 00:18:59,133
+当然, 我们的着色器编译没有成功
+because of course, our shader compilation didn't work out
+
+509
+00:18:59,366 --> 00:19:01,766
+并且然后我们可以像0这样的一些东西
+and then we can return something like zero
+
+510
+00:19:01,900 --> 00:19:03,100
+因为我们取的是无符号整数
+because we are taken unsigned int
+
+511
+00:19:03,100 --> 00:19:04,566
+所以我们不能返回-1
+so we can't really return -1
+
+512
+00:19:04,900 --> 00:19:06,166
+好了, 酷, 继续
+okay, cool, there we go
+
+513
+00:19:06,166 --> 00:19:08,700
+现在我们不检查它是否正常或类似的东西
+now we're not checking here to see if it works or anything like that
+
+514
+00:19:08,700 --> 00:19:10,475
+可能是断言之类的
+which probably is assert or something like that
+
+515
+00:19:10,475 --> 00:19:11,300
+如果这不起作用
+if this doesn't work out
+
+516
+00:19:11,300 --> 00:19:13,733
+因为它对程序的成功运行至关重要
+because it's kind of vital to a program running successfully
+
+517
+00:19:13,900 --> 00:19:14,566
+但不管如何
+but anyway
+
+518
+00:19:14,566 --> 00:19:16,433
+我们至少会将错误消息打印到控制台
+we'll at least get the error message printing to the console
+
+519
+00:19:16,433 --> 00:19:18,666
+这应该足以在我们这里调试它
+that should be enough to debug it in our situation here
+
+520
+00:19:18,733 --> 00:19:20,666
+好了, 酷, 这就是我们需要的一切
+all right, cool, so that's all we need
+
+521
+00:19:20,933 --> 00:19:23,075
+现在我们快速写个着色器
+now we can actually write a shader quickly
+
+522
+00:19:23,075 --> 00:19:24,466
+希望能用上它
+and hopefully use it
+
+523
+00:19:24,733 --> 00:19:26,500
+所以现在让我们说说, 写一些着色器
+so let's talk about writing some shaders now
+
+524
+00:19:26,500 --> 00:19:27,633
+我们要下来这里
+we're going to come down here
+
+525
+00:19:27,833 --> 00:19:29,233
+就在我们创建这个缓冲区之后
+to just after we create all this buff
+
+526
+00:19:29,233 --> 00:19:30,700
+我们在哪里做这个并不重要
+it doesn't really matter where we do this
+
+527
+00:19:30,733 --> 00:19:33,166
+在使用顶点属性指针之后, 会做很多事情
+much does after the kind of vertics attribute pointer on
+
+528
+00:19:33,666 --> 00:19:35,586
+所以首先, 我知道我们只需要输入
+so first of all, we know that we can just type in 
+
+529
+00:19:35,586 --> 00:19:39,200
+unsigned int shader = CreateShader()
+unsigned int shader equals create shader
+
+530
+00:19:39,200 --> 00:19:40,700
+然后我们需要指定两个字符串
+and then we just need to specify two strings
+
+531
+00:19:40,700 --> 00:19:41,950
+就是源码, 就这样
+which are the source code, and that's it
+
+532
+00:19:41,950 --> 00:19:43,500
+那么让我们来写我们的第一个着色器
+so let's kind of just write our first shader
+
+533
+00:19:43,500 --> 00:19:46,600
+std::string vertexShader =
+std string vertex shader equals
+
+534
+00:19:46,666 --> 00:19:48,800
+那么现在我们就要写我们的源码了
+and now we're going to write our source code
+
+535
+00:19:48,800 --> 00:19:51,400
+写这个可能比较烦人, 作为C++字符串
+now this is a little bit annoying to write, as a c++ string
+
+536
+00:19:51,433 --> 00:19:54,000
+因为我们必须在每行后面加一个新行字符( )
+because we have to put like a new line character after every line
+
+537
+00:19:54,000 --> 00:19:55,100
+一切都很烦
+and all that super annoying
+
+538
+00:19:55,100 --> 00:19:57,050
+但不管如何, 我们都要做
+but we'll kind of do it anyway
+
+539
+00:19:57,050 --> 00:19:58,333
+所以先让这个换行
+so I'll kind of bring this down here
+
+540
+00:19:58,333 --> 00:19:59,600
+这样写起来可能更容易一点
+to make it a little bit easier
+
+541
+00:19:59,600 --> 00:20:03,700
+我们首先要写的是#version 330 core
+first thing we're going to write is version 330 core
+
+542
+00:20:03,700 --> 00:20:06,366
+这基本上只是意味着我们将使用GLSL
+which basically just means that we're going to be using GLSL
+
+543
+00:20:06,366 --> 00:20:07,500
+这是OpenGL着色器
+which is OpenGL shader 
+
+544
+00:20:07,500 --> 00:20:09,200
+就是GL着色器语言
+which is the GL shading language
+
+545
+00:20:09,200 --> 00:20:10,266
+OpenGL着色器语言
+OpenGL shading language
+
+546
+00:20:10,300 --> 00:20:14,500
+version 330和core意味着它不让我们使用
+version 330 and core means that it's not going to let us use
+
+547
+00:20:14,533 --> 00:20:16,666
+任何弃用函数, 或者类似的东西
+any kind of deprecated functions, or anything like that
+
+548
+00:20:16,666 --> 00:20:18,500
+这将导致着色器编译
+that will result in a shader compilation
+
+549
+00:20:18,666 --> 00:20:20,000
+因为我们只想确认
+because we just want to make sure that 
+
+550
+00:20:20,000 --> 00:20:22,775
+我们正在用最新的和最好的
+we're using the latest and the greatest that we have 
+
+551
+00:20:22,775 --> 00:20:25,675
+现在我这里不写450或440的原因是
+now the reason I'm not writing like 450 or 440 here is because
+
+552
+00:20:25,675 --> 00:20:28,100
+我们还不需要所有这些新功能
+we're don't really need all those new features just yet
+
+553
+00:20:28,100 --> 00:20:31,333
+当我们这样做的时候, 我们将转而使用那些更多模式的语言
+when we do, we will switch to using those more mod languages
+
+554
+00:20:31,333 --> 00:20:34,233
+并且在这个例子中, 我们只是确保了一点额外的兼容性
+and in this case, we're just ensuring a bit of extra compatibility
+
+555
+00:20:34,350 --> 00:20:35,633
+我需要写个换行符
+I want to write a new line character
+
+556
+00:20:35,633 --> 00:20:37,733
+然后回车
+and then I'm going to just press enter
+
+557
+00:20:37,733 --> 00:20:40,533
+在C++中, 你不需要像加法或类似的东西那样写
+in c++, you don't need to write like plus or anything like that
+
+558
+00:20:40,666 --> 00:20:42,500
+如果你像这样写一些字符串
+if you just write strings kind of like this
+
+559
+00:20:42,633 --> 00:20:43,400
+一个在另一个后面
+one after the other
+
+560
+00:20:43,400 --> 00:20:45,600
+它们将被连接成一个字符串
+they will be concatenated into a single string
+
+561
+00:20:45,600 --> 00:20:48,475
+好了继续, 我们有一空行
+okay next, we'll have just a kind of a blank line 
+
+562
+00:20:48,475 --> 00:20:50,566
+只是因为
+just because
+
+563
+00:20:50,600 --> 00:20:52,300
+我确保在这儿写的是新行
+again I'll make sure I kind of write new line here
+
+564
+00:20:52,300 --> 00:20:53,600
+我们真的不需要写新行
+we don't really need to write new line
+
+565
+00:20:53,600 --> 00:20:55,933
+这比实际c++更适合我
+this is more for me than actual c++
+
+566
+00:20:55,933 --> 00:20:57,433
+但不论如何, 我们实际上还是要写
+but we'll actually do it anyway
+
+567
+00:20:57,433 --> 00:20:59,133
+然后最后的void main
+and then finally void main
+
+568
+00:20:59,133 --> 00:21:01,466
+这就是我们着色器的主函数
+this is our main function for our shader
+
+569
+00:21:01,533 --> 00:21:04,066
+像你看见的其他函数一样展开
+just going to open it up like it was any other function you can see
+
+570
+00:21:04,066 --> 00:21:08,100
+搞笑的是, 我几乎已经忘了写换行符了
+I'm already kind of forgetting to write new lines everywhere which is fun
+
+571
+00:21:08,366 --> 00:21:10,100
+定义此类着色器的另一个原因
+another reason why defining these kind of shaders
+
+572
+00:21:10,100 --> 00:21:11,433
+而且文件要好得多
+and files is a lot better
+
+573
+00:21:11,466 --> 00:21:13,400
+并且在下一期我们可能就会那样做
+and we will probably do that next episode
+
+574
+00:21:13,400 --> 00:21:15,966
+这个主函数的运行方式就和
+this main function works much the same way
+
+575
+00:21:15,966 --> 00:21:18,750
+在c++中我们实际的主函数一样
+as our actual main function does in c++
+
+576
+00:21:18,750 --> 00:21:20,666
+当我们这里有int main时
+when we actually have int main here
+
+577
+00:21:20,750 --> 00:21:23,850
+我们基本上只是指定这是做什么函数
+we're basically just specifying what function did this
+
+578
+00:21:23,850 --> 00:21:25,800
+这个主函数会被调用
+this main function will get called
+
+579
+00:21:25,866 --> 00:21:27,433
+当这个顶点着色器被调用的时候
+when this vertex shader gets called
+
+580
+00:21:27,433 --> 00:21:29,233
+并且我们基本上在这儿想做的
+and what we basically want to do in here
+
+581
+00:21:29,233 --> 00:21:31,366
+就是设置gl_Position
+is just set gl_Position
+
+582
+00:21:31,833 --> 00:21:35,400
+等于我们顶点位置的属性
+equal to our attribute which is our vertex position 
+
+583
+00:21:35,400 --> 00:21:37,000
+这是我们在这里指定的
+which we kind of specify over here
+
+584
+00:21:37,033 --> 00:21:40,266
+我们把顶点属性指针放在索引0处
+and we take in our vertex attribute pointer at index zero
+
+585
+00:21:40,333 --> 00:21:42,300
+所以我们如何访问这个数据
+so how do we access this data
+
+586
+00:21:42,300 --> 00:21:45,533
+如何在实际着色器中访问这两个浮点数
+how do we access these two floats in our actual shader
+
+587
+00:21:45,733 --> 00:21:48,600
+我们需要在这里指定实际属性
+well, we need to specify the actual attribute up here
+
+588
+00:21:48,600 --> 00:21:50,700
+所以我要在这里增加一些空间
+so I'm going to kind of add some space here
+
+589
+00:21:51,066 --> 00:21:53,866
+然后指定属性, 我将这样做
+and then specify the attribute, and I'm going to do this
+
+590
+00:21:53,866 --> 00:21:58,533
+基本就是输入in vec4 position
+by basically typing in in vec4 position
+
+591
+00:21:59,133 --> 00:22:00,333
+然后在这行的开头
+and then at the beginning of the line
+
+592
+00:22:00,333 --> 00:22:01,800
+我将指定
+I'm just going to specify that
+
+593
+00:22:01,800 --> 00:22:05,100
+这个实际属性位于索引0处
+this actual attribute is located at index zero
+
+594
+00:22:05,100 --> 00:22:06,875
+我这样做只是通过写
+and the way I'm doing that is just by writing 
+
+595
+00:22:06,875 --> 00:22:09,900
+像这样的layout(location = 0)
+a layout location equals zero like that
+
+596
+00:22:10,133 --> 00:22:11,925
+然后才是in vec4 position
+and then in vec4 position 
+
+597
+00:22:11,925 --> 00:22:15,500
+所以这个0应该和这个0匹配
+so this this zero is should be matching up with this zero
+
+598
+00:22:15,500 --> 00:22:17,733
+因为它就是我们属性的索引
+because it is the index of our attribute
+
+599
+00:22:17,733 --> 00:22:18,933
+所以有一件事你可能已经注意到了
+so one thing you might have noticed
+
+600
+00:22:18,933 --> 00:22:20,500
+就是我使用了vec4
+is that I'm taking an vec4
+
+601
+00:22:20,500 --> 00:22:22,466
+然后, 我实际上给它了一个vec2
+however, I'm actually giving it a vec2
+
+602
+00:22:22,466 --> 00:22:23,400
+为什么我要那样做
+why am I doing that
+
+603
+00:22:23,675 --> 00:22:27,000
+首先, 无论如何, 这最终都需要是一个vec4
+well, first of all, this needs to be a vec4 eventually anyway
+
+604
+00:22:27,000 --> 00:22:29,300
+因为gl_Position实际上是个vec4
+because gl_Position is actually a vec4
+
+605
+00:22:29,300 --> 00:22:31,525
+并且我们不能把vec2赋值到vec4
+and we can't just assign a vec2 to a vec4
+
+606
+00:22:31,525 --> 00:22:33,266
+我们可以把这个改成vec2
+we could change this to be a vec2
+
+607
+00:22:33,300 --> 00:22:36,000
+但然后, 我们实际上不得不把它转成vec4
+but then we actually have to kind of convert it into a vec4 
+
+608
+00:22:36,166 --> 00:22:39,366
+通过传入position.xy
+by taking in position x y
+
+609
+00:22:40,566 --> 00:22:43,433
+然后指定我们想要的其他值
+and then kind of specifying whatever we want for the other values
+
+610
+00:22:43,433 --> 00:22:45,200
+可能像0和1之类的一些值
+which would probably be something like zero on one
+
+611
+00:22:45,533 --> 00:22:46,866
+我们真的不想那样做
+we don't really want to do that
+
+612
+00:22:46,866 --> 00:22:48,275
+取而代之的是我们实际可以
+instead what we can do is actually 
+
+613
+00:22:48,275 --> 00:22:51,100
+不管如何, 让OpenGL把它转成vec4
+get OpenGL to convert this into a vec4 anyway
+
+614
+00:22:51,175 --> 00:22:53,266
+记住, 它知道这是一个vec2
+remember, it knows this is a vec2
+
+615
+00:22:53,400 --> 00:22:55,350
+它知道这是一个两个分量的矢量
+it knows this is a two component vector 
+
+616
+00:22:55,350 --> 00:22:57,000
+因为我们在这儿写了2
+because we've written two here
+
+617
+00:22:57,166 --> 00:22:58,666
+这就是它知道转换这个的原因
+that's why it knows to cast this
+
+618
+00:22:59,066 --> 00:23:00,533
+并且因为它是一个实际位置
+and because it's an actual position
+
+619
+00:23:00,533 --> 00:23:03,025
+它将设置第4个分量
+it's going to set the fourth kind of component position
+
+620
+00:23:03,025 --> 00:23:07,633
+双精度实际上是一个, 应该是这样的
+double w to actually be one which, which is what it should be
+
+621
+00:23:07,633 --> 00:23:10,333
+如果我们的矢量是一个实际的位置矢量
+if our vector is an actual positional vector
+
+622
+00:23:10,400 --> 00:23:13,152
+我们可以在OpenGL中多谈一点数学
+we might talk a little bit more about mathematics in OpenGL 
+
+623
+00:23:13,152 --> 00:23:15,900
+以及矢量的原理等等, 在未来的视频中
+and how vectors are working all that in a future video
+
+624
+00:23:15,900 --> 00:23:17,866
+但只需知道那个, 这就是我们现在运行的
+but just know that, this is what we're running for now
+
+625
+00:23:17,900 --> 00:23:19,133
+好了, 酷, 看起来没什么问题
+okay, cool, that looks pretty good
+
+626
+00:23:19,133 --> 00:23:21,066
+这就是我们在顶点着色器中实际要做的一切
+that's actually all we need to do in our vertex trader
+
+627
+00:23:21,066 --> 00:23:22,733
+所以让我们以分号结束这个吧
+so let's just end that with a semicolon
+
+628
+00:23:22,766 --> 00:23:23,833
+那么就让我们再写一个片段着色器吧
+and let's write a fragment shader
+
+629
+00:23:23,833 --> 00:23:25,800
+我将复制这里的所有代码
+I'm going to copy all this code here
+
+630
+00:23:25,975 --> 00:23:26,866
+粘贴在下面
+come down here
+
+631
+00:23:26,866 --> 00:23:28,733
+就叫它fragmentShader
+call this fragmentShader
+
+632
+00:23:28,733 --> 00:23:30,833
+我不需要任何这种layout的东西
+I don't need any of this kind of layout stuff
+
+633
+00:23:30,833 --> 00:23:32,166
+但我需要做的就是记住
+but what I do need to do remember
+
+634
+00:23:32,166 --> 00:23:34,300
+片段着色器应该输出一种颜色
+is that fragment shader should be outputting a color
+
+635
+00:23:34,433 --> 00:23:36,833
+所以我可以保持这个layout(location = 0)在这儿
+so I can just I can keep layout location equals zero here
+
+636
+00:23:36,833 --> 00:23:38,333
+如果我喜欢, 其实没必要
+if I like, it's not really necessary
+
+637
+00:23:38,333 --> 00:23:39,700
+不管怎样, 默认值都是零
+it will be zero by default anyway
+
+638
+00:23:39,700 --> 00:23:42,850
+但我只是想把这里改成out vec4
+but I'm just at changing this to be out vec4
+
+639
+00:23:42,850 --> 00:23:44,133
+然后叫它color
+and then I'll just call this color
+
+640
+00:23:44,400 --> 00:23:46,333
+这个version 300就保持在那儿
+this version 330 stays the same
+
+641
+00:23:46,700 --> 00:23:47,766
+主函数依旧
+main function stays the same
+
+642
+00:23:47,766 --> 00:23:50,700
+但在这里, 我们实际上指定了要输出的颜色
+but here we actually specify what color we would like to output
+
+643
+00:23:50,700 --> 00:23:51,666
+让我们试试红色吧
+let's try red
+
+644
+00:23:51,800 --> 00:23:54,133
+所以我就写color =  vec4()
+so I'm going to write color equals vector
+
+645
+00:23:54,333 --> 00:23:57,533
+1.0, 0.0, 0.0
+one point zero, zero point zero, zero point zero
+
+646
+00:23:57,600 --> 00:23:59,066
+然后是alpha值
+and then the alpha value which is
+
+647
+00:23:59,500 --> 00:24:02,000
+我们将它设置为1, 好了, 酷
+we'll set that to one, okay, cool
+
+648
+00:24:02,000 --> 00:24:04,225
+所以颜色和图形编程是传统的
+so colors and graphics programming are traditionally
+
+649
+00:24:04,225 --> 00:24:06,766
+只是0和1之间的浮点数
+just floats between zero and one
+
+650
+00:24:06,866 --> 00:24:08,966
+在一种非HDR环境中
+in kind of a non HDR environment
+
+651
+00:24:08,966 --> 00:24:12,566
+所以基本上, 0就是黑色, 1就是白色
+so basically zero is black and one is white
+
+652
+00:24:12,566 --> 00:24:14,966
+所以如果你习惯了颜色在0到255之间
+so if you're used to colors being between zero and two fifty five
+
+653
+00:24:14,966 --> 00:24:18,166
+想想, 把0当作0, 255当作1
+think of zero as zero and two fifty five as one
+
+654
+00:24:18,200 --> 00:24:21,066
+如果我这里写0.5, 那就是50%的红色
+if I write 0.5, that will kind of be 50% red
+
+655
+00:24:21,066 --> 00:24:24,500
+这种方式就是RGBA
+and the way that these go is RGB and a
+
+656
+00:24:24,500 --> 00:24:25,766
+现在想想RGBA和layout
+now this kind of RGBA layout
+
+657
+00:24:25,766 --> 00:24:28,533
+所有这些都取决于实际的帧缓冲区格式
+and all that kind of depends on your actual frame buffer format
+
+658
+00:24:28,533 --> 00:24:32,833
+但对于这种默认设置, 它肯定只是RGBA
+but for this kind of default setup, it definitely is just RGBA
+
+659
+00:24:32,866 --> 00:24:34,766
+所以我们现在应该看到我们的三角形是红色的
+so we should see our triangle as red now
+
+660
+00:24:34,833 --> 00:24:36,650
+这就是我们需要在这里写的所有源代码
+that is all the source code that we need to write here
+
+661
+00:24:36,650 --> 00:24:37,933
+希望我没有犯任何错误
+hopefully I haven't made any errors
+
+662
+00:24:37,933 --> 00:24:38,766
+不要认为我
+don't think I have
+
+663
+00:24:38,766 --> 00:24:40,333
+只检查了确保每处都有换行符
+just checking to make sure I have new lines everywhere
+
+664
+00:24:40,333 --> 00:24:41,133
+在那儿我没加
+I don't over here
+
+665
+00:24:41,133 --> 00:24:43,166
+不是什么大问题, 但不管如何我还是加上
+that's not a big deal, but I'll add it anyway
+
+666
+00:24:43,166 --> 00:24:45,125
+这对我来说很好, 酷
+and that looks pretty good to me, cool
+
+667
+00:24:45,333 --> 00:24:46,933
+所以在CreateShader()这里
+so over here on the CreateShader
+
+668
+00:24:46,933 --> 00:24:49,566
+让我们指定我们的顶点着色器和片段着色器
+let's specify our vertex shader and our fragment shader
+
+669
+00:24:49,566 --> 00:24:51,100
+希望一切正常
+and hopefully everything goes well
+
+670
+00:24:51,533 --> 00:24:55,022
+我们可以通过调用glUseProgram()绑定我们的着色器
+we can bind our shader by just writing glUseProgram
+
+671
+00:24:55,033 --> 00:24:56,633
+然后是着色器, 就这样
+and then shader, and that's it
+
+672
+00:24:56,633 --> 00:24:58,900
+我们实际的红色着色器现在应该用来渲染这个
+our actual red shader should now be used to render this
+
+673
+00:24:58,900 --> 00:24:59,800
+按f5
+I'm gonna hit f5
+
+674
+00:24:59,800 --> 00:25:01,933
+希望我们能看到一个红色的三角形
+and hopefully we will see a red triangle
+
+675
+00:25:02,000 --> 00:25:04,900
+我们看到一个白色的三角形, 没有错误
+and we see a white triangle, and no errors as well
+
+676
+00:25:05,066 --> 00:25:07,133
+太古怪了, 让我们来看看我做错了什么
+fantastic, let's take a look at what I do wrong
+
+677
+00:25:07,133 --> 00:25:08,900
+好吧, 滚动到这里
+okay, so just scrolling up here
+
+678
+00:25:09,700 --> 00:25:13,600
+让我们来看看, 噢, 好吧, 在这儿,GL_VERTEX_SHADER
+and let's take a look, oh, well, there you go, GL_VERTEX_SHADER
+
+679
+00:25:13,600 --> 00:25:14,466
+漂亮, 我打赌你们
+nice, I bet you guys
+
+680
+00:25:14,633 --> 00:25:16,875
+当你们看到我写的时候, 你们笑了
+had a good laugh when you saw me write that
+
+681
+00:25:16,875 --> 00:25:18,533
+确保这显然是在编译的类型
+make sure this is obviously compiling the type
+
+682
+00:25:18,533 --> 00:25:20,166
+所以我们不会编译两个顶点着色器
+so that we're not compiling two vertex shaders
+
+683
+00:25:20,166 --> 00:25:22,075
+事实上, 我很惊讶它居然正常运行
+I'm actually surprised that it worked well
+
+684
+00:25:22,075 --> 00:25:24,500
+事实上不, 我想这是一个有效的顶点着色器
+actually no, I guess this is a valid vertex shader 
+
+685
+00:25:24,500 --> 00:25:27,500
+因为我们输出的颜色只是vec4
+because we are outputting color is just kind of a vec4
+
+686
+00:25:27,700 --> 00:25:28,500
+那很好
+that's all good
+
+687
+00:25:28,666 --> 00:25:29,933
+这将是一个有效的顶点着色器
+that would have been a valid vertex shader
+
+688
+00:25:29,933 --> 00:25:31,400
+这就是为什么我们没有收到任何错误
+that's why we didn't get any errors
+
+689
+00:25:31,400 --> 00:25:34,033
+我们应该确认我们的消息是否正常工作
+we should definitely have verify our messaging is working correctly
+
+690
+00:25:34,033 --> 00:25:34,933
+按f5
+let's just hit f5
+
+691
+00:25:35,333 --> 00:25:36,566
+看看这是否有效
+and see if this works though
+
+692
+00:25:37,200 --> 00:25:38,333
+好了, 太棒了
+all right, fantastic
+
+693
+00:25:38,333 --> 00:25:40,600
+你可以看到我们有一个红色三角形
+you can see that we've got a red triangle
+
+694
+00:25:40,666 --> 00:25:42,433
+我们的着色器似乎运行成功了
+and our shaders seem to work successfully
+
+695
+00:25:42,433 --> 00:25:44,166
+太棒了, 让我们赶快把这个关上
+awesome, let's quickly just close this
+
+696
+00:25:44,166 --> 00:25:47,200
+我将在我的一个着色器中故意犯一个语法错误
+and I'm going to make a deliberate syntax error in one of my shaders
+
+697
+00:25:47,200 --> 00:25:48,166
+就在片段着色器中吧
+maybe in the fragment shader
+
+698
+00:25:48,166 --> 00:25:50,000
+只需要把这儿这个分号忽略掉
+just gonna miss the semicolon here
+
+699
+00:25:50,400 --> 00:25:51,200
+按f5
+let's hit f5
+
+700
+00:25:51,300 --> 00:25:53,000
+好吧, 所以我们没有在屏幕上看到任何东西
+okay, so we don't get anything on the screen
+
+701
+00:25:53,000 --> 00:25:54,066
+你可以在我们的日志中看到
+and you can see in our log
+
+702
+00:25:54,066 --> 00:25:56,350
+它实际上说了, fail to compile fragment shader
+it actually does say, fail to compile fragment shader
+
+703
+00:25:56,350 --> 00:25:59,100
+并在第9行指定我们有一个错误
+and specifies it on line nine we have an error
+
+704
+00:25:59,100 --> 00:26:02,566
+因为单词, 它只是说语法错误, 太棒了
+because words, it just says syntax error syntax error, fantastic
+
+705
+00:26:02,566 --> 00:26:04,700
+感谢Intel, 这是很棒的编译
+thank you Intel, it's great compilement
+
+706
+00:26:04,700 --> 00:26:06,233
+好吧, 不管怎样, 很酷
+all right, cool, anyway
+
+707
+00:26:06,433 --> 00:26:08,733
+让我们回到过去, 让我们恢复我们的代码
+let's go kind of back, let's revert back to our code
+
+708
+00:26:09,466 --> 00:26:10,766
+这是一个非常非常简单的着色器
+this is a very very simple shader
+
+709
+00:26:10,766 --> 00:26:12,600
+我们刚刚有一个红色的三角形
+we've just got a red triangle running
+
+710
+00:26:12,600 --> 00:26:15,300
+我会再次按f5, 这样我们就可以看到了, 太棒了
+I'll just hit f5 again, so we can see that, awesome
+
+711
+00:26:15,400 --> 00:26:16,900
+三角形, 有点酷的东西
+triangle,  pretty cool stuff
+
+712
+00:26:16,900 --> 00:26:18,733
+还有一件事我想快速提一下
+one more thing I want to quickly mention is that
+
+713
+00:26:18,733 --> 00:26:20,250
+你应该如何清理着色器
+what you should do to clean up your shader 
+
+714
+00:26:20,250 --> 00:26:22,266
+一旦你做完了, 也许就和那儿差不多
+once you're done with it, so maybe like over here
+
+715
+00:26:22,466 --> 00:26:24,700
+实际上就是调用glDeleteShader
+is actually called glDeleteShader
+
+716
+00:26:24,700 --> 00:26:26,350
+然后就是你想删除的着色器
+and then the shader you want to delete
+
+717
+00:26:26,350 --> 00:26:28,700
+现在我们也应该为顶点缓冲区做这个
+now we should also be doing this for kind of vertex buffers
+
+718
+00:26:28,700 --> 00:26:29,500
+并且所有这些
+and all of that
+
+719
+00:26:29,666 --> 00:26:32,666
+事实上, 我们将把很多东西抽象成类
+we are going to abstract a lot of the stuff into classes in fact
+
+720
+00:26:32,666 --> 00:26:33,775
+下一次, 我会向你们展示
+next time, I'm going to show you
+
+721
+00:26:33,775 --> 00:26:35,366
+如何从文件中实际访问着色器
+how to actually reach shaders in from files
+
+722
+00:26:35,366 --> 00:26:37,666
+以及我读取它们的策略
+and my strategy for reading them in and
+
+723
+00:26:37,666 --> 00:26:39,333
+我是多么喜欢写着色器
+how I like to kind of write shaders
+
+724
+00:26:39,333 --> 00:26:40,200
+因为我不喜欢
+because I don't like
+
+725
+00:26:40,533 --> 00:26:42,233
+OpenGL让你们写着色器的方式
+the way that OpenGL kind of makes you write them
+
+726
+00:26:42,233 --> 00:26:44,266
+等等, 所以我们会在下一期讨论这些
+and all that, so we'll talk about that next episode
+
+727
+00:26:44,333 --> 00:26:46,900
+但当我们开始将其抽象为文件时
+but as we begin to abstract this into files
+
+728
+00:26:47,300 --> 00:26:50,566
+我们就会讲清理之类的所有东西
+we are going to cover actually cleaning up and all that stuff
+
+729
+00:26:50,566 --> 00:26:52,233
+因为这会变得非常重要
+because that's gonna get super important
+
+730
+00:26:52,266 --> 00:26:53,850
+当我们有一个正在运行的程序时
+when we actually have a running program
+
+731
+00:26:53,850 --> 00:26:56,400
+我们一直在创建和释放东西
+in which we kind of create and destroy things all the time
+
+732
+00:26:56,400 --> 00:26:58,533
+我们不想泄露显卡内存
+and we don't want to be leaking GPU memory
+
+733
+00:26:58,633 --> 00:26:59,533
+或者之类的事情
+or anything like that
+
+734
+00:26:59,866 --> 00:27:01,750
+现在我们不打算在抽象方面走得太远
+now we're not going to go too far with the abstraction
+
+735
+00:27:01,750 --> 00:27:03,433
+当然, 因为这不是游戏引擎系列
+of course, because this isn't a game engine series
+
+736
+00:27:03,433 --> 00:27:05,100
+但我们还是要把它抽象一点
+but we are still going to abstract it a little bit
+
+737
+00:27:05,100 --> 00:27:08,233
+这样我们就不会把整个程序写在一个文件中
+so that we don't just write our entire program in one file
+
+738
+00:27:08,233 --> 00:27:09,875
+这将变得非常困难
+it's going to get very difficult
+
+739
+00:27:09,875 --> 00:27:12,733
+当我们有很多代码来实际实现某些图形时
+when we have a lot of code to actually achieve certain graphics
+
+740
+00:27:12,733 --> 00:27:14,633
+比如效果和策略等等
+like effects and strategies and all that
+
+741
+00:27:15,100 --> 00:27:16,400
+因此应该会很有趣
+so that should be a lot of fun
+
+742
+00:27:16,600 --> 00:27:18,000
+不管怎样, 我希望你们喜欢这个视频
+anyway, I hope you guys enjoyed this video
+
+743
+00:27:18,000 --> 00:27:19,055
+如果你喜欢的话, 你可以点击这个点赞按钮
+if you did, you can hit the like button
+
+744
+00:27:19,055 --> 00:27:21,150
+如果你想要这个视频的所有源代码
+if you want all the source code for this video
+
+745
+00:27:21,150 --> 00:27:22,400
+因为我们确实写了很多
+because we did write quite a lot
+
+746
+00:27:22,400 --> 00:27:25,433
+你可以访问patreon.com/TheCherno帮助支持本系列
+you can go to patreon.com/TheCherno help support the series
+
+747
+00:27:25,433 --> 00:27:28,200
+那么你就可以访问一个私有的github存储库
+and you will get access to a private github repository
+
+748
+00:27:28,266 --> 00:27:30,600
+那里有所有源码, 一集接一集
+with all of the source code, episode by episode
+
+749
+00:27:30,600 --> 00:27:32,933
+所以你可以继续看你现在正在看的那一集的代码
+so you can just follow along to the episode you're currently on
+
+750
+00:27:33,075 --> 00:27:35,166
+并且所有这些都是通过查看提交历史来实现的
+and all of that by just looking at the commit history
+
+751
+00:27:35,166 --> 00:27:35,933
+太棒了
+it's great
+
+752
+00:27:35,933 --> 00:27:38,766
+同样, 你也会帮助支持这个系列, 这是非常重要的
+and again, you'll also be helping support the series which is very important
+
+753
+00:27:38,766 --> 00:27:40,366
+除此之外, 还提供了其他一些很酷的奖励
+there are also some other pretty cool rewards
+
+754
+00:27:40,366 --> 00:27:41,950
+比如, 置顶赞助人
+for example, the top tier patrons
+
+755
+00:27:41,950 --> 00:27:44,266
+实际上我们每个月都有一个小时的聚会
+actually we have like a one-hour hangout once a month
+
+756
+00:27:44,266 --> 00:27:45,933
+但我们几乎什么都谈
+but we just talk about pretty much anything
+
+757
+00:27:45,933 --> 00:27:46,900
+这是很酷的事情
+it's pretty cool stuff
+
+758
+00:27:46,900 --> 00:27:49,133
+无论如何, 一定要看看patreon.com/TheCherno
+anyway, definitely check out patreon.com/TheCherno
+
+759
+00:27:49,400 --> 00:27:50,433
+真的对支持这个系列很有帮助
+really does help support the series
+
+760
+00:27:50,433 --> 00:27:51,775
+非常感谢大家
+so thank you so much to everyone
+
+761
+00:27:51,775 --> 00:27:53,000
+帮助我们实现这一切
+who's helping make this happen
+
+762
+00:27:53,066 --> 00:27:55,666
+和往常一样, 你可以在下方留言讨论这一集
+as always, you can talk about this episode by just leaving a comment below
+
+763
+00:27:55,666 --> 00:27:58,933
+或者去thecherno.com/discord, 并且加入这个社区
+or just going to thecherno.com/discord, and joining that community
+
+764
+00:27:59,066 --> 00:27:59,933
+这是很棒的
+it's awesome
+
+765
+00:27:59,966 --> 00:28:01,633
+下一次, 我们将会做更多着色器的东西
+next time, we're going do some more shader stuff
+
+766
+00:28:01,633 --> 00:28:02,966
+到时见, 拜
+I'll see you then, goodbye
+

@@ -1,0 +1,910 @@
+﻿1
+00:00:00,100 --> 00:00:03,766
+大家好，我是TheCherno，欢迎回到我的OpenGL系列教程
+hey, what's up guys, my name is TheCherno, welcome back to my OpenGL series
+
+2
+00:00:03,966 --> 00:00:06,833
+那么今天我们要讨论的是着色器中的统一变量
+so today we're gonna be talking about uniforms in shaders
+
+3
+00:00:06,866 --> 00:00:10,800
+并且我特别想谈谈我们如何缓存统一变量
+and specifically I wanted to talk about how we can cache uniforms
+
+4
+00:00:10,800 --> 00:00:15,550
+并且通常来说，我们可以用一种更聪明的方式来处理统一变量
+and in general just how we can deal with uniforms in a bit of a smarter way 
+
+5
+00:00:15,550 --> 00:00:18,200
+因为我们都知道怎么设置统一变量
+because we all know how to kind of set uniforms
+
+6
+00:00:18,200 --> 00:00:21,333
+我已经制作了一个关于OpenGL统一变量和着色器之类的视频
+I've got a video on uniforms in OpenGL and shaders and all that stuff
+
+7
+00:00:21,333 --> 00:00:25,233
+如果你们还没看过的话，可以去看看那个，但具体来说
+check that out, if you haven't already, but specifically
+
+8
+00:00:25,433 --> 00:00:29,275
+而不是从GPU从OpenGL中检索统一变量
+instead of just retrieving uniforms from OpenGL from our GPU
+
+9
+00:00:29,275 --> 00:00:31,933
+每次我们要设置统一变量的时候
+every single time we need to set a uniform
+
+10
+00:00:32,033 --> 00:00:36,533
+实际上，我们可以做很多不同的事情来保留那个位置
+there are many different things that we can actually do to kind of retain that location
+
+11
+00:00:37,066 --> 00:00:40,800
+并利用一旦统一变量被检索到的事实
+and take advantage of the fact that once uniforms have kind of been retrieved
+
+12
+00:00:40,800 --> 00:00:43,075
+你们知道的，一旦我们编译了着色器
+you know, once we've compiled our shader
+
+13
+00:00:43,075 --> 00:00:46,266
+我们就在我们的GPU上得到了那种实际的着色器对象
+we've got that actual kind of shader object on our GPU
+
+14
+00:00:46,300 --> 00:00:51,275
+当然，GPU中的着色器知道所有的统一变量
+and of course the shader in the GPU is aware of all of the uniforms 
+
+15
+00:00:51,275 --> 00:00:54,233
+这些都包含在其中的所有有效的统一变量中
+that are kind of contained within and all the valid uniforms
+
+16
+00:00:54,466 --> 00:00:56,066
+一旦我们得到了那个所有的数据
+once we've got all that data
+
+17
+00:00:56,066 --> 00:00:59,125
+我们没有理由不断地查询GPU，就像
+there's no reason for us to continually query the GPU being like 
+
+18
+00:00:59,125 --> 00:01:02,366
+嘿，请告诉我，我的统一变量在哪里
+hey, please tell me what like where my uniform is
+
+19
+00:01:02,366 --> 00:01:06,433
+因为我们应该已经知道那些了，你们应该知道，你们应该知道
+because we should already know that stuff, and as you know, as you should know
+
+20
+00:01:06,766 --> 00:01:09,100
+几乎所有你们实际运行的OpenGL调用
+pretty much any OpenGL call that you actually run
+
+21
+00:01:09,100 --> 00:01:14,066
+要比你们实际能做的C++风格的东西慢很多
+is going to be slower than a lot of the C++ style stuff that you can actually do
+
+22
+00:01:14,133 --> 00:01:16,733
+因为有很多会访问GPU
+because a lot of it actually hits the GPU
+
+23
+00:01:16,966 --> 00:01:19,266
+因此需要更多的处理能力
+and thus kind of requires a little bit more processing power
+
+24
+00:01:19,266 --> 00:01:22,300
+这比我们做更简单的事情要花费更多的时间
+and takes more time than if we did something a lot more simple
+
+25
+00:01:22,300 --> 00:01:26,700
+所以今天我们具体要讲的就是缓存统一变量
+so, today's specifically we're going to talk about caching that uniform
+
+26
+00:01:27,466 --> 00:01:30,533
+这样我们就能在任何时候检索位置
+so that we can just kind of retrieve the location at any time
+
+27
+00:01:30,533 --> 00:01:33,566
+我们想要建立一个小系统，一个非常简单的系统
+we want basically building a little system, a very very simple system
+
+28
+00:01:33,933 --> 00:01:37,633
+它只是持有了给定名称的统一变量的位置
+that just holds on to a uniform location for a given name that we have
+
+29
+00:01:37,633 --> 00:01:40,466
+在我们C++中的着色器对象里面
+inside our kind of C++ shader object
+
+30
+00:01:41,166 --> 00:01:45,133
+但总的来说，我以后可能会再多讲一点
+but in general, I may talk about this a little bit more in the future
+
+31
+00:01:46,100 --> 00:01:48,133
+因为通常的情况是
+because what typically happens is
+
+32
+00:01:48,633 --> 00:01:52,500
+一旦你们真正在每种游戏引擎中经常编译你们的着色器
+once you actually compile your shader pretty much every kind of game engine
+
+33
+00:01:52,500 --> 00:01:57,275
+或者每一种渲染引擎都会实际读取那个着色器的源代码
+or every kind of rendering engine is actually going to physically read that shader source code 
+
+34
+00:01:57,275 --> 00:02:01,033
+然后决定该怎么做，对吧
+and then determine what to kind of do with that, right
+
+35
+00:02:01,033 --> 00:02:03,433
+所以换句话说，如果我们加载一个着色器
+so in other words, if we just kind of load a shader
+
+36
+00:02:04,300 --> 00:02:07,500
+我们可以引导使用OpenGL来做所有这些事情
+and we can pilot and we use OpenGL to do all that stuff
+
+37
+00:02:07,750 --> 00:02:14,033
+我们要做的另一件很有用的事是在C++中读取源代码的着色器
+another very useful thing for us to do is actually kind of read the shader of source code inside C++
+
+38
+00:02:14,066 --> 00:02:19,100
+然后从中提取数据，这样你们就能找到所有的属性
+and then extract data from it, so from that you can actually find out all the attributes
+
+39
+00:02:19,100 --> 00:02:22,933
+所有的统一变量，所有的功能，所有在着色器里的东西
+all of the uniforms, all of the functions, everything that is in the shader
+
+40
+00:02:22,966 --> 00:02:28,166
+我们可以写一个程序本质上读取文本和着色器源代码
+we can write a program essentially that just kind of reads that text that shader source code
+
+41
+00:02:28,300 --> 00:02:31,366
+然后从那里，它可以智能地几乎
+and then from there, it can intelligently almost
+
+42
+00:02:31,500 --> 00:02:35,166
+将其转换为我们可以在运行时利用和使用的实际数据
+convert it into actual data that we can leverage and use at runtime
+
+43
+00:02:35,433 --> 00:02:39,966
+在这样的设置中你们有一个合适的系统，一个合适的引擎
+and so in a setup like that where you've got a proper system, and a proper engine like that
+
+44
+00:02:40,300 --> 00:02:42,675
+你们通常只会读取你们的着色器源代码
+you would typically just read your shader source code 
+
+45
+00:02:42,675 --> 00:02:46,166
+然后在实际的着色器文本中找到所有的统一变量
+and then find all of the uniforms in the actual shader text
+
+46
+00:02:46,566 --> 00:02:50,466
+然后检索所有的位置或者确认所有的统一变量
+and then retrieve all the locations or validate all of the uniforms
+
+47
+00:02:50,766 --> 00:02:55,966
+基本上当你们编译你们的着色器时，在这种情况下，当你得到
+basically when you're compiling your shader, so in that case anytime you get
+
+48
+00:02:55,966 --> 00:02:59,566
+你们知道，当你们的渲染器在你们的着色器中设置统一变量
+you know, when your renderer is actually setting uniforms in your shader
+
+49
+00:02:59,733 --> 00:03:01,500
+所有那些都已经完成了
+all of that stuff has already been done
+
+50
+00:03:01,633 --> 00:03:06,966
+你们已经有了所有的位置，你们可以很容易地检查统一变量是否存在
+you already have all the locations, you can easily check to see if a uniform even exists or not
+
+51
+00:03:07,533 --> 00:03:10,900
+而不涉及OpenGL，为什么，因为你们已经读取到了着色器源代码
+without touching OpenGL, why, because you've read the shader source code
+
+52
+00:03:11,050 --> 00:03:14,500
+所以那是在一个更完整的系统中会出现的情况
+so that is something that would happen in a more complete system
+
+53
+00:03:14,666 --> 00:03:18,275
+今天我要给大家展示的是一种快速而肮脏的小技巧
+what I'm showing you guys today is a quick and dirty little kind of hack 
+
+54
+00:03:18,275 --> 00:03:20,933
+如果你们想让你们的程序快一点
+if you will just to speed up your program a little bit
+
+55
+00:03:20,933 --> 00:03:23,333
+如果你们只是建立一些快速的OpenGL
+if you're just building something quick and OpenGL
+
+56
+00:03:23,433 --> 00:03:27,133
+你们不希望有这么庞大的渲染引擎之类的设置
+you don't want to have this massive, like rendering engine or anything like that set up
+
+57
+00:03:27,133 --> 00:03:30,666
+你们只是想快速地加快你们的代码而不需要花太多的精力
+and you just want to kind of speed up your code quickly without much effort really
+
+58
+00:03:30,900 --> 00:03:35,733
+通过使用一个简单的方法来快速设置统一变量
+by just kind of you know someone's like one simple trick to faster uniform setting
+
+59
+00:03:35,733 --> 00:03:37,200
+就是那样的，对吧，事实上
+that's kind of what this is, right, in fact
+
+60
+00:03:37,200 --> 00:03:40,800
+如果我说出视频的名字，我可能就会惹上你们所有人的麻烦
+if I name the video that I'll probably just get in trouble with all of you guys
+
+61
+00:03:40,800 --> 00:03:43,366
+所以我可能不会说这是一个简单的技巧来加速你们的统一变量
+so I might not name it one simple trick to speed up your uniform
+
+62
+00:03:43,533 --> 00:03:46,566
+也许我会，我们等着瞧，但重点是它超级简单
+maybe I will we'll see, but the point is it's super simple
+
+63
+00:03:46,566 --> 00:03:50,450
+这是一种很容易就能加快统一变量设置的方法
+and it's a way that we can just easily speed up our uniform setting 
+
+64
+00:03:50,450 --> 00:03:55,300
+但不是每次从OpenGL检索位置，而是通过缓存它，让我们看一下
+but just not retrieving the location every time from OpenGL, but by caching it, let's take a look
+
+65
+00:03:55,366 --> 00:03:58,100
+那么我有这个非常非常简单的着色器类
+so I have this very very simple shader class that we have here
+
+66
+00:03:58,100 --> 00:04:02,633
+这是OpenGL系列的剩余部分，它真正拥有的是
+kind of leftover from the OpenGL series and what it has really is
+
+67
+00:04:02,633 --> 00:04:06,966
+它代表的是一个包含RendererID的着色器
+and what it represents is just basically a shader which contains you know a RendererID
+
+68
+00:04:06,966 --> 00:04:09,066
+所以它有点像编译过的着色器对象
+so it's kind of like a compiled shader object
+
+69
+00:04:09,066 --> 00:04:12,150
+这就像一个实际编译的CPU表示
+this is like the CPU representation of an actual compiled 
+
+70
+00:04:12,150 --> 00:04:17,000
+在我们的GPU上创建着色器对象，一些绑定和解绑的函数
+and created shader object on our GPU, a bunch of functions for like binding and unbinding it
+
+71
+00:04:17,000 --> 00:04:21,166
+同时还要设置所有的统一变量，所以这是最重要的
+and also setting all of these uniforms, so this is kind of the meat of everything
+
+72
+00:04:21,166 --> 00:04:25,200
+如果我们看一下这段代码实际上做了什么，它真的非常非常简单
+and if we take a look at what that code actually does, it's really really simple
+
+73
+00:04:25,300 --> 00:04:28,466
+它所做的就是对于我们设定的每个统一变量
+all it really does is for every uniform that we set here
+
+74
+00:04:28,700 --> 00:04:31,850
+比如说这里有一个三个分量的向量，也就是vec3
+such as let's just say a three component vector here, vec3
+
+75
+00:04:32,150 --> 00:04:35,666
+它从OpenGL获取位置
+it gets the location from the from OpenGL
+
+76
+00:04:35,666 --> 00:04:38,733
+对吧，使用我们的RenderID和统一变量的名称
+right, using our RenderID and the name of the uniform
+
+77
+00:04:38,766 --> 00:04:44,366
+然后它设置那个统一变量，我的意思是，我们有这个GLCall宏
+and then it sets that uniform, right, now I mean, we've got this GLCall macro
+
+78
+00:04:44,500 --> 00:04:48,733
+顺便说一下，这是相当古老的，不是你们现在通常会使用的东西
+by the way, which is quite old and not something you would typically use nowadays
+
+79
+00:04:49,300 --> 00:04:51,033
+但是你们知道的，正如你们所见
+but and you know you can see
+
+80
+00:04:51,033 --> 00:04:53,933
+这个位置的东西没有包装在宏中，但那不是重点
+this location stuff isn't wrapped in that macro, but that's besides the point
+
+81
+00:04:54,333 --> 00:04:58,366
+如果我们想让它更具可读性，这才是我的重点
+if we were to just make this even more readable, it's kind of my point of that
+
+82
+00:04:58,900 --> 00:05:02,366
+这有点像我们最后得到的非常非常简单，对吧
+then this is kind of like what we end up with really really simple right
+
+83
+00:05:02,466 --> 00:05:06,500
+我们会检索位置，如果我们想设置统一变量，我们会在这里获得位置
+we basically retrieve the location, if we want to set the uniform, we get the location here
+
+84
+00:05:06,500 --> 00:05:08,833
+就是个整数，然后我们在这里用它
+which is going to be an integer, and then we use that here
+
+85
+00:05:08,833 --> 00:05:13,733
+你们甚至可以使用某种验证来确保它确实存在，因为我们知道
+and you could even use some kind of validation to make sure that that actually exists, because we know that
+
+86
+00:05:13,966 --> 00:05:19,066
+如果它是-1，对吧，那么它是无效的，我们可以这样做
+if it is -1, right, then it's invalid, so what we might do is something like this
+
+87
+00:05:19,066 --> 00:05:24,233
+这是OpenGL中很常见的代码，对吧
+this is a very very common code that you see in OpenGL quite often, right
+
+88
+00:05:24,233 --> 00:05:26,400
+也就是一些人基本上检索位置
+where someone basically retrieves the location
+
+89
+00:05:26,566 --> 00:05:31,666
+检查位置是否为-1，然后设置统一变量，就是那样，完成了
+checks to see if the location is like -1 or not, and then sets the uniform, and that's it, that's done
+
+90
+00:05:31,666 --> 00:05:36,066
+那将非常有效，但问题是它的效率有点低
+that's going to work beautifully, but the problem is it's a little bit inefficient
+
+91
+00:05:36,066 --> 00:05:41,900
+因为就像我提到的，这将是一段活跃代码，如果你们经常触发它
+because again as I mentioned, this is going to be a piece of hot code that if you hit it often
+
+92
+00:05:42,466 --> 00:05:44,333
+你们会遇到麻烦的，我们甚至会
+you're going to run into problems, and we could even
+
+93
+00:05:44,433 --> 00:05:47,575
+通过使用profiler来测试它
+chit like test that out by just using the profiler here
+
+94
+00:05:47,575 --> 00:05:51,400
+我想如果我们像调试分析器那样
+I think if we go like you know debug profiler performances flora
+
+95
+00:05:51,400 --> 00:05:54,866
+我们展示它，我们展示它，然后开始一个新的性能
+we show that, we kind of show that and start like a new performance session
+
+96
+00:05:55,466 --> 00:05:59,100
+看看我们是否有这样一个项目，你们知道的，每个帧都有设置统一变量
+and take a look if we had a program that was you know setting uniforms every frame
+
+97
+00:05:59,100 --> 00:06:02,333
+你们会说这是一段很活跃代码，对吧
+you'd say that this would come up as kind of a hot piece of code, right
+
+98
+00:06:03,233 --> 00:06:07,633
+因为这个东西每次都会被触发，对吧
+because this is something that's going to get hit often every time, right
+
+99
+00:06:07,933 --> 00:06:12,766
+因为这是一个GLCall，它需要一些时间，所以我们可以做的是
+and since it is a GLCall, it takes a bit of time to do, so what we can do instead is
+
+100
+00:06:12,933 --> 00:06:18,600
+检索这个位置，就像你们看到的，对吧，把它存储在一个哈希映射中
+grab this location as you can see we're doing, right, and then store it in just a hash map
+
+101
+00:06:18,600 --> 00:06:24,066
+所以如果我们跳到头文件，我们能做的就是包含一个unordered_map
+so if we hop over to our header file, what we can do is just include an unordered_map
+
+102
+00:06:24,850 --> 00:06:27,884
+然后这里我们输入std::unordered_map
+and then over here we'll just type in std::unordered_map
+
+103
+00:06:28,366 --> 00:06:30,933
+这里的键就是我们的名字
+now a key here is going to be our actual name
+
+104
+00:06:31,033 --> 00:06:34,866
+所以说一个字符串代表我们想要检索的统一变量的名字
+so a string which represents the name of our uniform that we want to kind of retrieve
+
+105
+00:06:34,866 --> 00:06:38,800
+然后GLint会是值类型，对吧，因为那实际上是OpenGL的类型
+and then GLint is going to be the value, right, because that's actually the OpenGL
+
+106
+00:06:39,133 --> 00:06:42,300
+我确定了我们使用的特定的统一变量位置
+I identify that we use for that particular uniform location
+
+107
+00:06:42,300 --> 00:06:45,333
+我们可以叫这个m_UniformLocationCache，好了
+we can call this m_UniformLocationCache, right
+
+108
+00:06:46,166 --> 00:06:48,600
+然后这实际上是要做什么
+and then what this is going to essentially do
+
+109
+00:06:48,600 --> 00:06:53,533
+我们会在每次我们想要检索位置时使用这个
+and where we're actually going to use this is every time that we want to retrieve a location
+
+110
+00:06:53,533 --> 00:06:55,900
+我们将检查它是否存在于映射中
+we'll check to see if it exists in the map
+
+111
+00:06:56,000 --> 00:06:59,666
+如果有，我们就不需要从OpenGL检索它了
+and if it does, then no need for us to actually retrieve it from OpenGL
+
+112
+00:06:59,800 --> 00:07:03,975
+为了实现那个，我们要为自己做一个方便函数，叫GLint
+to do that, we're going to make a little convenience function for ourself called GLint
+
+113
+00:07:03,975 --> 00:07:09,033
+我将把这个放在底部，也就是GLint GetUniformLocation
+and I'm going to put this at the bottom here GLint GetUniformLocation
+
+114
+00:07:09,166 --> 00:07:15,533
+这将再次接受一个const std::string&，也就是我们实际的name
+this is again going to take in a const string reference, which is going to be our actual name
+
+115
+00:07:15,766 --> 00:07:18,200
+并将返回一个GLint，对吧
+and is going to return a GLint, right
+
+116
+00:07:18,466 --> 00:07:21,700
+但是这个函数的作用有点不同
+but what this function is going to do is going to be a little bit different
+
+117
+00:07:21,966 --> 00:07:26,100
+那么我们现在有的，如果我在这里创建它
+then what we currently have, if I just kind of create it here
+
+118
+00:07:26,766 --> 00:07:29,766
+它只会再次获得位置
+what it's going to do is only get the location again
+
+119
+00:07:29,766 --> 00:07:30,933
+如果已经有了，就检查缓存
+if it's already, checked the cache
+
+120
+00:07:30,933 --> 00:07:36,033
+第一步是检查缓存，看看我们是否有那个值在里面
+the first step is to check the cache, and see if we've actually got that value in there
+
+121
+00:07:36,333 --> 00:07:40,850
+所以如果这个m_UniformLocationCache实际上包含
+so if this m_UniformLocationCache actually contains
+
+122
+00:07:40,850 --> 00:07:46,366
+如果我们在这里使用find，name是键，如果这个已经存在
+so if we use find here with the name is the key, if this actually already exists
+
+123
+00:07:46,366 --> 00:07:51,850
+如果缓存中有一个统一变量的名字，基本上我们可以这样做
+if the cache contains a uniform with this name, so basically we can do that by just saying 
+
+124
+00:07:51,850 --> 00:07:57,900
+如果不等于m_UniformLocationCache.end()，然后像那样简单返回
+if it doesn't equal m_UniformLocationCache.end(), then we just return that simple as that
+
+125
+00:07:58,733 --> 00:08:02,100
+所以我们还是用m_UniformLocationCache[name]，就像这样
+so we'll just do m_UniformLocationCache name like this again
+
+126
+00:08:02,100 --> 00:08:06,700
+这个只是将缓存返回给我们的数据结构中已经存在的值
+ what this does is just returns the cache to value that already exists inside our data structure
+
+127
+00:08:06,700 --> 00:08:10,900
+这意味着，我们的工作已经完成了，如果它不在缓存中
+and that means that work, our work has done now, if it's not in the cache
+
+128
+00:08:10,900 --> 00:08:15,766
+然后我们需要做的是通过使用这里的代码来检索它，对吧
+then what we need to do is retrieve it just by using this code here, right
+
+129
+00:08:16,133 --> 00:08:18,245
+然后把它存储在缓存里，我们可以这么做
+then store it in the cache, which we can do 
+
+130
+00:08:18,245 --> 00:08:22,633
+只要输入m_UniformLocationCache[name] = location，对吧
+by just typing in m_UniformLocationCache name equals location, right
+
+131
+00:08:22,633 --> 00:08:26,150
+所以现在我们把它存储在缓存里，然后显然我们还需要返回它
+so we're now storing it in the cache, and then obviously we still need to return it 
+
+132
+00:08:26,150 --> 00:08:30,833
+因为这个函数检索的是统一位置，好了，就那么简单
+because this function retrieves the uniform location, all right, simple as that
+
+133
+00:08:31,100 --> 00:08:35,433
+我可能要做的另一件事是将这个函数标记为const
+one other thing I would do potentially is mark this function as const
+
+134
+00:08:35,500 --> 00:08:38,433
+成为那样的原因是，你们知道的，这就是它的本质
+the reason it being that, you know, this is just kind of it's what it is
+
+135
+00:08:38,433 --> 00:08:41,366
+它应该只是检索一个统一变量的位置
+it's supposed to be something that just retrieves a uniform location
+
+136
+00:08:41,400 --> 00:08:46,800
+它并没有修改我们的着色器或者做任何事情
+it's not really modifying our shader or doing anything at all of that nature now
+
+137
+00:08:46,866 --> 00:08:48,833
+因为就像如果我们确实标记了const
+since like if we do marked as const
+
+138
+00:08:48,833 --> 00:08:53,300
+你们会注意到我们会得到一个错误，我们会得到一个错误的原因是
+you'll notice we will actually get an error, and the reason we'll get an error is because
+
+139
+00:08:53,366 --> 00:08:57,100
+我们实际上是在修改m_UniformLocationCache，就在那儿设置它的
+we're actually modifying m_UniformLocationCache, we're setting it right over here
+
+140
+00:08:57,266 --> 00:09:00,650
+正如你们所看到的，那导致了这个区域的错误，就在这儿
+and as you can see that results in an error in this area, right here
+
+141
+00:09:00,650 --> 00:09:02,966
+顺便说一下，它只是没有编译它
+by the way, it's totally, it just hasn't compiled it
+
+142
+00:09:03,466 --> 00:09:06,000
+所以那完全没问题，但这确实是个错误
+so that's totally fine, but this is actually a real error
+
+143
+00:09:06,000 --> 00:09:08,633
+如果我按control f7，你们就会看到那是行不通的
+if I hit control f7, you'll see that that's not going to work
+
+144
+00:09:08,900 --> 00:09:15,966
+所以我们需要做的是，把m_UniformLocationCache标记为可变变量
+so what we need to do is, basically mark our uniform location cache as a mutable variable
+
+145
+00:09:15,966 --> 00:09:19,166
+那意味着它可以被常量函数修改
+what that means is that it can be modified by a const function
+
+146
+00:09:19,466 --> 00:09:21,066
+现在这个可能有点违反直觉
+now this might be a little bit counterintuitive
+
+147
+00:09:21,066 --> 00:09:24,566
+为什么要创建不可变变量，比如为什么标记函数是常量
+why are you creating immutable variable, like why markes function is constant
+
+148
+00:09:24,566 --> 00:09:27,766
+但是，我再次解释这个函数被标记为常量的原因是
+but again, I'm explaining that the reason this function is marked as constant is
+
+149
+00:09:27,766 --> 00:09:33,366
+因为实际操作只是读取我们统一变量的位置，对吧
+because the actual operation is just reading the location of our uniform, right
+
+150
+00:09:33,400 --> 00:09:36,793
+底层实现缓存这个值
+the underlying implementation cache the value
+
+151
+00:09:36,793 --> 00:09:42,066
+但那对调用者来说并不重要，这并不是真正的修改
+but that's not important to the caller basically, it's not really modifying
+
+152
+00:09:42,633 --> 00:09:44,633
+它根本没有修改我们的着色器
+it's not really modifying our shader at all
+
+153
+00:09:44,766 --> 00:09:49,700
+它所做的只是将信息保存在缓存中，这完全没问题，好了
+what it is doing is just keeping information inside a cache, which is totally fine, okay
+
+154
+00:09:49,700 --> 00:09:53,412
+现在我们得到了这个，而不是每次都做这些
+so now that we've got this, instead of doing all of this stuff every time 
+
+155
+00:09:53,412 --> 00:09:55,900
+以及手动获取我们统一变量的位置
+and getting our location manually
+
+156
+00:09:55,900 --> 00:10:01,675
+我们现在可以用名字来调用这个GetUniformLocation
+what we can just do now is call this GetUniformLocation with the name
+
+157
+00:10:01,675 --> 00:10:04,233
+就那样，那就是我们的位置
+and that's it, that is what our location becomes
+
+158
+00:10:04,366 --> 00:10:06,966
+那么接下来会发生什么呢，我们一会儿会演示
+so now what happens, and we'll demonstrate it in a minute
+
+159
+00:10:07,200 --> 00:10:08,900
+我只是快速地替换了所有这些
+I just quickly replace all of these
+
+160
+00:10:09,166 --> 00:10:12,800
+现在，如果在这放一个断点，然后运行这个程序，会发生什么，好了
+now what happens if I put a break point here and run this program, okay
+
+161
+00:10:12,800 --> 00:10:14,066
+那么现在我正在运行我的程序
+so now that I'm running my program
+
+162
+00:10:14,066 --> 00:10:18,933
+你们就可以看到，我们试图将这个MVP矩阵统一设置为一个特定的值
+you can see that we're trying to set this mvp matrix uniform to a certain value
+
+163
+00:10:19,000 --> 00:10:22,866
+它就会运行这个GetUniformLocation函数
+what happens is it's going to of course run this GetUniformLocation function
+
+164
+00:10:23,066 --> 00:10:27,133
+这第一次运行的情况当然是空的
+which the first time this runs the cases of course somewhat empty
+
+165
+00:10:27,133 --> 00:10:30,900
+我的意思是在这个缓存中，u_Color和u_Texture已经在那里了
+I mean in this cache has actually got u_Color and u_Texture already in there
+
+166
+00:10:31,066 --> 00:10:34,733
+但它没有，你们可以看到，它根本没有mvp的位置
+but it doesn't as you can see, it doesn't have the mvp locations start at all
+
+167
+00:10:34,966 --> 00:10:36,700
+所以很明显它没有找到那个位置
+so obviously it's not gonna find it
+
+168
+00:10:36,966 --> 00:10:40,333
+然后它就会从OpenGL获取那个位置
+and then it's going to actually retrieve that location from OpenGL
+
+169
+00:10:40,333 --> 00:10:43,100
+将其存储在这个缓存中，然后返回该位置
+store it inside the cache and then return that location
+
+170
+00:10:43,333 --> 00:10:46,000
+然后如果我按f5，我们就会到下一次
+and then if I hit f5, and we come back to the next time
+
+171
+00:10:46,000 --> 00:10:48,700
+我们请求这个MVP矩阵的位置
+we ask for this mvp matrix location
+
+172
+00:10:48,700 --> 00:10:51,866
+对吧，这个m_UniformLocationCache显然就会包含它
+right, the m_UniformLocationCache  obviously contains it
+
+173
+00:10:51,866 --> 00:10:56,700
+这意味着现在它只是简单地返回这个统一变量的位置，正如你们看到的
+which means that now it just simply returns this uniform location as you can see
+
+174
+00:10:56,766 --> 00:11:00,550
+并且那比实际查询OpenGL要快得多，就像
+and that is a lot faster than actually querying OpenGL, and being like 
+
+175
+00:11:00,550 --> 00:11:02,233
+嘿，这个统一变量的位置是什么
+hey, what's this uniform location
+
+176
+00:11:02,400 --> 00:11:04,400
+好了，所以那就是所有的内容了
+okay, so that's pretty much all there is to it
+
+177
+00:11:04,400 --> 00:11:06,400
+如果这能帮助你们，就在下面点个赞吧
+if this helped you out, drop a like below
+
+178
+00:11:06,566 --> 00:11:09,633
+你们不能做的就是测试我们的代码，当然是在你们的代码库中测试
+nothing you could do is test us out, of course in your code base
+
+179
+00:11:09,633 --> 00:11:10,966
+看看它有多快
+see how much faster it is
+
+180
+00:11:11,100 --> 00:11:15,452
+运行一个快速的计时器，比较前后的性能
+just run a quick, like, right, a quick timer that compares the performance before and after
+
+181
+00:11:15,452 --> 00:11:18,100
+并且然后你们可以在下面的评论区分享你们的结果
+and then you can share your results in the comment section below
+
+182
+00:11:18,366 --> 00:11:19,900
+下次见，拜
+I will see you next time, goodbye
+

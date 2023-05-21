@@ -1,0 +1,1435 @@
+﻿1
+00:00:00,166 --> 00:00:03,933
+嘿, 你们好, 我是Cherno, 欢迎回到我的OpenGL系列教程
+hey, what's up guys, my name is Cherno, welcome back to my OpenGL series
+
+2
+00:00:04,166 --> 00:00:06,725
+那么我们今天主要讲渲染器
+so today we're gonna be talking all about the renderer
+
+3
+00:00:06,725 --> 00:00:09,925
+我们要写我们的第一个渲染器, 这是非常令人兴奋
+and we're gonna be writing our first renderer, which is pretty exciting 
+
+4
+00:00:09,925 --> 00:00:12,333
+到目前为止, 我们所有的都在主文件中
+so far, all we have is in our main file
+
+5
+00:00:12,366 --> 00:00:15,450
+我们基本上只得到了一些类
+we've basically just got a list of well classes
+
+6
+00:00:15,450 --> 00:00:19,500
+先创建, 然后绑定绘制等等
+that get created, and then later get bound, and then get drawn and
+
+7
+00:00:19,600 --> 00:00:20,933
+只是有点乱
+it's just a little kind of a mess
+
+8
+00:00:20,933 --> 00:00:23,300
+这些都不是通过中心管道的
+and none of this is going through a central pipeline
+
+9
+00:00:23,300 --> 00:00:25,500
+这是我们这儿存在的大问题
+which is really the big issue that we have here
+
+10
+00:00:25,733 --> 00:00:28,366
+对于我们像这样去实现一些东西还是挺不错的, 但是
+it's still perfectly fine for us to do something like this, but
+
+11
+00:00:28,600 --> 00:00:31,333
+好吧, 而不是我们实际告诉别人
+well, instead of us actually telling someone
+
+12
+00:00:31,433 --> 00:00:34,133
+嘿, 我有一些数据, 我想绘制个图
+hey, I have some data, I would like a drawn
+
+13
+00:00:34,333 --> 00:00:36,033
+我们不得不做所有那些工作
+we're having to do all of that work
+
+14
+00:00:36,333 --> 00:00:39,433
+因为一些原因, 那确实是一个问题, 首先
+and that's a problem for a few reasons, first of all
+
+15
+00:00:39,466 --> 00:00:43,033
+它就是那样, 因为我们每次都在做所有的工作
+it's that, because we're doing all the work every time
+
+16
+00:00:43,033 --> 00:00:44,533
+如果我们想再渲染一些东西
+and if we want to render something again
+
+17
+00:00:44,533 --> 00:00:46,866
+我们不得不为那个创建一个绘制调用
+well we have to make a draw call for that
+
+18
+00:00:46,866 --> 00:00:50,833
+我们不得不靠自己通过这种管道
+and we have to go through that kind of pipeline all by ourselves
+
+19
+00:00:50,866 --> 00:00:52,800
+一次又一次
+again and again and again
+
+20
+00:00:53,166 --> 00:00:55,266
+这很糟糕, 因为我们在重复代码
+which is bad, because we're repeating code
+
+21
+00:00:55,266 --> 00:00:58,200
+它比较容易出错, 也比较烦人
+it's error-prone, it's also just annoying
+
+22
+00:00:58,833 --> 00:01:00,300
+所有这些问题, 然后等到后面
+all of those problems, and then later
+
+23
+00:01:00,300 --> 00:01:01,600
+当这些变得更复杂的时候
+when things get more complicated
+
+24
+00:01:01,600 --> 00:01:03,366
+我们有多个渲染目标
+and we have multiple rendering targets
+
+25
+00:01:03,366 --> 00:01:05,269
+或者甚至是像混合一样简单的一些东西
+or even something simple like blending
+
+26
+00:01:05,433 --> 00:01:09,566
+我们没有一种中心粘合剂把一切联系在一起
+we have no kind of central glue that ties everything together
+
+27
+00:01:09,566 --> 00:01:14,066
+实际让一切保持有组织, 可调试, 运行顺利
+and actually keeps everything organized and debuggable and running smoothly
+
+28
+00:01:14,366 --> 00:01:16,400
+那就是渲染器的作用
+and that's kind of where the renderer comes in
+
+29
+00:01:16,466 --> 00:01:22,100
+渲染器就像工厂, 这里我们说的是一些部件
+the renderer is like the factory, where we say here are some parts
+
+30
+00:01:22,100 --> 00:01:24,000
+我想让你给我创建个东西
+I want you to make something for me
+
+31
+00:01:24,333 --> 00:01:26,166
+这是我即兴编出来的
+I literally made that up on a spot
+
+32
+00:01:26,166 --> 00:01:28,033
+但你知道吗, 我觉得这很有效
+but you know what, I guess it works
+
+33
+00:01:28,033 --> 00:01:29,333
+所以我们要坚持那个
+so we're going to stick with that
+
+34
+00:01:29,800 --> 00:01:33,000
+所以基本上这里的想法很简单
+so basically the idea here is fairly simple
+
+35
+00:01:33,133 --> 00:01:35,400
+我们有一堆数据, 就比如下面这些形式的
+we have a bunch of data in the form of like
+
+36
+00:01:35,400 --> 00:01:38,200
+顶点缓冲区, 索引缓冲区和着色器等等
+a vertex buffer and index buffer, a shader, whatever
+
+37
+00:01:38,500 --> 00:01:41,600
+我们希望能够把它给别人, 然后说
+and we want to be able to give that to someone and say
+
+38
+00:01:41,600 --> 00:01:44,366
+嘿, 我给你的这个东西
+hey, this stuff that I'm giving you
+
+39
+00:01:44,366 --> 00:01:46,066
+我需要显示在屏幕上
+I want to appear in the screen please
+
+40
+00:01:46,066 --> 00:01:49,366
+那就是渲染器的职责, 现在
+and that's kind of what the job of a renderer is, now
+
+41
+00:01:49,366 --> 00:01:51,066
+当然, 它比那个要复杂的多
+of course it gets a lot more complicated than that
+
+42
+00:01:51,066 --> 00:01:53,100
+我们可以告诉渲染器许多东西
+and we can tell the renderer a lot of things
+
+43
+00:01:53,166 --> 00:01:58,400
+但为了简单起见, 我们今天的目标就是移除
+but to keep it simple, our goal for today is really just to move away
+
+44
+00:01:58,400 --> 00:02:02,624
+我们实际在我们主文件中上次遗留的OpenGL调用
+the last remaining OpenGL call that we actually have inside our main file
+
+45
+00:02:02,624 --> 00:02:03,750
+当我们看看我们的代码
+if we take a look at our code
+
+46
+00:02:04,000 --> 00:02:07,066
+你可以看到所有这些中相当多的已经被抽象出去了
+you can see that pretty much all of this is abstracted away
+
+47
+00:02:07,066 --> 00:02:09,466
+我的意思是, 我们已经有了, 像VertexArray和VertexBuffer
+I mean we have like VertexArray VertexBuffer
+
+48
+00:02:09,466 --> 00:02:12,366
+我们已经得到了IndexBuffer和Shader所有这些类
+we've got IndexBuffer, we've got Shader, we've got all of this stuff
+
+49
+00:02:12,366 --> 00:02:15,700
+那完全被抽象到我们的自定义类中了
+that is just completely abstracted away into our custom classes
+
+50
+00:02:15,700 --> 00:02:18,600
+然而, 我猜我们有两个OpenGL调用
+however well, I guess we have two OpenGL calls
+
+51
+00:02:18,600 --> 00:02:22,333
+我们已经得到了应该被渲染器处理的glClear
+we've got the glClear which should be handled by the renderer
+
+52
+00:02:22,366 --> 00:02:26,266
+然后我们也有这个DrawElements, 所以这个基本上就是个绘制
+and then we've also got this DrawElements, so this is basically a draw
+
+53
+00:02:26,400 --> 00:02:29,033
+这个就是叫DrawCall的东西, 正如我们之前讨论的
+this is something called a DrawCall, as we've discussed previously
+
+54
+00:02:29,033 --> 00:02:32,433
+这是我们实际告诉OpenGL的地方, 我想让你取绑定的任何东西
+it's where we actually tell OpenGL, I want you to take whatever's bound
+
+55
+00:02:32,725 --> 00:02:37,200
+然后把这个绘制在屏幕上, 这就是glDrawElements所做的
+and just draw this on the screen somehow, and that's what glDrawElements does
+
+56
+00:02:37,366 --> 00:02:40,200
+这应该由渲染器来处理
+that should be something that is taken care of by the renderer
+
+57
+00:02:40,400 --> 00:02:42,800
+因为那很清楚, 但很清楚的是
+as is that clear thing, but the clear thing is
+
+58
+00:02:42,800 --> 00:02:45,200
+这是我们以后可能会讲到的一个小问题
+kind of a minor thing which we'll probably get into later
+
+59
+00:02:45,375 --> 00:02:47,533
+不论如何, 我们如何实现那个, 好吧
+anyway how are we going to do that well
+
+60
+00:02:48,266 --> 00:02:50,366
+我们要从创建一个Renderer类开始
+we're going to start by making a Renderer class
+
+61
+00:02:50,500 --> 00:02:53,100
+然后在那个Renderer类中, 我们会写一个Draw方法
+and then inside that Renderer class, we're going to be writing a Draw function
+
+62
+00:02:53,100 --> 00:02:55,866
+基本上就是接收一大堆参数, 那么
+which basically takes in a bunch of arguments, so
+
+63
+00:02:55,866 --> 00:02:57,533
+这些数据, 那个实际需要绘制一些东西
+the data that actually needs to draw something
+
+64
+00:02:57,933 --> 00:03:01,133
+然后用那种方法绘制在屏幕上
+and then draws it on the screen and from that approach
+
+65
+00:03:01,133 --> 00:03:03,533
+即使那可能看起来确实比较简单
+even though that might seem like a really simple thing
+
+66
+00:03:03,800 --> 00:03:09,566
+我们可以把它扩展成非常复杂和非常强大的东西
+we can grow that into into something extremely complex and extremely powerful
+
+67
+00:03:09,633 --> 00:03:11,300
+那么让我们直接进入代码并检查一下
+so let's get right into the code and check that out
+
+68
+00:03:11,300 --> 00:03:15,366
+所以我首先要做的就是, 右键点击这个src, 点击添加新项
+so the first thing I'm going to do is, right click on src here, hit add new item
+
+69
+00:03:15,866 --> 00:03:19,033
+创建一个叫Renderer.h的头文件
+gonna make a header file called Renderer.h
+
+70
+00:03:19,166 --> 00:03:22,000
+显然我已经得到了Renderer.h, 以及Renderer.cpp
+and apparently I've already got the Renderer.h, and Renderer.cpp
+
+71
+00:03:22,000 --> 00:03:25,033
+那就是我们放我们所有OpenGL东西的地方, 所以那很好
+yep that's where we put all of our OpenGL stuff, so that's great
+
+72
+00:03:25,400 --> 00:03:28,433
+那么在我们的Renderer.h文件中, 我要给这里腾点空间
+so inside our Renderer.h, I'm just gonna make some room here and
+
+73
+00:03:28,433 --> 00:03:30,466
+实际上创建一个叫Renderer的类
+actually make a class called Renderer
+
+74
+00:03:30,666 --> 00:03:32,933
+现在, 这个类是否应该是静态的
+now whether this class should be static
+
+75
+00:03:32,933 --> 00:03:35,333
+或者它应该是一个单例之类的
+or it should be a singleton or anything like that
+
+76
+00:03:35,466 --> 00:03:37,933
+那是值得商榷的
+that's it's up for debate
+
+77
+00:03:37,966 --> 00:03:41,166
+我的意思是, 有些人喜欢把这个类变成单例
+I mean some people like to actually make this class a singleton
+
+78
+00:03:41,166 --> 00:03:43,300
+确保只有一个这样的单例
+and make sure there's only a single instance of that
+
+79
+00:03:43,433 --> 00:03:45,166
+有些人不喜欢那样做
+some people don't like to do that
+
+80
+00:03:45,166 --> 00:03:47,833
+因为他们可能想要Renderer的多个实例
+because maybe they might want to have multiple instances of the Renderer
+
+81
+00:03:47,833 --> 00:03:51,700
+这很完美, 对吧, 这两种方法都不是错的
+that's perfectly, okay, it's not neither approaches really wrong
+
+82
+00:03:51,933 --> 00:03:53,633
+它只是取决于你需要如何去使用它
+it's just how you want to do it
+
+83
+00:03:53,900 --> 00:03:55,133
+我们只会让这个变得不那么
+we're just gonna make this not kind 
+
+84
+00:03:55,300 --> 00:03:58,633
+我不会让这里的每个方法都是静态的, 或者之类的任何处理
+I'm not gonna make every method here static or anything like that
+
+85
+00:03:58,733 --> 00:04:01,466
+我们会把它当作可以有多个实例
+we're just gonna treated as if we can have multiple instances of this
+
+86
+00:04:01,466 --> 00:04:03,800
+如果我们选择那样做, 也许就是一些处理
+if we choose to that, might be something
+
+87
+00:04:03,800 --> 00:04:05,766
+如果你有多个图层, 你可能会想这么做
+you might want to do if you have multiple layers
+
+88
+00:04:05,766 --> 00:04:09,466
+或者在你实际的图形应用中有类似的东西
+or something like that inside your actual graphics application
+
+89
+00:04:09,575 --> 00:04:11,800
+但我们没有理由做得太过火
+but there's no reason for us to kind of go overboard
+
+90
+00:04:11,800 --> 00:04:13,400
+然后开始创建一切, 从这里开始
+and just start making everything, started here
+
+91
+00:04:13,566 --> 00:04:15,533
+那么我就把它当做一个普通类来对待
+so I'm just going to treat this as if it was a normal class
+
+92
+00:04:15,533 --> 00:04:20,033
+我们的第一个目标是创建一个叫做Draw的方法, 它会接收一些参数
+so our first goal is really just to make a function called Draw, which takes in a bunch of stuff
+
+93
+00:04:20,033 --> 00:04:22,850
+所以让我们想想, 在OpenGL绘制一些东西, 我们实际需要什么
+so let's think about what we actually need to draw something in OpenGL
+
+94
+00:04:22,850 --> 00:04:25,733
+唔, 我们需要顶点数组和索引缓冲区
+well, we need a vertex array, we need an index buffer
+
+95
+00:04:25,833 --> 00:04:28,466
+以及着色器, 那就是我们目前所知道的, 对吧
+and we need a shader, that's what we know so far, right
+
+96
+00:04:28,800 --> 00:04:31,666
+这个顶点数组实际已经绑定了顶点缓冲区的
+the vertex array actually has the vertex buffer bound to it
+
+97
+00:04:31,666 --> 00:04:33,900
+所以我们一点儿也不担心顶点缓冲区
+so we don't need to worry about vertex buffers at all
+
+98
+00:04:34,100 --> 00:04:38,300
+但我们确实需要那个索引缓冲区, 当然还有我之前提到的顶点数组
+but we do need to have that index buffer, the vertex array of course as I mentioned
+
+99
+00:04:38,300 --> 00:04:41,566
+以及一个有效的着色器, 所以这三个东西就是我们所需要的
+and also a valid shader, so those three things are really all we need
+
+100
+00:04:41,566 --> 00:04:44,033
+现在索引缓冲区有这个索引计数
+now the index buffer has the index count
+
+101
+00:04:44,400 --> 00:04:48,033
+如果我们传入一个索引缓冲区到这个Draw方法
+and if we kind of pass in an index buffer into this Draw function
+
+102
+00:04:48,166 --> 00:04:51,966
+我们可以假设我们想要绘制整个索引缓冲区
+we can kind of assume that we want to draw that entire index buffer
+
+103
+00:04:51,966 --> 00:04:54,866
+因为如果我们想绘制一部分索引缓冲区
+because if we wanted to draw like a partial index buffer
+
+104
+00:04:54,866 --> 00:04:58,366
+我们可能传入一个索引缓冲区, 它只有一部分索引
+we probably pass in an index buffer, which just had a partial set of indices
+
+105
+00:04:58,366 --> 00:05:00,866
+那么在Draw这儿, 我就写VertexArray&
+so over here in Draw, I'm going to write VertexArray&
+
+106
+00:05:00,866 --> 00:05:03,400
+我将通过引用传递这些, 通过常量引用
+I'm going to pass all these by reference, by constant reference
+
+107
+00:05:03,833 --> 00:05:09,375
+那么就是const VertexArray& va, const IndexBuffer& ib
+so VertexArray va, const IndexBuffer ib
+
+108
+00:05:09,375 --> 00:05:13,100
+然后是const Shader& shader, 酷
+and then const Shader& shader, cool
+
+109
+00:05:13,100 --> 00:05:15,100
+那么继续, 我们也会把那个创建成静态的
+so there we go, and we can make that constant as well
+
+110
+00:05:15,100 --> 00:05:16,800
+因为我们不会改变任何东西
+since we won't be modifying anything
+
+111
+00:05:16,800 --> 00:05:17,632
+在Renderer头文件中
+into the Renderer
+
+112
+00:05:17,632 --> 00:05:24,600
+我会在这包含所有类, 就是VertexArray, IndexBuffer和Shader
+I'm going to include all of our classes here, VertexArray IndexBuffer and Shader
+
+113
+00:05:26,166 --> 00:05:27,566
+那在我看来很不错
+and that's looking pretty good to me
+
+114
+00:05:27,566 --> 00:05:29,725
+所以在Renderer.cpp中
+so in Renderer.cpp
+
+115
+00:05:29,725 --> 00:05:32,900
+我会写那个方法, 所以就是void Renderer::Drawer()
+I'm going to write that function, so void Renderer::Drawer
+
+116
+00:05:33,466 --> 00:05:37,100
+我只想保留这一切，同时也要标记那个为静态的
+I'm just gonna let it sit all that for me, remark that as const as well
+
+117
+00:05:37,300 --> 00:05:39,100
+现在我们可以把DrawCall移动到这里
+and now we can actually move our DrawCall here
+
+118
+00:05:39,100 --> 00:05:42,500
+那么让我们返回Application文件, 看看我们实际需要移动的是什么
+so let's go back to Application, and see what it is we actually need to move
+
+119
+00:05:42,666 --> 00:05:46,400
+那么我们已经绑定了顶点数组和索引数组以及这个着色器
+so we had this vertex array binding, this index array binding and this shader binding
+
+120
+00:05:46,533 --> 00:05:49,800
+现在有趣的是, 我们实际设置了一个统一变量
+now what's interesting here is we're actually setting a uniform
+
+121
+00:05:50,133 --> 00:05:52,400
+那么这如何与我们的Draw函数一起工作
+so how is that going to work with our Draw function
+
+122
+00:05:52,466 --> 00:05:53,833
+我们待会再讲这个
+well we'll come back to that later
+
+123
+00:05:53,833 --> 00:05:55,733
+但暂时就让我们复制所有这些代码
+but for now let's just grab all of this code
+
+124
+00:05:56,066 --> 00:06:00,133
+进入Renderer.cpp, 然后关闭其他这些文件
+I'm going to go into Renderer.cpp, and we just close these other files
+
+125
+00:06:01,033 --> 00:06:04,000
+像那样粘贴在这里, 不用担心这个设置统一变量
+gonna paste that in here like that, don't worry about the set uniform
+
+126
+00:06:04,033 --> 00:06:08,133
+那么我们已经绑定了着色器, 顶点数组和索引缓冲区
+so we have our shader binding, our vertex array binding and our index buffer binding
+
+127
+00:06:08,333 --> 00:06:10,166
+然后返回Application文件
+and then finally back in Application
+
+128
+00:06:10,166 --> 00:06:12,800
+我们也像那样复制glDrawElements
+we'll steal that glDrawElements just like that
+
+129
+00:06:13,333 --> 00:06:16,866
+那么我们就调用GLCall(glDrawElements(GL_TRIANGLES))
+and so we'll do GLCall glDrawElements triangles
+
+130
+00:06:16,966 --> 00:06:21,033
+现在为了代替6, 我们可以使用ib.GetCount()
+now instead of 6, we're going to have index buffer GetCount
+
+131
+00:06:22,133 --> 00:06:26,866
+我想我们假设过unsigned int, 这总是一个unsigned int
+unsigned int I think we assumed that, this is always going to be an unsigned int
+
+132
+00:06:26,866 --> 00:06:28,466
+正如你在这里看到的数据
+as you can see here with the data
+
+133
+00:06:28,566 --> 00:06:31,633
+那么我们基本上会隐藏代码, 这就是unsigned int
+so we will just basically hide code, this to be unsigned int
+
+134
+00:06:32,000 --> 00:06:35,700
+但在这种情况下, 你可能有unsigned short作为你的索引类型
+but in the case of, you may be having unsigned short as your index type
+
+135
+00:06:35,700 --> 00:06:39,933
+你可能想把它从索引缓冲区中取出, 或者任何你存储它的地方
+you might want to actually pull that out of the index buffer, or wherever you're storing that
+
+136
+00:06:39,933 --> 00:06:42,600
+最后我们暂时把所有东西都画成三角形
+and then finally we're drawing everything as triangles for now
+
+137
+00:06:42,600 --> 00:06:46,166
+我们肯定会在将来进入不同的渲染模式
+we will definitely get into kind of different modes of rendering in the future
+
+138
+00:06:46,166 --> 00:06:48,700
+但目前, 它只是三角形, 因为这就是我们要做的
+but for now, it's just going to be triangles, because that's what we're doing
+
+139
+00:06:48,766 --> 00:06:50,866
+好了, 酷, 一切看起来都很好, 在我们的代码中
+okay, cool, so everything looks pretty good, in our code
+
+140
+00:06:51,100 --> 00:06:52,733
+你可以看到那个编译也不错
+you can see that compiles just fine
+
+141
+00:06:53,066 --> 00:06:55,133
+我们不打算解绑这些东西
+we're not going to bother unbinding any of this
+
+142
+00:06:55,933 --> 00:07:00,066
+在更传统的情况下, 比如解绑这个概念
+in a more tradition, like this whole concept of unbinding
+
+143
+00:07:00,066 --> 00:07:03,200
+我真的应该为此专门做一期视频, 但就像
+I really should make a video dedicated about that about this, but like
+
+144
+00:07:03,466 --> 00:07:09,533
+在OpenGL中解绑不是严格必要的, 如果它对调试有用的话
+unbinding stuff in OpenGL not strictly necessary, if it is useful for debugging
+
+145
+00:07:09,533 --> 00:07:15,533
+我会那么说, 但是它可能会减少一些bug
+I will say that, but and it might reduce some bugs maybe
+
+146
+00:07:15,533 --> 00:07:17,600
+但从根本上来说
+but ultimately speaking
+
+147
+00:07:17,733 --> 00:07:22,200
+在OpenGL中解绑东西只是浪费性能, 你不需要这么做
+unbinding stuff in OpenGL is just a waste of performance, you don't really need to do that
+
+148
+00:07:22,466 --> 00:07:26,525
+因为在我们绘制下一个东西之前, 我们会把这些东西都绑定起来
+because before we draw the next thing, we'll be binding all this stuff anyway
+
+149
+00:07:26,525 --> 00:07:27,600
+所以解绑没有意义
+so there's no real point
+
+150
+00:07:28,066 --> 00:07:33,166
+更复杂的系统可能在调试模式下会有解绑
+more kind of complex systems might have like unbinding in debug mode and then
+
+151
+00:07:33,266 --> 00:07:35,966
+在发布模式下, 解绑当然什么都不做
+in release mode the unbind courses do nothing
+
+152
+00:07:35,966 --> 00:07:39,075
+这是一种选项, 我们可能会实现类似的东西
+that's one option, and we might implement something like that
+
+153
+00:07:39,075 --> 00:07:40,600
+当我们真的在制作游戏引擎的时候
+if we were actually making a game engine
+
+154
+00:07:40,733 --> 00:07:43,566
+但暂时我们要这样写代码, 那已经不错了
+but for now we're just gonna write our code like this, and that would be fine
+
+155
+00:07:43,566 --> 00:07:49,466
+你可能会说, 把解绑代码放在这里会更明智
+you could probably argue that it would be wiser for me to actually put unbinding code here
+
+156
+00:07:49,466 --> 00:07:52,566
+因为, 再说一次, 我们这里严格来说讲的是OpenGL
+because again, we are strictly kind of talking about OpenGL here
+
+157
+00:07:52,733 --> 00:07:53,966
+我们并没有真正开发一个游戏引擎
+we're not really writing a game engine
+
+158
+00:07:53,966 --> 00:07:56,533
+所以我们可能不关心性能之类的东西
+so we probably don't really care about performance or anything like that
+
+159
+00:07:56,700 --> 00:07:58,966
+我确实喜欢保持代码的整洁
+I do like to keep my code kind of clean though
+
+160
+00:07:59,833 --> 00:08:03,300
+只需要再多三行代码来解绑定所有这些不必要的东西
+and just having three more lines to unbind all of this stuff needlessly
+
+161
+00:08:03,300 --> 00:08:05,133
+就像我只是不想把代码弄得太乱
+like I just don't want to clutter the code too much
+
+162
+00:08:05,133 --> 00:08:07,433
+这就是为什么我在这里不这么做的原因, 好吧
+so that's the reason why I'm not doing that here, okay
+
+163
+00:08:07,433 --> 00:08:10,300
+那么返回Application文件, 我们仍然有这个统一变量的问题
+so back in Application, we still have this uniform issue
+
+164
+00:08:10,833 --> 00:08:13,133
+没有什么能阻止我们这么做
+there's nothing really stopping us from just doing this
+
+165
+00:08:13,333 --> 00:08:16,633
+就像我们仍然可以这样做, 然后我们不需要绑定任何东西
+like we can still do this, and then we don't need to bind any of that
+
+166
+00:08:16,633 --> 00:08:18,233
+然后对于这个Renderer
+and then finally for the Renderer
+
+167
+00:08:18,533 --> 00:08:21,666
+我在这里要做的就是创建这个Renderer类的一个新实例
+what I'm going to do here is just create a new instance of this Renderer class
+
+168
+00:08:21,666 --> 00:08:23,233
+就像这样Renderer renderer
+just like this Renderer renderer
+
+169
+00:08:23,633 --> 00:08:26,900
+然后在这里, 我们将调用renderer.Draw()
+and then over here, we're just going to call renderer.Draw
+
+170
+00:08:27,100 --> 00:08:28,666
+传入我们的顶点数组
+we're going to pass in our vertex array
+
+171
+00:08:28,666 --> 00:08:32,600
+索引缓冲区和着色器
+we're going to pass in our index buffer and we're going to pass in our shader
+
+172
+00:08:32,833 --> 00:08:33,633
+就像那样
+just like that
+
+173
+00:08:33,833 --> 00:08:36,000
+那么我们基本上告诉我们的渲染器
+and so we're basically telling our renderer here
+
+174
+00:08:36,133 --> 00:08:38,933
+嘿, 我现在有个顶点数组, 索引缓冲区和着色器
+hey, I have a vertex array, an index buffer and a shader
+
+175
+00:08:38,933 --> 00:08:40,700
+把那个绘制到屏幕上去
+please draw that onto the screen
+
+176
+00:08:40,700 --> 00:08:42,466
+那就是我们方法的功能
+and that's kind of what our function does
+
+177
+00:08:42,766 --> 00:08:46,100
+那么如果我们到这里, 运行这个应用程序
+so if we come over here, and we actually run this application of ours
+
+178
+00:08:46,100 --> 00:08:49,433
+我们会得到一大堆错误, 因为有些东西没有找到
+we're going to get a whole bunch of errors here, because something's not found
+
+179
+00:08:49,766 --> 00:08:52,733
+这可能是因为我们实际上在这里包含了Renderer
+it's probably because we're actually including Renderer in here
+
+180
+00:08:53,333 --> 00:08:56,575
+然后它也会被包含到Renderer中
+and then that's being included into Renderer as well
+
+181
+00:08:56,575 --> 00:09:00,733
+所以我们这儿得到了一个循环的包含过程
+so we kind of got a cyclical include thing going on here
+
+182
+00:09:00,733 --> 00:09:03,025
+那么让我们直接去看看那个
+so let's go ahead and check that
+
+183
+00:09:03,025 --> 00:09:06,600
+VertexArray,VertexBufferLayout, 因为我们需要那个  
+VertexArray VertexBufferLayout, because we do need that
+
+184
+00:09:06,600 --> 00:09:09,000
+那是一个引用, 所以我们可以排除它
+that is a reference though, so we could eliminate that
+
+185
+00:09:09,966 --> 00:09:14,533
+让我们看看VertexBufferLayout, 就是这个原因
+let's see if I think VertexBufferLayout, yeah, the reason
+
+186
+00:09:14,533 --> 00:09:17,100
+这是因为在VertexBufferLayout中调用了ASSERT
+this happens is because VertexBufferLayout calls ASSERT
+
+187
+00:09:17,500 --> 00:09:19,800
+我认为这是唯一的原因, 我们在这儿需要Renderer
+I think that's the only reason, we need Renderer here
+
+188
+00:09:19,800 --> 00:09:23,000
+事实上，我们还包含一个OpenGL
+isn't it, well, actually we also include a OpenGL
+
+189
+00:09:23,000 --> 00:09:35,500
+好了, 当然, 为了解决这个问题, 我们会去到VertexArray.h文件
+okay, sure, so to kind of solve this what we'll do is, we will actually go to VertexArray.h
+
+190
+00:09:35,733 --> 00:09:38,300
+我不打算在这里包含VertexBufferLayout
+I'm not going to include VertexBufferLayout in here
+
+191
+00:09:38,566 --> 00:09:43,850
+我要在声明之前, 输入像这样的class VertexBufferLayout
+I'm actually going to before declare, by just typing in class VertexBufferLayout like that
+
+192
+00:09:43,850 --> 00:09:48,433
+然后在cpp文件中, 我会像那样包含VertexBufferLayout
+and then in the cpp file, I'm going to include VertexBufferLayout just like that
+
+193
+00:09:48,500 --> 00:09:52,300
+这样我们就不会在这里包含VertexBufferLayout
+so that way we don't actually include VertexBufferLayout in here
+
+194
+00:09:52,433 --> 00:09:56,033
+问题就是VertexBufferLayout包含了Renderer
+the problem really is the VertexBufferLayout includes Renderer
+
+195
+00:09:56,333 --> 00:10:01,266
+我们在Renderer.h中包含VertexArray, 它包含了VertexBufferLayout
+and then we include VertexArray which includes VertexBufferLayout inside Renderer.h
+
+196
+00:10:01,266 --> 00:10:04,000
+所以它就像在VertexArray中包含Renderer
+so it's like we're including Renderer in VertexArray
+
+197
+00:10:04,000 --> 00:10:05,766
+我们也在Renderer包含了VertexArray
+and we're including VertexArray in Renderer
+
+198
+00:10:05,766 --> 00:10:09,833
+它有点像, 它进入了一个无限循环的包含
+and it's kind of, it's getting into like an infinite loop of inclusion
+
+199
+00:10:09,833 --> 00:10:13,366
+我会有一个C++视频, 在某种程度上是关于生存周期的
+well I'll have a c++ video about that available at some point in my life 
+
+200
+00:10:13,566 --> 00:10:14,733
+如果有的话, 就点击那里
+click there, if it's there
+
+201
+00:10:14,733 --> 00:10:16,533
+所以如果我们尝试再次编译我们的代码
+so if we try and compile our code once again
+
+202
+00:10:16,533 --> 00:10:17,900
+应该会成功的, 好吧
+we should be okay, alright
+
+203
+00:10:17,900 --> 00:10:23,100
+那么回到Application.cpp, 我们还必须包含那个VertexBufferLayout
+so back in Application.cpp, we also have to include that VertexBufferLayout
+
+204
+00:10:23,166 --> 00:10:24,666
+所以我会像那样包含那个
+so I'll include that like that
+
+205
+00:10:25,266 --> 00:10:28,566
+然后编译我们的代码, 好了, 成功了
+and compile our code, all right, there we go, success
+
+206
+00:10:28,800 --> 00:10:30,400
+让我们直接去运行一下这个应用
+let's go ahead and launch this application
+
+207
+00:10:30,400 --> 00:10:31,900
+看看我们能否得到同样的渲染东西
+and see if we get the same thing rendering
+
+208
+00:10:31,933 --> 00:10:33,733
+你可以看到我们得到了相同的结果
+and you can see that we have the same result
+
+209
+00:10:33,733 --> 00:10:37,100
+太好了, 为了清理这里, 我们还要做几件事
+great, few more things that we can actually do, to clean this up is
+
+210
+00:10:37,100 --> 00:10:38,533
+我们这里有这个glClear
+we have this glClear here
+
+211
+00:10:38,533 --> 00:10:40,933
+当然, 这里我真的不想那么做
+I don't really want to do that here of course
+
+212
+00:10:40,933 --> 00:10:43,366
+那么在Renderer.h中, 我就写Clear
+so inside Renderer.h, I'm just going to write Clear
+
+213
+00:10:43,733 --> 00:10:48,766
+然后在cpp文件中, 我要实现这个方法Clear
+and then inside the cpp file, I'm going to implement that function Clear
+
+214
+00:10:49,900 --> 00:10:54,200
+我们基本上就会复制粘贴我们在Application中的东西
+and we'll just basically copy and paste what we have inside Application
+
+215
+00:10:54,500 --> 00:10:57,866
+这是颜色缓冲, 就像这样
+which is color buffer a bit, just like that
+
+216
+00:10:58,966 --> 00:11:02,633
+我们只需要像那样调用Renderer.Clear()
+and we'll just call Renderer.Clear like that
+
+217
+00:11:03,033 --> 00:11:04,433
+为了更准确一点
+and to be a little bit more correct
+
+218
+00:11:04,433 --> 00:11:08,333
+我要做的就是把这个方法标记为const, 当然它什么都没做
+what I'm going to do is mark this function as const, of course it doesn't do anything
+
+219
+00:11:08,433 --> 00:11:10,100
+只在这种情况下, 我们有约束条件或类似的东西
+just in case, we have a constraint or anything like that
+
+220
+00:11:10,100 --> 00:11:12,100
+回到Application文件, 看看我们做了什么
+and if we go back to Application, let's just see what we've done
+
+221
+00:11:12,100 --> 00:11:15,533
+所以本质上, 我们所做的是我们去掉了每一个GLCall
+so essentially what we've done is we've gotten rid of every single GLCall
+
+222
+00:11:15,800 --> 00:11:18,533
+我想在整个文件都有
+I think that we have in this entire file yep
+
+223
+00:11:18,766 --> 00:11:22,166
+我们所做的就是整个渲染过程
+and so what we've done is that whole rendering situation that we've had
+
+224
+00:11:22,500 --> 00:11:23,733
+我们基本上改变了
+we've basically changed
+
+225
+00:11:23,766 --> 00:11:25,366
+我们已经创建了一些绘制函数
+we've made some kind of drawing functions
+
+226
+00:11:25,366 --> 00:11:28,100
+这样我们就可以用适当的数据调用Draw方法
+so that we can just call Draw with the appropriate data
+
+227
+00:11:28,100 --> 00:11:30,166
+然后清除, 如果我们实际想清屏
+and then clear, if we actually want to clear our screen
+
+228
+00:11:30,166 --> 00:11:32,866
+我们使用着色器时仍然有这种问题
+we do still have this kind of issue here with the shader
+
+229
+00:11:32,866 --> 00:11:34,700
+我们实际还需要在哪儿绑定着色器
+where we actually still have to kind of bind the shader
+
+230
+00:11:34,700 --> 00:11:37,700
+这样我们就可以在每一帧中任意设置统一变量
+so that we can set the uniform to whatever we want every frame
+
+231
+00:11:38,566 --> 00:11:41,733
+我不喜欢把代码留在这里
+I'm not a big fan of leaving that code in here
+
+232
+00:11:41,733 --> 00:11:43,900
+解决这个问题的唯一方法是
+the only real way to solve that though is
+
+233
+00:11:43,966 --> 00:11:48,466
+因为我们喜欢你们解决这个问题的方法是使用材质而不是着色器
+because we like the way that you would solve that is by using materials instead of shaders
+
+234
+00:11:48,800 --> 00:11:51,300
+那么我们的Draw方法中有什么, 也就是Renderer.Draw
+so what we have in our Draw function, and Renderer.Draw
+
+235
+00:11:51,300 --> 00:11:54,425
+我们会接收顶点数组, 索引缓冲区和着色器
+we're taking in a vertex array an index buffer and a shader
+
+236
+00:11:54,425 --> 00:11:58,400
+这在更传统的设置中有点奇怪, 我们会接收, 就像
+that's a bit weird in a more traditional setup, we'd be taking in like
+
+237
+00:11:58,700 --> 00:12:01,066
+你知道的, 顶点数组, 任何索引缓冲区, 都可以
+you know, vertex array, whatever index buffer, that's all fine
+
+238
+00:12:01,233 --> 00:12:04,966
+但然后我们就会使用一个材质代替一个真正的着色器
+but then we'd be taking in a material instead of an actual shader
+
+239
+00:12:05,100 --> 00:12:09,533
+材质基本上就是一个着色器加上一套
+and what a material is is basically a shader plus a set of diner
+
+240
+00:12:09,600 --> 00:12:12,033
+所以就是一个着色器加上它所有的统一变量
+so a shader plus all of its uniforms
+
+241
+00:12:12,100 --> 00:12:14,200
+不管那是渲染器的一种特殊的统一变量
+whether that be kind of renderer specific uniforms
+
+242
+00:12:14,200 --> 00:12:18,933
+或者是每个对象的统一变量, 例如, 这个矩形的颜色
+or kind of per object uniforms, like, for example, this rectangle's color
+
+243
+00:12:19,300 --> 00:12:22,266
+就像我们实际拥有的一种每个对象的统一变量
+would be like a kind of per object uniform that we actually have
+
+244
+00:12:22,566 --> 00:12:25,600
+那将被存储在材质中, 就在着色器的旁边
+and that would be stored inside the material, alongside the shader
+
+245
+00:12:25,666 --> 00:12:28,900
+这样, 当我们把材质传递给渲染器的时候
+and so that way, when we pass in the material to the renderer
+
+246
+00:12:28,966 --> 00:12:31,033
+渲染器基本上会绑定材质
+the renderer will basically bind the material
+
+247
+00:12:31,033 --> 00:12:34,366
+这意味着它会绑定着色器, 设置它所需的所有统一变量
+meaning that it would bind the shader,and set up all the uniforms that it needs to
+
+248
+00:12:34,500 --> 00:12:37,533
+然后在我们索引周围调用顶点数组的Draw方法
+and then call the Draw function for our vertex array around our index
+
+249
+00:12:37,533 --> 00:12:39,133
+但是对于那些东西
+but for and all that kind of stuff
+
+250
+00:12:39,300 --> 00:12:40,966
+那么那就是它的运行原理
+so that's how it should work
+
+251
+00:12:41,300 --> 00:12:43,066
+我们没有材质, 是的, 或者类似的东西
+we don't have materials, yeah, or anything like that
+
+252
+00:12:43,066 --> 00:12:47,266
+所以目前, 实际上, 我们必须, 如果我们想修改一个着色器的统一变量
+so for now, we have to actually, if we want to modify a uniform for a shader
+
+253
+00:12:47,333 --> 00:12:49,700
+我们必须自己手动完成, 这有点烦人
+we have to do that ourselves manually, a little bit annoying
+
+254
+00:12:49,700 --> 00:12:51,266
+我们将来可能会接触到材质
+we might get into materials in the future
+
+255
+00:12:51,266 --> 00:12:52,766
+在游戏引擎系列教程中我们肯定会碰到的
+we definitely will in the game engine series
+
+256
+00:12:52,766 --> 00:12:56,200
+不确定OpenGL系列, 但我们可能不得不这样做
+not sure about OpenGL series, we probably will have to though
+
+257
+00:12:56,566 --> 00:12:58,678
+这很快就会变得很复杂
+this is gonna get pretty complicated pretty soon 
+
+258
+00:12:58,678 --> 00:13:01,500
+所以对于你们这些认为这是变得
+so for all of you people who are thinking this is getting
+
+259
+00:13:01,666 --> 00:13:02,866
+到目前为止有点简单
+there's a bit simple so far
+
+260
+00:13:02,866 --> 00:13:05,300
+反正很快就会升级的
+it's gonna escalate pretty quickly anyway
+
+261
+00:13:05,366 --> 00:13:06,500
+Renderer类的方法相当多的
+that's pretty much the Renderer
+
+262
+00:13:06,500 --> 00:13:08,566
+我们现在有一个可以持续添加的类了
+we now have a class that we can keep adding to
+
+263
+00:13:08,566 --> 00:13:10,666
+当我们实际需要渲染越来越多的东西
+when we actually need to render more and more things
+
+264
+00:13:11,933 --> 00:13:14,333
+我迫不及待地想进入更复杂的东西
+I can't wait to get into the more complicated stuff
+
+265
+00:13:14,400 --> 00:13:16,466
+接下来我们将讨论纹理
+next up we're going to talk about textures
+
+266
+00:13:16,466 --> 00:13:20,333
+以及我们如何在OpenGL中渲染纹理和低级纹理以及所有这些东西
+and how we can render textures and low textures and do all of that stuff in OpenGL
+
+267
+00:13:20,533 --> 00:13:24,166
+在那之后, 我想我们可能会转向其他东西, 比如3D模型
+and after that, I think we're probably going to move on to things, like 3D models
+
+268
+00:13:24,166 --> 00:13:28,133
+或者我不知道有那么多事情要做
+or I don't know there's so much so much to do
+
+269
+00:13:28,400 --> 00:13:30,133
+我认为3D模型可能是个好主意
+I think 3D models is probably a good idea
+
+270
+00:13:30,133 --> 00:13:33,133
+我们可能还需要讲一些调试接口
+we probably want to move on to some kind of debugging interface as well
+
+271
+00:13:33,133 --> 00:13:35,933
+就像一个图形用户界面系统, 这样我们就可以使用它了
+and like a GUI system, so that we can play around with that
+
+272
+00:13:36,966 --> 00:13:39,833
+一旦我们有了3D模型, 我们可以转移到光源和像那样更酷的东西
+once we have 3D models, we can move on to lighting and cool stuff like that
+
+273
+00:13:40,533 --> 00:13:43,666
+在某些时候, 我们还是需要进行文本渲染
+we also need to do text rendering at some point
+
+274
+00:13:43,766 --> 00:13:47,633
+只会是一场噩梦, 当然我讨厌做文本渲染
+just gonna be a nightmare, of course I hate doing a text rendering
+
+275
+00:13:47,633 --> 00:13:49,500
+我可能会写一个库
+I might actually write a library
+
+276
+00:13:49,700 --> 00:13:52,900
+特别是为了使本系列的文本渲染更容易
+specifically to make text rendering easier for this series
+
+277
+00:13:53,333 --> 00:13:54,966
+因为这真的很烦人
+because it's really quite annoying
+
+278
+00:13:54,966 --> 00:13:56,866
+我真的不想处理那个, 但另一方面
+and I don't really want to deal with that, but then on the other hand
+
+279
+00:13:56,866 --> 00:13:59,533
+我需要向你们展示实际文本渲染的原理
+I need to show you guys how to actually make text rendering work
+
+280
+00:13:59,900 --> 00:14:03,164
+在不使用库的情况下, 所以那还是比较有趣
+without using libraries, so that's gonna be fun 
+
+281
+00:14:03,164 --> 00:14:05,166
+不论如何, 希望你们喜欢这个视频
+anyway I hope you guys enjoyed this video
+
+282
+00:14:05,166 --> 00:14:06,733
+如果你们喜欢的话, 就可以点击那个喜欢按钮
+if you did, you can hit that like button
+
+283
+00:14:06,900 --> 00:14:10,125
+你们也可以通过parteon.com/TheCherno来支持这个系列教程
+you can also help support this series by going to parteon.com/TheCherno
+
+284
+00:14:10,125 --> 00:14:14,366
+非常感谢所有支持我在YouTube上制作视频的人
+huge thank you as always to all of the supporters of all of the videos that I make here on YouTube
+
+285
+00:14:14,366 --> 00:14:16,966
+因为没有那些优秀的人, 它们就不会存在
+because they wouldn't be here, without those wonderful people
+
+286
+00:14:17,833 --> 00:14:21,000
+下次就是纹理, 再见
+next time textures, I will see you next time
+
+287
+00:14:21,866 --> 00:14:25,733
+下次, 下次, 我会经常提到这个词, 拜
+next time, next time, I'll just say that word a bit more often, goodbye
+

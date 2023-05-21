@@ -1,0 +1,1655 @@
+﻿1
+00:00:00,166 --> 00:00:03,766
+嘿，你们好，我是TheCherno，欢迎回到我的OpenGL系列教程
+hey, what's up guys, my name is TheCherno, welcome back to my OpenGL series
+
+2
+00:00:03,766 --> 00:00:09,800
+那么回顾一下上期视频，我们讲了创建整个测试框架和测试类等等
+so we are back last time, we talked about creating this whole test framework and test classes and all that
+
+3
+00:00:09,800 --> 00:00:12,800
+我们可以创建测试类
+and we had something where we could actually create test classes
+
+4
+00:00:12,800 --> 00:00:15,266
+它扩展了一个Test基类
+which extended like kind of a base Test class
+
+5
+00:00:15,366 --> 00:00:18,533
+我们可以演示每一个单独的OpenGL或特性
+and we could kind of demonstrate each individual OpenGL or feature
+
+6
+00:00:18,533 --> 00:00:22,100
+或者我们想用OpenGL在沙箱中做的任何事
+or whatever we wanted to really do with OpenGL in kind of a sandbox
+
+7
+00:00:22,100 --> 00:00:24,733
+测试环境对我们来说很干净
+test environment that was really clear for us to kind of
+
+8
+00:00:25,066 --> 00:00:30,400
+我想，演示并拥有我们在OpenGL中学到的各种特性的例子
+I guess, demonstrate and have samples of the various features that we learned about in OpenGL
+
+9
+00:00:30,400 --> 00:00:33,233
+还有各种各样的图形测试
+and just various kind of under graphical tests
+
+10
+00:00:33,233 --> 00:00:35,500
+那就是我们将来要用到的东西
+that's the kind of stuff that we're going to use for in the future
+
+11
+00:00:35,600 --> 00:00:37,700
+所以如果你们还没看过那个视频，一定要去看看
+so if you haven't seen that video, then if we check that out
+
+12
+00:00:37,700 --> 00:00:39,233
+因为今天我们要扩展那个
+because today we're going to be extending that
+
+13
+00:00:39,666 --> 00:00:42,033
+上次我给你们布置了一些作业，为了搞明白
+and last time I gave you guys a bit of homework to figure out
+
+14
+00:00:42,033 --> 00:00:45,500
+我们如何创建某种测试菜单，我们在哪儿可以点击一个测试
+how we could create some kind of test menu, where we could click on a test
+
+15
+00:00:45,500 --> 00:00:48,866
+它就会构造一个新的测试，然后当我们回到主菜单
+and it would construct a new test, and then when we went back to the main menu
+
+16
+00:00:48,866 --> 00:00:50,566
+它就会删除那个测试
+it would kind of delete that test
+
+17
+00:00:51,300 --> 00:00:55,900
+卸载所有资源，然后再次呈现给我们测试菜单
+unload all the resources, and then kind of present us with that test menu again
+
+18
+00:00:55,900 --> 00:00:59,200
+今天我将向你们展示其中一种实现它的方法
+and today I'm going to show you one of the ways that we can actually implement this
+
+19
+00:00:59,500 --> 00:01:02,900
+所以，感谢所有分享他们解决方案的人
+so thank you to all of those people who share their solutions
+
+20
+00:01:02,950 --> 00:01:04,425
+我想大多数人会在discord分享
+I think most of them will share it on discord
+
+21
+00:01:04,425 --> 00:01:06,933
+所以如果你们喜欢我的discord，那就是discord
+so if you guys have enjoyed my discord, that is discord
+
+22
+00:01:07,133 --> 00:01:10,433
+不好意思，是TheCherno.com/discord，那是邀请链接
+sorry, so TheCherno.com/discord, and then that's kind of the invite link
+
+23
+00:01:11,125 --> 00:01:13,250
+这是一个很棒的社区，你们可以在这里谈论
+it's just a great community of people where you can talk about
+
+24
+00:01:13,250 --> 00:01:16,200
+各种编程开发图像游戏的方面
+all kind of aspects of programming developing graphics games
+
+25
+00:01:16,200 --> 00:01:19,433
+不管你们想讨论什么，所有的东西都在那里
+whatever it is you want to talk about, all that stuff is there
+
+26
+00:01:19,433 --> 00:01:22,300
+所以一定要加入这个社区，如果你们还没有加入的话
+so definitely join that community, if you haven't already, anyway
+
+27
+00:01:22,300 --> 00:01:25,766
+让我们进入到代码吧，并检查我们创建那个测试菜单的方法
+let's just have into some code, and check out a way for us to create that test menu
+
+28
+00:01:25,766 --> 00:01:30,166
+让它为我们构造和销毁类实例，好了
+and have it kind of construct and destruct class instances for us, okay
+
+29
+00:01:30,166 --> 00:01:32,666
+那么进入Application,cpp文件
+so jumping into the Application.cpp file that we have
+
+30
+00:01:32,833 --> 00:01:35,233
+顺便说一句，如果你们还没获得这个代码的话
+if you guys don't have access to this yet, by the way
+
+31
+00:01:35,233 --> 00:01:38,833
+一定要去访问patreon.com/TheCherno帮助支持这个系列
+definitely go to patreon.com/TheCherno help support this series
+
+32
+00:01:38,833 --> 00:01:40,933
+它真的能帮助我为你们制作了更多的视频
+it really does help me make more videos for you guys
+
+33
+00:01:41,100 --> 00:01:46,566
+并且你们也会在github上收到每一期单独提交的代码
+and you'll also receive all of the code kind of episode by episode as separate commit on github
+
+34
+00:01:46,566 --> 00:01:48,666
+所以一定要去看看那个，帮助支持这个系列
+so definitely check that out and help support the series
+
+35
+00:01:49,466 --> 00:01:53,333
+这是从测试框架一期开始的代码
+this is the code from the beginning of the test framework episode
+
+36
+00:01:53,900 --> 00:01:55,933
+如果我们看看我们这里有什么
+and if we take a look at what we have here
+
+37
+00:01:57,700 --> 00:02:01,850
+本质上我们已经有了这个test，它演示了这个TestClearColor
+essentially we already have this test, that were kind of presenting this TestClearColor
+
+38
+00:02:01,850 --> 00:02:07,333
+但我要做的是首先到这个tests文件夹，添加一个新项
+but what I'm actually going to do is start off by just going to this testsfolder, and adding a new item
+
+39
+00:02:08,300 --> 00:02:11,100
+这实际上是，你们知道的，我们不需要创建新文件之类的
+and it's going to be actually, you know, what we didn't have to create a new file
+
+40
+00:02:11,100 --> 00:02:15,400
+我们也可以在Test.h头文件中做这个，只需要一个cpp文件
+we're just going to do this in the Test.h header file, and we will need a cpp file
+
+41
+00:02:15,400 --> 00:02:21,300
+因为我想分离实现，所以我将创建一个名为Test.cpp的cpp文件
+because I do want to separate the implementation, so I will create a cpp file called Test.cpp
+
+42
+00:02:22,000 --> 00:02:27,750
+这里，在C++命名空间中，我要创建这个TestMenu
+and over here, in C++ name space, I'm going to create this TestMenu
+
+43
+00:02:27,750 --> 00:02:32,066
+这个TestMenu类会有，它确实只是一个测试
+and this TestMenu class is going to have, it's just going to be a test really
+
+44
+00:02:32,233 --> 00:02:37,000
+所以如果我们在这里实现或扩展Test类
+so if we implement or rather extend the Test class here
+
+45
+00:02:37,366 --> 00:02:42,433
+并且然后我们会得到所有这些东西，我把它复制粘贴到这里
+and then we'll have pretty much all of this stuff, so I'll just copy and paste that over here
+
+46
+00:02:42,933 --> 00:02:50,100
+我不会实现这个，我只会标记为override，override，override
+I won't implement this, and I'll just mark it as override, override and override
+
+47
+00:02:53,733 --> 00:02:59,900
+顺便说一下，关于这个很酷的事情是，因为我没有让它们成为纯虚函数
+the cool thing, about this, by the way, is that because I didn't make them pure virtual functions
+
+48
+00:03:00,600 --> 00:03:05,733
+我们把这个去掉，因为我没有把它们写成纯虚函数
+let's get rid of this, because I didn't make them pure virtual functions
+
+49
+00:03:05,733 --> 00:03:07,933
+我们不需要重写其他的，我们不需要
+we don't actually have to override other ones, we don't need
+
+50
+00:03:08,033 --> 00:03:10,833
+这是一个很好的例子，我想在下面的评论中有人会问
+so this is a great example, I think someone asked in the comments below
+
+51
+00:03:11,500 --> 00:03:13,633
+为什么我不让这些函数是纯虚函数的呢
+why I didn't make these functions pure virtual
+
+52
+00:03:13,633 --> 00:03:17,600
+如果我像这样写一个等于0，我就会这样做，我留下它们的原因
+and I would do that if I just write an equals zero like this, the reason I kind of left them
+
+53
+00:03:17,666 --> 00:03:21,466
+作为一个特殊的函数，用一个像这样的空白函数体来实现它们
+as just special functions and implemented them with a blank body like this
+
+54
+00:03:21,633 --> 00:03:25,566
+它说的是，我们可以有选择地选择哪些是我们自己想要实现的
+it said that we could selectively choose which ones we actually wanted to implement ourselves
+
+55
+00:03:25,766 --> 00:03:29,333
+如果它们等于0，如果它们都是纯虚函数，我就必须把三个函数全部实现
+if they were equal zero, if they were all pure virtual, I'd have to have all three
+
+56
+00:03:29,333 --> 00:03:33,966
+但在这个方法中，我不需要onUpdate或onRender，所以我不需要它们
+but with this method, I don't actually want onUpdate or onRender, so I don't need to have them
+
+57
+00:03:33,966 --> 00:03:37,200
+我可以直接删除它们，然后一切仍然正常
+I can just go ahead and delete them, and then everything will still work fine
+
+58
+00:03:37,200 --> 00:03:40,400
+我不需要实现它们，这只是给我的一个选项
+I don't have to implement them, it's just an option that's given to me
+
+59
+00:03:40,566 --> 00:03:42,500
+所以这个TestMenu类会做两件事
+so this TestMenu class is going to do two things
+
+60
+00:03:42,500 --> 00:03:46,000
+首先，它将包含我们所有测试的集合
+first of all, it's going to contain a collection of all of our tests
+
+61
+00:03:46,100 --> 00:03:51,033
+并且我们想要找到一种方法，能够给它们起一个特定的名字
+and we want a way to be able to basically I guess present them with a specific name
+
+62
+00:03:51,175 --> 00:03:54,481
+所以我们需要一个指向Test类的指针
+so we need a pointer to a Test class
+
+63
+00:03:54,481 --> 00:03:57,300
+一个Test实例，我猜，一个Test对象实例
+a Test instance, I guess, a Test object instance
+
+64
+00:03:57,500 --> 00:04:01,300
+但我还想存储一个我们可以提供Test的名称
+but I also want to store a name that we can provide the Test 
+
+65
+00:04:01,400 --> 00:04:05,433
+所以那就是出现在测试菜单中的按钮标签
+so that's kind of the label, I guess, that appears for our button in the test menu
+
+66
+00:04:05,666 --> 00:04:09,166
+所以我要做的是放一个std::pair的向量
+so what I'm going to do is put a vector of std::pair
+
+67
+00:04:09,266 --> 00:04:14,166
+我们会有一对字符串和实际的Test指针，像这样
+and we're going to have a pair of string and the actual Test pointer like this
+
+68
+00:04:14,400 --> 00:04:19,166
+现在这是它变得有点有趣的地方，我实际上不想要一个Test指针
+now here's where it gets a little bit interesting, I don't actually want a Test pointer
+
+69
+00:04:19,233 --> 00:04:22,166
+因为那意味着实例已经存在，这很好
+because that implies that the instance already exists, which would be great
+
+70
+00:04:22,166 --> 00:04:24,133
+如果我们采取这样的策略
+if we kind of went with the strategy of
+
+71
+00:04:24,433 --> 00:04:29,133
+我只想在应用程序的开始创建我所有的测试
+I just want to create all of my tests at the beginning of my application
+
+72
+00:04:29,400 --> 00:04:33,700
+然后把它们添加到我的菜单上，然后切换到它们可能会激活它们
+and then add them to my menu, and then like switching to them would activate them maybe
+
+73
+00:04:34,400 --> 00:04:35,766
+但我并不想那么做
+but I don't actually want to do that
+
+74
+00:04:36,200 --> 00:04:39,600
+因为我做得对的是我有了构造函数和析构函数
+because what I'm doing right is I've got my construction and destructor
+
+75
+00:04:39,600 --> 00:04:42,166
+所以我真正想要发生的是当我按下按钮
+so what I actually want to happen is when I press the button
+
+76
+00:04:42,366 --> 00:04:44,366
+我不希望它只是激活一个Test实例
+I don't want it to just activate a Test instance
+
+77
+00:04:44,366 --> 00:04:50,050
+我实际上想创建一个Test实例，从字面上来说，也就是new Test()
+I actually wanted to create a Test instance, I literally wanted to say, new Test
+
+78
+00:04:50,375 --> 00:04:54,100
+并且当我退出那个测试时，我需要删除这个测试
+and when I kind of go back out of that test, I wanted to delete the test
+
+79
+00:04:54,366 --> 00:04:57,200
+所以我不能只添加一个Test指针，因为Test指针
+so I can't just add a Test pointer, because Test pointer
+
+80
+00:04:57,366 --> 00:05:00,166
+当然是因为一个指向已经存在对象的指针
+of course would be a pointer to an already existing object
+
+81
+00:05:00,250 --> 00:05:03,050
+我需要的是一种方法来构建那个对象
+what I need instead is a way to construct that object
+
+82
+00:05:03,050 --> 00:05:05,100
+一种我可以做我正在做的事情的方法
+and one way that I could do that which I'm
+
+83
+00:05:05,300 --> 00:05:08,333
+我现在要做的是我可以给它提供一个lambda
+what I'm going to do now here is I could actually just provide it with a lambda
+
+84
+00:05:08,333 --> 00:05:13,533
+我可以为它提供一个函数来构造我的Test类
+I could provide it with a function that constructs that that Test class of mine
+
+85
+00:05:13,533 --> 00:05:18,833
+那么，如果我们回到这里，我将创建这一对中的第二个元素
+so, if we go back here, I'm gonna make the second element of the pair here
+
+86
+00:05:18,900 --> 00:05:24,633
+一个std::function，只有Test指针，没有参数
+an std::function of just Test pointer here, and no parameters
+
+87
+00:05:24,633 --> 00:05:25,866
+所以这基本上意味着
+so this basically means that
+
+88
+00:05:25,900 --> 00:05:29,733
+这个函数返回一个Test指针，不接受任何参数
+this function returns a Test pointer, and does not take any parameters
+
+89
+00:05:29,733 --> 00:05:33,900
+所以这基本上会返回new Test，这取决于我们实际创建的是哪个测试
+so this is basically going to return new Test, depending on which test we actually create
+
+90
+00:05:35,166 --> 00:05:38,266
+并且那就是为什么要用向量，现在我要叫这个Test
+and then that's gonna be why vector, and now I'm gonna call this Test
+
+91
+00:05:38,533 --> 00:05:41,033
+好了，那么这里我还需要一个角括号
+okay, so I need one more angular bracket here
+
+92
+00:05:41,133 --> 00:05:45,833
+我会包括functional，这样我就能访问std函数的注解
+and I'll include functional, so that I get access to the std function gloss
+
+93
+00:05:46,566 --> 00:05:51,966
+好的，很好，我们有了，我有了一个成对的向量，每一对包含一个字符串
+okay cool, so there we go I've got a, I've got a vector of pairs, and each pair contains a string
+
+94
+00:05:52,300 --> 00:05:57,333
+以及一个返回测试指针的函数，不带参数，好了
+and a function which returns a test pointer, and takes no parameters, okay
+
+95
+00:05:57,533 --> 00:06:00,366
+所以我可以创建一个struct，而不是创建一个nacity pair
+so I could have created a struct, instead of creating a nacity pair
+
+96
+00:06:00,533 --> 00:06:01,866
+但这实际上是相当微不足道的
+but this is actually rather trivial
+
+97
+00:06:01,866 --> 00:06:04,266
+我不想在新结构中创建一个全新的类型
+I don't really want to create a whole new type in a new struct
+
+98
+00:06:04,300 --> 00:06:08,066
+我不知道，我不知道什么时候我叫它Test，有人得了Test
+called like, I don't know, Test, I don't know when I call it somebody got test
+
+99
+00:06:08,066 --> 00:06:12,300
+可能像testMenu实例或类似的东西，我不确定
+so maybe like testMenu instance or something like that, I'm not sure
+
+100
+00:06:12,433 --> 00:06:16,100
+没有必要装饰这样的东西，我们可以保持匿名，因为我们知道这里
+there's no need to decorate anything like that, we can keep it kind of anonymous, because we know here
+
+101
+00:06:16,366 --> 00:06:22,466
+这基本上就是收集一个字符串向量的列表
+that basically this is just collect a list right a vector of strings
+
+102
+00:06:22,966 --> 00:06:26,733
+还有那些字符串创建的实际测试类
+and the actual test classes which those those strings kind of create
+
+103
+00:06:26,733 --> 00:06:29,800
+因为字符串是空的，因为我们想给按钮一个标签
+because the string is just bare, because we want to give our button a label
+
+104
+00:06:29,800 --> 00:06:32,066
+当我们在屏幕上看到它时，这一点是有意义的
+this little makes sense when we actually see it on the screen
+
+105
+00:06:33,200 --> 00:06:37,433
+很好，我想要的另一个东西是指向currentTest的指针
+okay cool, and then one other thing I actually want is a pointer to the currentTest
+
+106
+00:06:37,433 --> 00:06:39,633
+我们需要这个的原因是因为我们的菜单
+now the reason we need this is because our menu is
+
+107
+00:06:39,633 --> 00:06:43,533
+改变当前应用中活动的currentTest
+going to change the currentTest that's active right now in application
+
+108
+00:06:43,633 --> 00:06:45,466
+我们没有currentTest，我们只有这个
+we don't have a currentTest, we've just got this
+
+109
+00:06:45,633 --> 00:06:51,666
+我在这里要做的是有一个实际的Test指针，这是我们的currentTest
+what I'm actually going to do here is have an actual Test pointer, which here's our currentTest
+
+110
+00:06:51,700 --> 00:06:55,933
+好了，我就叫它currentCurrent，这是我们需要修改的
+okay, I was called currentCurrent, this is what we actually need to modify
+
+111
+00:06:55,933 --> 00:06:58,050
+我们希望测试菜单能帮我们做到这一点
+and we want the test menu to actually do that for us
+
+112
+00:06:58,050 --> 00:07:02,300
+现在我们可以传入一些lambds或其他东西来修改这个
+now we could again pass in some kind of lambds or something which modifies this
+
+113
+00:07:02,300 --> 00:07:07,233
+但一个更简单的方法是传递一个对那个Test指针的引用
+but an easier way is going to be just to pass in a reference to that Test pointer
+
+114
+00:07:07,333 --> 00:07:10,900
+然后这个testMenu将能够写到那个指针
+and then this testMenu is actually going to be able to write to that pointer
+
+115
+00:07:11,100 --> 00:07:16,300
+从而改变currentTest，在这里的构造函数中传递它
+and thus change the currentTest, so in the constructor here passing that
+
+116
+00:07:16,700 --> 00:07:19,433
+我想我们会调用一个currentTest指针
+I guess we'll call a currentTest pointer
+
+117
+00:07:20,700 --> 00:07:24,300
+如果我们点击这里，我们回到那个c++文件
+and then if we right click here, actually let's go back to that C++ file
+
+118
+00:07:24,300 --> 00:07:29,533
+我可以包含Test.h，我们会放入命名空间tests
+so I can include Test.h, we'll put in namespace tests
+
+119
+00:07:31,133 --> 00:07:34,533
+然后我们可以回到这里，实现我们需要的所有方法
+and then we can go back here, and implement everything we need
+
+120
+00:07:34,900 --> 00:07:39,966
+通过创建方法实现，很好，我不认为我们需要析构函数
+by creating the method implementations, okay cool, I don't think we need a destructor actually
+
+121
+00:07:40,066 --> 00:07:42,150
+因为所有东西都在堆栈上，不管怎样我都要去掉它
+because everything's stacked, I'll get rid it anyway
+
+122
+00:07:42,150 --> 00:07:44,150
+这样我们就可以去掉析构函数了
+so we can get rid of that destructor
+
+123
+00:07:44,700 --> 00:07:47,900
+这很好，它绝对是我想要的
+and then this is great, it definitely do what I want
+
+124
+00:07:47,966 --> 00:07:54,850
+这是因为它是test名称空间，而不是tests，所以去掉它，然后实现那个
+that's because it's the test namespace not tests, so get rid of that, and do that
+
+125
+00:07:55,766 --> 00:08:00,636
+好了，那么构造函数，这里会像这样设置当前测试为currentTest指针
+okay, so constructor, there's gonna set current test to currentTest pointer like that
+
+126
+00:08:01,566 --> 00:08:05,166
+然后OnImGuiRender会渲染我们拥有的列表
+and then OnImGuiRender is going to actually render that list that we have
+
+127
+00:08:05,166 --> 00:08:10,800
+那么就是for auto，这是测试中的test
+so I'll just say for auto, and this will be I guess test in our tests
+
+128
+00:08:11,233 --> 00:08:14,233
+我们要做的是创建一个渲染和ImGui按钮
+what we're going to do is actually create a render and ImGui button
+
+129
+00:08:14,233 --> 00:08:20,266
+这里发生了什么，icd，不，我们需要包含一个向量
+that was okay what's going on here icd no, okay, so we need to include a vector
+
+130
+00:08:23,266 --> 00:08:30,000
+在这个测试中，我们会渲染ImGUI按钮
+oops, okay, so inside this test, we're going to basically render ImGUI button
+
+131
+00:08:30,250 --> 00:08:35,550
+我们会说ImGui::Button()，标签将是那个测试
+so we'll say ImGUI button label is going to be that test
+
+132
+00:08:35,850 --> 00:08:39,584
+对于你们来说，这是个元组，所以就是test.first
+this is a paire for you guys, so test.first
+
+133
+00:08:40,366 --> 00:08:43,600
+这只是一个点视觉辅助，谢谢
+and this will just be a dot visual assist thank you
+
+134
+00:08:44,400 --> 00:08:49,166
+.c_str()，因为它需要一个c字符串，当它指向字符指针时
+dot c_str(), because it wants a c string once it comes to char pointer
+
+135
+00:08:50,133 --> 00:08:52,466
+当然，如果按钮被按下
+and then of course if that button is pressed
+
+136
+00:08:52,466 --> 00:08:56,533
+我们想要执行那个按钮说要做的和那个按钮
+we basically want to execute what that button says to do and that button
+
+137
+00:08:56,533 --> 00:08:58,833
+这个按钮要做的就是这个功能
+what that button says to do is that actual function
+
+138
+00:08:58,933 --> 00:09:05,466
+我们只需要像这样调用test.second()，因为这是我们想要执行的函数
+so we really just need to call test.second() like that, because it's the function we want to execute
+
+139
+00:09:06,233 --> 00:09:07,733
+现在我们不需要调用它了
+now we don't just need to call it
+
+140
+00:09:08,100 --> 00:09:12,166
+这个返回，记住，这个返回一个Test指针，这个返回一个新的Test指针
+this returns, remember, this returns a Test pointer, this returns the new Test pointer
+
+141
+00:09:12,333 --> 00:09:17,233
+它应该会为我们构造，这也是我们想要设置的currentTest
+that it's supposed to construct for us, so that's what we actually want to set currentTest too
+
+142
+00:09:17,233 --> 00:09:22,833
+那么currentTest被设置为构建我们实际测试类实例
+so currentTest gets set to that lander that constructs our actual test class instance
+
+143
+00:09:23,133 --> 00:09:24,900
+我们实际上还没有创造出那种功能的lambda
+we haven't actually created that lambda yet that function
+
+144
+00:09:24,900 --> 00:09:29,700
+但是马上，让我们包含，我要在这里，因为我们需要
+but will in a second, let's include, I am going here, because we need to
+
+145
+00:09:32,266 --> 00:09:39,225
+很好，这对我来说很好，我们有，我们应该有一个按钮列表
+okay cool, there we go, so that looks pretty good to me, so we've got we should have a list of buttons 
+
+146
+00:09:39,225 --> 00:09:46,700
+如果我们按下按钮，那么它会改变currentTest指针
+and if we press the button, then it will hopefully change that currentTest pointer to be whatever 
+
+147
+00:09:46,700 --> 00:09:50,600
+这个测试实际上作为它的创建函数返回
+this test actually returns as its kind of creation function
+
+148
+00:09:51,433 --> 00:09:55,766
+很好，这看起来很好，让我们创建那个TestMenu
+okay cool, that looks pretty good to me, let's go ahead and create that TestMenu
+
+149
+00:09:56,066 --> 00:10:02,733
+我将在这里也包含它，所以实际上它应该已经被包含了
+I'll go ahead and include it over here as well, so actually it should already be included
+
+150
+00:10:02,733 --> 00:10:05,650
+因为它在Test.h文件中，我们看看
+because it's in the Test.h file, so let's see
+
+151
+00:10:05,650 --> 00:10:14,050
+TestMenu menu = new test::TestMenu()
+TestMenu menu equals new test testMenu
+
+152
+00:10:14,833 --> 00:10:19,766
+我们会传入这个currentTest
+we're going to pass in this currentTest
+
+153
+00:10:19,800 --> 00:10:23,033
+我将叫这个currentTest，这样更明确一些
+I'll actually call this currentTest, just so that it's a bit more explicit
+
+154
+00:10:23,900 --> 00:10:30,666
+默认情况下，我们会将这个able设为null，然后当它在这里被创建时
+by default, we'll set this able to null, and then when it does get created over here
+
+155
+00:10:32,066 --> 00:10:37,766
+我们会设置currentTest = menu，因为我们想从菜单开始
+we'll set the currentTest equal to menu, because we wanted to basically start off with the menu
+
+156
+00:10:37,766 --> 00:10:41,166
+现在从这点来说，你们可以添加一些命令行参数或类似的东西
+now at this point, you could add some kind of command line argument or something like that
+
+157
+00:10:41,166 --> 00:10:44,866
+如果你们希望这个应用程序已经用一个特定的测试启动
+if you wanted this application to boot up already with a specific test
+
+158
+00:10:44,866 --> 00:10:46,766
+这是非常有用的，如果你们尝试测试什么东西的话
+this is very useful, if you're actually trying to test something
+
+159
+00:10:46,900 --> 00:10:51,266
+因为如果你们真的在做测试或者在研究新的OpenGL技术之类的
+because if you're actually working on a test or working on a newer OpenGL technique or something
+
+160
+00:10:51,266 --> 00:10:54,766
+或者尝试去实现一些东西，不管它是什么，它被实现为一个测试
+or trying to implement something whatever it is, and it's implemented as a test
+
+161
+00:10:54,900 --> 00:10:57,700
+你们不希望每次都有菜单出现，然后你们必须点击它
+you don't want to have the menu come up every time, and then you have to click on it
+
+162
+00:10:57,800 --> 00:10:59,666
+所以每次你们调试代码的时候，菜单就会出现
+so every time you do bug your code, menu comes up
+
+163
+00:10:59,666 --> 00:11:02,900
+然后你们必须点击菜单，必须点击，这是浪费时间
+then you have to click on it menu comes up, have to click, that's a waste of time
+
+164
+00:11:03,166 --> 00:11:08,000
+所以你们可以从一开始就用它来做测试
+so you can just get it to kind of open a test for you kind of from the get go
+
+165
+00:11:08,300 --> 00:11:10,100
+不用先去看菜单
+without having to go first to the menu
+
+166
+00:11:10,766 --> 00:11:13,800
+而不是硬编码，这只是一个特定的测试或其他
+and instead of hard codingm, that to just go to a specific test or whatever
+
+167
+00:11:13,800 --> 00:11:15,750
+你们可以把它作为一个命令行参数
+you could just have it as a command line argument
+
+168
+00:11:15,750 --> 00:11:17,750
+那很好，如果你们也在一个团队中工作的话
+that's really nice, if you're working in a team as well
+
+169
+00:11:18,033 --> 00:11:19,166
+因为这意味着
+because it means that instead of
+
+170
+00:11:19,166 --> 00:11:22,866
+你们不小心签入了为特定测试设置测试的代码
+you accidentally checking in the code that sets the test for specific test
+
+171
+00:11:22,866 --> 00:11:26,166
+你们正在处理的那个，你们可以把它作为命令行参数
+the one that you're working on, you can just have it as a command line argument
+
+172
+00:11:26,166 --> 00:11:28,133
+这个绝对是存储在你们的用户设置中
+which is definitely stored kind of in your user settings
+
+173
+00:11:28,133 --> 00:11:30,266
+这样就不会真正提交到这个项目中
+and thus wouldn't actually be committed to the project
+
+174
+00:11:31,300 --> 00:11:33,975
+如果你们喜欢，你们可以做一些这样的事情
+so yeah you could do something like that if you like
+
+175
+00:11:33,975 --> 00:11:35,200
+那可以成为一个很好的家庭作业
+that could be a nice homework task
+
+176
+00:11:35,200 --> 00:11:38,533
+所以，让它，接受一个测试者的命令行参数的名称
+so make it, take in the name of a tester's command line argument
+
+177
+00:11:38,533 --> 00:11:43,500
+打开它，如果那个命令行参数真的被设置了
+and open that in maybe if that's actually, if that command line argument is actually set
+
+178
+00:11:43,500 --> 00:11:47,733
+很好，现在我们不用担心这个清除颜色测试
+okay cool, so we won't worry about this test clear color just yet
+
+179
+00:11:47,733 --> 00:11:50,300
+现在我们把所有东西都预热
+now we operating everything on the heat here by the way
+
+180
+00:11:50,433 --> 00:11:53,133
+因为我们确实想要探索删除之类的东西
+because we do want to explore the deletion and all that stuff
+
+181
+00:11:53,333 --> 00:11:57,366
+所以这个测试清除颜色或其他的东西会在一分钟内改变
+so this test clear color or whatever will kind of change in a minute
+
+182
+00:11:57,900 --> 00:12:01,566
+让我们先确保它能工作，我们没有办法添加测试
+let's just make sure this works first, we have no way to actually add tests
+
+183
+00:12:01,833 --> 00:12:05,133
+我知道我们马上就会解决这个问题，但我想先把这个设置好
+and I'm aware of that we'll fix that in a minute, but I want to set this up first
+
+184
+00:12:05,533 --> 00:12:07,600
+基本上我们要做的就是当我们开始新帧时
+basically all we're going to do is when we start the new frame
+
+185
+00:12:07,600 --> 00:12:12,466
+我们会说如果currentTest不正确，因此，如果currentTest
+we're going to say if the currentTest is not now right, so if currentTest
+
+186
+00:12:13,533 --> 00:12:21,666
+然后我们基本上会更新currentTest并渲染currentTest
+then we're going to basically update the currentTest and render the currentTest
+
+187
+00:12:24,600 --> 00:12:30,866
+然后我们会开始我们的ImGui窗口它会被称为test
+and then we're going to begin our ImGui window which is going to be just called test I guess
+
+188
+00:12:31,366 --> 00:12:34,400
+我们可以把测试的名字分开
+which is going to be we could actually separate the name of the test
+
+189
+00:12:34,800 --> 00:12:39,366
+但我们会把它作为测试对象，我们会把我们的deltaTime取为0
+but we'll keep it as just test for now on object, we'll take in zero I guess is our deltaTime
+
+190
+00:12:40,533 --> 00:12:45,650
+然后这实际上会调用一个currentTest->OnRender
+and then this is actually what's going to call currentTest OnRender
+
+191
+00:12:45,650 --> 00:12:46,900
+不好意思，是ImGuiRender
+oh sorry ImGuiRender
+
+192
+00:12:46,900 --> 00:12:49,766
+现在我们要实现我讲过的那个后退按钮
+now we are going to have to implement that back button that I talked about
+
+193
+00:12:49,766 --> 00:12:51,133
+让我们直接去实现那个吧
+let's go ahead and do that now actually
+
+194
+00:12:51,466 --> 00:12:58,166
+如果currentTest不是menuTest，它不等于menu
+so if our currentTest is not the menuTest, so it doesn't equal menu
+
+195
+00:12:58,400 --> 00:13:02,600
+它可能叫testMenu或者类似的东西testMenu
+which probably call it testMenu or something like that testMenu
+
+196
+00:13:02,600 --> 00:13:07,733
+为了不让大家太困惑，我喜欢命名变量为有意义的东西
+just so that we're not too confused here, I like to call my variables meaningful things
+
+197
+00:13:07,800 --> 00:13:12,466
+即使这意味着使它们更长，我们就叫它testMenu
+even if it does mean making them longer, so we'll call this testMenu
+
+198
+00:13:12,933 --> 00:13:17,666
+如果currentTest不等于testMenu
+so if the so if the currentTest is not testMenu
+
+199
+00:13:18,533 --> 00:13:22,766
+然后就是ImGui::Button，我想我们先画一个返回箭头
+and ImGui::Button, I guess we'll just draw a back arrow for now
+
+200
+00:13:23,500 --> 00:13:28,666
+我们会画一个ImGui按钮，我不能把这个箭头画反了
+so basically we're going to draw an ImGui button, I can't play factory that backwards
+
+201
+00:13:28,733 --> 00:13:32,700
+我们会画一个ImGui按钮，那就是我们的返回箭头，但这只会发生
+we're going to draw an ImGui button which is our back arrow, but that's only going to happen
+
+202
+00:13:32,700 --> 00:13:36,500
+如果测试在测试菜单中，我可以嵌套这些if语句
+if the test is in test menu right, so I could nest these if statements
+
+203
+00:13:36,700 --> 00:13:40,933
+但我只是用和运算符把它们放在一起，这意味着
+but I've just added them kind of side by side with an and operator which means of course
+
+204
+00:13:41,133 --> 00:13:44,233
+如果这个值为假，这个条件甚至不会被求值
+this condition won't even be evaluated, if this is false
+
+205
+00:13:45,000 --> 00:13:47,725
+如果currentTest不是testMenu
+so if the currentTest is not testMenu
+
+206
+00:13:47,725 --> 00:13:50,166
+那么我们会绘制这个按钮，如果按钮被点击
+then we'll draw this button, and if that button is clicked
+
+207
+00:13:50,166 --> 00:13:52,066
+然后我们就进入了这个阶段
+and that's when we get into this stage
+
+208
+00:13:52,300 --> 00:14:00,300
+我们要做的是删除currentTest，然后设置currentTest = testMenu
+so what we want to do is delete the currentTest, and then set the currentTest equal to testMenu
+
+209
+00:14:01,600 --> 00:14:07,266
+差不多了，很好，现在我们有办法回到我们的测试菜单
+and that is pretty much it, okay cool, so now we have a way to get back to our test menu
+
+210
+00:14:07,466 --> 00:14:11,066
+我们现在真正需要的是一种创建测试的方法，对吧
+really all we need now is a way to actually create kind of tests right
+
+211
+00:14:11,366 --> 00:14:14,300
+所以我要做的就是添加一个函数
+so the way I want to do that is I'm actually going to add a function
+
+212
+00:14:14,300 --> 00:14:18,300
+我要把代码写得好像函数已经存在一样
+and I'm actually going to kind of write the code as if the function exists already
+
+213
+00:14:18,500 --> 00:14:19,466
+许多人问我
+a lot of people ask me
+
+214
+00:14:19,733 --> 00:14:24,466
+这是写复杂代码的好方法，我刚写了一个正确的代码
+what a good way to write kind of marginally complex code I just had a right code really
+
+215
+00:14:25,033 --> 00:14:29,300
+当你们不确定的时候，比如，你们不想开始运行一个函数
+when you're kind of not sure of like you know, you don't want to just start running a function
+
+216
+00:14:29,300 --> 00:14:31,933
+因为你们不确定它应该返回什么，你们取的是什么代词
+because you're not really sure what it's supposed to return what pronoun is it you take
+
+217
+00:14:32,200 --> 00:14:34,766
+最好的方法就是假装这个函数已经存在
+the best way to do that is just to pretend that the function already exists
+
+218
+00:14:34,766 --> 00:14:40,966
+从使用这个函数开始，在这种情况下，我要假装这个函数存在
+and just actually start by using the function, so in this case, I'm going to pretend that function exists
+
+219
+00:14:41,066 --> 00:14:46,600
+在测试菜单中，我要写testMenu->RegisterTest
+and into test menu I'm going to just write testMenu arrow RegisterTest
+
+220
+00:14:47,000 --> 00:14:49,233
+现在我想注册测试，我需要传递类型
+now I want to register the test, I need to pass them the types
+
+221
+00:14:49,233 --> 00:14:54,000
+这显然将是一个模板，所以我想注册TestClearColor
+this is clearly going to be a template, so I want to register the TestClearColor
+
+222
+00:14:54,966 --> 00:14:57,666
+然后我当然想给它一个名字，所以我会用一个参数
+and then of course I want to give it a name, so I'll just use a parameter for that
+
+223
+00:14:57,833 --> 00:15:01,533
+我把它命名为，我不知道，清除颜色之类的吧，对吧
+and I'll call it, I don't know, clear color or something like that right
+
+224
+00:15:01,700 --> 00:15:05,866
+那就是我们的清除颜色测试，这就是我想让函数做的
+that's gonna be our clear color test, that is now what I want the function to do okay
+
+225
+00:15:05,866 --> 00:15:09,733
+我现在知道函数需要是模板需要接受类型
+I now know the function needs to be a template needs to take in the type
+
+226
+00:15:10,233 --> 00:15:16,533
+它还需要接收测试的名称，以便它可以在测试菜单中显示它
+it needs to also take in the name of the test, so that it can display it in the test menu right
+
+227
+00:15:16,533 --> 00:15:21,033
+因为我们有测试菜单，它把那些名字显示为按钮标签
+because we have our test menu which displays those names as the button label
+
+228
+00:15:21,833 --> 00:15:25,133
+当然，实际的函数需要创建一个lambda
+and then of course the actual function needs to create a lambda
+
+229
+00:15:25,233 --> 00:15:28,666
+创建此类类型的新实例
+that creates a new instance of this class type
+
+230
+00:15:28,800 --> 00:15:32,300
+所以从现在开始就很简单了，因为我已经创建了函数
+so it's really straightforward from now basically because I've already created the function
+
+231
+00:15:32,300 --> 00:15:36,000
+我现在只需要实现它，它将是模板类型名T
+I just need to implement it now, so it's gonna be template typename T
+
+232
+00:15:37,500 --> 00:15:43,133
+它会是一个名为RegisterTest的void函数，接受一个const string
+it's gonna be a void function called RegisterTest going to take in a const string
+
+233
+00:15:43,200 --> 00:15:47,433
+我想我们可以只接受一个const char指针，但我们存储在一个字符串
+I guess we can just take in a const char pointer, we are storing at a string though
+
+234
+00:15:47,500 --> 00:15:49,733
+所以我想我们可以用一个字符指针
+so I guess we could take in a char pointer
+
+235
+00:15:50,100 --> 00:15:55,333
+因为我们知道这个实际上我要渲染一个char指针
+because of course we know that this actually this I'm going thing renders a char pointer
+
+236
+00:15:55,433 --> 00:15:58,800
+但我把它转换成字符串，这也很好
+but I am converting it into a string, which is also fine
+
+237
+00:15:59,633 --> 00:16:01,766
+因为我们可能想做一些nicolation之类的
+because we might want to do some nicolation or whatever
+
+238
+00:16:01,766 --> 00:16:05,033
+我们应该使用字符串，所以我还是把它保留在这里
+and we should be using strings anyway, so I'll still keep that here
+
+239
+00:16:05,200 --> 00:16:08,925
+然后所有这些做的就是把那个test添加到那个列表中
+and then all this is really going to do is add that test into that list
+
+240
+00:16:08,925 --> 00:16:11,575
+所以只要m_Tests.push_back
+so just m_Tests.push_back
+
+241
+00:16:12,000 --> 00:16:15,900
+现在我们要在这里创建一对，所以是make_pair
+now we're going to have to make a pair here, so make_pair
+
+242
+00:16:16,733 --> 00:16:20,666
+我们会传入那个名字，然后我们会创建一个非常简单的lambdas
+we're going to pass in that name, and then we're going to just create a very simple lambdas
+
+243
+00:16:20,666 --> 00:16:24,500
+不需要捕获任何变量，它只会返回new T
+doesn't need to capture any variables, that's just going to return new T
+
+244
+00:16:24,666 --> 00:16:29,066
+就是那样，因为T是我们实际创建的类的类型，好了
+and that's it, because T is the type of class that we're actually creating, okay
+
+245
+00:16:29,133 --> 00:16:30,633
+接下来会发生的是
+and then what's going to happen is of course
+
+246
+00:16:30,633 --> 00:16:37,386
+当我们用我们创建的各种不同的测试类型调用这个注册测试类时
+as we call this register test class with every kind of different test type that we create
+
+247
+00:16:38,333 --> 00:16:41,800
+编译器会在代码库中创建这个注册测试函数的新版本
+the compiler is just going to create a new version of this register test function in our code base
+
+248
+00:16:41,800 --> 00:16:47,900
+那实际上会返回我们请求的基于类型的新类实例，好了
+that actually returns the new kind of class instance that we requested based on the type, okay
+
+249
+00:16:48,500 --> 00:16:53,933
+我要做的一件事就是快速地编写我们的注册测试
+one thing I will do is just quickly write for our sanity registering test
+
+250
+00:16:54,233 --> 00:16:57,033
+然后我们会打印出名字
+and then we'll kind of print the name
+
+251
+00:16:57,133 --> 00:17:00,900
+只是想知道，我们实际上创建了哪些测试
+just because it would be nice to know, which tests we actually kind of create
+
+252
+00:17:00,900 --> 00:17:03,000
+我想我们不会真正创建，而是注册
+I guess we'll not really create but register
+
+253
+00:17:03,000 --> 00:17:06,266
+因为我们会延迟创建直到我们运行lambda
+because of course we're deferring the creation until we run the lambda
+
+254
+00:17:06,300 --> 00:17:10,140
+当我们按下按钮来创建它时，我们正在运行这个lambda
+and we're running that lambda when we actually press that button to create it 
+
+255
+00:17:10,140 --> 00:17:13,600
+因为它在这里运行，希望这一切都有用
+because it gets run right over here, hopefully all this is making sense
+
+256
+00:17:14,000 --> 00:17:17,700
+给你们看这个的视频，一定要看关于lambdas的那个视频
+playing videos for you guys to watch about this, definitely watch the one on lambdas
+
+257
+00:17:18,166 --> 00:17:23,300
+我把它的链接放到这里，因为这样就能解释lambda的工作原理了
+I'll have it linked up there, because that of course is going to explain how lambdas work
+
+258
+00:17:23,300 --> 00:17:26,566
+以及我们创建的这些函数是如何被调用的
+and how these kind of functions that we're creating that are getting called later
+
+259
+00:17:26,700 --> 00:17:29,533
+这整个东西是如何工作的呢
+how that whole thing works also templates another good video to watch
+
+260
+00:17:29,900 --> 00:17:33,366
+看看我的C系列c++系列
+so in fact just check out my C series C++ series
+
+261
+00:17:34,066 --> 00:17:36,600
+如果你们不知道这些东西是什么
+if you're not kind of sure what some of these things are 
+
+262
+00:17:36,600 --> 00:17:41,950
+因为我想我可能已经掌握了，我在这个系列视频中用到的所有东西
+because I have I think I've probably pretty much everything I'm using in this video in that series
+
+263
+00:17:42,533 --> 00:17:46,266
+好了，所以我们已经准备好了，我们不需要再创建这个了
+okay, so we are pretty much good to go, we don't need to create this anymore at all
+
+264
+00:17:46,266 --> 00:17:51,133
+因为记住，当我们按下按钮时，它会被创建，所以我们把这些都删掉
+because remember that actually gets created when we press the button, so let's get rid of all this
+
+265
+00:17:51,700 --> 00:17:57,400
+我想我实现了所有的东西，我不确定，因为显然我在这里是直播撸码
+I think I've implemented everything, I'm not sure, because obviously I'm running the code right here live
+
+266
+00:17:58,400 --> 00:18:03,566
+那么让我们按f5，看看会发生什么，那是我经常说的
+so let's just hit f5, and see what happens, that's I say that very often
+
+267
+00:18:03,566 --> 00:18:07,133
+让我们点击f5，看看会发生什么，我应该把那个印在t恤上
+let's just hit it f5 and see what happens, I should get that on a t shirt
+
+268
+00:18:07,366 --> 00:18:09,925
+好的，很好，我们有这个测试，我们有清除颜色
+okay cool, so we have this test we have clear color
+
+269
+00:18:09,925 --> 00:18:11,750
+然后希望如果我点击清除颜色
+and then hopefully if I press clear color
+
+270
+00:18:11,966 --> 00:18:16,666
+看看它打开的清除颜色测试，我们可以改变所有的清除颜色
+look at that it opens the clear color test shows us how clear color we can change all of that
+
+271
+00:18:16,850 --> 00:18:23,666
+一切都很好，然后回到点击栏测试
+everything works pretty good I think, and then if I go back, we go back to the clickbar test
+
+272
+00:18:23,666 --> 00:18:27,133
+在这个例子中，你们可以看到它并没有改变快速的颜色
+now in this case, you can see it hasn't actually changed the quick color
+
+273
+00:18:27,133 --> 00:18:32,133
+这让我觉得也许它没起作用，但我很确定它有我很确定发生过的事
+which makes me think maybe it hasn't worked, but I'm pretty sure it has what I'm pretty sure has happened
+
+274
+00:18:33,233 --> 00:18:37,266
+因为你们可以看到它会返回是因为我们没有设置清除颜色
+because you can see it does go back is that we're just not setting the clear color
+
+275
+00:18:37,300 --> 00:18:42,933
+那么回到这里，我们有没有办法在渲染器中设置清除颜色
+so if we go back here, and do we have a way to set the clear color inside the renderer
+
+276
+00:18:43,266 --> 00:18:46,566
+我不认为我们需要，我们已经清楚了
+I don't think we do, we've just got clear right
+
+277
+00:18:46,866 --> 00:18:55,000
+那么在clear中，我们可以添加另一个函数setClearColor
+so maybe into clear, we could maybe add another function called setClearColor
+
+278
+00:18:55,933 --> 00:18:58,166
+然后这个需要我们有一个数学库
+and then this would take in we have a math library
+
+279
+00:18:58,966 --> 00:19:02,666
+我们没有数学库，好吧，好吧，这太难了
+we don't have a math library, okay great, okay, this is gonna be too hard
+
+280
+00:19:02,666 --> 00:19:10,175
+我现在就想做这个，那么回到Application.cpp
+and I really want to do this right now, so if we go back to Application.cpp, we're just going to
+
+281
+00:19:10,800 --> 00:19:14,175
+当我们清除颜色时，我们会把颜色设置为黑色
+when we clear the color, we're just going to set the color to black
+
+282
+00:19:14,175 --> 00:19:20,366
+那么就是glClearColor(0, 0, 0, 1)
+so glClearColor zero and zero zerpa and 0 0 and we'll set the alpha tool one
+
+283
+00:19:20,466 --> 00:19:26,666
+就像那样，测试结束后，我们应该会看到它回到黑色
+just like that, okay, so now hopefully, we should see that go back to black, when we go out of the test
+
+284
+00:19:28,600 --> 00:19:31,166
+因为那就是它的原理
+because that's how it should work
+
+285
+00:19:31,166 --> 00:19:35,866
+很好，如果我们点击清除颜色，我们回到这里我们回到清除颜色
+okay cool, so if we click clear color, we go there we go back, it takes our back to clear color
+
+286
+00:19:35,966 --> 00:19:41,666
+如果有一个额外的测试来测试它，看看它是否能正常工作，那就太棒了
+now it'll be fantastic, if we had an additional test to actually test this out, and see if it works properly
+
+287
+00:19:41,833 --> 00:19:45,033
+但是我们会讲到那个，随着我们开始实现更多的测试
+but we're going to kind of get into that, as we start implementing more tests
+
+288
+00:19:46,500 --> 00:19:48,500
+纹理测试之类的
+the texturing tests and all that
+
+289
+00:19:49,333 --> 00:19:51,750
+我想，下一期，我可能会做一些测试
+I think next episode, I'm probably going to create a bunch of tests 
+
+290
+00:19:51,750 --> 00:19:56,233
+把我们现在学过的所有概念都分成不同的测试
+and kind of divide out and all the kind of concepts that we've learned right now into separate tests
+
+291
+00:19:56,233 --> 00:19:59,233
+所以随着我们继续学习OpenGL系列，我们会添加越来越多的测试
+so as we continue on with the OpenGL series, we will be adding more and more tests
+
+292
+00:19:59,266 --> 00:20:03,075
+但是你们可以看到这个框架的基础已经建立并运行了
+but you can see the kind of the basis of the framework is up and running
+
+293
+00:20:03,075 --> 00:20:08,375
+你们可以添加多个测试到这个东西，并且它们就会出现在那个菜单中
+you can just add multiple tests to this thing and you'll have them all nicely appeared menu
+
+294
+00:20:08,375 --> 00:20:13,866
+它们应该在创造中被创造出来，就像点击按钮，然后销毁
+and they should be created upon creation upon like actually clicking the button and then destroyed
+
+295
+00:20:14,466 --> 00:20:16,766
+而我们现在，有一点内存泄漏
+when we just right now, there is a little bit of a memory leak
+
+296
+00:20:16,766 --> 00:20:20,000
+当然，因为我们没有删除testMenu或类似的东西
+of course, because we don't delete the testMenu or anything like that
+
+297
+00:20:20,200 --> 00:20:23,366
+所以我们现在要做的是
+so what we actually need to do here is what I want to do is
+
+298
+00:20:23,600 --> 00:20:26,500
+当我们真正关闭应用程序时，我需要删除currentTest
+I need to delete the currentTest, when we actually close the application
+
+299
+00:20:27,000 --> 00:20:28,800
+你们当然可以这么说
+now you could argue that of course
+
+300
+00:20:29,266 --> 00:20:32,800
+如果我们关闭应用程序，操作系统当然会清理干净
+if we do close the application, of course the operating system's going to clean up
+
+301
+00:20:32,800 --> 00:20:35,875
+不管怎样，我们不需要自己做
+anyway, so we don't really need to do it ourselves
+
+302
+00:20:35,875 --> 00:20:39,450
+但是为了友好起见，我们还是应该在技术上做
+however to be nice, it we should still technically do it
+
+303
+00:20:39,766 --> 00:20:44,325
+所以我要做的是删除currentTest，当我们关闭应用时
+so what I'm going to do is delete the currentTest, when we actually close the application
+
+304
+00:20:44,325 --> 00:20:46,575
+那么当然，当它的while循环结束时
+so of course, when it's while loop terminates
+
+305
+00:20:46,575 --> 00:20:49,850
+glfwWindowShouldClose的while循环，while循环
+the while loop that is the glfwWindowShouldClose, while loop
+
+306
+00:20:50,166 --> 00:20:55,066
+然后我们开始关闭所有东西并终止它，实际要写delete currentTest
+then we start to shut everything down and terminate it, I'm actually going to write delete currentTest
+
+307
+00:20:55,366 --> 00:21:00,866
+事情是这样的，当然这个需要在这个范围内
+now here's the thing, and of course this needs to be in this scope
+
+308
+00:21:02,000 --> 00:21:05,866
+这里是一件事，我还想删除testMenu
+here's a thing, I also want to delete the testMenu
+
+309
+00:21:05,866 --> 00:21:09,633
+然而，如果currentTest是testMenu，我将删除它两次
+however if the currentTest is the testMenu, I'll be deleting things twice
+
+310
+00:21:09,633 --> 00:21:13,000
+如果currentTest不等于testMenu
+so if currentTest does not equal testMenu
+
+311
+00:21:13,866 --> 00:21:19,266
+然后我们会删除testMenu，否则，currentTest已经是testMenu
+then we're going to delete testMenu, otherwise, currentTest already is the testMenu
+
+312
+00:21:19,266 --> 00:21:22,666
+这就是我要删除它的东西，这样我们就不会因为这个代码而崩溃
+and that's what I need to delete it, so we shouldn't get any crashes with this code
+
+313
+00:21:22,666 --> 00:21:30,400
+我们按f5，看看能做什么，如果我们现在就关闭它
+let's just hit f5, and see what we can do here, so if we just close it right now
+
+314
+00:21:30,466 --> 00:21:34,866
+我们应该没问题，因为它只是删除颜色测试，也就是testMenu
+we should be fine, because it just deletes the color test, which is the testMenu
+
+315
+00:21:35,800 --> 00:21:39,633
+然后再按f5运行一下
+and then if we hit f5 again
+
+316
+00:21:41,266 --> 00:21:44,066
+然后我们要进行那个测试，如果我们现在关闭它
+then we're going to go into that test and if we close it now
+
+317
+00:21:44,100 --> 00:21:47,166
+它应该同时删除currentTest和testMenu
+it should kind of delete both the currentTest and the testMenu
+
+318
+00:21:47,166 --> 00:21:48,800
+因为currentTest不是testMenu的话
+because the currentTest isn't a long a testMenu
+
+319
+00:21:49,300 --> 00:21:50,633
+好了，无论如何，我希望你们喜欢这期视频
+okay, anyway, I hope you guys enjoyed this video
+
+320
+00:21:50,633 --> 00:21:52,333
+如果你们喜欢的话，那就为它点赞吧
+if you did, you can hit that like button
+
+321
+00:21:52,333 --> 00:21:56,000
+你们也可以访问patreon.com/TheCherno表达你们的支持
+you can also show your support by going to patreon.com/TheCherno
+
+322
+00:21:56,666 --> 00:21:59,833
+这是访问我今天写的所有代码的好方法
+great way to get access to all the code of course that I wrote today
+
+323
+00:21:59,833 --> 00:22:01,333
+还有其他期的代码
+and all of the other episodes as well
+
+324
+00:22:02,000 --> 00:22:04,400
+像往常一样，向我所有可爱的支持者们大声喊出来
+huge shout out as always to all of my lovely supporters
+
+325
+00:22:04,400 --> 00:22:06,775
+因为如果没有你们，这些视频就不会出现在这里
+because these videos would not be here, without you guys 
+
+326
+00:22:06,775 --> 00:22:10,766
+所以我真的很感谢你们，你们的支持对我来说意义重大
+so I really am thankful for that, and your support means a lot to me
+
+327
+00:22:11,333 --> 00:22:13,600
+下次再见，我会继续写这些测试
+I will see you guys next time, I'm going to continue writing these tests
+
+328
+00:22:13,600 --> 00:22:17,966
+下次我会为纹理写一个，当然，从那以后
+I'm going to write one for textures next time, and then from then on, of course
+
+329
+00:22:17,966 --> 00:22:22,066
+我们可以开始学习更多关于OpenGL的知识，会有一个单独的测试类
+we can start learning more about OpenGL, and we'll have kind of a separate test class
+
+330
+00:22:22,100 --> 00:22:26,166
+展示我们学过的所有东西，所以如果我真的很感兴趣的话
+demonstrating all the stuff we learn kind of paraps, so if I'm really excited about that
+
+331
+00:22:26,533 --> 00:22:28,166
+下次见，拜
+I'll see you guys next time, goodbye
+

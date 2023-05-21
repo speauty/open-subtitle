@@ -1,0 +1,2935 @@
+﻿1
+00:00:00,100 --> 00:00:00,900
+嘿, 你们好
+hey, what's up guys
+
+2
+00:00:00,900 --> 00:00:03,866
+我是Cherno, 欢迎回到我的OpenGL系列教程
+my name is Cherno, and welcome back to my OpenGL series
+
+3
+00:00:03,966 --> 00:00:06,166
+所以今天我们要讨论的都是错误
+so today we're going to be talking all about errors
+
+4
+00:00:06,166 --> 00:00:08,166
+上次, 我们能够使用索引缓冲区
+last time, we were able to use index buffers
+
+5
+00:00:08,166 --> 00:00:12,333
+并且我甚至提过你可能做错的一件事, 那将会导致出现一个错误
+and I even mentioned one thing that you might do wrong, that would cause an error to appear
+
+6
+00:00:12,533 --> 00:00:14,866
+然而在屏幕上实际不会显示任何东西
+and actually just not display anything on the screen
+
+7
+00:00:15,233 --> 00:00:16,900
+去看看那期吧, 如果你还没看过的话
+check out that episode, if you haven't already
+
+8
+00:00:17,166 --> 00:00:18,500
+但今天我们会指出
+but today we're gonna figure out
+
+9
+00:00:18,500 --> 00:00:22,400
+我们实际上可以做些什么来得到通知, 或者我们如何才能找到
+what we can do to actually be notified, or how we can find out
+
+10
+00:00:22,566 --> 00:00:25,975
+OpenGL出了什么问题, 当我们做了错误的事情时
+what has gone wrong with OpenGL, when we do something incorrectly
+
+11
+00:00:25,975 --> 00:00:27,966
+那可是OpenGL的很大一部分
+that's a very big part of OpenGL
+
+12
+00:00:28,100 --> 00:00:30,100
+因为OpenGL像很多东西一样
+because OpenGL like a lot of things
+
+13
+00:00:30,100 --> 00:00:33,300
+感觉是相当脆弱的, 我们可以很容易地打乱它
+sense to be fairly fragile, and we can upset it pretty easily
+
+14
+00:00:33,300 --> 00:00:35,633
+那还好, 那只是开发普遍的一部分
+that's okay, that's just a normal part of development
+
+15
+00:00:35,866 --> 00:00:37,700
+我们怎么知道我们做错了什么
+how do we know what we've done wrong
+
+16
+00:00:37,700 --> 00:00:41,166
+以及我们如何尽快地调试并修复它
+and how can we debug this as quickly as possible and fix it
+
+17
+00:00:41,333 --> 00:00:43,500
+这样我们就不用花一整天的时间思考
+so that we don't have to spend the whole day wondering
+
+18
+00:00:43,500 --> 00:00:44,900
+为什么我们的屏幕是黑色的
+why our screen is black
+
+19
+00:00:45,325 --> 00:00:47,133
+好了, 因此这儿有几种处理方法
+okay, so there's a few ways to deal with this
+
+20
+00:00:47,133 --> 00:00:49,966
+我们不会讨论使用外部工具或类似的工具
+we're not going to talk about using external tools or anything like that
+
+21
+00:00:50,033 --> 00:00:53,100
+我们今天会讲OpenGL实际上给我们什么
+we're just going to talk today about what OpenGL actually gives us
+
+22
+00:00:53,100 --> 00:00:55,366
+作为一种检查错误的方法等等
+as a way of checking for errors and all of that
+
+23
+00:00:55,500 --> 00:00:57,366
+所以基本上现在
+so basically right now
+
+24
+00:00:57,400 --> 00:01:01,066
+我们有两种主要的方法来检查在OpenGL中的错误
+we have two main ways that we can check for errors in OpenGL
+
+25
+00:01:01,225 --> 00:01:04,466
+其中一个叫glGetError, 它是一个我们可以调用的函数
+one of them is called glGetError, it's a function we can call
+
+26
+00:01:04,533 --> 00:01:07,533
+它从一开始就一直在OpenGL中
+it's been in OpenGL since forever since the very beginning
+
+27
+00:01:07,766 --> 00:01:08,900
+而它一直存在是因为
+and it's conserved because of that
+
+28
+00:01:08,900 --> 00:01:10,266
+它兼容所有版本
+it's compatible with all versions
+
+29
+00:01:10,266 --> 00:01:12,466
+并且它的原理很简单
+and it works in a very simple way
+
+30
+00:01:12,466 --> 00:01:14,733
+基本上每次我们调用OpenGL函数
+basically whenever we call an OpenGL function
+
+31
+00:01:14,950 --> 00:01:16,733
+如果发生错误
+if an error were to occur
+
+32
+00:01:17,000 --> 00:01:20,400
+在OpenGL内存中, 有一个标志会被内部设置
+a flag kind of gets set internally in OpenGL's memory
+
+33
+00:01:20,500 --> 00:01:23,466
+那基本上就是说发生了什么类型的错误
+that basically says what type of error occurred
+
+34
+00:01:23,533 --> 00:01:27,400
+并且当我们调用glGetError时, 它会返回一个标志, 对吧
+and when we call glGetError, that gives us back a flag, right
+
+35
+00:01:27,400 --> 00:01:29,333
+而通过这个标志, 我刚刚的意思是就像是一个整型
+and by a flag, I just mean like an integer
+
+36
+00:01:29,333 --> 00:01:30,833
+总的来说这就像一个错误码
+basically there's like an error code
+
+37
+00:01:31,133 --> 00:01:33,250
+并且如果我们实际上继续调用glGetError
+and if we actually keep calling glGetError
+
+38
+00:01:33,250 --> 00:01:34,966
+它将会把所有标志返回给我们
+it will kind of give us all the flags
+
+39
+00:01:34,966 --> 00:01:38,175
+因为有时候, 我们可能会产生多个错误
+because sometimes, it's possible for us to generate multiple errors
+
+40
+00:01:38,175 --> 00:01:39,933
+如果你真的不擅长编程
+if you're really bad at programming
+
+41
+00:01:39,966 --> 00:01:42,000
+如果你真的, 如果你做了一些很糟糕的事
+if you really, if you've done something really bad
+
+42
+00:01:42,633 --> 00:01:44,933
+你甚至可能会导致几种不同类型的错误
+you might even have caused several different types of errors
+
+43
+00:01:44,933 --> 00:01:46,800
+使用一个OpenGL函数调用
+with a single OpenGL function call
+
+44
+00:01:47,133 --> 00:01:49,275
+所以因此, glGetError实际上会设置像
+so because of that, glGetError will actually set like
+
+45
+00:01:49,275 --> 00:01:52,466
+可能有三个标志或者发生了三种不同类型的错误
+maybe three flags or three different types of errors that have occurred
+
+46
+00:01:52,666 --> 00:01:54,033
+而当你调用glGetError
+and when you call glGetError
+
+47
+00:01:54,033 --> 00:01:56,800
+它会给你其中一个标志, 只是一个任意的标志
+it gives you one of the flags, just an arbitrary flag
+
+48
+00:01:57,100 --> 00:01:59,300
+所以你需要不断调用它才能得到所有的标志
+so you kind of have to keep calling it to get all of them
+
+49
+00:01:59,300 --> 00:02:03,133
+但总的来说, 这只是我们拉取OpenGL, 问OpenGL
+but basically, that's just us kind of pulling OpenGL, asking OpenGL
+
+50
+00:02:03,233 --> 00:02:04,533
+嘿, 一切正常吗
+hey, is everything okay
+
+51
+00:02:04,533 --> 00:02:07,433
+我犯了什么错误吗, 现在, 那策略是正确的
+have I caused any errors, now that strategy is okay
+
+52
+00:02:07,433 --> 00:02:09,800
+它通常是这样设置的
+the way that it's typically set up is that
+
+53
+00:02:09,800 --> 00:02:13,666
+因为几乎所有我们调用的OpenGL函数都可能会导致错误
+since pretty much any OpenGL function that we call might cause an error
+
+54
+00:02:13,666 --> 00:02:14,233
+让我们实际上
+let's actually
+
+55
+00:02:14,233 --> 00:02:17,700
+首先快速看一下OpenGL中的错误是什么样子的
+take a look quickly at what an error might look like in OpenGL to begin with
+
+56
+00:02:18,300 --> 00:02:19,900
+那么现在, 由于上一期
+so right now, since the last episode
+
+57
+00:02:19,900 --> 00:02:22,600
+我们有这个漂亮的蓝色正方形渲染
+we have this beautiful blue square rendering
+
+58
+00:02:22,600 --> 00:02:24,400
+现在我要做的就是关闭这个
+now what I'm going to do is just close this
+
+59
+00:02:24,633 --> 00:02:26,600
+并且在我的glDrawElements调用中
+and inside my glDrawElements call
+
+60
+00:02:26,600 --> 00:02:28,066
+这是我实际的DrawCall指令
+which is my actual DrawCall
+
+61
+00:02:28,200 --> 00:02:30,440
+我要改变这个无符号整型
+I'm going to change this unsigned int 
+
+62
+00:02:30,440 --> 00:02:33,933
+在指定我们实际上有的索引数据类型时
+in which specifies the type of index data that we actually have
+
+63
+00:02:34,125 --> 00:02:35,300
+把它改成GL_INT
+to just say GL_INT
+
+64
+00:02:35,300 --> 00:02:37,066
+这是我最喜欢演示的错误之一
+this is one of my favorite errors to demonstrate
+
+65
+00:02:37,066 --> 00:02:37,866
+因为它真的很简单
+because it's really simple
+
+66
+00:02:37,866 --> 00:02:39,700
+我已经制造过很多次这样的错误
+I've made this mistake plenty of times
+
+67
+00:02:39,866 --> 00:02:42,133
+并且它是同样有效的, 让我们按f5
+and it's fellow effective, so let's hit f5
+
+68
+00:02:42,300 --> 00:02:45,333
+你可以看到我们得到的只是一个黑屏
+you can see that all we get is well a black screen
+
+69
+00:02:45,333 --> 00:02:48,366
+我们的正方形我们的矩形根本就没有渲染
+our square our rectangle is just not rendering at all
+
+70
+00:02:48,366 --> 00:02:50,033
+并且你可以在控制台上看到
+and you can see that in the console
+
+71
+00:02:50,033 --> 00:02:51,800
+当然, 没有任何东西会被打印出来
+of course, nothing gets printed at all
+
+72
+00:02:51,833 --> 00:02:54,100
+除了我们打印的OpenGL版本
+except for our OpenGL version that we're printing
+
+73
+00:02:54,466 --> 00:02:55,400
+我们只得到一个黑屏
+we just get a black
+
+74
+00:02:55,600 --> 00:02:58,433
+我们只看到黑屏, 这太糟糕了
+we just get a black screen, and this absolutely sucks
+
+75
+00:02:58,433 --> 00:02:59,966
+我是说, 我讨厌这样
+I mean, I hate this
+
+76
+00:03:00,233 --> 00:03:03,033
+得到一个黑屏, 并且然后必须弄清楚
+getting a black screen, and then having to figure out
+
+77
+00:03:03,400 --> 00:03:08,900
+你实际上做错了什么, 比如你可能没有正确设置顶点数据
+what you've actually done wrong, in which like maybe you haven't set up your vertex data correctly
+
+78
+00:03:09,033 --> 00:03:11,800
+也许你的索引缓冲区不正确, 对吧
+maybe your index buffers not correct, right
+
+79
+00:03:11,800 --> 00:03:14,866
+也许你的着色器没运行, 就像出了什么问题
+maybe your shader doesn't work, like what has gone wrong
+
+80
+00:03:14,866 --> 00:03:17,066
+这很难说, 当然在这种情况下
+it's very hard to tell, and in this case, of course
+
+81
+00:03:17,366 --> 00:03:20,150
+我们只是发送GL_INT而不是GL_UNSIGNED_INT
+we're just sending GL_INT instead of GL_UNSIGNED_INT
+
+82
+00:03:20,150 --> 00:03:22,150
+作为索引缓冲区数据类型, 所以
+as the index buffer data type, so
+
+83
+00:03:23,300 --> 00:03:24,100
+它就会正常
+it would be great
+
+84
+00:03:24,100 --> 00:03:25,766
+如果我们能让OpenGL告诉我们
+if we could just get OpenGL to tell us
+
+85
+00:03:25,766 --> 00:03:28,100
+嘿, 伙计, 你的glDrawElements函数
+hey man, your glDrawElements function
+
+86
+00:03:28,133 --> 00:03:30,000
+你在这儿传递了一个错误的整型
+you're passing an incorrect int in there
+
+87
+00:03:30,033 --> 00:03:32,333
+你应该修复它, 那就太棒了
+you should fix that right, that would be fantastic
+
+88
+00:03:32,566 --> 00:03:37,550
+所以我们使用glGetError的典型工作流程
+so the typical kind of workflow that we have with glGetError is
+
+89
+00:03:37,550 --> 00:03:39,633
+首先, 比之前好很多了
+first of all, pretty much before
+
+90
+00:03:39,633 --> 00:03:41,700
+我们给OpenGL调用的每一个函数
+every function called we give to OpenGL
+
+91
+00:03:41,866 --> 00:03:43,166
+我们清除了所有的错误
+we clear all the errors
+
+92
+00:03:43,166 --> 00:03:45,866
+所以我们基本上在while循环中调用glGetError
+so we basically just call glGetError in like a while loop
+
+93
+00:03:45,866 --> 00:03:47,433
+直到它没有错误
+until it equals no error
+
+94
+00:03:47,433 --> 00:03:50,775
+这意味着我们已经从OpenGL取回了所有可能的错误
+which means that we've kind of retrieved every possible error from OpenGL
+
+95
+00:03:50,775 --> 00:03:55,633
+这只是我们清除所有待处理的错误的一种方法
+that's just a way for us to actually clear all of the pending kind of errors
+
+96
+00:03:55,933 --> 00:03:57,833
+然后我们调用glDrawElements
+then we call glDrawElements
+
+97
+00:03:58,000 --> 00:04:00,233
+并且然后我们再次调用glGetError
+and then we call glGetError again
+
+98
+00:04:00,366 --> 00:04:01,833
+这样我们可以看到
+and that way we can kind of see
+
+99
+00:04:01,900 --> 00:04:05,033
+是之前的glDrawElements函数吗
+has this previous function called glDrawElements
+
+100
+00:04:05,100 --> 00:04:08,466
+这是否产生了任何类型的错误, 如果有, 是哪些错误
+has that generated any kind of errors, and if so, which ones
+
+101
+00:04:08,466 --> 00:04:11,066
+然后我们可以把它打印到控制台或类似的地方
+and then we can kind of print that to the console or something like that
+
+102
+00:04:11,200 --> 00:04:12,600
+为了找出哪里出了问题
+to figure out what went wrong
+
+103
+00:04:12,933 --> 00:04:14,633
+所以那就是处理错误的一种方法
+so that's one way of dealing with error 
+
+104
+00:04:14,633 --> 00:04:17,300
+作为OpenGL最常见的方式, 最流行的方式
+as an OpenGL to pretty much the most common way, the most popular way
+
+105
+00:04:17,566 --> 00:04:19,633
+因为它已经在规范里了
+because it has been in the specification
+
+106
+00:04:19,633 --> 00:04:21,933
+从1.1开始, 从一开始
+since 1.1, since the very beginning
+
+107
+00:04:22,166 --> 00:04:25,133
+并且很明显, 它和所有东西都兼容
+and it's compatible obviously with pretty much everything
+
+108
+00:04:25,133 --> 00:04:28,966
+最近在OpenGL 4.3中, 所以它是相当新的
+now recently in OpenGL 4.3, so it is quite recent
+
+109
+00:04:29,300 --> 00:04:31,866
+OpenGL增加了一个函数, 那基本上允许我们
+OpenGL added a function that basically lets us
+
+110
+00:04:31,966 --> 00:04:34,266
+它叫做glDebugMessageCallback
+well it's called glDebugMessageCallback
+
+111
+00:04:34,266 --> 00:04:36,233
+如果我们快速看一下文档
+if we take a look at the documentation real quick
+
+112
+00:04:36,233 --> 00:04:37,800
+它被称为glDebugMessageCallback
+it's called glDebugMessageCallback
+
+113
+00:04:37,800 --> 00:04:40,800
+你可以看到它是在OpenGL 4.3中被添加的
+you can see that it's been added in OpenGL 4.3
+
+114
+00:04:41,666 --> 00:04:43,138
+并且它基本上就是
+and basically what it is is
+
+115
+00:04:43,138 --> 00:04:46,933
+它允许我们指定一个指向OpenGL的函数指针
+it allows us to specify a function pointer to OpenGL
+
+116
+00:04:46,966 --> 00:04:49,600
+OpenGL会调用我们的那个函数
+an OpenGL will actually call that function of ours
+
+117
+00:04:49,600 --> 00:04:50,866
+当错误发生时
+when an error occurs
+
+118
+00:04:51,033 --> 00:04:54,200
+现在这比glGetError好多了
+now this is much better than glGetError
+
+119
+00:04:54,200 --> 00:04:55,066
+因为首先
+because first of all
+
+120
+00:04:55,066 --> 00:04:57,600
+而不是我们不断地问OpenGL, 嘿
+instead of us having to constantly ask OpenGL, hey
+
+121
+00:04:57,600 --> 00:04:58,366
+一切正常吗
+are you all right
+
+122
+00:04:58,366 --> 00:04:59,733
+伙计, 一切都还好吧
+man, is everything okay
+
+123
+00:05:00,700 --> 00:05:02,966
+当出现问题时, 它会自己告诉我们
+it will tell us itself, when something goes wrong
+
+124
+00:05:03,033 --> 00:05:04,233
+唯一的问题是, 很明显
+the only thing with this is obviously
+
+125
+00:05:04,233 --> 00:05:06,333
+事实上, 它在OpenGL 4.3及以上版本
+the fact that it's in OpenGL 4.3 and above
+
+126
+00:05:06,333 --> 00:05:08,000
+所以你不能在早期版本中使用它
+so you can't use that in earlier versions
+
+127
+00:05:08,000 --> 00:05:10,133
+但另外一个很好的方面是
+but also another really good thing about this is
+
+128
+00:05:10,300 --> 00:05:12,500
+它实际上会给你更详细的信息
+it will actually give you more detailed information
+
+129
+00:05:12,500 --> 00:05:14,466
+而不是只给你一个错误码
+instead of just giving you an error code
+
+130
+00:05:14,566 --> 00:05:17,033
+这是完全没用的
+which is kind of useless like completely useless
+
+131
+00:05:17,033 --> 00:05:19,500
+它甚至会建议一些事情, 就像它会
+it will even suggest things, like it'll
+
+132
+00:05:19,500 --> 00:05:21,866
+用英语向你解释一下你做错了什么
+explain to you what you've done wrong in English
+
+133
+00:05:21,866 --> 00:05:22,600
+就像令人惊奇的
+like, it's amazing
+
+134
+00:05:22,633 --> 00:05:23,233
+这有点依赖
+it's kind of dependent
+
+135
+00:05:23,233 --> 00:05:24,766
+当然, 是驱动之类的东西
+of course, on drivers and stuff like that
+
+136
+00:05:24,933 --> 00:05:29,633
+但根据我的经验, 它总体上非常非常好, 比glGetError好得多
+but in my experience, it generally has been very very good and much better than glGetError
+
+137
+00:05:29,800 --> 00:05:33,933
+今天我们完全只关注glGetError
+today we're just going to be focusing on glGetError completely
+
+138
+00:05:33,933 --> 00:05:36,166
+它将完全是关于glGetError的
+it's going to be just totally about glGetError
+
+139
+00:05:36,900 --> 00:05:37,933
+那种方法还是不错的
+that way is still good
+
+140
+00:05:37,933 --> 00:05:40,466
+并且它显然与OpenGL的每个版本兼容
+and it's obviously compatible with every version of OpenGL
+
+141
+00:05:40,600 --> 00:05:42,666
+但在以后的一期里中, 我会的
+but then in a future episode, I will
+
+142
+00:05:42,666 --> 00:05:45,433
+我想花一整期的时间讲glDebugMessageCallback
+I want to devote like a whole episode to glDebugMessageCallback
+
+143
+00:05:45,566 --> 00:05:47,366
+并讨论我们实际上如何使用它
+and talk about how we can actually use that
+
+144
+00:05:47,366 --> 00:05:48,300
+因为这它更好
+because it is much better
+
+145
+00:05:48,966 --> 00:05:52,600
+但很明显, 它并不是与OpenGL的每个版本都兼容
+but obviously, it's not really compatible with every version of OpenGL
+
+146
+00:05:52,600 --> 00:05:55,266
+好了, 不管怎样, 让我们继续讨论glGetError
+all right, anyway, let's talk more about glGetError
+
+147
+00:05:55,900 --> 00:05:57,800
+所以如果我翻到这里的文档
+so if I flip over to the documentation here
+
+148
+00:05:58,066 --> 00:06:00,066
+对于glGetError, 除了告诉我们
+for glGetError, apart from telling us
+
+149
+00:06:00,066 --> 00:06:03,333
+当然, 事实上, 它所做的是它返回的GL_NO_ERROR
+of course, what it does in the fact that GL_NO_ERROR is what it returns
+
+150
+00:06:03,333 --> 00:06:04,666
+当我们没有错误的时候
+when we don't have an error
+
+151
+00:06:04,666 --> 00:06:07,800
+你可以看到, GL_NO_ERROR也是零
+which you can see, also that GL_NO_ERROR is guaranteed to be zero
+
+152
+00:06:07,800 --> 00:06:09,466
+所以那是有用的信息
+so that's useful information here
+
+153
+00:06:09,466 --> 00:06:10,900
+它也告诉我们
+it also tells us that
+
+154
+00:06:11,166 --> 00:06:13,933
+调用它将返回一个任意的错误标志
+calling it will return an arbitrary error flag
+
+155
+00:06:13,933 --> 00:06:16,033
+所以不一定是所有的错误
+so not necessarily all of the errors
+
+156
+00:06:16,100 --> 00:06:19,533
+正因为如此, 我们应该在循环中调用它来确保
+and because of that we should call this in a loop to make sure that
+
+157
+00:06:19,533 --> 00:06:20,733
+所有错误都被重置
+all of the errors are reset
+
+158
+00:06:20,733 --> 00:06:23,766
+并且我们得到了所有错误的信息
+and we kind of get information about all of the errors 
+
+159
+00:06:23,766 --> 00:06:25,033
+在OpenGL中发生的
+that have actually occurred with OpenGL
+
+160
+00:06:25,166 --> 00:06:27,033
+所以那是很重要的信息
+so that's kind of like important information
+
+161
+00:06:27,033 --> 00:06:28,766
+那是你绝对需要注意的
+that you definitely need to pay attention to
+
+162
+00:06:29,133 --> 00:06:32,533
+我们应该在循环中调用它, 以确保我们得到所有的错误
+we should be calling this inside a loop to make sure that we get all of the errors
+
+163
+00:06:32,666 --> 00:06:34,100
+因为如果你不那么做的话
+because if you don't kind of do that
+
+164
+00:06:34,100 --> 00:06:37,700
+那么你可能只是通过调用glGetError来清除了一个错误
+then maybe you might be clearing an error just by calling glGetError
+
+165
+00:06:37,833 --> 00:06:38,733
+然后你调用一个函数
+then you call a function
+
+166
+00:06:38,733 --> 00:06:40,133
+并且然后你就会得到两个错误
+and then you get two errors back
+
+167
+00:06:40,300 --> 00:06:42,166
+而你实际上却没有意识到
+and you actually didn't realize that
+
+168
+00:06:42,533 --> 00:06:45,566
+哦, 实际上其中一个来自我之前调用的另一个函数
+oh, actually one of them was from another function I called earlier on
+
+169
+00:06:45,566 --> 00:06:47,033
+因为我没有清除所有的错误
+because I didn't clear all of the errors
+
+170
+00:06:47,033 --> 00:06:49,033
+所以你一定要看一下这个
+so just make sure you kind of read this
+
+171
+00:06:49,033 --> 00:06:53,333
+因为关于glGetError最糟糕的事情是如果你甚至不能正确地处理那个
+because the worst thing about glGetError is if you can't even do that properly
+
+172
+00:06:53,600 --> 00:06:55,833
+并且然后你甚至不知道发生了什么
+and then you don't even know what's happening
+
+173
+00:06:56,766 --> 00:06:59,500
+好的, 让我们回到我们的代码中, 让我们实际上把所有这些加起来
+all right, so let's put back to our code, and let's actually add all of this
+
+174
+00:06:59,966 --> 00:07:02,500
+所以在最上面我要做的就是创建一个函数
+so what I'm going to do at the very top is make a function
+
+175
+00:07:02,500 --> 00:07:04,100
+并且我要在最上面做这个
+and I'm actually going to do this at the very top
+
+176
+00:07:04,433 --> 00:07:08,025
+我要创建一个函数, static void GLClearError
+I'm going to make a function, static void GLClearError
+
+177
+00:07:08,025 --> 00:07:11,733
+并且我把大写字母的GL写在函数的开头
+and I'm kind of just writing gl and capitals here at the beginning of this function
+
+178
+00:07:11,933 --> 00:07:14,866
+只是让我们知道它是一个OpenGL
+just to kind of let ourselves know that it is kind of an OpenGL 
+
+179
+00:07:14,866 --> 00:07:17,500
+我们在这里写的内部函数
+internal kind of function that we're writing here
+
+180
+00:07:17,500 --> 00:07:20,066
+并且这个函数的目的当然是为了清除所有的错误
+and the purpose of this function of course is just to clear all the errors
+
+181
+00:07:20,066 --> 00:07:23,900
+所以我们需要做的就是像这样调用glGetError
+so all we really need to do is call glGetError just like that
+
+182
+00:07:24,533 --> 00:07:26,966
+并且循环它, 不等于0
+and while that, doesn't equal zero
+
+183
+00:07:26,966 --> 00:07:31,900
+而你也可以这样写, 不等于GL_NO_ERROR
+so either the way you could kind of write this is does not equal GL_NO_ERROR
+
+184
+00:07:31,933 --> 00:07:32,866
+在那儿循环
+so while there
+
+185
+00:07:32,866 --> 00:07:35,833
+而我们实际上从OpenGL返回一个错误
+while we actually have an error back from OpenGL
+
+186
+00:07:35,966 --> 00:07:37,133
+让我们继续循环
+let's kind of keep looping through this
+
+187
+00:07:37,133 --> 00:07:39,400
+所以我要在这里加一个分号, 就这样
+so I'm just gonna add a semicolon here, and that's it
+
+188
+00:07:39,400 --> 00:07:40,566
+我们真的不需要一个函数体
+we don't really need a body
+
+189
+00:07:40,566 --> 00:07:43,233
+我们不关心这个时间点的错误码
+we don't care about error codes at this point in time
+
+190
+00:07:43,475 --> 00:07:46,033
+我们只是想清除所有的错误, 仅此而已
+we just want to clear all the errors, that's all
+
+191
+00:07:46,066 --> 00:07:47,300
+现在另一种写法是
+now another way you could write this
+
+192
+00:07:47,300 --> 00:07:51,333
+很明显, 因为我们之前看到的GL_NO_ERROR就是零
+obviously because GL_NO_ERROR is guaranteed to be zero as we read earlier
+
+193
+00:07:51,400 --> 00:07:53,033
+你可以那样写
+you could just kind of write this like that
+
+194
+00:07:53,166 --> 00:07:55,100
+所以当glGetError不为零时
+so while glGetError is not zero
+
+195
+00:07:55,333 --> 00:07:58,433
+然后继续循环, 继续获取所有的错误
+then keep kind of looping, keep retrieving all the errors
+
+196
+00:07:58,533 --> 00:07:59,675
+但我在尝试保存这些代码
+but I am trying to keep this code 
+
+197
+00:07:59,675 --> 00:08:01,633
+学习OpenGL的人会更清楚一些
+a little bit more clear for people who are learning OpenGL
+
+198
+00:08:01,633 --> 00:08:02,933
+所以我把它写成这样
+so I'm just going to write it like this
+
+199
+00:08:03,000 --> 00:08:05,833
+好了, 酷, 现在我们有了一种消除错误的方法
+okay, cool, so we now have a way of clearing errors
+
+200
+00:08:05,985 --> 00:08:07,433
+让我们在这儿写另一个函数
+let's write another function here
+
+201
+00:08:07,433 --> 00:08:09,766
+这会打印出实际发生的错误
+which will actually print an error that does occur
+
+202
+00:08:09,766 --> 00:08:12,733
+或者函数调用后发生的所有错误
+or all of the errors that do occur after a function call
+
+203
+00:08:12,766 --> 00:08:17,166
+所以我将这个函数设为GLCheckError或类似的东西
+so I'm just going to make this void function called GLCheckError or something like that
+
+204
+00:08:17,333 --> 00:08:19,033
+并且这一切的目的基本上是
+and all this is going to do is basically
+
+205
+00:08:19,033 --> 00:08:22,966
+这和另一个函数glGetError是一样的
+what kind of the same thing is the other function is going to glGetError
+
+206
+00:08:22,966 --> 00:08:25,000
+然而, 我们并没有忽略这一点
+however instead of just kind of ignoring this
+
+207
+00:08:25,300 --> 00:08:27,000
+我们实际上会把它赋值给其他变量
+we're actually going to assign it to something
+
+208
+00:08:27,000 --> 00:08:30,000
+所以如你所知, glGetError返回一个GL_ENUM
+so glGetError, as you know, returns a GL_ENUM
+
+209
+00:08:30,000 --> 00:08:31,166
+它就是一个无符号整型
+which is just an unsigned int
+
+210
+00:08:31,166 --> 00:08:33,400
+但是, 因为这是一种和GL紧密相连的关系
+but, because this is such a closely kind of tied GL full
+
+211
+00:08:33,400 --> 00:08:35,333
+我实际上会在这里使用GL_ENUM
+I will actually use GL_ENUN here
+
+212
+00:08:35,733 --> 00:08:39,300
+所以while(GL_ENUM error = glGetError())
+so while GL_ENUN error equals glGetError
+
+213
+00:08:39,300 --> 00:08:40,566
+所以我在这里给它赋值, 好吧
+so I'm assigning it here, okay
+
+214
+00:08:40,566 --> 00:08:41,650
+所以, 我在获取错误
+so, I'm kind of retrieving the error
+
+215
+00:08:41,650 --> 00:08:44,166
+并把它赋值给error, 这就是一行中的所有内容
+and assigning it to error, kind of all in one line
+
+216
+00:08:44,333 --> 00:08:46,433
+很明显, 因为这是在一个自然的代码块里
+obviously since this is inside a wild block
+
+217
+00:08:46,533 --> 00:08:48,866
+这个盲目的循环会和glGetError一直运行
+this wild loop will run as long as glGetError
+
+218
+00:08:48,866 --> 00:08:51,533
+直到这个error变量不是0
+as long as this kind of error variable is not zero
+
+219
+00:08:51,533 --> 00:08:52,700
+也就是它不是false
+so it's not false
+
+220
+00:08:52,966 --> 00:08:56,166
+所以当我们有一些我们实际上获取得错误时
+so while we kind of have errors that we are actually retrieving
+
+221
+00:08:56,166 --> 00:08:58,466
+让我们继续, 把它们打印到控制台上
+let's go ahead, and just kind of print them out to the console
+
+222
+00:08:58,466 --> 00:09:00,433
+所以我会写std::cout
+so I'm just gonna write std cout
+
+223
+00:09:00,466 --> 00:09:03,766
+用更好的形式输出它, 所以可能是[OpenGL Error]
+kind of form out this nicely, so maybe OpenGL Error
+
+224
+00:09:04,000 --> 00:09:05,000
+并且然后在括号中
+and then in brackets
+
+225
+00:09:05,000 --> 00:09:07,100
+我猜我们实际上会把错误码放在那里
+I guess we'll actually put that error code
+
+226
+00:09:07,333 --> 00:09:08,466
+暂时就这样把
+and that's it for now
+
+227
+00:09:09,266 --> 00:09:12,300
+好吧, 很酷, 所以现在我们有一个非常简单的方法
+allright, pretty cool, so now we have a very very simple way of
+
+228
+00:09:12,300 --> 00:09:14,566
+实际检查我们是否有错误
+actually checking to see if we have an error
+
+229
+00:09:14,566 --> 00:09:17,333
+那么, 让我们来测试一下, 我要到这里来
+so, let's just test this out, so I'm going to go down here
+
+230
+00:09:17,500 --> 00:09:18,600
+来到我们绘制函数
+to my draw function
+
+231
+00:09:18,600 --> 00:09:20,566
+现在我会在这里制造一个错误, 对吧
+now I have made a mistake here, right
+
+232
+00:09:20,766 --> 00:09:22,866
+你可以看到我正在使用GL_INT而不是GL_UNSIGNED_INT
+you can see I'm using GL_INT and not GL_UNSIGNED_INT
+
+233
+00:09:22,866 --> 00:09:24,033
+我仍然会得到那个错误码整数
+I've still got that code int
+
+234
+00:09:24,275 --> 00:09:27,100
+首先我要做得就是调用GLClearError
+the first thing I'm going to do is call GLClearError
+
+235
+00:09:27,133 --> 00:09:28,700
+对吧, 为了清除我们所有的错误
+right, to clear all of our errors
+
+236
+00:09:28,766 --> 00:09:31,350
+然后在这个函数之后调用GLCheckError
+and then finally GLCheckError after the function
+
+237
+00:09:31,350 --> 00:09:33,100
+所以你可以看到这个的原理
+so you can kind of see how this works
+
+238
+00:09:33,100 --> 00:09:34,266
+我们首先清除所有错误
+we clear all the errors first
+
+239
+00:09:34,266 --> 00:09:37,700
+为了确保我们不会从其他函数得到其他任何错误
+to make sure that we don't have any other errors from other functions
+
+240
+00:09:37,900 --> 00:09:39,733
+然后调用我们实际的函数
+we then call our actual function
+
+241
+00:09:39,733 --> 00:09:42,666
+而然后就是检查错误, 通过那样的方式, 我们可以确保
+and then we check errors, that way we can kind of make sure
+
+242
+00:09:42,933 --> 00:09:45,633
+所有的错误实际上都是来自这个函数
+that all of the errors are actually coming from this function
+
+243
+00:09:45,633 --> 00:09:48,200
+我们刚刚从上次函数调用中得到错误
+and we're just getting the errors from our last function call
+
+244
+00:09:48,466 --> 00:09:50,866
+好了, 所以现在让我们按f5, 看看会发生什么
+allright, so now let's just hit f5 and see what happens
+
+245
+00:09:50,900 --> 00:09:52,133
+好了, 看看这个, 看看这个
+okay, look at this, check this out
+
+246
+00:09:52,133 --> 00:09:53,800
+所以在我们的渲染循环中, 我们实际上得到了
+so in our rendering loop, we're actually getting
+
+247
+00:09:53,800 --> 00:09:54,966
+当我把马上它拉一下
+if I just pulls this for a sec
+
+248
+00:09:55,066 --> 00:09:59,675
+我们实际上得到了占位的OpenGL Error, 然后是1280, 太棒了
+we're actually getting OpenGL Error appropriating and then 1280, fantastic
+
+249
+00:09:59,675 --> 00:10:02,133
+所以我们知道我们已经做了一些错事
+so we know that we've done something wrong
+
+250
+00:10:02,133 --> 00:10:03,866
+而当我们返回我们的文档
+and if we go back to our documentation
+
+251
+00:10:03,966 --> 00:10:06,366
+你可以看到下面这些错误, 我们实际上不得不去找
+you can see the following errors, that we actually have to find
+
+252
+00:10:06,366 --> 00:10:09,200
+现在其中哪个是1280, 是真正的问题
+now which one of these is 1280 is the real question
+
+253
+00:10:09,566 --> 00:10:11,733
+为了找出那个, 让我们继续
+to figure that out, let's go ahead and
+
+254
+00:10:11,925 --> 00:10:14,133
+实际上来到我们的OpenGL头文件
+actually go to our OpenGL header file
+
+255
+00:10:14,133 --> 00:10:15,733
+所以这个会在glew.h里面
+so this will be in glew for us
+
+256
+00:10:15,733 --> 00:10:18,066
+当我们输入1280, 我们实际上没有得到任何东西
+if we type in 1280, we're not actually going to get anything
+
+257
+00:10:18,100 --> 00:10:21,800
+因为OpenGL用十六进制表示法定义了它的所有错误码
+because OpenGL defines all of its in in hexadecimal notation
+
+258
+00:10:21,833 --> 00:10:26,166
+所以我们实际上要做的是将错误代码从十进制转换成十六进制
+so what we'll actually have to do is convert that error code from decimal into hex
+
+259
+00:10:26,333 --> 00:10:29,366
+要做到这一点, 我只需要在这个错误函数中设置一个断点
+to do that, I'm just going to set a breakpoint into this error function here
+
+260
+00:10:29,633 --> 00:10:32,733
+我要选择这个, 就这样, 重新运行我的程序
+I'm going to select this, so that's it, resumes my program
+
+261
+00:10:33,366 --> 00:10:35,466
+你可以看到我们得到了1280, 当我右键点击这里
+you can see we have 1280, if I just right click here
+
+262
+00:10:35,466 --> 00:10:36,966
+我可以用十六进制显示
+I can go hexadecimal display
+
+263
+00:10:36,966 --> 00:10:40,266
+你可以看到错误码是十六进制的500
+and you can see the error code is just 500 here in hex
+
+264
+00:10:40,633 --> 00:10:42,745
+所以当我返回到我的glew头文件时
+so if I go back to my glew header file
+
+265
+00:10:42,745 --> 00:10:47,033
+然后搜索500, 可能开头有0x0
+and search for 500, maybe a zero x zero at the beginning
+
+266
+00:10:47,166 --> 00:10:47,966
+你可以看到那个了
+you can see that
+
+267
+00:10:47,966 --> 00:10:50,333
+这里有我们所有的无效错误, 对吧
+here we have all of our invalid kind of errors, right
+
+268
+00:10:50,333 --> 00:10:51,566
+我们所有的错误码
+all of our error codes
+
+269
+00:10:51,566 --> 00:10:54,073
+所以500意味着无效的枚举
+so if 500 means invalid enum
+
+270
+00:10:54,073 --> 00:10:55,200
+现在, 在这个方面
+now, at this point
+
+271
+00:10:55,200 --> 00:10:57,450
+对我们来说, 编写一个函数是非常明智的
+it would be very wise for us to actually write a function
+
+272
+00:10:57,450 --> 00:11:01,166
+它将这些数字转换成实际的单词
+which translates these numbers into actual words
+
+273
+00:11:01,166 --> 00:11:03,750
+所以基本上, 如果我们的错误代码是GL_INVALID_ENUM
+so basically, if our error code is GL_INVALID_ENUM
+
+274
+00:11:03,750 --> 00:11:04,466
+就像这里一样
+as it is here
+
+275
+00:11:04,466 --> 00:11:07,900
+也许将invalid enum打印到实际屏幕上, 那就好了
+maybe print invalid enum to the actual screen, that would be nice
+
+276
+00:11:07,900 --> 00:11:10,066
+但我不会在这里那么做, 只是不想浪费时间
+but I'm not going to do that here, just not to waste time
+
+277
+00:11:10,066 --> 00:11:12,700
+所以你可以看到我们的错误代码在这里是无效的枚举
+so you can see that our error code here is invalid enum
+
+278
+00:11:12,700 --> 00:11:13,866
+这告诉我们, 实际上
+which tells us that we've actually
+
+279
+00:11:13,866 --> 00:11:16,766
+把无效值传递到了OpenGL函数中
+passed in an invalid value into an OpenGL function
+
+280
+00:11:16,766 --> 00:11:18,500
+特别是一个无效的枚举
+and specifically an invalid enum
+
+281
+00:11:18,500 --> 00:11:20,000
+现在, 在这个例子中, 那当然是有道理的
+now, in this case, that of course makes sense
+
+282
+00:11:20,000 --> 00:11:22,500
+因为GL_INT是我们实际传递的无效枚举
+because GL_INT is the actual invalid enum we've passed
+
+283
+00:11:22,500 --> 00:11:23,900
+它应该是无符号整型
+it should be unsigned int
+
+284
+00:11:24,466 --> 00:11:25,575
+你可以看到虽然这里
+you can see though there
+
+285
+00:11:25,700 --> 00:11:28,666
+我们在这里和这里所做的有一些缺陷
+there are a few flaws with what we've done here and
+
+286
+00:11:29,033 --> 00:11:29,833
+它真的不是
+it's not really
+
+287
+00:11:29,866 --> 00:11:32,566
+它不是缺陷, 只是没有那么好
+it's not that it's flawed it's just it's not that great
+
+288
+00:11:33,066 --> 00:11:35,300
+对吧, 我的意思是我们知道我们犯了一个错误
+right, I mean we know we're getting an error
+
+289
+00:11:35,400 --> 00:11:39,066
+我们知道, 我们可以使用它, 它在渲染循环中
+we know it, we can kind of did use that, it is inside the render loop
+
+290
+00:11:39,066 --> 00:11:41,533
+而它不是在OpenGL的所有类型中
+but it's not in all the kind of OpenGL
+
+291
+00:11:41,633 --> 00:11:43,833
+初始化代码或类似于我们所做的任何事情
+initialization code or anything like that that we did
+
+292
+00:11:43,833 --> 00:11:46,033
+比如创建顶点或索引缓冲区
+such as creating our vertex or index buffer
+
+293
+00:11:46,175 --> 00:11:49,400
+因为我们基本上每一帧就会得到错误
+because we're getting errors like every frame basically
+
+294
+00:11:49,400 --> 00:11:51,466
+所以我们知道这里有些东西, 对吧
+so we know is something here, right
+
+295
+00:11:52,500 --> 00:11:57,066
+实际上我们不知道的是它发生在哪一行代码上
+what we don't know is actually which line of code it occurred on
+
+296
+00:11:57,066 --> 00:11:59,633
+所以那是一个问题, 并且不仅如此
+so that's kind of an issue, and not only that
+
+297
+00:11:59,800 --> 00:12:01,366
+但是你也可以看到这个有点
+but you can see the code is a little bit
+
+298
+00:12:01,366 --> 00:12:03,666
+笨重, 我的意识是如果我们返回这儿
+clunky, I mean if we have to go back up here
+
+299
+00:12:03,966 --> 00:12:08,233
+基本上就是调用清除错误, 然后在每个函数之前检查错误, 就像
+and basically call clear error and check error before every function, like
+
+300
+00:12:08,466 --> 00:12:09,833
+清除错误而后检查
+clear error and then check error
+
+301
+00:12:09,833 --> 00:12:11,500
+那只是在我们的代码取出来
+that's going to just pull out our code
+
+302
+00:12:11,500 --> 00:12:14,600
+并且让扩展变得更加困难, 比如我们想要什么
+and make it so much harder to breed, like where would we want any of that
+
+303
+00:12:14,600 --> 00:12:17,100
+那只会给我们带来错误检查的负担
+that's going to just burden us with error checking
+
+304
+00:12:17,100 --> 00:12:19,933
+这是我们应该一直自动地这样做, 对吧
+which we should be doing just automatically all the time, right
+
+305
+00:12:20,233 --> 00:12:22,133
+所以这里有一些方法来解决这个
+so there are a few ways of dealing with this
+
+306
+00:12:22,166 --> 00:12:23,133
+对于我们的第一个问题
+for our first problem
+
+307
+00:12:23,300 --> 00:12:24,666
+我们很高兴知道
+it'd be nice for us to know
+
+308
+00:12:24,800 --> 00:12:27,733
+实际发生这个错误的代码行
+the line of code on which this error actually occurred on
+
+309
+00:12:28,066 --> 00:12:30,425
+现在我们可以自己手动完成
+now we can kind of do that manually ourselves 
+
+310
+00:12:30,425 --> 00:12:32,733
+如果我们在这里重新运行我们的程序
+if we kind of resume our program here
+
+311
+00:12:32,733 --> 00:12:33,400
+所以它正在运行
+so it is running
+
+312
+00:12:33,400 --> 00:12:35,766
+它仍然在向控制台发送错误
+it is still kind of spamming all of this to the console
+
+313
+00:12:35,766 --> 00:12:39,050
+我确实在这个GLCheckError函数中放置了一个断点来找到
+I did place a breakpoint here in this GLCheckError function to figure out 
+
+314
+00:12:39,050 --> 00:12:41,233
+这个值的十六进制值
+what kind of value this was in hex
+
+315
+00:12:41,233 --> 00:12:42,666
+你可以看到当我看到调用堆栈
+you can see if I look at the call stack
+
+316
+00:12:42,666 --> 00:12:44,066
+双击这里
+and I double click over here
+
+317
+00:12:44,966 --> 00:12:47,733
+我知道它发生在这行上
+I know that it's happened on this line
+
+318
+00:12:47,733 --> 00:12:49,300
+就是glDrawElements
+which is glDrawElements
+
+319
+00:12:49,300 --> 00:12:51,933
+所以我确实知道发生在哪行代码上了
+so I do kind of know what line of code had happened on
+
+320
+00:12:51,933 --> 00:12:54,400
+然而, 这涉及到我放置一个断点和所有这些
+however that involves me placing a breakpoint and all of that
+
+321
+00:12:54,400 --> 00:12:55,900
+这不太有趣
+it's not too fun
+
+322
+00:12:56,200 --> 00:12:59,266
+在这个例子中, 不管如何, 我们也知道它发生在哪一行
+and also in this case, we kind of know what line it happened on anyway
+
+323
+00:12:59,266 --> 00:13:01,700
+因为我们只检查一个函数的错误
+because we're only checking one function for errors
+
+324
+00:13:01,700 --> 00:13:05,348
+但我们实际上可以做的就是得到实际的调试器
+but what we can actually do is get our actual debugger
+
+325
+00:13:05,348 --> 00:13:10,550
+暂停执行并在导致错误的代码行上中断
+to just pause execution and break on the line that causes that error
+
+326
+00:13:10,550 --> 00:13:13,400
+对吧, 我们可以通过使用断言来实现这一点
+right, and we can do that by just using an assert
+
+327
+00:13:13,400 --> 00:13:14,900
+基本上, 一个断言就是
+basically an assertion is
+
+328
+00:13:14,933 --> 00:13:17,500
+当你断言某事是true是false时
+when you assert if something is true or false
+
+329
+00:13:17,566 --> 00:13:20,466
+并且如果那个条件是false的
+and if that kind of condition is false
+
+330
+00:13:20,533 --> 00:13:23,350
+你通常要么将消息写入控制台
+you typically like either write a message to the console
+
+331
+00:13:23,350 --> 00:13:25,766
+要么只是停止程序的执行
+or just kind of stop execution of the program
+
+332
+00:13:25,766 --> 00:13:28,166
+并且在那行中断
+and kind of break on that line
+
+333
+00:13:28,166 --> 00:13:30,266
+所以它有点像设置一个断点
+so it's kind of like placing a breakpoint
+
+334
+00:13:30,533 --> 00:13:33,233
+但我们实际上可以通过代码放置断点
+but we can actually place a breakpoint through code
+
+335
+00:13:33,366 --> 00:13:36,400
+对吧, 我们实际上可以告诉我们的调试器
+right, we can actually tell our kind of debugger
+
+336
+00:13:36,500 --> 00:13:38,200
+嘿, 当你运行到这儿这行代码时
+hey, if you run into this line of code here
+
+337
+00:13:38,400 --> 00:13:40,300
+进入到我调用的这个函数, 在这儿中断而不是断点
+into this function that I'm calling, break instead of breakpoint here
+
+338
+00:13:40,300 --> 00:13:42,733
+只是中断, 对吧, 它比较酷
+and just break, right, it's pretty cool
+
+339
+00:13:42,733 --> 00:13:45,700
+我们一定要在c++系列教程中讲更多关于断言的东西
+we're definitely going to talk more about assertions in the c++ series
+
+340
+00:13:45,700 --> 00:13:47,933
+一旦视频制作完成, 我会有一个链接在那里
+I'll have a link up there once that video is made
+
+341
+00:13:48,300 --> 00:13:50,100
+但是让我们来看看, 我们是如何做到这一点的。
+but let's take a look at how we can actually do that
+
+342
+00:13:50,333 --> 00:13:51,900
+所以为了实现那个, 我会
+so to do that, I'm just going to
+
+343
+00:13:52,300 --> 00:13:54,500
+重写一点点这个检查错误的函数
+kind of rewrite this check error function a little bit
+
+344
+00:13:54,500 --> 00:13:57,066
+首先是让它返回一个布尔
+I'm going to first of all get it to return a boolean
+
+345
+00:13:57,166 --> 00:13:59,200
+让我们也停止执行那个程序
+let's just stop execution of that program as well
+
+346
+00:13:59,366 --> 00:14:01,866
+并且叫它GLLogCall, 明白吧
+and I'll call this GLLogCall, okay
+
+347
+00:14:01,866 --> 00:14:03,766
+因为我们马上将为它添加更多功能
+because we'll add some more features to it in a minute
+
+348
+00:14:03,966 --> 00:14:05,800
+现在当这个确实返回一个错误
+now if this does return an error
+
+349
+00:14:05,800 --> 00:14:07,300
+事实上, 一旦发生这种情况
+and in fact as soon as it does
+
+350
+00:14:07,300 --> 00:14:09,425
+现在我会在这儿返回false
+I'm just going to call return false here now 
+
+351
+00:14:09,425 --> 00:14:11,833
+现在你可能会质疑这个循环的有效性
+you might kind of question the validity of this loop now
+
+352
+00:14:12,033 --> 00:14:13,200
+为什么这个一定要在一个while循环中
+why does this have to be in a while loop
+
+353
+00:14:13,200 --> 00:14:15,133
+如果你从第一次迭代返回的话
+if you're returning from the first iteration
+
+354
+00:14:15,200 --> 00:14:16,933
+但这只是从现在开始的一种展示
+but this is just kind of to demonstrate from now
+
+355
+00:14:17,000 --> 00:14:17,900
+所以我真的不在意
+so I don't really care
+
+356
+00:14:18,200 --> 00:14:19,200
+然后返回true
+and then return true
+
+357
+00:14:19,200 --> 00:14:21,000
+基本上, 如果你的返回值为false
+so basically if where your return false from this
+
+358
+00:14:21,000 --> 00:14:23,333
+这意味着我们的gl调用没有成功
+it means that our gl call was not successful
+
+359
+00:14:23,333 --> 00:14:24,800
+然后到这里来
+I'm then going to come up here
+
+360
+00:14:24,800 --> 00:14:26,666
+而我实际上要写一个宏
+and I'm actually going to write a macro
+
+361
+00:14:26,800 --> 00:14:30,713
+就是我们的断言, 对吧, 所以#define ASSERT(x)
+which is our assertion, right, so define ASSERT x
+
+362
+00:14:30,713 --> 00:14:33,900
+所有这些都是验证一个条件
+so all this is going to do is validate a condition
+
+363
+00:14:33,900 --> 00:14:35,133
+所以我们不得不就像这样写它
+so we'll have to write it like this
+
+364
+00:14:35,133 --> 00:14:37,533
+如果你这样写的话, 它确实不会运行
+if you kind of write it like this, it won't really work
+
+365
+00:14:37,533 --> 00:14:38,466
+因为一些原因
+because of reasons
+
+366
+00:14:38,566 --> 00:14:40,866
+我们会有一期关于c++宏的视频
+we'll have a video about c++ macros and all that
+
+367
+00:14:40,866 --> 00:14:42,566
+等制作好了, 我会把它链接放这儿的
+again, I'll link it up there when that's actually made
+
+368
+00:14:42,700 --> 00:14:45,800
+但是我们必须像这样把条件用括号括起来
+but we have to write our condition wrapped in parentheses like this
+
+369
+00:14:45,875 --> 00:14:47,300
+并且如果这是false
+and if this was false
+
+370
+00:14:47,300 --> 00:14:48,566
+我要调用一个函数
+I'm just going to call a function
+
+371
+00:14:48,566 --> 00:14:53,766
+基本上就是会在代码中插入一个断点然后中断调试器
+which will basically insert a breakpoint at that moment in code and just break the debugger
+
+372
+00:14:53,766 --> 00:14:56,533
+所以这是编译器的固有特性
+so this is an intrinsic to your compiler
+
+373
+00:14:56,533 --> 00:14:57,550
+这基本上意味着
+which basically means that 
+
+374
+00:14:57,550 --> 00:15:02,033
+你在这里调用的函数将与你正在使用的编译器不同
+this function that you call here is going to be different forage compiler that you're using
+
+375
+00:15:02,300 --> 00:15:04,533
+当我在c++系列中讲到断言时
+when I cover assertions in the c++ series
+
+376
+00:15:04,533 --> 00:15:07,933
+我将展示这个函数的用途, 比如所有的编译和其他
+I will show what the function is for like all compiles and all of that
+
+377
+00:15:07,933 --> 00:15:09,333
+无论如何, 我相信你可以用谷歌搜索它
+I'm sure you can google it, anyway
+
+378
+00:15:09,500 --> 00:15:11,400
+但因为我们这儿正在用VS
+but because we're using visual studio here and
+
+379
+00:15:11,400 --> 00:15:13,666
+这也不是关于c++, 而是关于OpenGL
+this isn't really about c++, about OpenGL
+
+380
+00:15:13,733 --> 00:15:16,033
+我会用MSVC(微软的VC库)函数
+I'm just going to use the MSVC function
+
+381
+00:15:16,200 --> 00:15:19,433
+就是像那样的__debugbreak
+which is underscore undiscovered debugbreak like that
+
+382
+00:15:19,766 --> 00:15:22,966
+__让我们知道它是一个编译器本身的
+the underscore underscore kind of lets us know that it's a compiler intrinsic
+
+383
+00:15:22,966 --> 00:15:25,033
+这意味着它是MSVC特有的
+which means that it's specific to MSVC
+
+384
+00:15:25,033 --> 00:15:28,675
+而它在clang、gcc或其他任何编译器中都不起作用
+and it won't work in clang or gcc, or any of those compilers 
+
+385
+00:15:28,675 --> 00:15:31,000
+好了, 酷, 这是我们的断言函数
+okay, so that's pretty cool, that's our assertion function
+
+386
+00:15:31,266 --> 00:15:32,266
+所以我现在能做的就是
+so what I can do now
+
+387
+00:15:32,500 --> 00:15:36,500
+基本上就是我们的GLLogCall, 放在下面这儿
+is basically where we have this GLLogCall over here at the bottom
+
+388
+00:15:36,500 --> 00:15:38,766
+并且这个GLCheckError实际上应该改成GLLogCall
+and this GLCheckError will actually it's called GLLogCall
+
+389
+00:15:38,766 --> 00:15:40,900
+现在让我们就像那样把它重命名为GLLogCall
+now let's just rename it to GLLogCall like that
+
+390
+00:15:41,100 --> 00:15:42,266
+我可以断言那个
+I can assert that
+
+391
+00:15:42,266 --> 00:15:45,533
+所以我会写ASSERT, 并且我会把它用括号括起来
+so I'll write ASSERT, and I'll wrap this in parenthesis like that
+
+392
+00:15:45,800 --> 00:15:47,300
+然后按f5来运行我的程序
+and I'll hit f5 to run my program
+
+393
+00:15:47,300 --> 00:15:50,175
+所以如果这个返回false, 它应该中断调试器
+so if this returns false, it should just break the debug
+
+394
+00:15:50,175 --> 00:15:51,450
+而你可以看到, 看看那个
+and you can see, look at that
+
+395
+00:15:51,450 --> 00:15:54,233
+OpenGL.exe在这一行上触发了一个断点
+OpenGL.exe triggered a breakpoint on this exact line
+
+396
+00:15:54,233 --> 00:15:57,033
+我们现在确切地知道我们的程序不会继续运行并且
+we know exactly now our program does not continue running and
+
+397
+00:15:57,033 --> 00:16:00,100
+不会一直将错误发送到我们的控制台
+doesn't keep spamming the error into our console
+
+398
+00:16:00,100 --> 00:16:02,800
+我们的控制台只读取到了OpenGL Error(1280)
+our console just reads OpenGL Error 1280
+
+399
+00:16:02,833 --> 00:16:04,600
+而我们就可以那个错误发生在哪儿了
+and we can see where that error occurred
+
+400
+00:16:04,600 --> 00:16:06,133
+那有多酷啊
+how cool is that much better
+
+401
+00:16:06,166 --> 00:16:08,200
+但我们可以做得更好
+but we can do a lot better than this
+
+402
+00:16:08,333 --> 00:16:10,400
+实际上下一步要做的就是
+the next step is actually going to be just to
+
+403
+00:16:10,400 --> 00:16:12,266
+去掉清除错误的调用
+get rid of having to call clear error
+
+404
+00:16:12,266 --> 00:16:14,266
+以及在每个函数后面的GLLogCall调用
+and then log call after every function
+
+405
+00:16:14,400 --> 00:16:17,566
+让我们创建一种宏来为我们做到这一点
+let's invent some kind of macro that does that for us
+
+406
+00:16:17,566 --> 00:16:20,466
+所以当我们来到顶部, 我们定义所有宏的地方
+so if we go up to the top, where we define all of our macros
+
+407
+00:16:20,466 --> 00:16:24,633
+我会定义另一个叫GLCall的宏, 对吧
+I'm going to define another one called GLCall, right
+
+408
+00:16:24,750 --> 00:16:27,766
+x将是我们调用的函数
+x is going to be the function essentially that we're calling
+
+409
+00:16:27,766 --> 00:16:29,966
+并且在这儿, 实际上我首先要做的就是
+and over here, the first thing that I'm actually going to do
+
+410
+00:16:30,000 --> 00:16:33,725
+调用GLClearError以确保我们已清除所有内容
+is call GLClearError to make sure that we clear everything
+
+411
+00:16:33,725 --> 00:16:36,166
+现在, 我不想把这个所有代码写在一行上
+now, I don't want to write all this code on one line
+
+412
+00:16:36,166 --> 00:16:37,133
+因为它看起来看困难
+because it'll be hard to read
+
+413
+00:16:37,133 --> 00:16:40,100
+所以我要添加一个反斜杠, 然后回车
+so I'm just going to add a backslash and then hit enter
+
+414
+00:16:40,166 --> 00:16:42,000
+这个基本上会忽视这个新的换行符
+this basically ignores the new line character
+
+415
+00:16:42,066 --> 00:16:44,725
+这样我们就可以在另一行继续写这个宏了
+so that we can continue writing this macro on another line
+
+416
+00:16:44,725 --> 00:16:46,666
+然后我就写x;
+I'm then going to just write x semicolon
+
+417
+00:16:46,666 --> 00:16:50,066
+它基本上会插入我们指定的函数, 所以我们调用它
+which basically will insert that function we've specified, so that we call it
+
+418
+00:16:50,300 --> 00:16:51,533
+并且然后再加个反斜杠
+and again another backslash
+
+419
+00:16:51,533 --> 00:16:53,833
+现在我还要提到的一件事是确保
+now one more thing I have to mention is make sure
+
+420
+00:16:53,900 --> 00:16:56,266
+当你添加反斜杠时, 你需要插入一个空格
+when you put the backslash, you'd only insert a space
+
+421
+00:16:56,500 --> 00:16:57,900
+然后再输入你的其他代码
+and then enter otherwise yours
+
+422
+00:16:57,900 --> 00:16:59,833
+你在这儿仍会有个换行符
+you still got the new line character there
+
+423
+00:16:59,966 --> 00:17:03,233
+如果你添加反斜杠后面没有空格然后就回车的话
+you have to put a backslash and then with no spaces, press enter
+
+424
+00:17:03,233 --> 00:17:06,233
+最后, 我就调用GLLogCall
+and then finally I'm just going to call GLLogCall
+
+425
+00:17:06,433 --> 00:17:08,633
+但这次实际上在一个断言中
+but this time actually inside an assertion
+
+426
+00:17:08,633 --> 00:17:12,133
+像那样输入这个GLLogCall
+so like this GLLogCall like that
+
+427
+00:17:12,300 --> 00:17:15,000
+我不会在这里放分号之类的东西
+and I'm not going to put like a semicolon or anything over here
+
+428
+00:17:15,000 --> 00:17:15,833
+因为我们不需要
+because we don't need to
+
+429
+00:17:15,833 --> 00:17:17,000
+因为在我们调用GLCall
+because after we call GLCall
+
+430
+00:17:17,000 --> 00:17:18,333
+我们就是以分号结束的
+we'll end it with a semicolon
+
+431
+00:17:18,333 --> 00:17:21,166
+好了, 所以现在, 让我们滚动到我们代码这里
+all right so now let's scroll down to our code here
+
+432
+00:17:21,366 --> 00:17:25,266
+并且替换调用GLClearError, 然后断言GLLogCall
+and instead of having to call GLClearError and then asserting that GLLogCall
+
+433
+00:17:25,333 --> 00:17:26,425
+实际上我们能做的就是
+what we can actually do is
+
+434
+00:17:26,425 --> 00:17:30,500
+就这样用一个GLCall来包裹这个gldrawerelements
+just wrap this glDrawElements with a GLCall just like that
+
+435
+00:17:30,600 --> 00:17:32,900
+太酷了, 现在我们就可以按f5了
+how cool is that, and now we can hit f5
+
+436
+00:17:33,100 --> 00:17:34,766
+好了, 并且在这儿我们得到了同样的结果
+all right, and we get the same result here
+
+437
+00:17:34,966 --> 00:17:36,233
+但是你现在可以看到它更清楚了
+but you can see now it's even more clear
+
+438
+00:17:36,233 --> 00:17:38,333
+它实际上就在这个glDrawElements这行上
+it's actually on this glDrawElements line
+
+439
+00:17:38,333 --> 00:17:41,166
+所以我们知道到底出了什么问题, 现在
+so we know exactly what's gone wrong, now now
+
+440
+00:17:41,166 --> 00:17:43,275
+我们实际上可以做的另一件事是这个错误消息
+one more thing we can actually do is this error message
+
+441
+00:17:43,275 --> 00:17:47,600
+没有指定发生实际错误的文件或行
+doesn't specify which file or line the actual error occurred on
+
+442
+00:17:47,966 --> 00:17:49,066
+我们真的不太需要那个
+we don't really need that
+
+443
+00:17:49,200 --> 00:17:50,575
+因为我们是通过调试器运行的
+because we're running through the debugger 
+
+444
+00:17:50,575 --> 00:17:51,933
+它只是一个断点, 对吧
+and it just breakpoints, right
+
+445
+00:17:51,933 --> 00:17:54,300
+我们很容易看到在哪个文件的哪行
+and it's easy for us to see what file in line
+
+446
+00:17:54,333 --> 00:17:56,300
+但是如果我们在没有调试器之类的情况下运行它
+but if we're running it without the debugger or anything like that
+
+447
+00:17:56,333 --> 00:17:58,800
+对于控制台来说, 它还是不错的
+it would still be nice for the console
+
+448
+00:17:59,000 --> 00:18:02,133
+以某种方式打印文件和代码行
+right to somehow print out the file and line of code
+
+449
+00:18:02,133 --> 00:18:04,933
+这个实际错误发生的地方, 甚至可能是函数名
+this actual error happened on, maybe even the function name
+
+450
+00:18:04,933 --> 00:18:06,366
+所以让我们看看我们是否能实现那个
+so let's see if we can do that
+
+451
+00:18:06,866 --> 00:18:07,900
+让我们回到这儿
+let's go back out of here
+
+452
+00:18:07,966 --> 00:18:09,200
+而我实际上要做的就是
+and what I'm actually going to do
+
+453
+00:18:09,500 --> 00:18:12,233
+让这个GLLogCall接收更多的参数
+is make this GLLogCall accept some more parameters
+
+454
+00:18:12,233 --> 00:18:14,300
+所以我们添加const char* function
+so we'll add const char function
+
+455
+00:18:14,300 --> 00:18:15,466
+这是函数的名称
+which will be the name of the function
+
+456
+00:18:15,466 --> 00:18:18,633
+我们尝试调用它的所有参数等等
+we tried to call with all of its arguments and everything
+
+457
+00:18:18,700 --> 00:18:22,433
+然后添加const char* file, 这是c++源文件
+we'll add const char* file, which will be the c++ source file
+
+458
+00:18:23,000 --> 00:18:24,533
+这个函数实际调用的文件
+where this function was actually called from
+
+459
+00:18:24,533 --> 00:18:26,133
+最后是int line
+and then finally int line
+
+460
+00:18:26,200 --> 00:18:28,966
+所以我要对这个错误做的就是添加所有这些细节
+so what I'll do to this error is I'll add all of those details
+
+461
+00:18:28,966 --> 00:18:30,300
+所以当我们打印错误消息时候
+so when we print our error message
+
+462
+00:18:30,300 --> 00:18:34,300
+我也会把这个函数加进去
+I'll also add in the function which will be just function
+
+463
+00:18:34,300 --> 00:18:36,266
+实际上我会把它换行, 这样你们就可以看到
+I'll actually move this down here, so you guys can see
+
+464
+00:18:36,366 --> 00:18:38,200
+在那个函数后面我们添加了一个空格
+we'll add a space after that function
+
+465
+00:18:38,433 --> 00:18:39,566
+然后就是文件
+then we'll add file
+
+466
+00:18:40,133 --> 00:18:43,300
+然后像那样一个冒号, 然后才是代码行
+then maybe a colon like that and then the line of code
+
+467
+00:18:43,400 --> 00:18:44,100
+好了, 太棒了
+okay, great
+
+468
+00:18:44,100 --> 00:18:46,133
+所以现在我们需要填充所有的信息
+so now we need to fill all of that information in
+
+469
+00:18:46,133 --> 00:18:47,733
+所以在这个GLLogCall中
+so inside this GLLogCall
+
+470
+00:18:47,866 --> 00:18:50,133
+实际上可以用宏指出
+we can actually use macros to figure out
+
+471
+00:18:50,466 --> 00:18:52,600
+我们调用这个函数的文件或行
+which file or line we call this function from
+
+472
+00:18:52,633 --> 00:18:53,633
+然而不仅如此
+and not only that
+
+473
+00:18:53,866 --> 00:18:54,866
+而我们也可以
+but we can also
+
+474
+00:18:54,966 --> 00:18:57,000
+当我们实际上传入这个函数时
+since we are actually passing in this function
+
+475
+00:18:57,000 --> 00:19:00,400
+实际上我们可以把x转成一个字符串
+we can actually turn in whatever x is into a string
+
+476
+00:19:00,400 --> 00:19:02,366
+而那就是我们如何打印我们的函数名称
+and that's how we'll print our function name
+
+477
+00:19:02,766 --> 00:19:03,666
+所以为了实现那个
+and so to do that
+
+478
+00:19:03,700 --> 00:19:07,166
+我会在x前面加上#, 这会把它转成一个字符串
+I'm just going to write hash in front of x, which turns it into a string
+
+479
+00:19:07,233 --> 00:19:10,300
+然后就是这个文件, 它是__FILE__
+and then for the file, it's underscore underscore file in all caps
+
+480
+00:19:10,300 --> 00:19:13,300
+不像调试器中断, 这不是一个特性
+now unlike the debug break, this is not an intrinsic
+
+481
+00:19:13,500 --> 00:19:15,133
+它应该被所有编译器支持的
+it should be supported by all compilers
+
+482
+00:19:15,133 --> 00:19:16,133
+所以不用担心那个
+so don't worry about that
+
+483
+00:19:16,733 --> 00:19:20,700
+最后这个代码行, 它也是像那样的__LINE__, 好了
+and then finally for the line, again it's just underscore underscore line like that, okay
+
+484
+00:19:20,733 --> 00:19:21,533
+很酷的东西
+pretty cool stuff
+
+485
+00:19:21,800 --> 00:19:23,233
+让我们再次尝试运行我们的代码
+let's try and run our code again
+
+486
+00:19:23,300 --> 00:19:25,833
+现在当这里中断后, 当我们回到我们的控制台
+now when this breaks, if we go back to our console
+
+487
+00:19:25,833 --> 00:19:29,400
+看看这个, 我们看到了glDrawElements
+check this out, we see glDrawElements
+
+488
+00:19:29,433 --> 00:19:33,033
+以及我们实际的参数, GL_TRIANGLES, 6, GL_INT, nullptr
+with our actual parameters, GL_TRIANGLES, six, GL_INT, nullptr
+
+489
+00:19:33,166 --> 00:19:37,633
+并且然后我们实际上也看到了这个Application.cpp源文件的全路径
+and then we actually have a full path to this Application.cpp source file
+
+490
+00:19:37,633 --> 00:19:40,066
+接下来就是实际的代码行166
+followed by the actual line of code one sixty six
+
+491
+00:19:40,066 --> 00:19:42,866
+你可以看到的是断点所在的代码行
+which you can see is line of code that their breakpoint is on
+
+492
+00:19:42,866 --> 00:19:43,600
+那个太酷了
+how cool is that
+
+493
+00:19:43,600 --> 00:19:45,833
+所以我们现在知道到底出了什么问题
+so we now know exactly what's gone wrong
+
+494
+00:19:46,133 --> 00:19:48,833
+在哪儿发生的, 我们实际上做了什么, 就像
+where and what we've actually, like what
+
+495
+00:19:49,200 --> 00:19:51,533
+我们实际上尝试调用什么代码失败了
+what code we actually tried to call that failed
+
+496
+00:19:51,633 --> 00:19:53,233
+因为我们已经在控制台打印了它的一切
+because we're printing it all to the console
+
+497
+00:19:53,400 --> 00:19:54,466
+很酷的东西, 现在有点多
+pretty cool stuff, now a lot
+
+498
+00:19:54,466 --> 00:19:55,666
+我们这个接收的有点多
+now I know this is a lot to take in
+
+499
+00:19:55,666 --> 00:19:57,300
+如果你不熟悉c++宏的话
+if you're not familiar with c++ macros
+
+500
+00:19:57,300 --> 00:19:58,966
+这就是当那个视频准备好了
+which is why that video when it's ready
+
+501
+00:19:59,200 --> 00:20:01,266
+我们会把链接放那儿等等
+we'll be linked up there and all of that
+
+502
+00:20:01,266 --> 00:20:03,100
+而我应该很快就会制作那期
+and I should do that probably very soon
+
+503
+00:20:03,566 --> 00:20:05,400
+但是你可以看到, 在c++和宏的加成下
+but you can see, with the power of c++ and macros
+
+504
+00:20:05,400 --> 00:20:08,575
+我们可以真的可以改进OpenGL调试
+we can like really improve this OpenGL debugging
+
+505
+00:20:08,575 --> 00:20:11,366
+特别是这里最有用的功能
+and specifically the most useful feature here
+
+506
+00:20:11,400 --> 00:20:14,033
+说实话, 实际上就是那个调试器中断
+to be honest is that actual debug break
+
+507
+00:20:14,033 --> 00:20:16,433
+能够在实际代码行上中断
+just being able to break on that actual line
+
+508
+00:20:16,433 --> 00:20:18,433
+通过我们创建的那个断言
+by that assetion that we've kind of created
+
+509
+00:20:18,533 --> 00:20:19,800
+真的真的很有用
+is really really useful
+
+510
+00:20:19,800 --> 00:20:22,833
+因为它能让我们确切地知道我们现在哪里出了问题
+because it kind of lets us know exactly where we've gone wrong now
+
+511
+00:20:22,900 --> 00:20:26,000
+你现在通过这个GLCall应该能做的很多
+what you should do now with this GLCall is actually pretty much
+
+512
+00:20:26,000 --> 00:20:28,233
+我们调用的每一个OpenGL函数
+every OpenGL function we ever call
+
+513
+00:20:28,496 --> 00:20:30,350
+像glGen所有东西
+like glGen just everything
+
+514
+00:20:30,350 --> 00:20:32,533
+我们应该用GLCall把那个包装起来
+we should be wrapping that with GLCall
+
+515
+00:20:32,600 --> 00:20:36,000
+所以基本上我在这里要做的就是很快地做到这一点
+so basically what I'm going to do here is just do that really quickly
+
+516
+00:20:36,000 --> 00:20:39,775
+每个独立的OpenGL函数调用都被包含在GLCall中
+every single OpenGL function call surrounded in GLCall
+
+517
+00:20:39,775 --> 00:20:43,000
+因为我用一种非常简单的方式写了这个宏
+now because I wrote this macro in a very simple kind of way
+
+518
+00:20:43,000 --> 00:20:43,966
+这儿会有些缺陷
+there are a few flaws
+
+519
+00:20:43,966 --> 00:20:46,133
+例如, 如果我们使用一行if语句
+for example, if we use a one-line if statement
+
+520
+00:20:46,133 --> 00:20:47,266
+这个就不会运行
+this isn't going to work
+
+521
+00:20:47,450 --> 00:20:50,166
+因为只有第一行会在if语句内
+because just the first line is going to be inside the if statement
+
+522
+00:20:50,166 --> 00:20:52,000
+这些都不是true
+and these true won't be in all of that
+
+523
+00:20:52,233 --> 00:20:54,366
+你可以通过包围这个范围来解决此问题
+you can fix that by just surrounded this here scope
+
+524
+00:20:54,366 --> 00:20:56,933
+就像一个do-while(0)循环, 然后再做一遍
+and like a do while zero loop and all of that again
+
+525
+00:20:57,466 --> 00:20:58,966
+我在那期关于宏的视频中讲过那个
+I talked about that in the macros video
+
+526
+00:20:59,500 --> 00:21:01,333
+所以这个函数
+so kind of so kind of take this function
+
+527
+00:21:01,333 --> 00:21:02,450
+我在这儿写的这个代码就是
+this code that I've written here is 
+
+528
+00:21:02,450 --> 00:21:04,633
+一种实现这个的真的很基础很简单的方法
+just a really kind of basic simple way of doing this
+
+529
+00:21:04,766 --> 00:21:06,733
+同时, 把它放在一个范围内也不是很好
+also putting it in a scope isn't very preferable
+
+530
+00:21:06,733 --> 00:21:08,966
+因为如果你真的有赋值操作的话
+because if you actually have values being assigned
+
+531
+00:21:08,966 --> 00:21:11,766
+就像如果, 你需要我们在这儿写的这个着色器源码
+like if, you have the shader code that we wrote over here
+
+532
+00:21:12,166 --> 00:21:15,866
+你可以看到调用glCreateProgram的程序实际赋值给了它
+you can see the calling glCreateProgram actually assigns it
+
+533
+00:21:16,033 --> 00:21:17,933
+而我们仍然可以在GLCall内部实现那个
+so we can still do that inside GLCall
+
+534
+00:21:17,933 --> 00:21:19,600
+只是确保你要这样做
+just make sure you do it like this
+
+535
+00:21:19,900 --> 00:21:23,425
+然而问题是如果我们将其包装在一个范围内
+however the issue is that if we were to wrap that in a scope
+
+536
+00:21:23,425 --> 00:21:25,533
+那么program这个变量将超出这里的范围
+program would be out of scope over here
+
+537
+00:21:25,833 --> 00:21:28,733
+所以如果我们像那样放一个大括号
+so if we were to kind of put curly brackets like that
+
+538
+00:21:28,733 --> 00:21:31,133
+围绕这个为了保持它在一个范围
+around this to keep it all in one scope
+
+539
+00:21:31,400 --> 00:21:36,900
+然后我们有一个问题, 就是不能真正使用这里的program
+then we have the issue of not really being able to use program over here
+
+540
+00:21:37,066 --> 00:21:40,600
+因为这就像我们把program包装在一个源码中一样
+because it's like if we wrapped program in a source code kind of like that
+
+541
+00:21:40,600 --> 00:21:42,200
+它无法被访问了
+it wouldn't be accessible anymore
+
+542
+00:21:42,400 --> 00:21:43,300
+正如你在这儿看到的
+as you can see here
+
+543
+00:21:43,533 --> 00:21:46,700
+因此, 你必须意识到一些阻碍
+so there are a few kind of setbacks that you have to be aware of
+
+544
+00:21:46,866 --> 00:21:48,150
+以及所有那些, 我会继续的
+and all that, I'm going to go ahead 
+
+545
+00:21:48,150 --> 00:21:50,600
+并且把剩下所有的这些函数添加上GLCall
+and add GLCall to the rest of all these functions
+
+546
+00:21:50,766 --> 00:21:52,700
+那个源码在patreon上有提供
+that source code is available for patreon
+
+547
+00:21:52,700 --> 00:21:55,633
+如果你通过patreon.com/TheCherno支持这个系列
+if you support the series by going to patreon.com/TheCherno
+
+548
+00:21:55,666 --> 00:21:59,033
+你基本上会收到每一期的源代码
+you will receive basically the source code to every single episode
+
+549
+00:21:59,033 --> 00:22:00,400
+那种一期接一期的
+kind of episode by episode
+
+550
+00:22:00,550 --> 00:22:02,133
+并且那会有我写的所有描述
+and that will have all the story written
+
+551
+00:22:02,133 --> 00:22:02,933
+当然我会做那个
+of course I'll do that
+
+552
+00:22:02,933 --> 00:22:03,900
+我只是不想浪费你们的时间
+I'm not gonna waste your time 
+
+553
+00:22:03,900 --> 00:22:06,700
+并且你只要知道把GLCall加到你面前的每一个函数
+and just you know write GLCall add every single function in front of you
+
+554
+00:22:06,700 --> 00:22:07,700
+因为你已经get到了那个点
+because you kind of get the point
+
+555
+00:22:07,900 --> 00:22:11,733
+但不管如何, 那只是基础的OpenGL错误检测, 对吧
+but anyway, that is basically OpenGL error checking, right
+
+556
+00:22:11,866 --> 00:22:13,166
+那就是我喜欢如何实现它的
+that's how I like to do it
+
+557
+00:22:13,166 --> 00:22:15,566
+我喜欢每个独立函数调用包装起来
+I like to just wrap every single function call
+
+558
+00:22:15,566 --> 00:22:17,033
+每个独立的OpenGL函数调用
+every single OpenGL function call
+
+559
+00:22:17,133 --> 00:22:18,533
+在GLCall中
+inside GLCall and
+
+560
+00:22:18,733 --> 00:22:21,700
+基本上就是只要我有一个错误, 那就会触发断点
+basically that will just breakpoint whenever I have an error
+
+561
+00:22:22,833 --> 00:22:25,766
+关于glDebugMessageCallback, 我们会在后面的一期中讨论
+glDebugMessageCallback, we will talk about in a later episode
+
+562
+00:22:25,766 --> 00:22:27,375
+因为那个也真的很有用
+because that is also very useful 
+
+563
+00:22:27,375 --> 00:22:30,533
+从理论上讲, 意味着我们不必做所有这些
+and kind of theoretically means we don't have to do all of this
+
+564
+00:22:30,533 --> 00:22:32,500
+虽然我发现我仍然喜欢这样做
+although I find I still like doing this
+
+565
+00:22:32,533 --> 00:22:35,933
+因为你确实得到了与OpenGL早期版本的兼容性
+because you do get the compatibility with earlier versions of OpenGL
+
+566
+00:22:36,133 --> 00:22:38,233
+而且这种方法也没有什么问题
+and also there's nothing really wrong with this method
+
+567
+00:22:38,233 --> 00:22:41,266
+只是glDebugMessageCallback确实会给你提供更多信息
+it's just the glDebugMessageCallback does give you more information
+
+568
+00:22:41,266 --> 00:22:43,100
+在所有这些方面都稍微有用一点
+and is slightly more useful in all of that
+
+569
+00:22:43,700 --> 00:22:44,900
+不管怎样, 我希望你们喜欢这个视频
+anyway, I hope you guys enjoyed the video
+
+570
+00:22:44,900 --> 00:22:46,066
+如果你喜欢的话, 就点击那个点赞按钮
+if you did, you hit that like button
+
+571
+00:22:46,066 --> 00:22:47,200
+正如我之前提到的
+as I mentioned earlier
+
+572
+00:22:47,200 --> 00:22:49,766
+你可以通过patreon.com/TheCherno来支持这个系列
+you can support this series by going to patreon.com/TheCherno
+
+573
+00:22:49,766 --> 00:22:51,266
+得到一些很酷的奖励
+and get some pretty cool rewards
+
+574
+00:22:51,533 --> 00:22:52,925
+最后我们也有一个discord服务
+finally we also have a discord server 
+
+575
+00:22:52,925 --> 00:22:54,766
+你可以讨论这期内容等等
+where you can discuss this episode and all of that
+
+576
+00:22:54,833 --> 00:22:57,333
+thecherno.com/discord是你在那里得到邀请的方式
+thecherno.com/discord is how you get an invite there
+
+577
+00:22:57,900 --> 00:22:59,833
+这是一个非常酷的社区, 你可以在这里谈论
+it's a really cool community where you can actually talk about
+
+578
+00:22:59,900 --> 00:23:01,366
+你在这一期看到的一切
+everything you've seen in this episode
+
+579
+00:23:01,566 --> 00:23:03,500
+让我知道你对OpenGL错误检查的看法
+let me know what you think about OpenGL error checking
+
+580
+00:23:03,566 --> 00:23:06,100
+或者如果你有一个非常酷的方法来检查错误
+or maybe if you have a really cool way of actually checking errors
+
+581
+00:23:06,100 --> 00:23:07,700
+那可不像我的方法那么酷
+that isn't as cool as my way
+
+582
+00:23:07,700 --> 00:23:09,066
+那么一定要在下面留言
+then definitely leave a comment below
+
+583
+00:23:09,066 --> 00:23:13,400
+或者只是在一般情况下你是怎么调试OpenGL的
+or just in general what you do to debug OpenGL
+
+584
+00:23:13,400 --> 00:23:17,633
+因为我知道那是个大问题
+because I know that it can be a huge issue and
+
+585
+00:23:18,366 --> 00:23:19,200
+这就是为什么我不
+that's why I'm not
+
+586
+00:23:19,200 --> 00:23:21,720
+这就是为什么我不太热衷于OpenGL的原因之一
+that's one of the reasons why I'm not the biggest fan of OpenGL
+
+587
+00:23:21,720 --> 00:23:24,300
+不论如何, 下次再见, 拜
+anyway, I'll see you guys in the next video, goodbye
+

@@ -1,0 +1,1160 @@
+﻿1
+00:00:00,166 --> 00:00:03,475
+嘿，大家好，我是TheCherno，欢迎回到我的OpenGL系列教程
+hey, what's up guys, my name is TheCherno, welcome back to my OpenGL series
+
+2
+00:00:03,733 --> 00:00:08,800
+那么上一次我们讨论了投影矩阵，我们基本上，在前几期中
+so last time we talked about projection matrixes, and we basically, over the last few episodes
+
+3
+00:00:08,800 --> 00:00:12,900
+我在我们的应用中有了一个在OpenGL中构建的数学库
+I've gotten a math library into our application here, that we're building in OpenGL
+
+4
+00:00:13,200 --> 00:00:14,966
+所以今天我想说的是
+so today what I want to talk about is
+
+5
+00:00:15,266 --> 00:00:19,200
+我猜在投影矩阵之后的下一步，那么我们有了投影矩阵
+I guess the next step after the projection matrix, so we have projection matrixes
+
+6
+00:00:19,200 --> 00:00:22,200
+特别地，我们实现了一个比如正交投影的矩阵
+and specifically we implemented like an orthographic projection
+
+7
+00:00:22,450 --> 00:00:27,100
+至于我们的视图，如果启动上次的程序，这样就能看到实际上有什么
+for our view, if we just launch our program from last time, so that we can see what we actually had
+
+8
+00:00:27,166 --> 00:00:30,550
+我们设法把这个ChernoLogo绘制在了一个不同的位置
+we managed to draw this ChernoLogo kind of in a different position
+
+9
+00:00:30,550 --> 00:00:33,300
+而不是在正确的纵横比的中心
+not in the center of the correct aspect ratio
+
+10
+00:00:33,300 --> 00:00:38,200
+通过使用正交投影，就是我们这行代码提供的
+by using an orthographic projection, which we provided over here in this line of code
+
+11
+00:00:38,200 --> 00:00:40,900
+所以那就是投影矩阵的一个阶段
+so that's kind of one phase of it the projection matrix
+
+12
+00:00:40,900 --> 00:00:43,800
+但是这儿还有另外两个非常重要的矩阵
+but there's also two other matrices that are very important
+
+13
+00:00:43,800 --> 00:00:46,066
+当我们在处理几何变换的时候
+when we're dealing with the transformation of geometry
+
+14
+00:00:46,166 --> 00:00:50,233
+当我们在场景中渲染它时，那么首先是投影
+when we render it in a scene, so the first being projection
+
+15
+00:00:50,233 --> 00:00:55,000
+然后我们还有一个叫做视图矩阵的东西，还有一个叫做模型矩阵的东西
+but then we also have something called view matrix, and we have something called a model matrix as well
+
+16
+00:00:55,326 --> 00:01:00,200
+并且所有这些和每个顶点位置相乘
+and that all of that gets multiplied together with our with each vertex position
+
+17
+00:01:00,300 --> 00:01:04,333
+计算出我们顶点在实际屏幕中的最终位置
+to give us kind of the final position of the vertex in our actual screen
+
+18
+00:01:04,333 --> 00:01:09,800
+比如窗口内部，或者在电脑屏幕上的2D投影
+like on inside our window, or in our kind of 2D projection that is on our computer screen
+
+19
+00:01:10,233 --> 00:01:14,966
+那么再说一次，这背后有很多理论，我以后可能会讲到
+so again, lots of theory behind this, which I probably will cover at some point
+
+20
+00:01:14,966 --> 00:01:18,800
+但我今天想做的是，介绍这个概念，并向大家展示
+but what I want to do today is, just kind of introduce the concept, and actually show you guys
+
+21
+00:01:18,800 --> 00:01:21,033
+如何访问它，它的用途是什么
+how you can access it, and what it's used for
+
+22
+00:01:21,766 --> 00:01:24,600
+然后你们可以尝试一下，希望能通过这种方式学习
+and then you can kind of play around with that, and hopefully learn it that way
+
+23
+00:01:24,600 --> 00:01:26,366
+因为那可能是一个更好的学习方法
+because that's probably a better way of learning it
+
+24
+00:01:26,666 --> 00:01:31,575
+他们只是在学习很多理论，什么都不做，好了，那么直接切入正题吧
+they're just studying a lot of theory, and not doing anything, okay, so let's get straight into it
+
+25
+00:01:31,950 --> 00:01:37,366
+模型视图投影mvp，或者我想，你们也可以把它反转为pvm
+model view projection mvp, or in you know, if you reverse it pvm, I guess
+
+26
+00:01:37,366 --> 00:01:43,750
+但通常它被称为mvp，你们可能也听过那个术语mvp或mvp矩阵
+but usually it's said as mvp, and you may have heard that term as well mvp or mvp matrix
+
+27
+00:01:44,133 --> 00:01:47,566
+所以那个代表模型视图投影矩阵
+so that stands for model view projection matrix
+
+28
+00:01:47,600 --> 00:01:52,566
+并且那是一种经过每个顶点的变换管道
+and that is kind of the transformation pipeline that goes through every vertex
+
+29
+00:01:52,600 --> 00:01:54,766
+现在我一直在说管道，但真的
+now I keep saying pipeline, but really
+
+30
+00:01:54,766 --> 00:02:00,625
+我的意思是每一个mvp的字母都是一个单独的4x4矩阵
+what I mean is that each one of those letters mvp is a separate 4 by 4 matrix
+
+31
+00:02:01,233 --> 00:02:06,866
+并且所有这些矩阵以模型视图投影那种顺序相乘
+and that and all of those matrices get multiplied together in that order model view projection
+
+32
+00:02:06,866 --> 00:02:09,966
+现在在OpenGL中，当我们处理到列主排序时
+now in OpenGL, since we deal with column major ordering
+
+33
+00:02:10,233 --> 00:02:14,633
+实际上，它们都是反过来的，就像我们要把它写出来一样
+it's actually done in kind of reverse each, like if we were to write it out
+
+34
+00:02:14,933 --> 00:02:18,475
+在我们的着色器代码中或者在C++的glm代码中
+in it inside our shader code or inside our glm code in C++ here
+
+35
+00:02:18,625 --> 00:02:22,266
+它可以是投影*视图*模型
+it would be projection times view times model
+
+36
+00:02:22,700 --> 00:02:28,725
+而像Dirext3D和DirextX，因为它们确实处理的矩阵是行主序的
+whereas like DirextX and Dirext3D, because they did deal with row major order for matrices
+
+37
+00:02:28,725 --> 00:02:31,050
+那实际上就是mvp，模型，视图，投影
+that would actually be mvp, model view projection
+
+38
+00:02:31,050 --> 00:02:35,300
+实际上，你们会在这个等式的左边找到顶点的位置
+and you'd actually have your vertex positions on the left side of that kind of equation
+
+39
+00:02:35,766 --> 00:02:38,900
+至少是在等式之外，但那是第一个东西
+non less out of the equation, but that would be kind of the first thing
+
+40
+00:02:38,900 --> 00:02:42,500
+如果你们从左到右读取，相乘的时候，而OpenGL是相反的
+you multiply if you read left to right, whereas an OpenGL is reverse 
+
+41
+00:02:42,700 --> 00:02:45,833
+所以实际上这个mvp并不一定决定了顺序
+so the fact that this mvp doesn't necessarily define the order
+
+42
+00:02:46,600 --> 00:02:49,533
+我们可以在这里讨论很多可能不需要提及的东西
+lots of stuff we could talk about here that we probably don't need to mention
+
+43
+00:02:49,833 --> 00:02:52,766
+但是我们有这三个矩阵
+but the idea is that we have these three matrices
+
+44
+00:02:52,766 --> 00:02:56,966
+它们定义了顶点位置的不同东西
+and they kind of define different things for our vertex position
+
+45
+00:02:56,966 --> 00:03:00,933
+因为最后我们把所有的矩阵相乘
+because what happens in the end is we multiplied all the matrices together
+
+46
+00:03:01,266 --> 00:03:06,066
+我们乘以那个矩阵，得到的矩阵和我们的顶点位置相乘
+and we multiplied that matrix, that resulting matrix with our vertex position
+
+47
+00:03:06,333 --> 00:03:09,333
+那个顶点位置就是几何图形的顶点位置
+and that vertex position is the vertex position of our geometry
+
+48
+00:03:09,333 --> 00:03:14,233
+存储在顶点缓冲区中，并且那些所有相乘
+which is stored inside our vertex buffer, and that kind of all that multiplication
+
+49
+00:03:14,800 --> 00:03:20,600
+将顶点转换为它应该在计算机屏幕上实际屏幕上的位置
+transforms that vertex into where it should be on our actual screen on our computer screen
+
+50
+00:03:20,600 --> 00:03:22,366
+那就是这一切的目的
+that's what this is all for
+
+51
+00:03:22,766 --> 00:03:26,266
+那么我们有上次讲过的投影矩阵
+so we have the projection matrix which we talked about last time
+
+52
+00:03:26,600 --> 00:03:34,533
+这是专门用来转换这种我们选择使用的空间的
+which was specifically for actually converting this kind of whatever space we choose to work with
+
+53
+00:03:35,200 --> 00:03:37,500
+到标准化设备坐标
+into normalized device coordinates
+
+54
+00:03:37,500 --> 00:03:40,266
+这意味着我们要从我们所处理的空间转换到
+meaning we're converting from whatever space we're dealing with
+
+55
+00:03:40,533 --> 00:03:42,733
+不管是正交投影还是透视投影
+and whether that be orthographic or perspective
+
+56
+00:03:43,125 --> 00:03:47,900
+转换到-1到1的映射，在每个xyz轴上
+into a -1 to 1 mapping, in kind of every axis xyz
+
+57
+00:03:48,266 --> 00:03:50,200
+那就是投影矩阵的作用
+that's what the projection matrixes is responsible for
+
+58
+00:03:50,200 --> 00:03:52,433
+如果你们还没有看的话，一定要看看那个视频
+definitely check out that video if you haven't already
+
+59
+00:03:53,133 --> 00:03:57,033
+模型和视图矩阵有点不同
+the model and the view matrix are something a little bit different
+
+60
+00:03:57,750 --> 00:04:03,066
+视图矩阵有时被称为视觉矩阵，是相机的视图
+the view matrix sometimes called the eye matrix is kind of the view of the camera
+
+61
+00:04:03,066 --> 00:04:06,600
+所以这或多或少是一种模拟相机的方法
+so it's a way for us to kind of simulate a camera more or less
+
+62
+00:04:07,225 --> 00:04:12,866
+模型矩阵是我们基本上用来模拟模型矩阵的一种方法
+and then the model matrix is a way for us to basically simulate the model matrix
+
+63
+00:04:12,866 --> 00:04:15,400
+所以这个模型就是我们实际绘制的这个模型
+so the model being the model that we're actually drawing
+
+64
+00:04:15,400 --> 00:04:21,233
+那么我们绘制的这个顶点，这个矩阵具体的说就是这个模型的一个变换
+so the vertex that we're drawing, and the matrix specifically is just a transformation of the model
+
+65
+00:04:21,666 --> 00:04:25,333
+所以为了把它化成更简单的形式，先不考虑投影
+so to put this into more simple terms, projection aside
+
+66
+00:04:25,433 --> 00:04:29,800
+因为那就定义了我们要处理的空间
+because that just kind of defines like I guess what kind of space we deal with
+
+67
+00:04:30,266 --> 00:04:35,800
+视图矩阵是相机的位置，旋转，缩放等等
+the view matrix is the position, the rotation, scale whatever of our camera
+
+68
+00:04:36,233 --> 00:04:40,375
+然后模型矩阵是位置，这是变换
+and then the model matrix is the position, there's the transform
+
+69
+00:04:40,375 --> 00:04:46,733
+所以就是我们对象中绘制的实际模型的位置旋转缩放
+so the position rotation scale of our actual model that we're drawing of our object
+
+70
+00:04:47,000 --> 00:04:50,600
+那么我们就有对象变换和相机变换
+so we have the object transform, and we have the cameras transform
+
+71
+00:04:51,300 --> 00:04:55,733
+现在重要的是要明白，归根结底的说，这些只是数学数字
+now it's important to understand that, at the end of the day, these are just mathematical numbers
+
+72
+00:04:55,733 --> 00:04:57,566
+实际上我已经给了你们这个图解
+the fact that I've kind of given you this illustration
+
+73
+00:04:57,566 --> 00:05:01,500
+如果我们有一个相机，我们有这个变换矩阵的模型
+if we have a camera, we have this model kind of transformation matrix
+
+74
+00:05:02,866 --> 00:05:06,566
+那都是一种幻觉，在某种意义上
+that's all kind of an illusion, in the sense that
+
+75
+00:05:06,800 --> 00:05:10,233
+你们不需要，你们不需要相机，你们可以
+you don't like, you don't have to have a camera, you could just, you
+
+76
+00:05:10,266 --> 00:05:14,250
+我不知道，你们可以一直把相机放在中间
+I don't know just, you could just have your camera in the center at all times 
+
+77
+00:05:14,250 --> 00:05:18,833
+只要有这样的模型矩阵，就可以了
+and just have the kind of model matrix, and that will work as well
+
+78
+00:05:18,833 --> 00:05:22,333
+因为实际上这些只是数字，不管怎样，它们会相乘
+because really these are just numbers, and they will get multiplied together, anyway
+
+79
+00:05:22,333 --> 00:05:26,000
+你们可以有另一个矩阵，就像你们的第二个相机矩阵之类的
+you could have another matrix, that's like your secondary camera matrix or whatever
+
+80
+00:05:26,275 --> 00:05:28,833
+有很多方法可以做到这一点，因为这并不重要
+there's so many ways you can do this, because it doesn't really matter
+
+81
+00:05:28,833 --> 00:05:30,566
+它们只是矩阵相乘
+they're just your multiplying matrix things together
+
+82
+00:05:30,566 --> 00:05:32,966
+你们要明白，就是那么简单
+you have to understand that, it's as simple as that
+
+83
+00:05:34,066 --> 00:05:38,533
+我们处理的惯例是我们有一个视图矩阵
+so the convention that we kind of deal with is we have a view matrix
+
+84
+00:05:38,833 --> 00:05:45,333
+那是专门用来代表相机的，位置和方向
+that is specifically supposed to represent our cameras, kind of position and orientation
+
+85
+00:05:45,733 --> 00:05:52,866
+然后我们有一个模型矩阵用来表示我们的对象变换
+and then we have a model matrix which is supposed to represent our objects transform
+
+86
+00:05:52,866 --> 00:05:55,333
+对象就是我们当前绘制的东西
+object being the thing that we're currently drawing
+
+87
+00:05:56,233 --> 00:05:58,433
+因为我们要做的就是相乘
+because what will happen is we're going to multiply
+
+88
+00:05:58,433 --> 00:06:04,300
+投影矩阵乘上相机矩阵乘上模型矩阵乘上顶点位置
+the projection matrix with the camera matrix with the model matrix with the vertex position
+
+89
+00:06:04,300 --> 00:06:06,400
+我们待会再看那个
+and we'll take a look at that in a minute
+
+90
+00:06:06,500 --> 00:06:10,900
+但从概念上讲，我只是想让你们理解我在这里介绍的东西
+but conceptually, I just want you to understand that what I'm introducing here
+
+91
+00:06:10,900 --> 00:06:13,833
+就是两个不同的矩阵，视图矩阵和模型矩阵
+are two different matrices, the view matrix and the model matrix
+
+92
+00:06:13,866 --> 00:06:18,733
+视图矩阵应该代表相机的位置和方向
+the view matrix is supposedly supposed to represent our camera position and orientation
+
+93
+00:06:19,333 --> 00:06:23,366
+模型矩阵是用来表示对象变换的
+and the model matrix is supposed to represent our objects transform
+
+94
+00:06:23,833 --> 00:06:26,366
+意思是通过变换，至于变换
+meaning by transforming, by transforming
+
+95
+00:06:26,366 --> 00:06:28,500
+我可能也会专门为此做一个视频
+I probably will make a video specifically on this as well
+
+96
+00:06:29,900 --> 00:06:33,600
+教OpenGL很困难，对吧，我也会做一期关于那个的视频
+teaching an OpenGL is hard man, okay, I'm gonna make a video on that as well 
+
+97
+00:06:33,600 --> 00:06:39,500
+但变换的具体意思是位置，旋转，缩放或平移
+but transform specifically means kind of position rotation scale or translation
+
+98
+00:06:39,500 --> 00:06:42,433
+我应该说这就是我一直在寻找的方式，这是漫长的一天，伙计
+I should say that's the way I was looking for, it's been a long day man
+
+99
+00:06:42,700 --> 00:06:46,700
+变换，旋转，缩放，简称TRS
+translation translation rotation scale, TRS
+
+100
+00:06:47,566 --> 00:06:50,533
+变换的意思我想是我们物体的位置
+translation meaning the kind of the position I guess of our object
+
+101
+00:06:50,566 --> 00:06:53,800
+这个旋转是朝向的旋转
+the rotation being the orientation is kind of rotated in
+
+102
+00:06:53,925 --> 00:06:56,200
+然后缩放就是它的大小
+and then the scale being kind of how big or small it is
+
+103
+00:06:56,200 --> 00:06:59,833
+也不需要统一缩放，所以你们可以改变
+doesn't have to be uniform scaling either, so you might be able to change
+
+104
+00:06:59,900 --> 00:07:03,600
+比如，如果它是一个立方体，你们可以把它做成一个矩形或类似的东西
+like if it's a cube, you could make it a like a rectangle of prison or something like that
+
+105
+00:07:04,033 --> 00:07:05,833
+我们以后肯定也会讲到
+and we'll definitely get into that in the future as well
+
+106
+00:07:06,633 --> 00:07:09,475
+但那就是我的想法，不管如何，这个就先说到这儿吧
+but that is the idea, anyway, I'm gonna stop talking
+
+107
+00:07:09,475 --> 00:07:13,375
+因为我觉得我又要唠叨18个小时了
+because I feel like I'm just gonna ramble on for another 18h
+
+108
+00:07:13,850 --> 00:07:17,966
+让我们进入正题吧，看看我们能用这个新知识做些什么
+let's just get into this and see what we can do with this newfound knowledge
+
+109
+00:07:17,966 --> 00:07:23,400
+那么现在，我们有一些基本顶点的位置在这里
+so at the moment, what we have is kind of our base vertex positions which are over here
+
+110
+00:07:23,466 --> 00:07:27,666
+我们创建了一个顶点，抱歉，是投影矩阵，这是一个正交矩阵
+we've created a vertex, a sorry, projection matrix, that is an orthographic matrix
+
+111
+00:07:27,700 --> 00:07:30,600
+从0到960，从0到540
+that is kind of from 0 to 960, and from 0 to 540
+
+112
+00:07:30,700 --> 00:07:34,400
+否则它就是一个像素空间的投影
+so otherwise it's kind of a pixel space projection here
+
+113
+00:07:34,400 --> 00:07:39,100
+因为每个单元是1个像素，这是我们的顶点位置
+because every unit is 1 pixel, here are our vertex positions
+
+114
+00:07:39,100 --> 00:07:43,800
+这些都在顶点缓冲区内，我们在这里做的
+and those are just inside our vertex buffer, and what we're doing here
+
+115
+00:07:44,566 --> 00:07:49,533
+这个result是我在CPU端模拟的乘法
+well this result was just kind of me simulating that multiplication on the cpu side
+
+116
+00:07:49,800 --> 00:07:52,700
+但如果你们看我们的着色器在做什么，它也在做这个
+but if you look at what our shader is doing, it's also doing that
+
+117
+00:07:52,700 --> 00:07:56,933
+从这个意义上说，就是读取mvp，我们传入这里的模型投影矩阵
+in the sense that is taking our mvp, model  projection matrix that we're passing in here
+
+118
+00:07:57,133 --> 00:07:58,700
+然后乘以位置
+and multiplying it with position
+
+119
+00:07:58,866 --> 00:08:02,733
+现在我们来看看mvp到底是什么，你们可以看到
+now if we take a look at what mvp actually is here, you can see that
+
+120
+00:08:03,833 --> 00:08:09,000
+我们实际上传递的是这个proj，对吧，我们传递的是那个proj矩阵
+what we're actually passing here is just this proj, right, we're just passing in that proj matrix
+
+121
+00:08:09,000 --> 00:08:12,433
+实际上我们没有任何视图矩阵或模型矩阵
+we're not actually we don't have any kind of view matrix or model matrix
+
+122
+00:08:12,433 --> 00:08:17,150
+但是我们现在要做的是我们要做矩阵的加法
+but what we're going to do now is we're going to add of matrix
+
+123
+00:08:17,575 --> 00:08:20,733
+这将是相机的位置
+and what this is going to be is the position of our camera
+
+124
+00:08:20,766 --> 00:08:24,133
+那么在这一点上，我们需要决定，我们要如何移动相机
+so at this point we need to decide, well, how do we want to move our camera
+
+125
+00:08:24,233 --> 00:08:29,000
+也许我们想要平移相机，我们不需要考虑旋转，暂时让这个简单点
+maybe we want to translate our camera, we won't worry about rotation, just to give this simple for now
+
+126
+00:08:29,150 --> 00:08:33,033
+让我们把相机移到左边100单位
+let's maybe move our camera, I don't know, 100 units to the left
+
+127
+00:08:33,633 --> 00:08:39,166
+现在这里有个技巧，我们这儿要做的是尝试移动相机
+now here's a trick, what we're doing here is we're trying to move our camera
+
+128
+00:08:39,733 --> 00:08:43,125
+那么让我们花一分钟，就一分钟
+so let's kind of for a minute, for brief minute
+
+129
+00:08:43,125 --> 00:08:45,100
+因为我会有一个关于相机的独立的视频
+because I will have a separate video on cameras
+
+130
+00:08:45,575 --> 00:08:48,666
+就一分钟，让我们想想相机是什么
+for a brief minute, let's just think about what a camera is, well
+
+131
+00:08:49,100 --> 00:08:53,500
+好吧，其实相机是不存在的
+okay, there's not actually like a camera doesn't actually actually exist
+
+132
+00:08:53,500 --> 00:08:56,466
+根本就没有相机这东西，所以我们要如何模拟相机呢
+there's no such thing as a camera, so how would we simulate a camera
+
+133
+00:08:56,533 --> 00:09:00,900
+我们看一下，我们有一个物体，比如这里的这个手机，我们有一个相机
+well let's just see, we have an object, like this phone over here, right, we have a camera here
+
+134
+00:09:01,133 --> 00:09:08,533
+所以如果我想把相机移到左边，从技术上讲，那么物体就会移到右边
+so if I want to remove the camera to the left, then the object would move to the right, technically speaking
+
+135
+00:09:08,533 --> 00:09:13,925
+那么如果我能将相机向左移动，那么物体就会向右移动
+so if I can move the camera to the left, then the object kind of moves to the right 
+
+136
+00:09:13,925 --> 00:09:16,433
+那就是发生的事情，我可能看不到什么东西
+that's what happens, I probably can't see much something
+
+137
+00:09:16,525 --> 00:09:22,233
+我可能应该画个图，但如果你们喜欢，那就是我想要表达的
+I probably should have just drawn a diagram, but that's kind of what I'm getting at if you like
+
+138
+00:09:22,466 --> 00:09:24,433
+OpenGL中没有相机这个东西
+there's no such thing as a camera in OpenGL
+
+139
+00:09:24,566 --> 00:09:29,766
+我们能做的就是移动几何体，我们能移动顶点
+all we can really do really is just move geometry around, we can move vertices around
+
+140
+00:09:30,100 --> 00:09:36,000
+所以为了模拟相机向左移动，我们需要做的是将所有东西向右移动
+so to simulate a camera moving left, what we really need to do is move everything to the right
+
+141
+00:09:36,066 --> 00:09:38,402
+所以它是一种逆向运算
+so it's kind of the reverse operation here
+
+142
+00:09:38,700 --> 00:09:42,966
+那么我要做的是创建一个平移矩阵
+so what I'm going to do here is create a translation matrix
+
+143
+00:09:43,033 --> 00:09:46,966
+因为我想把所有东西都向右移动100单位
+except since I want to move everything to the right 100 units
+
+144
+00:09:46,966 --> 00:09:51,733
+我要在这里写的是一个vec3，我只是移动所有的东西
+what I'm actually going to write here is a vec3, where I'm just moving everything
+
+145
+00:09:51,900 --> 00:09:53,800
+就是-100，那么向左
+-100, so to the left
+
+146
+00:09:53,833 --> 00:09:57,166
+因为那有点像将相机向右移动
+because that will kind of be like moving the camera to the right
+
+147
+00:09:58,100 --> 00:10:03,433
+我把其他的都填上0，我们看看还有什么
+and I'll just fill in 0 for the other units here, and let's see what else is once
+
+148
+00:10:03,433 --> 00:10:09,933
+那么我想我们应该做的是创建一个视图矩阵本体
+so I guess what we should really probably do here is actually just create an identity view matrix
+
+149
+00:10:10,233 --> 00:10:17,500
+也就是其中的一个，然后通过实现那个来平移这个矩阵
+which would mean one of these, and then translate that matrix by just doing that
+
+150
+00:10:17,500 --> 00:10:21,166
+我相信这会改变它的，现在要付出很大的代价
+and I believe that should change it, now it takes a cost which is great
+
+151
+00:10:21,500 --> 00:10:24,866
+所以我们实际上必须，我想我们能做的
+so we'll actually have to, what we could do I guess
+
+152
+00:10:25,200 --> 00:10:33,333
+在这里构造一个矩阵本体，然后像那样把它赋值给view
+is probably end up constructing a identi matrix here, and then assigning it to view like that
+
+153
+00:10:34,033 --> 00:10:37,400
+很好，所以那就是我们的视图矩阵
+all right, cool, so that's kind of our view matrix
+
+154
+00:10:37,400 --> 00:10:45,866
+现在我们要做的是这个mvp，会创建一个glm::mat4 mvp
+so now what we'll do is this mvp thing will actually create a flm mat4 mvp matrix
+
+155
+00:10:45,866 --> 00:10:48,300
+现在就是proj乘以view
+which will be that proj time to the view now
+
+156
+00:10:48,600 --> 00:10:54,300
+那么让我们把它传给这里的mvp，然后按f5运行程序，很好
+so let's pass that into mvp here, and hit f5 to run now program alright, cool
+
+157
+00:10:54,300 --> 00:10:58,833
+所以这儿的结果就是，这个ChernoLogo向左边移动了100个单位
+and so the result here is that, this ChernoLogo has just moved 100 units to the left
+
+158
+00:10:59,200 --> 00:11:01,200
+因为我们做的是我们把相机向右移动
+because what we've done is we've moved our camera to the right
+
+159
+00:11:01,200 --> 00:11:02,633
+并且如果我们把相机向右移动
+and if we move our camera to the right
+
+160
+00:11:02,633 --> 00:11:05,633
+这意味着我们现在看到的所有东西都向左移动了
+it means that everything else we're now seeing kind of move to the left
+
+161
+00:11:05,966 --> 00:11:09,366
+我已经通过逆向运算模拟过了
+and I've simulated that by just doing the reverse operation here
+
+162
+00:11:09,733 --> 00:11:14,500
+因为我在这里输入了-100，这实际上是将目标向左移动
+because I'm typing a -100 here, which essentially ends up moving the objective left
+
+163
+00:11:14,500 --> 00:11:17,500
+这又是一个向右移动相机的模拟
+which again is a simulation of moving the camera to the right
+
+164
+00:11:17,833 --> 00:11:18,833
+所以那就是它的工作原理
+so that's how that works
+
+165
+00:11:18,833 --> 00:11:22,833
+显然，如果你们在一个相机类中，会有这种逆向运算的
+obviously if you're at a camera class, you'll kind of this kind of negation
+
+166
+00:11:23,100 --> 00:11:25,700
+你们会自动化所有这些，接口会帮你们处理这些
+you'll automate all that, and the api will take care of that for you
+
+167
+00:11:25,700 --> 00:11:28,700
+所以你们不用担心那个，但数学上就是这样的
+so you don't have to worry about that, but mathematically that's how it works
+
+168
+00:11:28,800 --> 00:11:31,933
+将相机向左移动实际上就是将所有矩阵向右移动
+moving the camera to the left is actually just moving all the matrixes to the right
+
+169
+00:11:32,333 --> 00:11:35,533
+所以在同样的标准下，因为我们在这里做的
+so with this same principle, because all we've really done here
+
+170
+00:11:35,566 --> 00:11:38,625
+我的意思是你们看不出区别，我把它叫做视图矩阵
+I mean you can't tell the difference, I've called it view matrix
+
+171
+00:11:38,833 --> 00:11:41,975
+但你们无法分辨我们将相机向左移动
+but you can't tell the difference between us moving the camera to the left
+
+172
+00:11:42,600 --> 00:11:46,150
+还是要求物体向右移动，都是同样的结果
+or ask moving the object to the right, same thing
+
+173
+00:11:46,625 --> 00:11:51,866
+所以这纯粹是这是如何运作的一种形象化的方法
+so it's again purely a kind of way to visualize how this actually works
+
+174
+00:11:51,866 --> 00:11:54,733
+但从数学上讲，它们都是一样的，都是数字
+but mathematically, it's just it's all the same, it's just numbers
+
+175
+00:11:54,900 --> 00:11:58,766
+所以我们现在要做的是创建这个模型矩阵
+so what we'll do now is we'll create this model matrix
+
+176
+00:11:59,500 --> 00:12:02,566
+我再把这个模型变换一下
+and I'll again translate the model somewhere
+
+177
+00:12:02,633 --> 00:12:07,866
+所以当我向右移动的时候，我们最终向右平移了这个相机
+so we ended up translating this well the camera right, when I'm moving to the right
+
+178
+00:12:07,866 --> 00:12:11,700
+那么这里我要做的是把模型往上移一点
+so what I'll do here maybe is move the model up a bit
+
+179
+00:12:12,533 --> 00:12:17,333
+那么也许我们会看到，向右移动200，向上移动200，应该这样
+so maybe we'll see, we'll move a 200 to the right, and 200 up, and so we should
+
+180
+00:12:18,033 --> 00:12:23,166
+但我们最终应该让ChernoLogo更靠近屏幕中心
+but we should basically end up with our ChernoLogo being closer to the center of the screen
+
+181
+00:12:23,766 --> 00:12:27,633
+我们把这些矩阵相乘，所以就是proj*view*model
+and we'll multiply all these matrices together, so proj times view times model
+
+182
+00:12:27,966 --> 00:12:32,133
+按f5，你们可以看到现在我们有了ChernoLogo被移动到了另一个位置
+hit f5, and you can see now we have the ChernoLogo being moved another
+
+183
+00:12:32,700 --> 00:12:34,966
+你们知道的，向上200单位，向右200单位
+you know, 200 units up, and 200 units to the right
+
+184
+00:12:35,266 --> 00:12:37,733
+好了，那就是我们最后得到的，酷
+okay, and that's what we end up with, cool
+
+185
+00:12:37,800 --> 00:12:43,133
+所以这个得到的矩阵就是我们的mvp就是模型视图投影
+so this resulting matrix here is what our mvp is model view projection
+
+186
+00:12:43,133 --> 00:12:46,333
+并且再说一次，乘法的顺序是相反的
+and again, the multiplication is kind of an reverse order that's to do with
+
+187
+00:12:46,333 --> 00:12:49,900
+事实上，所有数字的内存布局，它们是主列排列的事实
+the fact the memory layout of all the numbers, the fact that they're in colum major
+
+188
+00:12:50,400 --> 00:12:55,366
+你们可以把OpenGL中的矩阵乘法理解为从右到左
+you can kind of think of reading matrix multiplication in OpenGL as right to left
+
+189
+00:12:55,466 --> 00:13:00,833
+我们把模型，视图和投影相乘，那就是最终结果
+so we multiply model with view with projection, that's just how it ends up working out
+
+190
+00:13:00,900 --> 00:13:02,700
+由于我们内存分布的方式
+because of the way that we've laid out our memory
+
+191
+00:13:02,966 --> 00:13:06,700
+因为它们是OpenGL在着色器和显卡中期望的方式
+because of the way they're OpenGL actually expected in the shader in the GPU
+
+192
+00:13:06,966 --> 00:13:09,633
+还有glm对我们的处理方式
+and also the way the glm handles are for us
+
+193
+00:13:09,800 --> 00:13:12,633
+因为那就是OpenGL的这种规范
+because of that kind of specification by OpenGL
+
+194
+00:13:13,066 --> 00:13:17,100
+不管怎样，那就是你们在这里看到的，三个矩阵相乘
+but anyway, that's what you see here, three matrices multiplied together
+
+195
+00:13:17,366 --> 00:13:21,900
+为我们实际的顶点创建变换
+which create the transformation for our actual vertices
+
+196
+00:13:22,300 --> 00:13:24,433
+就是这样，很简单
+that's it, very simple
+
+197
+00:13:25,266 --> 00:13:31,900
+相机乘以物体的变换乘以那个proj
+camera multiplied with the transform of our object multiplied with that proj
+
+198
+00:13:31,900 --> 00:13:34,566
+把所有东西转换成标准设备坐标
+which converts everything into normalized device coordinates
+
+199
+00:13:34,766 --> 00:13:39,733
+那就是所有你们需要知道的矩阵乘法
+that is basically all the matrix multiplication you need to know
+
+200
+00:13:39,900 --> 00:13:43,200
+如果你们担心3D或2D世界中的对象位置
+if you're worried about position objects in a 3D or 2D world
+
+201
+00:13:43,433 --> 00:13:48,966
+就是这样，这就是所有需要知道的，显然你们可以做的不仅仅是变换
+that's it, that's all there is to know, obviously you can do more than just translation
+
+202
+00:13:49,000 --> 00:13:53,366
+我只是给你们展示了一个简单的例子，我下次想做的是
+I kind of just showed you with simple example, now what I want to do next time
+
+203
+00:13:53,600 --> 00:13:57,100
+因为我们在这一期中已经接触了所有这些模型视图投影的东西
+because we've kind of touched on all this kind of model view projection stuff in this episode
+
+204
+00:13:57,100 --> 00:14:02,025
+非常棒，下次我想开始介绍透视投影
+which is awesome, next time I want to actually start introducing perspective projection
+
+205
+00:14:02,025 --> 00:14:03,700
+可能会涉及到3D的东西
+and maybe get into some 3D stuff
+
+206
+00:14:04,166 --> 00:14:06,300
+因为它对我们来说非常重要
+now because it's going to be really important for us to
+
+207
+00:14:06,300 --> 00:14:09,433
+需要某种方式来控制这些参数的生存周期
+have some kind of way of controlling these parameters live
+
+208
+00:14:09,433 --> 00:14:12,966
+因为我不能一直关闭我的应用
+because I can't keep closing my application
+
+209
+00:14:13,033 --> 00:14:16,300
+更改代码，重新编译，更新，那将是非常痛苦的
+changing the code, recompiling it, and updating it, that's going to be really painful
+
+210
+00:14:16,300 --> 00:14:18,300
+这对我来说真的很难证明，任何类似的东西
+and it's really hard for me to demonstrate, anything like that
+
+211
+00:14:19,000 --> 00:14:23,928
+我要做的可能是集成ImGui，这是一种UI框架
+what I'm actually going to do is probably integrate ImGui which is a kind of a UI framework
+
+212
+00:14:25,033 --> 00:14:27,666
+很容易使用UI的图层
+really easy to use UI kind of layer that we can use for
+
+213
+00:14:27,666 --> 00:14:33,850
+实际上，UI控件是我们应用的一部分，我们可以用它来修改变量
+actually kind of having UI controls as part of our application which we can use to modify variables 
+
+214
+00:14:33,850 --> 00:14:37,000
+当我们的应用程序像调试层一样运行时
+while our application is running kind of like a debug layer
+
+215
+00:14:37,333 --> 00:14:40,833
+非常容易使用的UI，下次我们可能会集成它
+really easy kind of ui to use, so we'll probably integrate that next time
+
+216
+00:14:41,866 --> 00:14:45,050
+但除此之外，我们还得继续，继续用数学这个库
+but other than that, we're just going to progress, keep going with this kind of maths stuff 
+
+217
+00:14:45,050 --> 00:14:48,266
+希望很快就能进入透视投影
+and hopefully get into perspective projections soon
+
+218
+00:14:48,766 --> 00:14:53,000
+想想我们如何在屏幕上呈现真实世界的物体
+and think about how we can render real world kind of objects on the screen
+
+219
+00:14:53,000 --> 00:14:54,400
+无论是3D还是2D
+whether that be 3D or 2D
+
+220
+00:14:54,400 --> 00:14:57,366
+我们可能会在3D和2D之间来回切换，还没决定
+we might go back and forth between 3D and 2D, haven't decided yet
+
+221
+00:14:57,566 --> 00:14:59,366
+但那就是这个的要点
+but that is kind of the gist of this
+
+222
+00:14:59,366 --> 00:15:02,333
+告诉我，你们对模型投影的看法
+let me know what you guys thought of this whole model projection thing
+
+223
+00:15:02,700 --> 00:15:07,436
+我最后可能会为每个概念做更详细的视频
+I am going to probably end up making more detailed videos about each concept 
+
+224
+00:15:07,625 --> 00:15:12,033
+但我想先做一个完整的视频来介绍这个主题
+but I kind of like to make an overall video just covering just introducing the topic first
+
+225
+00:15:12,350 --> 00:15:14,526
+因为这可能是足够的信息
+because this is probably enough information
+
+226
+00:15:14,526 --> 00:15:18,200
+对于你们很多人来说，实际上开始做这个，并尝试它
+for a lot of you, to actually start doing this yourself, and play around with it
+
+227
+00:15:18,566 --> 00:15:20,766
+那可能是最好的学习方式
+and that's going to be probably the best way to learn
+
+228
+00:15:21,100 --> 00:15:23,966
+不管怎样，我希望你们喜欢这个视频，如果喜欢的话，就为它点赞吧
+anyway, I hope you guys enjoyed this video, if you did, you can hit that like button
+
+229
+00:15:24,466 --> 00:15:27,700
+你们可以直接访问patreon.com/TheCherno来帮助支持本系列教程
+you can go ahead and help support this series by going and patreon.com/TheCherno
+
+230
+00:15:28,000 --> 00:15:31,300
+非常感谢所有可爱的赞助人，是他们让这个系列教程成为可能
+huge thank you as always to all the lovely patrons who make this series possible
+
+231
+00:15:31,300 --> 00:15:33,400
+如果没有你们就没有这个系列教程
+it wouldn't be here without you
+
+232
+00:15:33,900 --> 00:15:35,800
+下次见，拜
+I will see you guys next time, goodbye
+

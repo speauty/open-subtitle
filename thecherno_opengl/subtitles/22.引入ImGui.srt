@@ -1,0 +1,1110 @@
+﻿1
+00:00:00,166 --> 00:00:03,366
+嘿，你们好，我是TheCherno，欢迎回到我的OpenGL系列教程
+hey, what's up guys, my name is TheCherno, welcome back to my OpenGL series
+
+2
+00:00:03,366 --> 00:00:06,118
+那么我想今天的内容可能比较酷比较有趣
+so today's gonna be a pretty cool and fun episode I think
+
+3
+00:00:06,118 --> 00:00:08,422
+我们会整合一些叫做ImGui的东西
+we're gonna be integrating something called ImGui
+
+4
+00:00:08,422 --> 00:00:12,500
+人们有不同的叫法比如ImGUI或ImgUi，我就叫它ImGui
+ImGUI, ImgUi people say it differently, I say ImGui
+
+5
+00:00:12,766 --> 00:00:15,466
+但基本上ImGui就是一个GUI(图形用户接口)库
+but basically what ImGui is is a GUI library
+
+6
+00:00:15,466 --> 00:00:19,400
+我们可以在OpenGL, DirectX，以及任何渲染接口中使用的东西
+kind of thing that we can use in OpenGL, in DirectX, and any kind of rendering api
+
+7
+00:00:19,400 --> 00:00:24,033
+它是大多数接口是独立的，这是我们在屏幕上绘制UI(界面)的一种方式
+it's pretty much api independent, it's a way for us to just draw UI on the screen
+
+8
+00:00:24,066 --> 00:00:28,266
+并且对于UI，我的意思就像按钮，文本框，拾色器之类的东西
+and by UI, I mean things like buttons, text fields, color pickers
+
+9
+00:00:29,000 --> 00:00:34,166
+以及像那些的信息窗口，对调试非常有用
+just information windows stuff like that, it's really really useful for debugging purposes
+
+10
+00:00:34,166 --> 00:00:35,133
+并且它甚至很有用
+and it's even useful
+
+11
+00:00:35,133 --> 00:00:39,600
+如果你们想在实时渲染设置中快速制作一些应用
+if you want to make some kind of application quickly in kind of a real time rendering setting
+
+12
+00:00:39,600 --> 00:00:43,781
+那么像图形编辑，可能比如我们在制作游戏引擎，我们希望能够在
+so like a graphics edit, so maybe like if we were making a game engine, and we wanted to
+
+13
+00:00:43,781 --> 00:00:48,000
+不使用Qt制作Windows应用的情况下运行一个关卡编辑器
+get a level editor up, and running without having to actually make a Windows application using Qt
+
+14
+00:00:48,033 --> 00:00:49,966
+或者使用WPF之类的
+or WPF anything like that
+
+15
+00:00:50,100 --> 00:00:52,600
+你们甚至可以快速使用ImGui
+you can even just make it using ImGui really quickly
+
+16
+00:00:52,833 --> 00:00:56,700
+它会像游戏一样运行，像实时应用一样运行，这很酷
+and it would just run like a game, run like a real time application, which is really cool
+
+17
+00:00:56,866 --> 00:00:59,900
+那么ImGui的链接将在下面的描述中
+so link to ImGui will be in the description below
+
+18
+00:01:00,033 --> 00:01:04,700
+今天这一期的想法基本上就是把它集成到我们现有的OpenGL代码库中
+the idea for today's episode is just to basically integrated into our existing OpenGL code base
+
+19
+00:01:04,733 --> 00:01:07,266
+我们这么做的原因是为了以后
+the reason we're doing this is because going forward
+
+20
+00:01:07,366 --> 00:01:10,100
+UI对我们非常有用
+it's going to be really really useful for us to have a UI
+
+21
+00:01:10,100 --> 00:01:14,333
+为了调试的目的，我们可以快速地讲一下
+kind of that we can just spin up really quickly for kind of debugging purposes
+
+22
+00:01:14,600 --> 00:01:20,633
+那么在屏幕上调出我们能看到和编辑的值会很容易
+so for a it's going to be really easy for me to just bring up values on the screen that we can see and edit
+
+23
+00:01:20,733 --> 00:01:24,266
+然后看看这是如何影响我们的实际图像的
+and then see that how that affects our actual graphics
+
+24
+00:01:24,533 --> 00:01:28,933
+但也对于调试，如果我们想要图形，如果我们想要帧率
+but also for kind of debugging, if we want graphs, if we want frame rate
+
+25
+00:01:28,933 --> 00:01:32,400
+如果我们想要某种我们可以点击触发某些东西的按钮
+if we want kind of buttons that we can click the trigger certain things
+
+26
+00:01:33,200 --> 00:01:37,875
+用ImGui库来实现那些真的很容易
+it's really easy to kind of do all of that with with a library like ImGui
+
+27
+00:01:37,875 --> 00:01:44,700
+这样我们就不用编写新的UI库了，老实说，可能需要很长时间
+and saves us having to write our new UI library, which to be honest, can take like really long time
+
+28
+00:01:44,733 --> 00:01:48,033
+所以不管怎样，废话少说，让我们进入正题，看看我们有些什么
+so anyway, without further ado, let's just go in, and take a look at what we've got
+
+29
+00:01:48,033 --> 00:01:50,866
+那么如果我们只是运行我们的代码，看看上次我们做到了哪里
+so if we guys are just running our code to see, where we were at last time
+
+30
+00:01:51,300 --> 00:01:55,033
+你们可以看到我们有这个ChernoLogo，我们有一个模型视图投影矩阵
+you can see we had this ChernoLogo, and we had a model view projection matrix that we made
+
+31
+00:01:55,033 --> 00:01:56,450
+由投影矩阵组成
+consisting of a projection matrix
+
+32
+00:01:56,466 --> 00:02:00,166
+那么视图矩阵和模型矩阵以及所有这些代码总是可以在github上获得
+so view matrix and model matrix as always all this code is available on github
+
+33
+00:02:00,166 --> 00:02:02,866
+如果你们是我们的赞助人，请登录patreon.com/TheCherno
+if you're a patron, so check out patreon.com/TheCherno
+
+34
+00:02:02,866 --> 00:02:06,466
+如果你们还没有，那就来注册获得每一期的所有代码吧
+if you're not, and sign up to get all of this code individually per episode
+
+35
+00:02:06,600 --> 00:02:09,766
+那就是我们从模型视图投影那期开始的地方
+that's where we're going to be starting from the kind of model view projection episode
+
+36
+00:02:10,166 --> 00:02:12,300
+所有这些代码都将成为这一期的基础
+all that code is going to be the basis for this entire episode
+
+37
+00:02:12,300 --> 00:02:14,366
+好了，那么我们要做的第一件事是得到ImGui
+okay, so the first thing we're going to do is get ImGui
+
+38
+00:02:14,366 --> 00:02:17,966
+所以如果你们查看描述中的链接或谷歌ImGui，我相信你们会找到它的
+so if you check out the link in the description or just google ImGui, I'm sure you'll find it
+
+39
+00:02:18,133 --> 00:02:24,025
+如果我们去发布页面，我要下载1.6版本的源代码
+if we go to the releases page here, I'm just going to download the source code for version 1.6
+
+40
+00:02:24,025 --> 00:02:26,766
+它是在12天前发布的，也就是制作这段视频的时候
+it was released 12 days ago at the time of making this video
+
+41
+00:02:27,133 --> 00:02:32,066
+所以我要得到ImGui的这个版本的旧源代码的zip压缩包
+so I'm just going to get the zip archive of old source code for this version of ImGui
+
+42
+00:02:32,166 --> 00:02:35,600
+一旦我找到那个，打开后，你们会看到imgui-1.6
+once I've got that, if I open that, you'll see we have, imgui-1.6
+
+43
+00:02:35,800 --> 00:02:37,466
+现在这里有一些我们关心的东西
+now there are a few things here that we care about
+
+44
+00:02:37,466 --> 00:02:40,800
+我们并不关心所有这些，你们可以看到，比如我们并不需要所有的例子
+we don't care about all of this, like we don't really need all of the examples, you can see
+
+45
+00:02:40,800 --> 00:02:45,033
+从Apple到DirectX，有很多DirectX版本
+there's everything here from Apple to DirectX, a bunch of DirectX versions
+
+46
+00:02:45,066 --> 00:02:51,133
+老式的OpenGL或现代的OpenGL，vulkan和sdl，有很多不同的东西
+old school kind of OpenGL or modern OpenGL, vulkan and sdl and there's a lot of different things
+
+47
+00:02:51,350 --> 00:02:54,700
+我们并不关心这些，我们关心的是OpenGL3的例子
+we don't care about a lot of these, what we do care about is at the OpenGL3 example
+
+48
+00:02:54,700 --> 00:02:57,666
+因为那个恰好用的是glfw，也就是我们现在用的
+because that one happens to be using glfw, which is what we're using
+
+49
+00:02:57,733 --> 00:03:01,266
+并且那将使我们非常非常容易快速地集成它
+and that's going to just make it really really easy for us to integrate it quickly
+
+50
+00:03:01,500 --> 00:03:04,266
+我们关心的另一件事是，当然实际是
+and the other thing we care about is, of course the actual is
+
+51
+00:03:04,366 --> 00:03:08,333
+那么我们真正需要的基本上就是这些东西
+so from is what we actually need is all this stuff basically
+
+52
+00:03:08,333 --> 00:03:12,225
+那么如果我就像那样复制所有这些cpp和头文件
+so if I copy all of these kind of cpp header of files that we have here like that
+
+53
+00:03:12,225 --> 00:03:16,366
+所以就是所有这些，如果我复制它们，我要打开我的vendor文件夹
+so that's all of them, if I copy them, I'm going to go ahead and open my vendor folder
+
+54
+00:03:16,700 --> 00:03:19,333
+并且然后从这里，我要创建一个名为imgui的文件夹
+and then from here, I'm just going to make a folder called imgui
+
+55
+00:03:20,033 --> 00:03:26,350
+然后把所有的代码粘贴进去，那么我想要的另一个东西是glfw的例子
+and then just paste in all of my code into there, so the other thing that I wanted was that glfw example
+
+56
+00:03:26,350 --> 00:03:30,525
+回到这个zip文件，打开examples文件夹
+so if I go back to this zip file and into examples
+
+57
+00:03:30,525 --> 00:03:34,300
+glfw在哪里，那么就在opengl3_example文件夹中
+and where is glfw, so opengl3
+
+58
+00:03:34,433 --> 00:03:38,300
+我只需要这两个，现在我们不需要main，我把它复制出来
+I'm just gonna grab these two, now we don't really need main, I'll copy it out 
+
+59
+00:03:38,300 --> 00:03:43,033
+不管怎样，我们不想要它，但它是一个很好的例子，我们可以用它
+anyway, we don't want it or anything, but it is a good kind of example that we can just use
+
+60
+00:03:44,000 --> 00:03:45,856
+所以回到这里，把这些东西都粘贴进去
+so if I go back here, I'll paste all this stuff in 
+
+61
+00:03:45,856 --> 00:03:48,933
+至于main，再说一次，我们会删除的，可能不会包含在项目中
+main, again, we're gonna delete, and we probably just won't include our project
+
+62
+00:03:48,933 --> 00:03:52,900
+但它仍然可以作为参考，好了，酷，所以那就是ImGui所需要的
+but it's still useful to have there for reference, okay, cool, so that's all we need for ImGui
+
+63
+00:03:52,900 --> 00:03:54,166
+它非常非常容易设置
+it's really really easy to set up
+
+64
+00:03:54,400 --> 00:03:57,066
+那么回到vendor，我会点击这里的刷新按钮
+so go back to vendor, I'm just gonna hit this refresh button up here
+
+65
+00:03:57,066 --> 00:04:00,400
+在顶部，我将基本上包括这里的所有内容
+at the top, and I'm going to basically include everything from here
+
+66
+00:04:00,566 --> 00:04:04,800
+我将排除那个main.cpp文件，因为我们不需要那个文件
+I'm just going to exclude that one main.cpp file, because we do not want that
+
+67
+00:04:04,800 --> 00:04:07,866
+那么就是从项目中移除，但我们还是要把它放在这里作为参考
+so exclude from project, but again we'll keep it around here for reference
+
+68
+00:04:08,650 --> 00:04:15,533
+好了，那么为了设置这个，如果我们看一下这个glfw的例子
+okay, so to set this up, if we take a look at this glfw example here
+
+69
+00:04:17,066 --> 00:04:20,800
+它所做的一件事是它实际上使用gl3w而不是glew
+one thing that it does is it actually uses gl3w instead of glew
+
+70
+00:04:21,200 --> 00:04:23,433
+我们要改变那个，所以去掉这个注释
+we're just going to change that, so we'll get rid of this comment
+
+71
+00:04:24,500 --> 00:04:28,833
+我们把这个改成glew，我想，我也要把这个注释改一下
+and we'll change this to be glew, and I guess, I'll change this comment here as well
+
+72
+00:04:29,100 --> 00:04:33,900
+差不多就这样，如果按ctrl f7，应该会编译，你们可以看到它是被编译了
+that's pretty much it, if I hit ctrl f7, this should just compile, you can see it does
+
+73
+00:04:34,033 --> 00:04:35,366
+那么让我们试着编译整个项目
+so let's try compiling the whole project
+
+74
+00:04:35,366 --> 00:04:39,333
+现在我们已经包含了所有这些ImGui文件，希望一切正常
+now that we've included all of these ImGui files, hopefully everything works fine
+
+75
+00:04:40,900 --> 00:04:45,933
+并且如你们所见，好了，没有错误，我把输出窗口拖到这里
+and as you can see, there we go, no errors, let me just drag this output window over here
+
+76
+00:04:46,100 --> 00:04:47,833
+没有错误，一切正常
+no errors, everything is fine beautiful
+
+77
+00:04:48,066 --> 00:04:52,033
+那么现在我们只需要将它集成到我们的应用中，所以为了实现那个
+so now we just need to integrate it into our application, so to do that
+
+78
+00:04:52,233 --> 00:04:56,233
+实现那个的一个很简单的方法是看一下我们排除的main.cpp文件
+a really easy way to do that is just to take a look at this main.cpp file that we excluded
+
+79
+00:04:56,500 --> 00:04:58,100
+因为那里基本上有一个例子
+because that basically has an example
+
+80
+00:04:58,300 --> 00:05:02,175
+所以这里我们需要做的就是为ImGui创建上下文
+so really all we need to do here is we need to create the context for ImGui
+
+81
+00:05:02,325 --> 00:05:05,020
+我们需要调用这个GlfwGL3_Init
+we need to call this GlfwGL3_Init
+
+82
+00:05:05,020 --> 00:05:11,200
+这个函数是在这个glfw_gl3例子中找到的
+that function is found inside this glfw_gl3 example that they have here
+
+83
+00:05:11,833 --> 00:05:16,500
+并且你们可以看到，它注册了所有这些键绑定，它为我们处理这些
+and you can see, it registers all of these kind of key bindings, it takes care of that for us
+
+84
+00:05:16,500 --> 00:05:20,266
+你们可以看到，我们要做的就是把window指针传递给GlfwGL3_Init
+you can see that all we have to do is pass in the window pointer into a init
+
+85
+00:05:20,266 --> 00:05:23,200
+并且它会设置所有的输入绑定，所以它真的很酷
+and it will just set up all of the input bindings, so it's really really cool
+
+86
+00:05:24,133 --> 00:05:26,825
+至于styleColorsDark，当然，为什么不呢
+styleColorsDark, sure, why not
+
+87
+00:05:26,825 --> 00:05:28,633
+然后它调用了一些实际使用的例子
+and then it's called some examples on actual uses
+
+88
+00:05:28,633 --> 00:05:31,233
+就像我们的运行循环一样，我们只需要开始一个新帧
+just as for our run loop, we just need to start a new frame
+
+89
+00:05:31,300 --> 00:05:35,700
+并且在最后，我们只需要使用ImGui::Render()结束帧
+and at the end, we just need to basically end the frame, using ImGui Render 
+
+90
+00:05:35,700 --> 00:05:42,050
+然后是GlfwGL3_RenderDrawData，这就是所有的DrawData
+and then RenderDrawData for Glfw3, and that's pretty much it, for all the DrawData
+
+91
+00:05:42,050 --> 00:05:45,266
+这样它就会使用OpenGL渲染它，最后我们可以调用shutdown
+so that it actually renders it using OpenGL, and at the end we can do shutdown
+
+92
+00:05:45,620 --> 00:05:49,000
+并且差不多就这样了，那么如果我把这个并排停靠
+and that's pretty much it, so if I just dock this side by side
+
+93
+00:05:49,033 --> 00:05:51,100
+让我们继续并开始复制其中的一些代码
+let's go ahead and start copying some of this code
+
+94
+00:05:51,233 --> 00:05:53,933
+我把它缩小一点，希望你们能看到所有东西
+I'm gonna zoom out a little bit, hopefully you guys can still see everything
+
+95
+00:05:55,266 --> 00:05:57,133
+在我复制这些东西的时候
+this will just be for a bit while I copy this stuff
+
+96
+00:05:58,100 --> 00:06:06,266
+但基本上，让我们复制这儿这个CreateContext，并把它粘贴在顶部
+but basically let's grab that CreateContext that we have here, and put it at the top
+
+97
+00:06:06,766 --> 00:06:11,650
+所以在我们做循环之前，也许在我们创建渲染器之后
+so right before we do our loop here, maybe after we create the renderer
+
+98
+00:06:11,666 --> 00:06:13,450
+我会调用ImGui::CreateContext()
+I'll call ImGui CreateContext
+
+99
+00:06:13,666 --> 00:06:16,333
+现在我们需要包含这个，因为它现在是在vendor文件夹
+now we need to include this, because it's now vendor folder
+
+100
+00:06:16,333 --> 00:06:25,233
+我们应该能够做到包含imgui/imgui.h，还必须包含那个glfw3示例
+we should just be able to do include imgui/imgui.h, and we'll also have to include that glfw3 example
+
+101
+00:06:25,766 --> 00:06:31,733
+所以就是这儿这个，好了，那么我们创建了上下文
+so this one here great, okay, so we create the context
+
+102
+00:06:32,900 --> 00:06:36,850
+然后我们会初始化这个，那么我们会传入那个，你们可以看到
+we're then going to initialize this, so we'll just pass that in, you can see
+
+103
+00:06:36,850 --> 00:06:37,325
+我的意思是
+I mean
+
+104
+00:06:37,325 --> 00:06:40,466
+它的叫法甚至都是一样的，在两个例子中它都被称为window
+it's even called the same, it's even called window in both examples
+
+105
+00:06:40,500 --> 00:06:42,450
+所以我们真的不需要改变任何事情
+so we really literally don't have to change anything
+
+106
+00:06:43,333 --> 00:06:46,300
+我们将继续设置StyleColorsDark
+we'll go ahead and set up that StyleColorsDark
+
+107
+00:06:47,400 --> 00:06:49,366
+初始化差不多就这样了
+and that's it for the initialization
+
+108
+00:06:50,400 --> 00:06:54,266
+让我们直接开始一个新帧，这并不一定是
+let's go ahead and start a new frame, now this doesn't have to be
+
+109
+00:06:54,900 --> 00:06:58,800
+这与开始一个新帧无关，就像一个新的glfw帧
+this has nothing to do with starting a new frame, in terms of like a new glfw frame
+
+110
+00:06:58,800 --> 00:07:01,675
+这只是为了ImGui，所以我们可以把它放在这里
+it's just for ImGui, so we can just put this here
+
+111
+00:07:01,675 --> 00:07:03,425
+没关系，我把它放在renderer.Clear()后
+doesn't matter, I'll put it after the renderer clear
+
+112
+00:07:03,625 --> 00:07:04,450
+你们可以把它放在任何地方
+you can put it anywhere
+
+113
+00:07:04,450 --> 00:07:08,266
+只要确保你们把它放在，比如在ImGui代码之间
+just make sure you put it, like in between your ImGui code
+
+114
+00:07:08,266 --> 00:07:13,566
+所以在你们为这帧开始写任何ImGui代码之前，需要有新的帧函数调用
+so before you start any ImGui code for this frame, you want to have the new frame function call
+
+115
+00:07:14,100 --> 00:07:19,566
+然后在最后，我要去渲染，然后绘制一个东西
+and then at the end, there's I'm going render, and then that kind of draw out a thing
+
+116
+00:07:19,566 --> 00:07:24,333
+所以我会在交换缓冲区之前做这个，然后最后我们有一个shutdown
+so I'll do that right before we swap the buffers, and then finally we have a shutdown
+
+117
+00:07:25,533 --> 00:07:29,166
+所以就是这两行代码，在glfwTerminate之前
+so there's two lines for that, and that's right before glfwTerminate
+
+118
+00:07:29,166 --> 00:07:33,900
+我们把它放在这里，就那样，好了，现在让我们试着渲染一个窗口
+we'll put it right there, that is it, okay, so now let's try and render a window
+
+119
+00:07:34,666 --> 00:07:37,100
+这个main的例子也是很漂亮的
+this main example also has that which is beautiful
+
+120
+00:07:37,133 --> 00:07:39,433
+你们可以看到，这里有一个小窗口
+you can see, there's a bit of a window over here
+
+121
+00:07:39,600 --> 00:07:45,400
+让我们复制那个把它放在，可能会把它放在渲染之后，那么也许在这里
+let's copy that, I'll put it after, I might put it after we render everything, so maybe right over here
+
+122
+00:07:47,433 --> 00:07:51,500
+然后在顶部有一些我们也想复制的变量
+and then there are a few variables at the top here that we want to also copy
+
+123
+00:07:52,266 --> 00:08:00,166
+让我们把它放在这里，让我们关闭main，把这个窗口还原
+let's just put that here, and let's close main, I'll put the Texas back up
+
+124
+00:08:00,200 --> 00:08:03,400
+按f5，看看得到什么，好了，那么看一下，那很简单吧
+let's hit f5, and see what we get, okay, so check that out, that was really easy
+
+125
+00:08:03,400 --> 00:08:07,333
+你们可以看到，现在我们有了这个窗口，我们可以四处移动它
+and you can see, now what we have is this window, that we can kind of move around
+
+126
+00:08:08,000 --> 00:08:12,066
+并且所有的一切都很漂亮，那么我们还可以改变颜色
+and everything's everything's pretty beautiful there, so we can change the color
+
+127
+00:08:12,800 --> 00:08:16,566
+我甚至可以点击这里，调整所有东西的颜色
+I can even click over here, and adjust the color of everything
+
+128
+00:08:16,766 --> 00:08:19,975
+现在你们会注意到它和我的鼠标指针有一点偏移
+now you'll notice that it is a bit offset from my mouse pointer
+
+129
+00:08:19,975 --> 00:08:22,325
+那实际上是因为这个笔记本电脑
+that's actually this laptop
+
+130
+00:08:22,800 --> 00:08:28,200
+出于某种原因，window是dpi缩放的，我不知道，到底发生了什么
+for some reason, window is dpi scaling or something, I don't know, exactly what's going on
+
+131
+00:08:28,233 --> 00:08:31,700
+但是鼠标指针对很多应用程序都存在偏移
+but the mouse pointer is just offset for a lot of applications
+
+132
+00:08:31,700 --> 00:08:35,200
+如果我打开像Mischief软件，这是一个绘图应用
+if I even open something like Mischief up, which is a paint drawing app
+
+133
+00:08:35,300 --> 00:08:40,133
+你们可以看到，当我在屏幕顶部时，它会偏离我的光标
+you can see that it draws way offset from my cursor, when I'm at the top of the screen
+
+134
+00:08:40,233 --> 00:08:43,966
+然后如果我往下，它就会匹配，我不知道，你们能看到多少
+and then if I kind of go down, it kind of matches, I don't know, how well you guys can see that
+
+135
+00:08:43,966 --> 00:08:47,966
+但没人知道到底发生了什么，这真的很令人沮丧
+but anyone knows what on earth is going on here, it's been really frustrating
+
+136
+00:08:47,966 --> 00:08:49,266
+就是这台笔记本电脑
+it's just this laptop
+
+137
+00:08:49,266 --> 00:08:53,066
+它不是唯一一种高分辨率的笔记本，我也有其他的
+it's not the only kind of high resolution for whatever laptop, I've got either
+
+138
+00:08:53,066 --> 00:08:53,966
+所以我也不确定是什么原因
+so I'm not sure why
+
+139
+00:08:53,966 --> 00:08:57,650
+但只是这台笔记本，这似乎是完全错误的，所以不要担心它
+but it's just this one, that seems to be completely wrong, so don't worry about it 
+
+140
+00:08:57,650 --> 00:09:00,000
+如果你正在做像我正在做的那样，应该完全没问题
+if you're like your I'm doing, should be completely fine
+
+141
+00:09:01,466 --> 00:09:04,166
+但你们可以看到那个，是的，它甚至有拾色器
+but you can see that, yeah, it's even got like color pickers
+
+142
+00:09:04,166 --> 00:09:07,500
+并且这只是这里的一个例子，然后还有所有这些设置
+and this is just an example of kind of what you have here, and then all of these settings
+
+143
+00:09:07,500 --> 00:09:10,200
+就像，是的，我们可以拖动它，我们可以调整这个窗口的大小
+and like, yeah, we can drag this around, we can resize this window
+
+144
+00:09:10,466 --> 00:09:14,700
+然而我只需要找到我的鼠标指针，这太烦人了，好了
+however we like I just need to find my mouse pointer, this is so annoying, there we go
+
+145
+00:09:15,733 --> 00:09:19,733
+所以那就是我要继续做的，这是一个关于它是怎么运行的很好的例子
+so yeah that's I'm going, this is a great example of how it works
+
+146
+00:09:19,866 --> 00:09:22,633
+现在让我们在代码中做一些有用的事情
+now let's actually do something useful with it in our code
+
+147
+00:09:22,733 --> 00:09:25,933
+那么我把这些都删掉，我们这儿所有这些例子
+so I'll get rid of all these, all this kind of example stuff that we have here
+
+148
+00:09:26,933 --> 00:09:28,533
+在整个示例窗口中，我们不需要
+in this whole example window, we don't need
+
+149
+00:09:28,566 --> 00:09:32,700
+我会保留这个SliderFloat，因为它会很有用
+one thing I will keep is this, I guess this SliderFloat, because that'll be useful
+
+150
+00:09:33,266 --> 00:09:35,933
+我会把所有东西都删掉，我想我们会保留帧率的东西
+I'll get rid of everything, and I guess we'll keep this frame rate thing
+
+151
+00:09:35,933 --> 00:09:37,733
+因为这很有用，好了
+because it's kind of useful, okay
+
+152
+00:09:37,900 --> 00:09:42,300
+那么现在我想做的一件事是，我们之前讨论过模型矩阵
+so now one thing I want to do here is, we've just talked about model matrixes
+
+153
+00:09:42,300 --> 00:09:44,966
+以及如何用它们来变换实际的几何图形
+and how we can use them to translate our actual geometry
+
+154
+00:09:45,266 --> 00:09:49,900
+让我们继续，把这个model矩阵改成我们可以实时编辑的那种
+let's go ahead, and make this kind of model matrix something that we can actually edit live
+
+155
+00:09:50,266 --> 00:09:54,100
+所以为了实现那个，我要复制，基本上就是这两行代码
+so to do that, I'm going to copy, basically these two lines
+
+156
+00:09:55,800 --> 00:09:59,533
+然后把它们粘贴到这里，就是我们实际提交统一变量的地方
+and paste them over here, where we actually do our uniform submission
+
+157
+00:09:59,766 --> 00:10:04,333
+所以我们需要model矩阵，我们需要mvp，然后我要做的是
+so we need the model metrix and we need the mvp, and then what I'll do with that is
+
+158
+00:10:05,366 --> 00:10:08,400
+我把这儿这个model矩阵和这儿这个mvp去掉
+I'll just get rid of the model metrix from here and the mvp from here
+
+159
+00:10:08,633 --> 00:10:12,100
+我要剪贴mvp这行代码，这实际上是统一变量的设置
+I'll cut this mvp line, this actually uniform setting
+
+160
+00:10:12,366 --> 00:10:16,933
+把它和其他统一变量放在一起
+and I will put it over here with the other uniforms
+
+161
+00:10:17,066 --> 00:10:22,400
+所以现在我们基本上只是在每帧重新计算model和mvp，完全没问题
+so now we're basically just recalculating the model matrix and the mvp every frame, which is totally fine
+
+162
+00:10:22,400 --> 00:10:25,766
+现在让我们添加一些东西到ImGui，让我们修改这个
+so now let's add something to ImGui, lets us actually kind of modify this
+
+163
+00:10:25,766 --> 00:10:27,566
+那么现在它只是一个glm::vec3
+so right now it's just a glm::vec3
+
+164
+00:10:27,900 --> 00:10:31,900
+并且那就是我们传递给这个glm::translatie的东西
+and that's something that we're passing into this translate glm function
+
+165
+00:10:32,200 --> 00:10:35,766
+我会剪切那个，然后把它放到我们运行的循环之外
+I'll cut that, and I'll put that outside of our run loop
+
+166
+00:10:35,766 --> 00:10:41,666
+那么也许在这里，我把这个叫做translation，还是(200, 200, 0)
+so maybe over here, and I'll call this translation, we'll still start at a 200 200 and 0
+
+167
+00:10:42,100 --> 00:10:44,666
+如果我回到这里，粘贴translation
+and if I go back here, I'll paste in translation
+
+168
+00:10:45,200 --> 00:10:48,166
+然后进入ImGui，我会使用一个叫做SliderFloat3的东西
+and then into ImGui, I'll use something called a SliderFloat3
+
+169
+00:10:48,166 --> 00:10:51,133
+我们可能只用SliderFloat2，因为我们只关心x和y
+we'll probably just use a float2, because we just care about x and y
+
+170
+00:10:51,133 --> 00:10:55,733
+但我们会使用SliderFloat3，我会传入translation.x的内存地址
+but we'll use a SliderFloat3, and I'll pass in the memory address of translation.x
+
+171
+00:10:55,766 --> 00:11:00,066
+现在我不太确定这个的参数，你们可以看到，需要接收一个浮点数组
+now I'm not really sure this takes a, you can see, this takes a float array
+
+172
+00:11:01,566 --> 00:11:05,875
+我不太确定如何把它从glm中找出来，如果我们看
+I'm not really sure how to get that out of glm though, if we look at
+
+173
+00:11:06,042 --> 00:11:07,667
+如果我们看一下vec3是什么
+if we look at what a vec3 is
+
+174
+00:11:07,667 --> 00:11:13,933
+它是lowp_vec3, highp_vec3，只是tvec3的别名
+that's lowp_vec3, highp_vec3, is just a type def of tvec3
+
+175
+00:11:14,900 --> 00:11:16,900
+你们可以看到
+you can see that
+
+176
+00:11:16,900 --> 00:11:22,133
+这里使用的是T x, y, z的联合体，T是浮点数，所以我们有了xyz
+the thing that is using is just a union of T x y z, T is float, so we have xyz
+
+177
+00:11:22,133 --> 00:11:27,000
+差不多了，你们期望的vec3的布局是怎样的，当然是一个联合体
+it's pretty much, how you would expect a vec3 to be laid out, the reason is a union of course
+
+178
+00:11:27,033 --> 00:11:30,900
+这样我们基本上就可以通过xyz或rgb或stp来定位它
+just so that we can basically address it by the xyz or rgb or stp
+
+179
+00:11:30,900 --> 00:11:35,666
+不管我们想用什么变量名，它们的意思都是一样的
+whatever kind of variable names we want to use, and they of course mean the same thing
+
+180
+00:11:36,366 --> 00:11:39,300
+但我什么都看不到，我之前看过这个
+but I can't really see anything, I was looking through this a bit earlier
+
+181
+00:11:39,300 --> 00:11:43,675
+它返回一个实际的数组，就像一个指向所有东西的指针
+that returns an actual array, like a pointer to everything
+
+182
+00:11:43,675 --> 00:11:45,150
+你们可以看到，它只返回T
+you can see, this just returns T
+
+183
+00:11:46,133 --> 00:11:47,633
+所以我不太确定是否有办法
+so I'm not exactly sure maybe there is a way
+
+184
+00:11:47,633 --> 00:11:52,233
+但现在，我要传递第一个变量的内存地址，也就是x或r
+but right now, I'm just going to pass in the memory address of the first variable, which is x or r
+
+185
+00:11:52,600 --> 00:11:58,200
+不管你们想用什么，我就用x，那就给了它x的内存地址
+whatever you want to use I'll just use x of course, and that's just going to give it the memory address of x
+
+186
+00:11:58,200 --> 00:12:00,166
+当然内存中的下一个是yz
+and then of course the next one in memory is going to be yz there
+
+187
+00:12:00,166 --> 00:12:04,633
+因此，一切都将按照预期工作，因为内存布局与浮点数组相同
+so everything will work as expected, because the memory layout is the same as a float array
+
+188
+00:12:04,633 --> 00:12:10,200
+好了，那么不管怎样，边界可能是0, 960
+okay, so anyway, the bounds that will set are maybe 0, 960
+
+189
+00:12:10,200 --> 00:12:14,700
+因为我们有我们的投影矩阵，我想是960
+because we have our projection matrix, I believe set to be up to 960
+
+190
+00:12:15,266 --> 00:12:16,666
+并且那就是我们要做的
+and that's really all we have to do
+
+191
+00:12:17,000 --> 00:12:22,300
+我的意思是，这基本上是设置了之后我们可以使用的三个组件
+I mean of course where this is basically setting up three components later that we can use
+
+192
+00:12:22,733 --> 00:12:28,966
+为了修改这个矢量tranlation，被传递到model，用于我们的mvp
+to modify this translation vec3, which is being passed into model, and being used for our mvp matrix
+
+193
+00:12:28,966 --> 00:12:32,681
+我们把它传递到着色器中，那么所有的东西都连接起来了
+which we pass into our shader, so everything is kind of linking up
+
+194
+00:12:32,866 --> 00:12:38,233
+如果我们按f5来运行这里的代码，你们可以看到我们得到的是这个
+if we hit f5 to run out code here, you can see what we get is this
+
+195
+00:12:38,233 --> 00:12:40,300
+如果我把这个窗口移到一边一点
+and if I move this window out to the side a little bit
+
+196
+00:12:40,366 --> 00:12:44,766
+我能做的就是改变这儿这个值，也就是x的位置
+what I can do is change the this value here, this is the x position
+
+197
+00:12:44,766 --> 00:12:48,500
+这是y的位置，你们可以看到它移动了所有的东西，对吧
+this is the y position, and you can see that it moves everything, right
+
+198
+00:12:48,666 --> 00:12:53,066
+如果我把所有的都换成0，你们可以看到，它并不是很靠近底部
+and if I put everything to 0 0, you can see, it's not really quite the bottom here
+
+199
+00:12:53,066 --> 00:12:56,266
+那将是，因为我认为在我们的顶点缓冲中
+and that would be, because I think in our vertex buffer
+
+200
+00:12:57,200 --> 00:12:59,300
+是的，你们可以看到，我们并没有触底
+yeah, you can see, we don't actually hit the bottom anywhere
+
+201
+00:12:59,300 --> 00:13:05,025
+这里是100x200，这便是为什么它不在左下角的原因
+we're kind of at 100 by 200, so that is why that's not in the very kind of bottom left
+
+202
+00:13:05,281 --> 00:13:09,933
+不管怎样，是的，这就是为什么ImGui总是很有用的一个很好的例子
+anyway, yeah, that's a great example of why ImGui always really useful
+
+203
+00:13:09,933 --> 00:13:15,433
+它能让我们快速地调出这个，当代码运行时，我们能控制这些东西
+it just lets us quickly bring up stuff like this, that we can control while our actual code is running
+
+204
+00:13:15,433 --> 00:13:16,700
+所以我们不需要一直重新编译
+so we don't have to keep recompiling
+
+205
+00:13:16,700 --> 00:13:21,366
+它真的会帮助我展示一些我们在这个系列中涉及到的东西
+and it's really going to help me to show some of this things that we cover in this series
+
+206
+00:13:21,633 --> 00:13:24,533
+更详细一点，不幸的是，我讨厌鼠标偏移
+in a bit more detail, now unfortunately, I hate this mouse offset thing
+
+207
+00:13:24,533 --> 00:13:27,233
+也许我可以考虑下次解决
+maybe I can actually think about solving that for next time
+
+208
+00:13:27,699 --> 00:13:30,266
+但我希望你们喜欢这个视频，如果喜欢的话，就为它点赞吧
+but I hope you guys enjoyed this video, if you did you hit the like button
+
+209
+00:13:30,266 --> 00:13:33,366
+你们也可以通过访问patreon.com/TheCherno来帮助支持这个系列
+you can also help support the series by going to patreon.com/TheCherno
+
+210
+00:13:35,166 --> 00:13:38,766
+像往常一样，每期视频的代码都会放在github上
+as always, like every the code for every video goes up on github
+
+211
+00:13:38,766 --> 00:13:41,800
+如果你们是赞助人，就可以访问它，所以一定要看看这个代码
+and if you're a patron, you can access that, so be sure to take a look at this code 
+
+212
+00:13:41,800 --> 00:13:44,866
+如果你们想确保没有犯任何错误或类似的事情
+if you want to make sure you didn't make any errors or anything like that
+
+213
+00:13:45,733 --> 00:13:48,025
+集成ImGui真的很简单
+it was really simple to integrate ImGui
+
+214
+00:13:48,025 --> 00:13:50,600
+我的意思是你们看到了它有多容易，真的没什么大不了的
+I mean you saw how easy it was, really no big deal
+
+215
+00:13:50,966 --> 00:13:56,133
+如果我是在编写自己的引擎，我可能会重写他们的glfw
+if I was kind of writing my own engine, I probably may have rewritten their kind of glfw thing 
+
+216
+00:13:56,133 --> 00:13:59,066
+为了包括其他像DirectX或任何我想支持的接口
+to also include other apis like DirectX or whatever I supported
+
+217
+00:13:59,066 --> 00:14:03,633
+这个系列显然是关于OpenGL的，我只是想ImGui
+so this series is obviously just about OpenGL, I just thought ImGui
+
+218
+00:14:03,700 --> 00:14:07,033
+因为它会帮助我更容易地解释很多OpenGL概念
+because it's gonna help me explain a lot of OpenGL concepts a lot easier
+
+219
+00:14:07,050 --> 00:14:09,050
+因为我可以实时控制东西
+because I can kind of manipulate things live
+
+220
+00:14:09,450 --> 00:14:12,966
+但是不管怎样，下节课，我们会继续下节课的内容
+but anyway, next time, what we're gonna move on to next time
+
+221
+00:14:13,466 --> 00:14:16,266
+有这么多内容要讲，你们只能等到下次了
+that is just so much to cover, you'll have to just wait until next time
+
+222
+00:14:16,266 --> 00:14:18,766
+看看最后会发生什么，到时候见，再见
+and see what ends up happening, I'll see you then, goodbye
+

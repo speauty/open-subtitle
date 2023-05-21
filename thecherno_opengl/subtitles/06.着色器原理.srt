@@ -1,0 +1,2120 @@
+﻿1
+00:00:00,133 --> 00:00:01,000
+嘿，你们好
+hey, what's up guys
+
+2
+00:00:01,033 --> 00:00:03,450
+我是Cherno，欢迎回到我的OpenGL系列教程
+my name is Cherno, welcome back to my OpenGL series
+
+3
+00:00:03,450 --> 00:00:05,375
+今天，我们将讨论的，都是关于着色器的
+today, we're going to be talking all about shaders
+
+4
+00:00:05,375 --> 00:00:09,250
+最后，我们终于可以在屏幕上看到一些东西了
+finally, and we're finally going to be able to actually see something on the screen
+
+5
+00:00:09,250 --> 00:00:11,150
+那么，上一次，我们讲了顶点属性
+so, last time, we talked about vertex attributes
+
+6
+00:00:11,150 --> 00:00:14,833
+并且在那之前，我们讨论过需要缓冲区的顶点对象之类的东西
+and before that, we talked about vertex objects that takes buffers and all that stuff
+
+7
+00:00:14,833 --> 00:00:16,700
+所以如果你还没看过，一定要看看这些视频
+so definitely check out those videos if you haven't
+
+8
+00:00:16,700 --> 00:00:18,533
+只需要点击上面的链接
+by just clicking on the link up there
+
+9
+00:00:18,625 --> 00:00:23,066
+并且经过上一集，你们中的一些人已经能够在屏幕上看到一些东西了
+and from last episode, some of you were actually able to already see something on the screen
+
+10
+00:00:23,066 --> 00:00:25,125
+那么，如果我们深入研究上次的代码
+and if we dive into the code that we were at last time
+
+11
+00:00:25,125 --> 00:00:27,966
+在这里，我们只是写了这两行代码
+over here, we basically just throw these two lines
+
+12
+00:00:27,966 --> 00:00:31,966
+如果我尝试在没有任何着色器之类的情况下运行这个应用程序
+if I try and run this application as is without any kind of shader stuff at all
+
+13
+00:00:32,100 --> 00:00:33,666
+然后你会在我的电脑上看到
+then you'll see on my computer
+
+14
+00:00:33,933 --> 00:00:35,066
+它真的运行起来了
+it actually works
+
+15
+00:00:35,066 --> 00:00:39,300
+并且我们确实在正确的顶点位置看到了一个三角形或者白色三角形
+and we do seem to see a triangle or white triangle at our correct vertex positions
+
+16
+00:00:39,333 --> 00:00:41,166
+这实际上就是我们在这里指定的
+which we actually specified over here
+
+17
+00:00:41,366 --> 00:00:42,800
+所以为什么会这样呢
+so how come that's happening
+
+18
+00:00:42,800 --> 00:00:44,166
+答案就是
+and the answer to that is that
+
+19
+00:00:44,233 --> 00:00:47,600
+一些显卡驱动实际上会为你提供一个默认的着色器
+some GPU drivers will actually provide you with a default shader
+
+20
+00:00:47,633 --> 00:00:51,233
+在你实际上没有提供自己的着色器的时候
+if you haven't actually provided your own shader
+
+21
+00:00:51,233 --> 00:00:53,400
+并且这似乎就是这里正在发生的事情
+and that was that's what seems to be happening here
+
+22
+00:00:53,400 --> 00:00:56,050
+但这确实是基于你现在的驱动
+but this is something that is really based on your drivers 
+
+23
+00:00:56,050 --> 00:00:59,400
+现在，我只是在这台真正的笔记本上用Intel显卡驱动运行这个
+right now, I'm just running this with the Intel drivers on this actual laptop
+
+24
+00:00:59,400 --> 00:01:01,333
+不过我也有一个NVIDIA的显卡
+however I do also have an NVIDIA GPU
+
+25
+00:01:01,333 --> 00:01:03,850
+这可能需要在以后为了更重要的事情不得不切换吧
+which will probably have to switch too later for more serious things
+
+26
+00:01:04,225 --> 00:01:05,533
+但话虽如此
+but that being said
+
+27
+00:01:06,066 --> 00:01:07,533
+它完全依赖于驱动
+it's completely driver dependent
+
+28
+00:01:07,533 --> 00:01:11,000
+所以我真的不想，这就是为什么我上次没有运行它
+so, I don't really want to kind of, that's why I didn't run it last time
+
+29
+00:01:11,000 --> 00:01:12,766
+并且我也不想鼓励你这么做
+and I don't really want to encourage that
+
+30
+00:01:12,766 --> 00:01:14,533
+因为它可能最终会，只有你们中的一些人能运行
+because it'll probably end up working for some of you
+
+31
+00:01:14,533 --> 00:01:15,466
+但不是对于你们所有人
+but not for all of you
+
+32
+00:01:15,466 --> 00:01:17,666
+然后你们中的一些人会觉得我的代码不能运行
+and then some of you will be like my code doesn't work
+
+33
+00:01:17,833 --> 00:01:18,933
+这不是真的意味着
+it's not really meant to
+
+34
+00:01:18,933 --> 00:01:21,900
+OpenGL标准中并没有说
+there's nothing in the OpenGL standard that actually says
+
+35
+00:01:22,366 --> 00:01:24,500
+如果你写了我们做的代码，你应该会看到一个三角形
+you should see a triangle if you write the code that we've done
+
+36
+00:01:24,500 --> 00:01:27,200
+现在，这实际上只是取决于显卡制造商，他们说
+right now, that's actually just up to the GPU manufacturers to say
+
+37
+00:01:27,200 --> 00:01:28,000
+嘿，你知道吗
+hey, you know what
+
+38
+00:01:28,200 --> 00:01:29,166
+如果你不提供一个着色器
+if you don't provide a shader
+
+39
+00:01:29,166 --> 00:01:30,366
+我们将为你只写一个基本的着色器
+we'll just write a basic one for you
+
+40
+00:01:30,366 --> 00:01:33,566
+这样你至少可以更容易地调试你的代码，或之类的事情
+so that you can at least debug your code a bit easier, or something like that
+
+41
+00:01:33,825 --> 00:01:36,233
+今天，我们实际上要写我们自己的着色器
+today, we're actually going to write our own shaders
+
+42
+00:01:36,233 --> 00:01:37,866
+所以，每个人脑海里的第一个问题是
+so, the first question on everyone's mind is
+
+43
+00:01:37,900 --> 00:01:39,300
+什么是着色器
+what is a shader
+
+44
+00:01:39,500 --> 00:01:43,400
+一个着色器基本上就是一个运行在你的显卡上的一个程序(代码)
+a shader is basically just a program that runs on your GPU
+
+45
+00:01:43,400 --> 00:01:45,366
+这是你应该能想到的一切
+that's all you should be thinking of
+
+46
+00:01:45,366 --> 00:01:46,900
+当你想到一个着色器的时候
+when you think about a shader
+
+47
+00:01:46,900 --> 00:01:50,300
+至于程序，我的意思是，就像一段代码
+by program, I just mean, like a block of code
+
+48
+00:01:50,300 --> 00:01:54,700
+它是我们可以在计算机上以文本或字符串形式编写的代码
+it's code that we can write as text as a string on our actual computer
+
+49
+00:01:54,833 --> 00:01:56,300
+然后我们可以把它给OpenGL
+then we can give it to OpenGL
+
+50
+00:01:56,300 --> 00:01:57,733
+我们可以把它发到显卡上
+we can send it to the graphics card
+
+51
+00:01:57,733 --> 00:02:01,466
+像其他程序一样编译它，像其他程序一样链接它
+compile it like any other program, and link it like any other program
+
+52
+00:02:01,650 --> 00:02:04,433
+然后像运行其他程序一样运行它，但是
+and then run it like any other program, but
+
+53
+00:02:04,700 --> 00:02:08,966
+不同的是，它实际上是在我们的显卡上运行的
+the difference is that it actually is run on our GPU on our graphics card
+
+54
+00:02:09,000 --> 00:02:12,133
+而不是像这个c++程序那样在我们的CPU上
+and not on our CPU like this c++ program is
+
+55
+00:02:12,133 --> 00:02:15,933
+那么为什么我们需要程序完全在显卡上运行
+so why do we need programs to actually run on the GPU at all
+
+56
+00:02:16,250 --> 00:02:19,600
+为什么我们必须编写代码，然后在显卡上运行
+why do we have to write code and then run it on the GPU
+
+57
+00:02:20,133 --> 00:02:20,466
+好吧
+well
+
+58
+00:02:20,466 --> 00:02:22,466
+显然，我们正在学习图形编程
+obviously we're learning about graphics programming
+
+59
+00:02:22,466 --> 00:02:25,600
+因此，显卡在这方面发挥了重要作用
+so, the graphics card does play a major role in that
+
+60
+00:02:25,900 --> 00:02:27,133
+但具体来说
+but specifically the reason
+
+61
+00:02:27,133 --> 00:02:29,966
+我们想要能够为显卡编程是因为
+that we want to be able to program the GPU is because
+
+62
+00:02:29,966 --> 00:02:32,633
+我们希望能够告诉显卡该做什么
+well, we want to be able to tell the GPU what to do
+
+63
+00:02:32,866 --> 00:02:37,100
+我们想要利用显卡的能力在屏幕上绘制图形
+we want to utilize the power of the GPU to actually draw graphics on the screen
+
+64
+00:02:37,100 --> 00:02:39,133
+这并不意味着我们所做的一切
+now that doesn't mean that everything we do
+
+65
+00:02:39,133 --> 00:02:40,866
+我们都得在显卡上做
+we need to do on the GPU
+
+66
+00:02:40,866 --> 00:02:43,700
+或者我们应该以着色器的形式使用显卡
+or we should be going on the GPU in the form of a shader
+
+67
+00:02:43,775 --> 00:02:46,400
+但CPU在某些方面还是更快
+there are some things that the CPU is still faster at
+
+68
+00:02:46,600 --> 00:02:48,700
+并且随着这个系列的深入
+and as we kind of progress through this series
+
+69
+00:02:48,700 --> 00:02:52,300
+我们可能会发现一些我们更喜欢在CPU上做的事情
+we'll probably find some things that we will prefer to do on the CPU
+
+70
+00:02:52,433 --> 00:02:56,650
+然后可能只是将结果数据发送给显卡
+and then maybe just send the result the resulting data to the GPU
+
+71
+00:02:56,650 --> 00:02:59,300
+同时仍然在CPU上进行处理
+while still doing that, processing on the CPU
+
+72
+00:02:59,766 --> 00:03:01,266
+但话虽如此
+but that being said
+
+73
+00:03:01,333 --> 00:03:03,000
+有些事情是不可否认的
+there are undeniably things
+
+74
+00:03:03,333 --> 00:03:05,033
+很多事情都与图形有关
+a lot of things to do with graphics
+
+75
+00:03:05,033 --> 00:03:07,800
+显卡的速度要快得多
+that the GPU is simply going to be way faster at
+
+76
+00:03:08,033 --> 00:03:10,400
+那么这就是着色器派上用场的地方
+and that's where shader has come in handy
+
+77
+00:03:11,366 --> 00:03:13,966
+不仅仅是在我们想遵从的时候
+now not just when we want to defer things
+
+78
+00:03:14,733 --> 00:03:16,366
+现在不仅仅是当我们想要
+now, not just when we want to kind of
+
+79
+00:03:16,733 --> 00:03:18,633
+把东西从CPU上拿出来放到显卡上
+take things from the CPU and put them on the GPU
+
+80
+00:03:18,833 --> 00:03:20,133
+但从根本上
+but fundamentally
+
+81
+00:03:20,233 --> 00:03:22,333
+我们得给显卡编程
+we need to be able to program the GPU
+
+82
+00:03:22,333 --> 00:03:22,766
+因为
+because
+
+83
+00:03:22,766 --> 00:03:25,966
+即使是在画这个简单三角形的时候
+even in the form of drawing of drawing this really simple triangle
+
+84
+00:03:26,233 --> 00:03:28,200
+我还是需要能够告诉显卡
+I still want to be able to tell the GPU
+
+85
+00:03:28,200 --> 00:03:29,666
+如何画这个三角形
+how to draw that triangle
+
+86
+00:03:30,000 --> 00:03:32,766
+对吧，就像，顶点位置该在哪儿
+right, like, where did the vertex positions go
+
+87
+00:03:33,066 --> 00:03:34,700
+三角形应该是什么颜色的
+what color should the triangle be
+
+88
+00:03:34,700 --> 00:03:36,133
+应该怎么画
+how should it be drawn
+
+89
+00:03:36,266 --> 00:03:38,100
+诸如此类的东西，对吧
+all that kind of stuff, right
+
+90
+00:03:38,200 --> 00:03:41,833
+当我们进入更复杂的三维场景时
+when we actually get into more complex 3D scenes, as well
+
+91
+00:03:42,066 --> 00:03:43,766
+光源就是一个很好的例子
+lighting is a great example of
+
+92
+00:03:43,766 --> 00:03:45,700
+为什么我们想要为显卡编程
+why we want to be able to program the GPU
+
+93
+00:03:45,700 --> 00:03:47,766
+光源是如何运行的，诸如此类的东西
+how does lighting work, all of that stuff
+
+94
+00:03:47,766 --> 00:03:49,266
+我不想做得太早
+I don't want to get too ahead of myself
+
+95
+00:03:49,266 --> 00:03:52,800
+但所有这些在某种程度上都需要被编程
+but all of that stuff needs to be program somehow
+
+96
+00:03:52,800 --> 00:03:56,133
+显卡不知道怎么做，对吧
+the GPU doesn't just know, how to do this, right
+
+97
+00:03:56,333 --> 00:03:57,600
+我们需要告诉显卡
+we need to tell the GPU
+
+98
+00:03:57,600 --> 00:03:59,666
+如何处理我们发送的数据
+what to do with the data that we've sent it
+
+99
+00:03:59,766 --> 00:04:02,100
+这就是着色器的本质
+and that is what a shader fundamentally is
+
+100
+00:04:02,133 --> 00:04:03,066
+在这一集里
+now in this episode
+
+101
+00:04:03,066 --> 00:04:04,300
+以及对于大多数(学习)OpenGL
+and for most of OpenGL
+
+102
+00:04:04,300 --> 00:04:06,266
+并且对于大多数图形编程
+and for most of graphics programming
+
+103
+00:04:06,533 --> 00:04:09,033
+我们和你可能都会把重点放在
+we're and you as well probably going to be focused on
+
+104
+00:04:09,066 --> 00:04:10,400
+两种着色器
+two types of shaders
+
+105
+00:04:10,600 --> 00:04:12,800
+就是，顶点着色器和片段着色器
+vertex shaders and fragment shaders
+
+106
+00:04:12,800 --> 00:04:15,600
+顺便说一下, 片段着色器也被称为像素着色器
+fragment shaders are also known as pixel shaders, by the way
+
+107
+00:04:15,600 --> 00:04:18,600
+到目前为止，这两种着色器类型是
+so these two shader types are by far
+
+108
+00:04:18,633 --> 00:04:20,633
+最受欢迎的两种，并且
+the two kind of most popular ones, and
+
+109
+00:04:20,800 --> 00:04:23,666
+可能你90%的时间都会用到它们
+probably the ones that you will be using 90% of the time
+
+110
+00:04:23,900 --> 00:04:26,966
+还有其他的着色器类型，细分曲面着色器
+there are other shader types, tessellation shaders
+
+111
+00:04:27,000 --> 00:04:28,233
+几何着色器
+geometry shaders
+
+112
+00:04:28,300 --> 00:04:31,366
+计算着色器之类的东西，如果你在做
+that kind of stuff compute shaders, if you're doing like
+
+113
+00:04:31,800 --> 00:04:33,533
+完全是所有的东西，
+completely kind of all the stuff as well
+
+114
+00:04:34,400 --> 00:04:35,766
+那儿有许多不同类型的着色器
+there are many different types of shaders
+
+115
+00:04:35,766 --> 00:04:37,700
+不要认为只有顶点和片段着色器
+don't think that there are just vertex and fragment shaders
+
+116
+00:04:37,700 --> 00:04:40,900
+就这样，你做完了这儿所有的着色器，还有更多
+that's it, you're done that's all there is, there's much more
+
+117
+00:04:41,133 --> 00:04:42,766
+它们确实会派上用场
+and they do come in handy
+
+118
+00:04:42,766 --> 00:04:44,866
+当你开始接触更高级的东西时
+when you kind of start getting to the more advanced stuff
+
+119
+00:04:44,966 --> 00:04:49,133
+在本系列中，我们肯定会进一步介绍这些类型的着色器
+and we will certainly be covering those types of shader further down, in this series
+
+120
+00:04:49,133 --> 00:04:51,300
+当我们讲到更复杂的图形时
+when we get to more complex graphics
+
+121
+00:04:51,375 --> 00:04:55,266
+但是现在对于90%的着色器编程来说
+but for now and for like 90% of shader programming
+
+122
+00:04:55,333 --> 00:04:59,300
+你可能会处理顶点和片段或像素着色器
+you're probably going to be dealing with vertex and fragment or pixel shaders
+
+123
+00:05:00,100 --> 00:05:03,133
+就是这样，首先，我们来谈谈这到底意味着什么
+that's it, so first of all, let's talk about what that actually means
+
+124
+00:05:03,133 --> 00:05:05,100
+什么是顶点着色器，什么是片段着色器
+what does a vertex shader, what is a fragment shader
+
+125
+00:05:05,100 --> 00:05:05,900
+它们是什么
+what are they
+
+126
+00:05:06,133 --> 00:05:07,166
+为什么是这两种类型
+why they're two types
+
+127
+00:05:07,166 --> 00:05:07,933
+我们如何使用它们
+how do we use them
+
+128
+00:05:07,933 --> 00:05:10,700
+所以，我知道，我还没真正讲过OpenGL管道
+so I know, I haven't really covered the OpenGL pipeline
+
+129
+00:05:10,700 --> 00:05:13,400
+或者只是标准的图形渲染管道
+or the just standard kind of graphics rendering pipeline yet
+
+130
+00:05:13,400 --> 00:05:14,750
+但它大致是如何工作的
+but how does roughly works 
+
+131
+00:05:14,750 --> 00:05:17,533
+所以你们应该在脑子里想象一下
+so really the picture that, you should be having in your head
+
+132
+00:05:17,666 --> 00:05:19,842
+我们在CPU上写了一堆数据
+is that we've written a bunch of data on the CPU
+
+133
+00:05:19,842 --> 00:05:21,766
+我们已经向显卡发送了一些数据
+we've sent some data to the GPU
+
+134
+00:05:21,766 --> 00:05:23,733
+我们已经发出了一个叫做DrawCall指令的东西
+we've issued something called a DrawCall
+
+135
+00:05:23,900 --> 00:05:27,433
+在发出DrawCall指令之前，我们也绑定了某些状态
+we've bound certain states as well before issuing that DrawCall
+
+136
+00:05:27,586 --> 00:05:30,633
+最后我们进入了着色器的阶段
+and finally we kind of get to the shader stage of things
+
+137
+00:05:30,633 --> 00:05:33,533
+或者说是显卡
+or rather the GPU gets to
+
+138
+00:05:33,700 --> 00:05:37,433
+实际处理DrawCall指令并在屏幕上绘制一些东西
+actually processing the DrawCall and drawing something on the screen
+
+139
+00:05:37,466 --> 00:05:39,400
+并且我们在屏幕上看到了一个三角形
+and we get to see a triangle on the screen
+
+140
+00:05:39,600 --> 00:05:43,466
+这个特定的过程基本上就是渲染管道，对吧
+that specific process is basically the rendering pipeline, right
+
+141
+00:05:43,466 --> 00:05:47,166
+我们如何在屏幕上从有数据到有结果的
+how do we go from having data to actually having a result on our screen
+
+142
+00:05:47,166 --> 00:05:52,912
+现在，当显卡开始绘制三角形时，着色器就派上用场了
+now, shader come in handy, when the GPU actually starts drawing its triangle
+
+143
+00:05:52,912 --> 00:05:57,466
+顶点着色器和片段着色器是顺着管道的两种不同的着色器类型
+and vertex and fragment shaders are two different shader types that are along that pipeline
+
+144
+00:05:57,466 --> 00:05:59,333
+所以当我们真正发出DrawCall指令时
+so when we actually issue a DrawCall
+
+145
+00:05:59,466 --> 00:06:01,900
+顶点着色器会被调用
+what happens is the vertex shader will get called
+
+146
+00:06:02,133 --> 00:06:04,333
+然后片段着色器会被调用
+and then the fragment shader will get called
+
+147
+00:06:04,400 --> 00:06:06,466
+然后我们会在屏幕上看到结果
+and then we'll see a result on the screen
+
+148
+00:06:06,666 --> 00:06:09,466
+在这两者之间有很多东西，我已经跳过了
+now there are many things in between that, I have skipped over
+
+149
+00:06:09,466 --> 00:06:10,500
+为了简单起见
+for simplicity's sake
+
+150
+00:06:10,500 --> 00:06:12,500
+在顶点着色器调用之前有很多阶段
+there are many stages before the vertex shader
+
+151
+00:06:12,500 --> 00:06:15,300
+在调用顶点和片段着色器之间有许多阶段
+many stages in between the vertex and fragment shader
+
+152
+00:06:15,300 --> 00:06:17,666
+以及在片段着色器和光栅化阶段之间也有也多阶段
+as well as between the fragment shader and the rasterization stage
+
+153
+00:06:17,666 --> 00:06:18,533
+诸如此类的东西
+and all that stuff
+
+154
+00:06:19,100 --> 00:06:20,466
+我现在不太想讲这个
+I don't want to really cover that right now
+
+155
+00:06:20,466 --> 00:06:21,400
+我尽量简单点说
+I'm trying to give this simple
+
+156
+00:06:21,400 --> 00:06:22,233
+所以只记住这一点
+so just keep that in mind
+
+157
+00:06:22,233 --> 00:06:24,200
+你们这些高级人才都知道到底发生了什么
+all of you advanced people who know exactly what's going on
+
+158
+00:06:24,200 --> 00:06:25,833
+但还是为了一些原因坚持在看这些视频
+but it's still watching these videos for some reason
+
+159
+00:06:25,833 --> 00:06:26,600
+顺便说一下，我是在开玩笑
+I'm kidding by the way
+
+160
+00:06:26,600 --> 00:06:27,900
+几乎每个人都应该看看这些视频
+pretty much everyone should watch these videos
+
+161
+00:06:27,900 --> 00:06:30,100
+因为它可能会让你觉得你错过了很多细节
+because it might feel in a lot of gaps that you're missing
+
+162
+00:06:30,100 --> 00:06:31,566
+但无论如何，重点是
+but anyway the point being
+
+163
+00:06:32,100 --> 00:06:33,966
+我在简化这个
+I am simplifying this
+
+164
+00:06:34,233 --> 00:06:35,100
+所以我们从
+so we go from
+
+165
+00:06:35,233 --> 00:06:35,900
+DrawCall指令
+the DrawCall
+
+166
+00:06:35,900 --> 00:06:38,000
+到顶点着色器，再到片段着色器
+to the vertex shader, to the fragment shader, 
+
+167
+00:06:38,000 --> 00:06:39,600
+最终为了能在屏幕上看到像素
+to being able to see pixels on our screen
+
+168
+00:06:39,900 --> 00:06:41,366
+现在，顶点着色器是做什么的
+now, what a vertex shader does
+
+169
+00:06:41,366 --> 00:06:44,000
+或者说顶点着色器的代码是什么
+or specifically the code that is our vertex shader
+
+170
+00:06:44,150 --> 00:06:48,400
+它会为我们试图渲染的每个顶点调用
+that gets called for each vertex that we're trying to render
+
+171
+00:06:48,533 --> 00:06:50,300
+所以，在这个例子中，我们有一个三角形
+so in this case we have a triangle
+
+172
+00:06:50,300 --> 00:06:52,600
+我们有三个顶点，知道吧
+we have three vertices, okay
+
+173
+00:06:53,200 --> 00:06:57,700
+这意味着顶点着色器会被调用三次，明白吧
+that means that the vertex shader will get called three times, okay
+
+174
+00:06:57,900 --> 00:06:59,900
+每个顶点调用一次
+one for each vertex
+
+175
+00:06:59,900 --> 00:07:04,566
+并且顶点着色器的主要目的是告诉OpenGL
+and the primary purpose of a vertex shader is to tell OpenGL
+
+176
+00:07:04,966 --> 00:07:08,466
+你希望这个顶点在屏幕空间的什么位置
+where you want that vertex to be in your screen space
+
+177
+00:07:08,700 --> 00:07:10,100
+对吧，所以
+right, so where
+
+178
+00:07:10,600 --> 00:07:12,900
+再一次简化这个，在你窗口的什么位置
+again simplifying this where in your window 
+
+179
+00:07:12,900 --> 00:07:14,733
+你的电脑上开着一个窗口
+you have a window open on your computer
+
+180
+00:07:14,733 --> 00:07:16,266
+你在这里输入这些图形
+where you're entering these graphics
+
+181
+00:07:16,366 --> 00:07:20,366
+你希望这个顶点在哪里，对吧
+where would you like that vertex to be, right
+
+182
+00:07:20,666 --> 00:07:24,133
+这就是顶点着色器的主要目的，再说一下
+that is what the primary purpose of a vertex shader is just, again
+
+183
+00:07:24,300 --> 00:07:25,700
+它里面有shader这个词
+it has the word shader in it
+
+184
+00:07:25,700 --> 00:07:27,666
+所以有些人喜欢这样想
+so some people like to think of it like
+
+185
+00:07:28,100 --> 00:07:30,380
+这与光源或着色器有关
+that's having something to do with lighting or shaders or
+
+186
+00:07:30,380 --> 00:07:32,733
+不，这只是个程序, 这就是它
+no, it's a program, that's all it is
+
+187
+00:07:32,966 --> 00:07:35,566
+这和实际的图形没有任何关系
+so this doesn't even have anything to do with actual graphics
+
+188
+00:07:35,566 --> 00:07:38,275
+传统的图形，就像颜色等等
+traditional graphics, in terms of like color or whatever
+
+189
+00:07:38,275 --> 00:07:39,633
+所有的顶点着色器，它们做的是
+ all the vertex shader, it does is
+
+190
+00:07:39,633 --> 00:07:41,500
+它指定了你想要的位置的方式
+it specifies the way you want on the positions to be
+
+191
+00:07:41,700 --> 00:07:42,666
+话虽如此
+now that being said
+
+192
+00:07:42,666 --> 00:07:46,466
+它也被用来解析数据从属性到下一阶段
+it's also used to parse data kind of from attributes into the next stage
+
+193
+00:07:47,000 --> 00:07:50,866
+在我们的例子中，下一个阶段是片段着色器
+and then also in our case, the next stage is the fragment shader
+
+194
+00:07:51,000 --> 00:07:52,800
+所以它也被用来做这个
+so it's also used for that
+
+195
+00:07:52,800 --> 00:07:53,366
+因为当然
+because of course
+
+196
+00:07:53,366 --> 00:07:55,333
+顶点着色器会把这些都包含进去
+the vertex shader will actually take in all
+
+197
+00:07:55,333 --> 00:07:58,133
+我们在缓冲区中指定的顶点属性
+the vertex attributes that we've specified in our buffer
+
+198
+00:07:58,300 --> 00:08:00,100
+在这种情况下，我们只有一个位置
+in this case, we only have a position
+
+199
+00:08:00,225 --> 00:08:03,166
+这些我们指定的位置，如果我们回头看我们的代码
+these positions that we specified, if we look back to our code
+
+200
+00:08:03,300 --> 00:08:06,933
+这种-0.5，以及所有这些东西
+these kind of -0.5 and all of this actual this stuff
+
+201
+00:08:07,033 --> 00:08:10,233
+我们可以在实际的顶点着色器中访问这个
+we can access this in our actual vertex shader
+
+202
+00:08:10,401 --> 00:08:13,500
+因为我们已经把它们指定为顶点属性指针
+because we've actually specified them as vertex attribute pointers
+
+203
+00:08:13,500 --> 00:08:16,700
+并且你会注意到我们也把索引写为0
+and you would have noticed that we also wrote the index zero
+
+204
+00:08:16,700 --> 00:08:20,233
+而这个索引0实际上对应于索引0
+and this index zero is actually going to correspond to an index zero
+
+205
+00:08:20,233 --> 00:08:22,666
+在我们实际的顶点着色器中定义的那个
+which will define in our actual vertex shader
+
+206
+00:08:22,775 --> 00:08:24,466
+并且通过这种形式
+and through that kind of format
+
+207
+00:08:24,466 --> 00:08:26,633
+我们将能够实际访问数据
+we'll be able to actually access the data
+
+208
+00:08:26,700 --> 00:08:29,166
+或者访问这个特定的顶点属性数据
+or access this specific vertex attribute data
+
+209
+00:08:29,166 --> 00:08:32,300
+这个特定的顶点属性就是位置
+this specific vertex attribute being the position
+
+210
+00:08:32,566 --> 00:08:35,750
+所以一旦我们在顶点着色器中访问了那个位置
+so once we've accessed that position in our vertex shader
+
+211
+00:08:35,750 --> 00:08:37,375
+我们基本上就可以告诉OpenGL
+we can basically tell OpenGL 
+
+212
+00:08:37,633 --> 00:08:41,533
+我想让你把这个顶点定位到属性中指定的位置
+I want you to position this vertex at the position that we're specified in the attribute
+
+213
+00:08:41,766 --> 00:08:44,700
+现在你可能会认为这是一个非常非常琐碎的工作
+now you might be thinking this is a very very trivial task
+
+214
+00:08:44,700 --> 00:08:46,133
+比如为什么要存在这个
+like why does this even need to exist
+
+215
+00:08:46,133 --> 00:08:49,566
+显然，我们想确定三角形的位置或者说是顶点的位置
+obviously we want to position our triangle or our vertex position
+
+216
+00:08:49,933 --> 00:08:52,100
+我们在缓冲区中具体指定的位置
+where we've actually specified in our buffer
+
+217
+00:08:52,266 --> 00:08:55,133
+是的，但是想想看，如果你有一台相机
+well, yes, but think about this what if you have a camera
+
+218
+00:08:55,300 --> 00:08:57,266
+你在三维世界里有一个摄像机
+you have a camera in a 3D world and
+
+219
+00:08:57,533 --> 00:08:58,900
+这是定位在某个地方
+it's positioned somewhere
+
+220
+00:08:59,075 --> 00:09:00,066
+突然
+suddenly
+
+221
+00:09:00,066 --> 00:09:05,166
+这些我们为三角形指定的顶点位置
+these vertex positions that we've specified for our triangle
+
+222
+00:09:05,433 --> 00:09:09,733
+不会直接转换到屏幕上相同的位置
+aren't really going to translate directly to being on the screen at those same positions
+
+223
+00:09:09,733 --> 00:09:11,400
+因为如果相机移动了，那么
+because if the cameras moved, then
+
+224
+00:09:11,600 --> 00:09:13,166
+三角形也应该会移动
+well, the triangle should move as well
+
+225
+00:09:13,166 --> 00:09:17,800
+三角形的这种转换需要在某个地方发生
+and that kind of transformation of that triangle needs to happen somewhere
+
+226
+00:09:17,925 --> 00:09:19,900
+现在归结到某些事情上
+now this comes down to certain things
+
+227
+00:09:19,900 --> 00:09:21,900
+在CPU和GPU上，哪个做得更快
+being faster to do on the CPU and the GPU
+
+228
+00:09:21,900 --> 00:09:24,533
+并且关于这个有很多想法
+and there's a lot of thought that goes into this
+
+229
+00:09:24,533 --> 00:09:27,733
+当我们开始写相机之类的东西时，我们肯定会讲到它
+and we'll certainly cover it when we get up to writing cameras and stuff like that
+
+230
+00:09:28,000 --> 00:09:29,166
+但我说的一切
+but all I'm saying is that
+
+231
+00:09:29,466 --> 00:09:30,133
+别去想它
+don't think of it
+
+232
+00:09:30,133 --> 00:09:32,200
+其实并不是那么简单，我只是说
+it's not actually that trivial, is just saying that
+
+233
+00:09:32,200 --> 00:09:34,766
+我的缓冲区中的数据
+the data that is in my buffer
+
+234
+00:09:34,900 --> 00:09:36,466
+这就是我想要的顶点所在的位置
+that is where I want my vertices is to be
+
+235
+00:09:36,466 --> 00:09:38,766
+因为确实有一些转换需要发生
+because there are certain transformations that actually need to happen
+
+236
+00:09:39,166 --> 00:09:42,466
+基于某些的状态和很多其他的东西
+based on certain states and just a lot of other stuff as well
+
+237
+00:09:42,650 --> 00:09:43,425
+但是再说一次
+but again
+
+238
+00:09:43,425 --> 00:09:47,200
+顶点着色器的主要目的是提供那些顶点位置
+the primary purpose of a vertex shader is to provide those vertex positions
+
+239
+00:09:47,200 --> 00:09:51,733
+如果有必要，我们需要能够提供一些转换
+we need to be able to provide some kind of transformation, if necessary
+
+240
+00:09:51,733 --> 00:09:56,800
+以便OpenGL能把这些数字转换成屏幕坐标
+so that OpenGL can actually transform these numbers into actual on screen coordinates
+
+241
+00:09:56,800 --> 00:09:59,566
+这样我们就能在窗口中看到我们的图形
+so that we see our graphics in our window
+
+242
+00:09:59,566 --> 00:10:01,866
+在对的位置，在对的地方
+at the right location, in the right place
+
+243
+00:10:02,166 --> 00:10:03,700
+所以一旦顶点着色器运行
+so once the vertex shader has run
+
+244
+00:10:03,700 --> 00:10:06,733
+并且我记得它对每个顶点运行一次
+and I remember it runs for each vertex once that's happened
+
+245
+00:10:06,933 --> 00:10:09,100
+那么在我们这个例子中，就会运行它三次
+and we've run it in our case three times
+
+246
+00:10:09,100 --> 00:10:11,533
+它被调用了三次，每个顶点一次
+it gets called three times, one for each vertex
+
+247
+00:10:11,733 --> 00:10:14,633
+我们进入了管道的下一个阶段
+we move on to the next stage in our pipeline
+
+248
+00:10:14,700 --> 00:10:16,733
+在这个应用程序的管道中
+in our pipeline for this application
+
+249
+00:10:16,833 --> 00:10:19,600
+下一个阶段就是片段着色器或者像素着色器
+which is the fragment shader or the pixel shader
+
+250
+00:10:19,800 --> 00:10:24,633
+现在，片段和像素在术语上有点小差别
+now fragmented fragments and pixels are a little bit different kind of terminology
+
+251
+00:10:24,633 --> 00:10:25,766
+我们现在不讨论这个
+we're not going to get into that now
+
+252
+00:10:25,766 --> 00:10:29,150
+但现在你可以把像素当成片段
+but for now you can kind of think of pixels as fragment
+
+253
+00:10:29,150 --> 00:10:31,766
+或者你可以把片段想象成像素
+or rather you can think of fragments as pixels
+
+254
+00:10:31,766 --> 00:10:38,666
+因为片段着色器会为每个需要光栅化的像素运行一次
+because the fragment shader is going to run once for each pixel that needs to get rasterized
+
+255
+00:10:38,966 --> 00:10:42,033
+我所说的光栅化实际上是画在屏幕上的
+what I mean by rasterized is actually drawn on our screen
+
+256
+00:10:42,166 --> 00:10:45,433
+所以，我们的窗口基本上是由像素组成的，对吧
+so our window is just basically made up of pixels, right
+
+257
+00:10:45,433 --> 00:10:46,666
+它就像一个像素数组
+it's like a pixel array
+
+258
+00:10:47,166 --> 00:10:52,325
+需要发生的是我们指定的那三个顶点组成我们的三角形
+what needs to happen is those three vertices that we've kind of specified that make up our triangle
+
+259
+00:10:52,325 --> 00:10:55,166
+现在需要用实际的像素填充
+now need to get filled in with actual pixels
+
+260
+00:10:55,200 --> 00:10:57,600
+这就是光栅化阶段所做的
+that's what the rasterization stage is doing
+
+261
+00:10:57,733 --> 00:11:00,066
+并且片段着色器或像素着色器
+and the fragment shader or the pixel shader
+
+262
+00:11:00,133 --> 00:11:05,100
+就是对三角形中需要填充的每个像素调用一次
+is going to get called one once for each pixel in our triangle that needs to get filled in
+
+263
+00:11:05,466 --> 00:11:10,966
+并且我们片段着色器或像素着色器的主要目的是决定
+and the primary purpose of our fragment shader or our pixel shader is to actually decide
+
+264
+00:11:11,400 --> 00:11:14,100
+这个像素应该是什么颜色
+which color that pixel is supposed to be
+
+265
+00:11:14,366 --> 00:11:17,400
+这就是它的作用，它决定了颜色
+that's all it does, it just, it determines a color
+
+266
+00:11:17,633 --> 00:11:20,600
+像素的输出颜色，这样我们就可以得到
+an output color for our pixel, so that we can get
+
+267
+00:11:20,833 --> 00:11:23,700
+这样像素就可以用正确的颜色着色
+so that the pixel can get shaded with the right color
+
+268
+00:11:23,700 --> 00:11:25,300
+把它想象成一本涂色本
+think of this as like a coloring book
+
+269
+00:11:25,466 --> 00:11:27,100
+当你只有东西的轮廓时
+when you've kind of got an outline of things
+
+270
+00:11:27,200 --> 00:11:28,900
+但实际上，你需要给它上色
+but you need to actually color it in
+
+271
+00:11:28,900 --> 00:11:31,266
+你需要给它涂上某种颜色
+you need to shade it in with a certain color
+
+272
+00:11:31,533 --> 00:11:34,100
+这就是片段着色器的职责
+that's what the fragment shader is responsible for
+
+273
+00:11:34,100 --> 00:11:34,700
+现在马上
+now straight away
+
+274
+00:11:34,700 --> 00:11:36,866
+你可能已经注意到两者之间的区别了
+you might have noticed a difference between the two
+
+275
+00:11:37,300 --> 00:11:39,433
+首先，像素着色器被调用三次
+first, pixel shader gets called three times
+
+276
+00:11:39,600 --> 00:11:43,925
+片段着色器可能会被调用数万次，对吧，取决于
+fragment shader might get called tens of thousands of times, right, depending on 
+
+277
+00:11:43,925 --> 00:11:47,066
+我们的三角形在屏幕上占据了多少空间
+how much room our actual triangle occupies on our screen
+
+278
+00:11:47,266 --> 00:11:50,566
+如果你的窗口有一个很小的三角形，一个非常小的三角形
+if you have a tiny triangle, a really small triangle in your window
+
+279
+00:11:50,700 --> 00:11:52,166
+这可能只会被调用比如
+that might only get called like
+
+280
+00:11:52,666 --> 00:11:54,133
+大概有50次吧
+and there are 50 times or something
+
+281
+00:11:54,133 --> 00:11:56,366
+也许它最终会变成50像素
+maybe if it ends up taking on 50 pixels
+
+282
+00:11:56,466 --> 00:12:00,233
+如果你有一个巨大的三角形，填满了你的窗口
+if you have a giant triangle, just filling your window
+
+283
+00:12:00,700 --> 00:12:02,200
+你知道OpenGL之类的
+you know OpenGL or something like that
+
+284
+00:12:02,566 --> 00:12:04,500
+它可能会占用，比如
+you might it might be taking up like
+
+285
+00:12:04,533 --> 00:12:08,033
+我不知道，100万或者50万像素之类的
+I don't know, 1 million pixels or 500,000 pixels or something like that
+
+286
+00:12:08,133 --> 00:12:11,066
+这意味着片段着色器实际上会被调用
+which means that that fragment shader is actually going to get called
+
+287
+00:12:11,233 --> 00:12:12,257
+50万次
+500,000 times 
+
+288
+00:12:12,257 --> 00:12:16,700
+紧接着，我希望你们从一开始就意识到这一点
+immediately and I want you guys to realize this even from the very beginning
+
+289
+00:12:17,133 --> 00:12:20,675
+如果我做25次某些事
+that if I do something like five times five equal
+
+290
+00:12:20,675 --> 00:12:23,400
+我计算5*5
+I calculate what five times five is
+
+291
+00:12:23,566 --> 00:12:24,933
+在顶点着色器中
+in the vertex shader
+
+292
+00:12:25,266 --> 00:12:26,700
+就是25
+and the value of that is 25
+
+293
+00:12:26,966 --> 00:12:29,333
+这个计算会发生三次
+that calculation is going to happen three times
+
+294
+00:12:29,425 --> 00:12:31,500
+在绘制这个三角形的过程中
+in the process of rendering this triangle
+
+295
+00:12:31,500 --> 00:12:34,966
+因为顶点着色器会被调用三次
+because the vertex shader gets called three times
+
+296
+00:12:35,633 --> 00:12:41,366
+如果我们有一个巨大的三角形，我们在片段着色器中做5乘以5的计算
+if we have a huge triangle, and we do five times five that calculation in the fragment shader
+
+297
+00:12:41,633 --> 00:12:44,700
+那么那个片段着色器就会被调用50万次
+and that fragment shader gets called 500,000 times
+
+298
+00:12:45,033 --> 00:12:49,366
+瞬间，我们做了50万次乘法而不是三次
+suddenly, we're doing 500,000 multiplications and not three
+
+299
+00:12:49,900 --> 00:12:51,766
+这里有点不同，对吧
+it's a bit of a difference here, right
+
+300
+00:12:52,066 --> 00:12:53,366
+这就是为什么说到
+which is why when it comes to
+
+301
+00:12:53,366 --> 00:12:56,000
+当需要优化和考虑性能时
+when it comes time to kind of optimize and think about performance
+
+302
+00:12:56,033 --> 00:12:57,166
+这真的是所有的时间
+which is really all the time
+
+303
+00:12:57,966 --> 00:13:00,133
+你可能已经注意到了，嘿
+you can probably start to notice that, hey
+
+304
+00:13:00,233 --> 00:13:04,200
+在顶点着色器中做一些关键操作可能是值得的
+it might be worth me doing some of these critical operations in the vertex shader
+
+305
+00:13:04,366 --> 00:13:05,400
+而不是在片段着色器
+rather than the fragment shader
+
+306
+00:13:05,400 --> 00:13:09,400
+你也可以把数据从顶点着色器传递到片段着色器
+and again you can pass data from the vertex shader to the fragment shader as well
+
+307
+00:13:10,233 --> 00:13:12,133
+所以，是的，这是值得思考的
+so, yeah, just something to think about
+
+308
+00:13:12,133 --> 00:13:13,266
+只是想提一下
+just wanted to mention that
+
+309
+00:13:13,433 --> 00:13:14,300
+记住那件事
+keep that in mind
+
+310
+00:13:14,600 --> 00:13:15,600
+片段着色器
+fragment shader
+
+311
+00:13:15,833 --> 00:13:18,033
+片段着色器里面的东西代价要高得多
+things in there tend to be a lot more expensive
+
+312
+00:13:18,100 --> 00:13:21,066
+因为片段着色器会为每个像素运行
+because, that fragment shader is going to run for each pixel
+
+313
+00:13:21,366 --> 00:13:22,000
+话虽这么说
+that being said
+
+314
+00:13:22,000 --> 00:13:24,300
+有些东西显然需要按像素计算
+some things obviously need to get calculated per pixel
+
+315
+00:13:24,300 --> 00:13:25,200
+这是个很好的例子
+so a great example
+
+316
+00:13:25,200 --> 00:13:27,366
+我喜欢用片段着色器来举这个例子
+I love bringing up this example with fragment shader
+
+317
+00:13:27,366 --> 00:13:28,600
+特别是光源
+specifically is lighting
+
+318
+00:13:28,866 --> 00:13:30,700
+对吧，如果你在计算光源
+right, if you're calculating lighting
+
+319
+00:13:30,733 --> 00:13:34,400
+每个像素都有一个颜色值，这个值是由很多东西决定的
+each pixel is going to have a color value that is determined by a number of things
+
+320
+00:13:34,766 --> 00:13:37,766
+例如，光源，环境
+for example, the lighting, the environment potentially
+
+321
+00:13:37,966 --> 00:13:38,866
+纹理
+the texture
+
+322
+00:13:38,866 --> 00:13:41,200
+提供给表面的材质
+the material, that's supplied to the surface
+
+323
+00:13:41,200 --> 00:13:42,300
+所有这些东西，对吧
+all of this stuff, right 
+
+324
+00:13:42,300 --> 00:13:47,566
+一起来确定一个特定像素的正确颜色
+comes together to determine what the correct color is for a specific pixel
+
+325
+00:13:47,775 --> 00:13:50,366
+显然，这取决于一些输入
+obviously this is going to depend on a number of inputs
+
+326
+00:13:50,366 --> 00:13:51,966
+例如，相机的位置在哪里
+such as, where the camera position is
+
+327
+00:13:51,966 --> 00:13:52,500
+正如我所说的
+and as I said
+
+328
+00:13:52,500 --> 00:13:53,566
+所有的表面属性
+all the surface properties
+
+329
+00:13:53,566 --> 00:13:54,833
+环境属性
+the environment properties
+
+330
+00:13:55,066 --> 00:13:56,433
+我们所有的东西都会聚集在一起
+all of our stuff is going to come together
+
+331
+00:13:56,433 --> 00:13:57,566
+但在一天结束时
+but in the end of the day
+
+332
+00:13:57,833 --> 00:14:01,166
+在一天结束的时候，你在片段着色器中所有的决定
+at the end of the day, all you're determining in the fragment shader
+
+333
+00:14:01,333 --> 00:14:03,700
+是单个像素的颜色
+is the color of a single pixel
+
+334
+00:14:03,966 --> 00:14:05,333
+这就是片段着色器的作用
+that is what the fragment does
+
+335
+00:14:05,333 --> 00:14:08,233
+它是一个程序，运行来确定这个像素应该是什么颜色
+it's a program that runs to determine which color this pixel should be
+
+336
+00:14:08,600 --> 00:14:10,933
+就是这样，一旦发生
+that's it, once that happens
+
+337
+00:14:11,366 --> 00:14:13,266
+一旦片段着色器得到计算结果
+once that fragment shader gets calculated
+
+338
+00:14:13,800 --> 00:14:18,166
+你的颜色基本上会出现在屏幕上，对吧
+your color will basically make it to the screen, okay
+
+339
+00:14:18,266 --> 00:14:19,033
+到实际的
+to the actual
+
+340
+00:14:19,033 --> 00:14:21,433
+到你计算机上打开的实际窗口
+to your actual window that is open on your computer
+
+341
+00:14:21,466 --> 00:14:23,033
+我们会看到一个真正的三角形
+and we'll see an actual triangle
+
+342
+00:14:23,275 --> 00:14:25,233
+这里是白色三角形
+white triangle, in this case
+
+343
+00:14:25,325 --> 00:14:26,300
+因为
+because
+
+344
+00:14:26,300 --> 00:14:29,500
+这个例子中的默认着色器在我们的驱动程序
+the default shader in this example in our example in our driver
+
+345
+00:14:29,500 --> 00:14:30,766
+似乎默认是白色的
+seems to be just defaulting to white
+
+346
+00:14:30,766 --> 00:14:32,533
+这可能是合适的默认着色器
+which is probably the reasonable default
+
+347
+00:14:32,533 --> 00:14:34,366
+不管怎样，当我们开始写这些着色器的时候
+but anyway, when we start writing these shaders
+
+348
+00:14:34,533 --> 00:14:36,133
+它将是我们指定的任何颜色
+it will be whatever color we specify
+
+349
+00:14:36,233 --> 00:14:38,900
+所以，作为一个简单的测试，我们可以说，嘿
+so, as an easy test, we could just say that, hey
+
+350
+00:14:38,900 --> 00:14:41,933
+这个三角形的每个像素都应该是红色的
+every single pixel for this triangle should be red
+
+351
+00:14:41,933 --> 00:14:44,000
+我们会看到一个完全红色的三角形
+and we should just see a completely red triangle
+
+352
+00:14:44,000 --> 00:14:46,266
+明白吧，为每个像素运行片段着色器
+okay, fragment shaders run for each pixel
+
+353
+00:14:46,266 --> 00:14:48,066
+并且它们决定了颜色输出
+and they determine the color output
+
+354
+00:14:48,300 --> 00:14:49,900
+顶点着色器为每个顶点运行
+vertex shaders run for each vertex
+
+355
+00:14:49,900 --> 00:14:52,466
+它们决定了屏幕上的位置
+and they determine the position on our screen
+
+356
+00:14:52,766 --> 00:14:54,500
+这基本上就是着色器的工作原理
+that is basically how shaders work
+
+357
+00:14:54,566 --> 00:14:56,933
+现在，你可能认为我真的把事情过度简单化了
+now, you may think that I'm really over simplifying things
+
+358
+00:14:56,966 --> 00:14:59,466
+因为我散发了实际管道的许多阶段
+because I am emitting a lot of the stages of the actual pipeline
+
+359
+00:14:59,466 --> 00:15:02,300
+以及我们还有很多其他可用的着色器
+and a lot of other shaders that we actually have available to us
+
+360
+00:15:02,500 --> 00:15:04,566
+但我不认为我真的太过简化了
+but I don't think I'm actually over simplifying at all
+
+361
+00:15:04,566 --> 00:15:06,866
+这其实很简单
+that is actually as simple as it is
+
+362
+00:15:07,275 --> 00:15:08,266
+话虽这么说
+that being said
+
+363
+00:15:08,500 --> 00:15:11,366
+你可以用它做一些很酷的东西，对吧
+you can do some really cool stuff with this, right
+
+364
+00:15:11,566 --> 00:15:14,900
+有为每个顶点运行和刷新像素的一些东西
+you have something that runs for each vertex and fresh pixel
+
+365
+00:15:14,900 --> 00:15:18,075
+有了它，你可以完成90%的图形编程
+with that, you can do like 90% of graphics programming
+
+366
+00:15:18,075 --> 00:15:19,600
+你在游戏中看到的一切
+everything you see in games
+
+367
+00:15:19,600 --> 00:15:23,000
+现在大概有80%到90%是在这些着色器中完成的
+nowadays is probably done 80 to 90% in those shaders
+
+368
+00:15:23,225 --> 00:15:25,000
+好吧，相信我
+okay, and believe me
+
+369
+00:15:25,166 --> 00:15:27,466
+一旦你得到一些非常好看的图形
+once you get to some really nice looking graphics
+
+370
+00:15:27,500 --> 00:15:30,333
+这些着色器可能需要数千行代码
+those shaders could be thousands of lines of code
+
+371
+00:15:30,366 --> 00:15:32,933
+所以它们肯定会变得非常复杂
+so they definitely get very complicated
+
+372
+00:15:32,933 --> 00:15:34,733
+更不用说那个了. 许多游戏引擎
+not to mention that. a lot of the game engines
+
+373
+00:15:34,733 --> 00:15:37,533
+当然，每一种严格的大型游戏引擎
+and certainly, every kind of serious big game engine
+
+374
+00:15:37,600 --> 00:15:40,325
+实际上生成着色器在飞速增加
+actually generates shaders on the fly
+
+375
+00:15:40,500 --> 00:15:41,966
+基于你的游戏中所发生的一切
+based on what's going on in your game
+
+376
+00:15:41,966 --> 00:15:43,833
+并且基于你所选择的图形设置
+and based on what graphics settings you've selected
+
+377
+00:15:43,833 --> 00:15:44,733
+所有这些东西
+and all of that stuff
+
+378
+00:15:44,975 --> 00:15:48,666
+所以有实时的着色器生成和编译是非常
+so having like live shader generation and compilation is very
+
+379
+00:15:48,666 --> 00:15:49,866
+在游戏引擎中很常见
+very common in game engines
+
+380
+00:15:49,866 --> 00:15:51,166
+所以确实有很多
+so there's definitely a lot of really
+
+381
+00:15:51,166 --> 00:15:53,933
+你可以用着色器做许多很酷的事情
+cool things you can actually end up doing with shaders
+
+382
+00:15:54,333 --> 00:15:56,733
+总之，这是对着色器的一个平缓的介绍
+anyway, that's a gentle introduction to shaders
+
+383
+00:15:56,900 --> 00:15:58,433
+这次我们没有写任何代码
+we didn't get to writing any code this time
+
+384
+00:15:58,433 --> 00:16:00,100
+但我们下次一定会写的
+but we definitely will next time
+
+385
+00:16:00,100 --> 00:16:02,233
+我只是想给你们一个基本的概述
+I just wanted to give you guys a basic overview
+
+386
+00:16:02,233 --> 00:16:04,400
+最后是一些技术概述
+finally, kind of a bit of a technical overview
+
+387
+00:16:04,433 --> 00:16:05,300
+着色器是什么
+of what shaders are
+
+388
+00:16:05,300 --> 00:16:05,866
+它们是如何工作的
+how they work
+
+389
+00:16:05,866 --> 00:16:07,100
+它们用来做什么的之类的
+what they used for and all that
+
+390
+00:16:07,100 --> 00:16:09,450
+希望我们能在下一集中看到它们的实践
+and hopefully we'll see them in practice in the next episode
+
+391
+00:16:09,450 --> 00:16:11,200
+还有一件事我想说的是
+one more thing I want to mention is that like
+
+392
+00:16:11,200 --> 00:16:14,433
+OpenGL着色器中的其他一切都是基于状态机工作的
+everything else in OpenGL shaders work based on the state machine
+
+393
+00:16:14,433 --> 00:16:15,233
+这意味着
+which means that
+
+394
+00:16:15,433 --> 00:16:17,166
+当你想要启用一个着色器
+when you want to enable a shader
+
+395
+00:16:17,166 --> 00:16:18,233
+你要画一个三角形
+you're about to draw a triangle
+
+396
+00:16:18,233 --> 00:16:20,966
+你想让它用一个特定的着色器来画那个三角形
+and you want it to use a certain shader to draw that triangle
+
+397
+00:16:21,200 --> 00:16:22,766
+你启用那个着色器
+you enable that shader
+
+398
+00:16:22,766 --> 00:16:24,666
+你也可以发送一些数据到着色器
+you might also send some data to the shader
+
+399
+00:16:24,666 --> 00:16:27,266
+就像我们从CPU发送这个顶点数据一样
+so much like we're sending this vertex data from the CPU
+
+400
+00:16:27,266 --> 00:16:29,366
+以顶点缓冲区的形式发送给GPU
+to the GPU in the form of a vertex buffer
+
+401
+00:16:29,366 --> 00:16:33,100
+我们也可以通过uniform的形式发送数据到我们的着色器
+we can also send data to our shader in the form of something called a uniform
+
+402
+00:16:33,100 --> 00:16:34,966
+这也来自CPU
+and that comes from the CPU as well
+
+403
+00:16:35,133 --> 00:16:38,175
+所以我们设置了所有的状态，启用着色器
+so we kind of set up all of that state, enable the shader
+
+404
+00:16:38,175 --> 00:16:39,733
+然后画出三角形
+and then we draw our triangle
+
+405
+00:16:39,800 --> 00:16:41,566
+这也是它在OpenGL中的工作方式
+that's how it works in OpenGL again
+
+406
+00:16:41,700 --> 00:16:42,733
+和OpenGL的其他部分一样
+like the rest of OpenGL
+
+407
+00:16:42,733 --> 00:16:44,266
+它基本上就是一个状态机
+it's pretty much just a state machine
+
+408
+00:16:44,266 --> 00:16:45,033
+如果你们喜欢这个视频
+if you guys enjoyed this video
+
+409
+00:16:45,033 --> 00:16:46,233
+你可以点那个点赞按钮
+you can hit that like button
+
+410
+00:16:46,233 --> 00:16:50,033
+你也可以访问patreon.com/TheCherno来帮助支持本系列
+you can also help support this series by going over to patreon.com/TheCherno
+
+411
+00:16:50,066 --> 00:16:52,666
+它确实帮助我更快地制作出更多这样的
+it really does help me make more of these episodes and more quickly
+
+412
+00:16:52,666 --> 00:16:53,433
+还有那些有趣的东西
+and all that fun stuff
+
+413
+00:16:53,433 --> 00:16:54,833
+你也会得到一些很酷的奖励
+you also get some pretty cool rewards
+
+414
+00:16:54,833 --> 00:16:57,966
+比如访问所有这些视频的所有源代码
+such as access to all of the source code for all of these videos
+
+415
+00:16:57,966 --> 00:17:00,033
+一集接一集的在github上
+kind of episode by episode by episode on github
+
+416
+00:17:00,033 --> 00:17:01,266
+以及还有很多其他的奖励
+and plenty of other rewards as well
+
+417
+00:17:01,266 --> 00:17:02,433
+看看这个链接吧
+just check out that link
+
+418
+00:17:02,433 --> 00:17:04,100
+如果你想进一步讨论这一集
+if you want to discuss this episode further
+
+419
+00:17:04,100 --> 00:17:06,300
+在我的discord，有一个OpenGL频道
+I've got an OpenGL channel on my discord
+
+420
+00:17:06,300 --> 00:17:09,666
+你可以登陆thecherno.com/discord加入这个discord
+you can head on over and join that discord by going to thecherno.com/discord
+
+421
+00:17:09,666 --> 00:17:11,733
+它基本上就是一个不错的社区
+it's basically just a nice community of people
+
+422
+00:17:11,900 --> 00:17:15,300
+你可以谈论c++ OpenGL游戏之类的有趣的东西
+where you can talk about c++ OpenGL games all that kind of fun stuff
+
+423
+00:17:15,300 --> 00:17:17,666
+所以一定要加入，链接就在这儿
+so definitely join that link there
+
+424
+00:17:17,866 --> 00:17:19,900
+下次见，再见
+I will see you guys next time, goodbye
+
