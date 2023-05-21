@@ -1,0 +1,1398 @@
+﻿1
+00:00:00,133 --> 00:00:04,566
+嘿，大家好，我是TheCherno，欢迎回到我的Hazel游戏引擎系列
+hey, what's up guys, my name is TheCherno, and welcome back to my game engine series of the Hazel engine series
+
+2
+00:00:04,566 --> 00:00:07,175
+我想我可以这样称呼它了，上次我们已经讲了
+as I guess I can call it now, last time we talked about
+
+3
+00:00:07,175 --> 00:00:10,233
+设置一个基本的VS项目和解决方案之类的东西
+setting up a basic visual studio project and solution all of that
+
+4
+00:00:10,233 --> 00:00:14,725
+并且实际上，把我们的Hazel库链接到了一个Sandbox应用程序
+and actually having kind of our Hazel library link against a Sandbox application
+
+5
+00:00:14,725 --> 00:00:17,366
+如果你们还没看过那期视频，一定要去看看
+if you guys haven't seen that episode, make sure you check it out
+
+6
+00:00:17,366 --> 00:00:22,433
+因为那是我们在这个系列中撸码的第一期，而这一期也将继续撸码
+because that was the first episode in which we wrote any code, in this episode, we're going to continue on with writing code
+
+7
+00:00:22,433 --> 00:00:27,700
+我们上次写了一个测试，它展示了我们如何交互
+we kind of just wrote more of a test last time, that really just showed kind of how we could interact
+
+8
+00:00:27,700 --> 00:00:30,966
+我想在我们构建的静态库或动态库之间
+I guess between that the static library or the dynamic library that we built
+
+9
+00:00:31,633 --> 00:00:38,133
+也就是我们的Hazel引擎，还有我们实际的Sandbox应用程序，但它真的很粗糙
+which was our Hazel engine and then also the actual Sandbox application that we have, but it was really rough
+
+10
+00:00:38,300 --> 00:00:44,466
+并且今天，我们会更适当地设置它，并且具体地说，我们会从创建一个入口点开始
+and today, we're gonna set it up a little bit more properly, and specifically we're gonna actually start by creating an entry point
+
+11
+00:00:44,900 --> 00:00:51,175
+所以让我们稍微讲一下它的实际含义，那么当我们谈到编写应用程序时
+so let's talk a little bit about what that actually means, so when we talk about kind of writing applications
+
+12
+00:00:51,175 --> 00:00:58,800
+我想应用总有一个入口点，除非是静态库，比如动态库甚至也有入口点
+I guess there's always an entry point to that application, unless it's like some kind of static library, like even dynamic libraries have entry points
+
+13
+00:00:58,800 --> 00:01:02,825
+并且我们也可以在这个系列的后面讨论那个
+and we can kind of talk about that, I think a little bit later in this series as well
+
+14
+00:01:03,750 --> 00:01:08,333
+但本质上，我们的应用程序需要从某个地方启动，对吧
+but essentially our application needs to start somewhere, right
+
+15
+00:01:08,766 --> 00:01:14,100
+当我们启动应用程序时会发生什么，比如你们知道的，某些可编码的应用程序实际运行
+what happens when we launch our application, well you know, certain codable is actually run
+
+16
+00:01:14,800 --> 00:01:17,633
+然后从我们可能想要控制的那个位置
+and then from there we probably want to somewhat take control
+
+17
+00:01:17,633 --> 00:01:21,275
+然后说，好吧，所有这些引擎启动代码都需要实际运行
+and say well okay, all of this kind of engine startup code needs to actually happen
+
+18
+00:01:21,725 --> 00:01:23,925
+比如现在这儿我们就有很多不同的方式来实现它
+now there's many different ways that we could do it for example
+
+19
+00:01:24,150 --> 00:01:29,275
+因为我们的引擎是一个dll文件，dll文件也有一个main函数
+because our engine is a dll file, dll files also have kind of a main function
+
+20
+00:01:29,275 --> 00:01:32,100
+所以基本上我们允许调用某些代码
+so basically we're allowed to call certain code
+
+21
+00:01:32,233 --> 00:01:39,733
+当我们附加或分离dll进程时，所以换句话说，如果我们的应用程序加载或解除dll时
+when either we attach that dll process or when we detach it, so in other words, if our application loads the dll or unlows the dll
+
+22
+00:01:39,733 --> 00:01:44,900
+我们可以陷入那些事件，然后说，我想运行这段代码，并且那挺好的
+we can kind of hook into those events, and just say, I want to run this code, and that's fine
+
+23
+00:01:45,200 --> 00:01:49,850
+但因为我们正在构建一个引擎，本质上是一个应用程序引擎，很酷的
+but because we are building kind of an engine, that is essentially an application engine, that's cool 
+
+24
+00:01:49,850 --> 00:01:53,175
+我的意思是，当然，它是一个游戏引擎，但什么是游戏引擎，对吧
+I mean, sure, it's a game engine, but what is a game engine, right
+
+25
+00:01:53,175 --> 00:01:56,300
+游戏引擎本质上是一种实时应用程序引擎
+a game engine is essentially a real time kind of application engine
+
+26
+00:01:56,966 --> 00:02:05,933
+它并不只适用于游戏，当然Hazel也不一定，我甚至可能不会把它标榜为游戏引擎
+it doesn't just have to apply to games, and certainly, Hazel is not necessarily, I probably might not even brand it necessarily as a game engine
+
+27
+00:02:05,933 --> 00:02:11,266
+因为它能做的远不止这些，它将会做的远不止这些，因为我们有点
+because it's capable of so much more than that, and it will be capable of so much more than that, so because we kind of
+
+28
+00:02:11,533 --> 00:02:17,633
+它是一个我们可以在上面构建应用程序的引擎，那对我们来说很重要，基本上还是不错的
+it's an engine on which we can build applications, it's kind of important for us essentially to just be able to say, okay
+
+29
+00:02:17,700 --> 00:02:23,225
+我将为Hazel应用程序提供一种方法来创建它们的入口点
+well I'm going to provide a way for Hazel applications to actually create their entry point
+
+30
+00:02:24,375 --> 00:02:26,633
+我们可以在我们的应用程序中编写一个主函数
+we could just write a main function in our application
+
+31
+00:02:26,633 --> 00:02:28,975
+实际上，如果我们看一下当前的代码
+in fact if we look over at the code that we currently have
+
+32
+00:02:29,325 --> 00:02:33,800
+我们有在Sandbox中的这个Application.cpp文件，以及它有
+we have this Application.cpp file which is inside Sandbox, and that just has
+
+33
+00:02:34,100 --> 00:02:38,725
+我可能把这个调大一点，我们有主函数void main
+maybe I'll just make this a bit bigger, we just have that main function void main
+
+34
+00:02:38,725 --> 00:02:40,966
+它调用Hazel::Print()，所有这些都保存得很好
+and that calls Hazel::Print(), and all that stores fine
+
+35
+00:02:41,233 --> 00:02:43,350
+基本上，我的意思是，我不希望这个在这里
+basically what I'm saying is, I don't want this to be here
+
+36
+00:02:43,350 --> 00:02:48,600
+因为这意味着，主函数如何定义取决于应用程序
+because this means that this kind of, how the main function is defined is up to the application
+
+37
+00:02:48,900 --> 00:02:54,566
+而这是我想从引擎那一边来控制的，所以那就是我们今天要讨论的内容
+whereas this is something that I would like to take control of from the engine side, so that's what we're going to talk about today
+
+38
+00:02:54,733 --> 00:02:57,750
+这将是一个简单的设置，我认为不会花太长时间
+it's going to be kind of a simple setup, I don't think it will take too long
+
+39
+00:02:58,525 --> 00:03:03,300
+并且只是作为对于系列的一切的一个简短声明
+and just as a short kind of disclaimer with everything in the series
+
+40
+00:03:03,300 --> 00:03:09,425
+这个系列，显然，我是边搞边写，因为任何类型的软件工程项目已经完成了
+this series obviously, I'm writing as I go, and as any kind of software engineering project is done
+
+41
+00:03:09,675 --> 00:03:11,700
+这在未来是会变化的
+this is subject to change in the future
+
+42
+00:03:11,700 --> 00:03:16,900
+所以如果我决定，比如让我们做得有点不同，就像在任何意义上这不是最终代码一样
+so if I decide that actually, like let's do it a bit differently, like this is not final code in any sense
+
+43
+00:03:16,900 --> 00:03:19,933
+我们正在一起编写一个游戏引擎，我还没有编写游戏引擎
+we're writing a game engine together, I haven't got a game engine written
+
+44
+00:03:19,933 --> 00:03:22,750
+然后我一步一步地向你们展示，我是如何得到这个最终产品的
+and then I'm just showing you step by step, how I got that end product
+
+45
+00:03:22,950 --> 00:03:24,833
+不，我们一起在这儿写一个引擎的
+no, we're writing an engine together here
+
+46
+00:03:25,066 --> 00:03:26,925
+所以很明显，事情可能会随着时间的推移而改变
+so obviously things may change over time
+
+47
+00:03:27,225 --> 00:03:30,100
+但是不管怎样，没有更多的麻烦，让我们就直接开始编程吧
+but anyway, without further ado, let's just jump in and start programming
+
+48
+00:03:30,100 --> 00:03:34,533
+并且我将向你们展示，如何创建入口点，我们还将创建一个Application类
+and I'm just going to show you guys, how to make an entry point, we're also going to make an Application class
+
+49
+00:03:34,566 --> 00:03:42,400
+这样我们才能真正启动应用程序并在Sandbox项目中定义一个Application
+that will essentially be away for us to actually launch our application and define an Application inside our Sandbox project
+
+50
+00:03:43,200 --> 00:03:50,050
+并且我们可能还需要把__declspec dllimport和exoprt函数放到一个宏中
+and we're also probably going to need to get that __declspec dllimport and export functions into a macro
+
+51
+00:03:50,050 --> 00:03:54,366
+这样我们就可以复用头文件，而不是像刚才这儿那样操作
+so that we can actually reuse header files and not do what we've done here
+
+52
+00:03:54,600 --> 00:04:02,200
+也就是手动导入这个void Print，通过dllimport手动导入这个函数声明
+which is essentially having to manually kind of import this void Print thing, manually have this function declaration here with a dllimport
+
+53
+00:04:02,375 --> 00:04:04,350
+并且然后在这里，正如你们看到的，我们有那个导出
+and then over here, as you can see, we have that export
+
+54
+00:04:04,775 --> 00:04:08,200
+所以不管怎样，我要做的第一件事是在src中
+so anyway, the first thing that I want to do is inside the src
+
+55
+00:04:08,200 --> 00:04:14,733
+我要添加一个名为Hazel的新文件夹，所有东西都会放到这里，那么这将是Hazel的核心库
+I'm going to add a new folder called Hazel, and everything's kind of going to go into here, so this is going to be kind of the Hazel core library
+
+56
+00:04:15,466 --> 00:04:24,033
+至于这个Test，要删掉，因为我不关心那些，然后在Hazel中，我要创建一些新项
+this Test stuff, I'm just going to flat out delete, because I don't care about any of that, and then inside hazel, I'm going to make a few new items
+
+57
+00:04:24,433 --> 00:04:31,366
+我想要创建一个叫做Core.h的文件
+I really want to make something called, well, I'm going to make something called Core.h
+
+58
+00:04:31,666 --> 00:04:38,833
+现在我叫它Core.h，这有一些基本的映射，我还想要我的Application类
+which for now I'm calling a Core.h, this will have some basic mappers to begin with, and I also want to make my kind of Application
+
+59
+00:04:39,000 --> 00:04:49,300
+我可以创建一个C++类Application，然后它会为我创建头文件和cpp文件，点击ok
+I can probably just make a C++ class called Application, and then hopefully it will create a header file for me and a cpp file, let's just hit okay
+
+60
+00:04:50,533 --> 00:04:52,650
+那是非常基本的操作，这节省了一些输入时间
+that's pretty basic, this saves a bit of typing
+
+61
+00:04:53,350 --> 00:04:56,766
+如果我在这里关闭，你们可以看到，我们也有一些定义
+if I off over here, you can see, we've got some definitions as well
+
+62
+00:04:57,133 --> 00:05:00,866
+因此，我将首先获取这个Application类，并将其放入Hazel命名空间
+so I'll start by taking this Application class, and putting it into the Hazel namespace
+
+63
+00:05:01,166 --> 00:05:05,150
+这个Hazel命名空间是，我们没有讲太多命名之类的东西
+the Hazel namespace is, we didn't talk too much about naming or anything like that
+
+64
+00:05:05,150 --> 00:05:12,900
+但基本上所有东西都将放在Hazel名称空间中，对于宏，它们很可能会被简写成HZ那样的
+but essentially everything is going to be in the Hazel namespace, and for macros, they will most likely be shortened for HZ like that
+
+65
+00:05:13,633 --> 00:05:18,066
+那是一种非常流行的方法，而不是像这样实现像这样的HZ命名空间
+instead of making an HZ at namespace like this which you could do, that's quite a popular approach
+
+66
+00:05:18,966 --> 00:05:25,350
+至少现在，不管这个Hazel引擎还是什么，我决定用全拼
+for now at least well whatever for this Hazel engine, I decided to kind of go with the actual full word like that
+
+67
+00:05:25,350 --> 00:05:33,750
+如果我们切换到cpp文件，我将做同样的事情，namespace Hazel，像那样包裹它
+and if we switch over to the cpp file, I'm going to do the exact same thing, namespace Hazel, I'm going to wrap it like that
+
+68
+00:05:34,200 --> 00:05:36,733
+并且在这里写一个void Run
+I'm going to write a void Run here
+
+69
+00:05:36,733 --> 00:05:45,533
+它将运行我们的应用程序，现在这个将非常简单，我将在这里像那样插入一个危险的死循环
+which is basically just going to run our application, and for now this is going to be incredibly simple, I'm literally just going to stick a wild true loop in here like that
+
+70
+00:05:45,733 --> 00:05:50,100
+这样我们就能有一个无限运行的应用程序，它暂时不会关闭
+just so that we can kind of just have an infinitely running application, that won't close for now
+
+71
+00:05:51,566 --> 00:05:57,000
+另一件很重要的事是将析构方法变为虚方法，因为这个类会被继承
+the other thing that's really important to do is make this destructor virtual, because this class will actually be inherited
+
+72
+00:05:57,300 --> 00:06:02,800
+实际上是被我们的Sandbox应用程序继承，因为我们写这个的方式，你们马上就会看到
+well subclassed by our actual sandbox application, because the way that we're going to write this, as you see in a minute
+
+73
+00:06:02,800 --> 00:06:06,600
+基本上就是我们将创建自己的Application，它继承自Hazel::Application，
+is essentially we're going to make our own Application, which inherits from Hazel Application, 
+
+74
+00:06:07,150 --> 00:06:09,566
+好了，酷，看起来不错吧
+okay, cool, that's looking pretty good to me
+
+75
+00:06:10,233 --> 00:06:19,066
+我们有一个大问题，那就是必须根据dll的写入位置来设置__declspec(dllexport)和import
+we have the big problem here of having to actually __declspec dllexport and imports depending on where it's kind of written
+
+76
+00:06:19,633 --> 00:06:21,650
+这个实际的Application就像这样，好了
+this actual Application like this, okay
+
+77
+00:06:21,650 --> 00:06:26,066
+那么为了在Sandbox中实际使用这个类，因为这是一个dll
+so in order to actually use this class inside sandbox, because this is a dll
+
+78
+00:06:26,225 --> 00:06:32,366
+我们需要从那个Hazel.dll中导出它，所以当我们构建Hazel.dll时，它需要是dllexport
+we need to export it from that Hazel.dll, so when we build this Hazel.dll, this needs to be dllexport
+
+79
+00:06:32,600 --> 00:06:38,300
+然后当我们在Sandbox项目的Application.cpp中包含Application.h时
+and then when we include Application.h inside Application.cpp in our sandbox project
+
+80
+00:06:38,675 --> 00:06:40,800
+它实际上需要是dlimport
+this actually needs to be dllimport
+
+81
+00:06:40,800 --> 00:06:47,800
+和我们的Print函数一样，只是这里是整个类，这样做会更简单
+the same way that we had with our Print function, except here is with the entire class, so to do this and to make it a lot easier for ourselves
+
+82
+00:06:47,866 --> 00:06:53,400
+我们会去到我们创建的Core头文件，顺便说一下，Application应该在这个Hazel中
+we're actually going to go to that Core header file that we made, by the way, Application should be inside that Hazel
+
+83
+00:06:54,600 --> 00:07:02,000
+那么我要把它移到这儿，在Core里面，我要找到一个宏，它要么是dlimport要么是export
+think so I'm just going to move it into there, inside core, I'm just going to find a macro that is either dllimport or export
+
+84
+00:07:02,300 --> 00:07:08,066
+取决于我们是否要构建这个dll文件，所以我们要实现那个的方法很简单
+depending on whether or not we're building this dll file, so the way we're going to do that is very simple
+
+85
+00:07:08,200 --> 00:07:12,875
+首先，__declspec dllexport和import是一个Windows唯一的东西
+first of all, dll __declspec dllexport and import is a windows only thing
+
+86
+00:07:13,175 --> 00:07:16,375
+所以我想说的是，#ifdef HZ_PLATFORM_WINDOWS
+so I want to say ifdef HZ_PLATFORM_WINDOWS
+
+87
+00:07:16,533 --> 00:07:24,425
+好了，那么这个只适用于windows，再深一层，继续写，#ifdef HZ_BUILD_DLL
+okay, so this only applies to windows, one more level deep, I'll say, ifdef HZ_BUILD_DLL
+
+88
+00:07:24,425 --> 00:07:26,525
+也就是说，我们要构建这个dll
+which means we're trying to build this dll
+
+89
+00:07:26,525 --> 00:07:32,233
+也就是说，这个宏是为了这个Hazel项目被定义的，而不是为了Sandbox项目
+mean which will this macro will be defined for this actual Hazel project but not for Sandbox
+
+90
+00:07:33,033 --> 00:07:46,950
+我们会说，#define HAZEL_APP __declspec(dllexport)
+we're going to say define HAZEL_API as __declspec(dllexport)
+
+91
+00:07:46,950 --> 00:07:59,566
+并且对于其他情况，就会把它定义为__declspec(dllimport)，好了
+and if for other else, we're going to define it as import, okay
+
+92
+00:08:00,066 --> 00:08:03,250
+并且我的意思是，我们可以写一个简单的else
+and I mean we could just put like a simple kind of else
+
+93
+00:08:03,250 --> 00:08:11,100
+比如你们知道的，#error Hazel ony support Windos，因为现在它总是支持，对吧
+you know, error, Hazel only support Windows, because that's always support for now, okay
+
+94
+00:08:11,366 --> 00:08:14,075
+那样的话，它就会触发一个错误，不会构建
+just so that this basically will trigger an error and won't build
+
+95
+00:08:14,075 --> 00:08:19,833
+如果没有定义平台，我想现在只有这个，那么我们应该捕获这个
+if no platforms are defined, which for now I guess is just this, so we're going to grab this
+
+96
+00:08:19,933 --> 00:08:25,575
+我们右键点击Hazel，进入Hazel属性，在关于所有配置的Hazel属性页面
+we're going to right click on Hazel go to properties, inside Hazel property pages for all configurations
+
+97
+00:08:25,575 --> 00:08:30,066
+对于我们的x64平台，在C/C++预处理器下
+and for our x64 platform, under C/C++ preprocessor
+
+98
+00:08:30,066 --> 00:08:32,125
+我们会定义一些宏
+we're going to define a couple of macros
+
+99
+00:08:32,825 --> 00:08:39,900
+那么首先，我们会放入一些定义，HZ_PLATFORM_WINDOWS会放在这里
+so first of all, we'll put a couple of definitions in, HZ_PLATFORM_WINDOWS will be something that I'll put in here
+
+100
+00:08:40,333 --> 00:08:42,650
+当然，这也需要放到Sandbox中
+of course, and this actually also needs to go into Sandbox
+
+101
+00:08:43,075 --> 00:08:48,900
+所以我选择Sandbox，然后放入HZ_PLATFORM_WINDOWS，好了，确保我们有一个分号
+so I'll take on Sandbox and put HZ_PLATFORM_WINDOWS, okay, making sure that we have a semicon
+
+102
+00:08:49,400 --> 00:08:59,300
+另外，在Hazel中，我要放一个宏HAZEL_BUILD_DLL，我称这些宏为定义或定义
+and then additionally in Hazel, I'm going to put a macro called HAZEL_BUILD_DLL, I call the macros, they're really just definitions or defines
+
+103
+00:09:00,200 --> 00:09:04,275
+但是我们继续，HAZEL_BUILD_DLL，这就是我们在这里得到的
+but there we go, so HAZEL_BUILD_DLL, okay, so that's what we've got in here
+
+104
+00:09:04,275 --> 00:09:09,333
+这意味着当我们构建Hazel库时，这个export应该是启用的
+which means that this kind of export should be active, when we build the Hazel library
+
+105
+00:09:09,466 --> 00:09:13,500
+但对于Sandbox，这个import应该是启用的
+but for Sandbox, this import should be active
+
+106
+00:09:14,200 --> 00:09:18,866
+所以如果我们有Application.h，我会包含Core.h
+so if we got an Application.h, I'll include Core.h
+
+107
+00:09:19,833 --> 00:09:26,625
+然后我们就会看见，class HAZEL_API Application
+and then we'll just see, class HAZEL_API Application 
+
+108
+00:09:26,625 --> 00:09:29,000
+就像那样，好了，那么我们就实现那个了
+just like that, okay, so now that we've done that
+
+109
+00:09:29,000 --> 00:09:35,100
+这意味着如果我们进入Application.cpp，这是一个Sandbox，这变得有点混乱
+what essentially that means is that if we go into our Application.cpp, which is a Sandbox, this is becoming a little bit confusing
+
+110
+00:09:35,100 --> 00:09:37,500
+因为这两个文件都叫Application.cpp
+because both of these files are called Application.cpp
+
+111
+00:09:37,500 --> 00:09:43,133
+那么我将这个文件重命名为Sandbox.cpp或者SandboxApp.cpp
+so I'm actually going to rename this file to Sandbox.cpp or maybe SandboxApp.cpp
+
+112
+00:09:44,500 --> 00:09:47,725
+这样我们就能摆脱那种困惑
+just so that we kind of get rid of that confusion
+
+113
+00:09:48,075 --> 00:09:54,000
+现在我想做的是，我不想在我的Sandbox应用程序中包含
+now what I wanna do is I don't really want to in my Sandbox application have to do stuff like include
+
+114
+00:09:54,000 --> 00:09:56,250
+你们知道的，比如Hazel/Application.cpp
+you know, Hazel/Application.cpp
+
+115
+00:09:56,500 --> 00:10:03,666
+那有点难以使用，对吧，我实际上想要做的是，我想要像那样包含Hazel.h，好了
+that's kind of hard to use, right, what I actually want to be able to do essentially is just say, I want to include Hazel.h like that, okay
+
+116
+00:10:03,866 --> 00:10:05,825
+这应该能帮我把所有东西都排好序
+and that should sort out everything for me
+
+117
+00:10:06,225 --> 00:10:11,966
+那么我要做的是首先，在src这里，我要添加一个新项Hazel.h
+so what I'm going to do is first of all, inside src over here, I'm going to add a new item called Hazel.h
+
+118
+00:10:12,000 --> 00:10:20,166
+并且这有点像头文件，只打算被客户端应用包含，所以Hazel就永远不会包含它
+and this will kind of be like a header file, that is only intended to be included by client applications, so Hazel will never include this
+
+119
+00:10:20,166 --> 00:10:26,625
+你们可以看到，它在Hazel之外，这是应用程序使用的
+you can see, it's actually outside of Hazel, this is just kind of for use by applications
+
+120
+00:10:26,625 --> 00:10:35,100
+那么这是为了Hazel应用程序使用的，好了
+so this is for use by Hazel applications, okay
+
+121
+00:10:35,200 --> 00:10:41,575
+在这里，我们会包含Hazel的东西，包含Hazel/Application.h
+and inside here, we're going to include Hazel stuff, so include Hazel/Application.h
+
+122
+00:10:41,575 --> 00:10:44,566
+也许还有Hazel/Core.h，不过我们不需要包含Core.h
+maybe Hazel/Core.h whatever, we don't really need to include Core.h
+
+123
+00:10:44,566 --> 00:10:50,533
+不过你们应该明白了，我们要把所有需要的东西都放到这里，然后这个会包含在这里
+but you kind of get the point, we're just going to put everything that we need kind of into here, and then this will be included here
+
+124
+00:10:51,000 --> 00:10:57,433
+那么为了实现这一点，我们右键点击Sandbox，点击属性，然后进入C/C++通用
+so to make this kind of work, we're going to right click on Sandbox, hit properties, we're going to go to C/C++ general
+
+125
+00:10:57,433 --> 00:11:09,333
+并且对于这里的一个附加包含目录，我要写上$(SolutionDir)Hazel/src，就像那样
+and as an additional include directory, I'm going to say $(SolutionDir), and then Hazel, and then /src like that
+
+126
+00:11:09,533 --> 00:11:12,850
+那么我们将src文件夹添加为Sandbox中的包含目录
+so we're adding this src folder as an include directory in Sandbox
+
+127
+00:11:13,100 --> 00:11:18,633
+这样我们就可以那样写，用不用角括号都无所谓
+so that we can actually either you know do that, or it doesn't really matter if we use angular brackets or not
+
+128
+00:11:18,900 --> 00:11:23,833
+但关键是，我们可以像这样使用编译器包含路径，或者像这样来包含Hazel
+but the point is we can kind of use a compiler include path either like this, or like this to actually include Hazel
+
+129
+00:11:24,700 --> 00:11:28,825
+我们不需要使用相对部分，好，很好，就这样，完成了
+and we don't have to use relative parts, okay, cool, so that's it, that's done
+
+130
+00:11:29,300 --> 00:11:31,900
+让我们考虑编写一个实际的应用程序
+let's think about writing an actual application now
+
+131
+00:11:31,900 --> 00:11:38,175
+那么我们可以看到Sandbox类是公共的，继承了Hazel::Application
+so we can see class Sandbox is public, Hazel::Application
+
+132
+00:11:39,375 --> 00:11:42,933
+好了，我们可以做很多事情
+okay, we can do a number of things here
+
+133
+00:11:43,533 --> 00:11:47,875
+让我们有一个基本的构造函数和析构函数，现在我们什么都不做
+let's maybe just have a basic constructor and destructor, which for now we'll do nothing
+
+134
+00:11:48,700 --> 00:11:52,433
+我的意思是，我们真的不需要在这儿做太多
+and then I mean, we don't really need to do much here
+
+135
+00:11:52,433 --> 00:11:56,300
+但基本思想就是，我们有一个骨架类，它是一个Hazel::Application子类
+but basically the idea is we kind of have a skeleton class which is a Hazel Application
+
+136
+00:11:56,700 --> 00:11:59,125
+并且现在的想法是，我们想要运行它
+and the idea now is that we kind of want to run it
+
+137
+00:11:59,250 --> 00:12:03,666
+可能通过一些代码，比如Sandbox* sandbox = new Sandbox()
+maybe by doing something like Sandbox*, sandbox equals new Sandbox
+
+138
+00:12:04,650 --> 00:12:10,050
+我们会像这样在堆上分配它，确保之后会删除它
+we're going to allocate it on the heap like this for now, making sure to delete it later
+
+139
+00:12:10,050 --> 00:12:12,466
+然后我们会做一些类似sandbox->Run()之类的操作
+and then we'll do something like sandbox Run
+
+140
+00:12:12,866 --> 00:12:17,800
+那就是我们想做的，好了，不过我不想在SandboxApp.cpp中写这个
+that's what we basically want to do, okay, I don't want to do this inside SandboxApp.cpp
+
+141
+00:12:17,866 --> 00:12:24,266
+因为这应该由引擎来处理，而不是由应用程序来处理
+because this should be somewhat handled, this should basically be handled by the engine, and not by the application
+
+142
+00:12:25,133 --> 00:12:30,225
+我们对它进行？，因为Sandbox可能非常大，我们确实想明确地控制它的生命周期
+we're heat balllicating it, because Sandbox can potentially be very large, and we do want to control the lifetime of this explicitly
+
+143
+00:12:30,225 --> 00:12:38,033
+因为它是我们的整个应用程序，所以这就好像，我当然想显式地使用内存
+because it is our literally our entire application, so this does like, I definitely want to be explicit with memory, when it comes to this
+
+144
+00:12:39,166 --> 00:12:44,266
+但如果我们运行这个，它应该能工作，希望能弹出
+but if we run this, it should actually work and hopefully just bring up
+
+145
+00:12:44,633 --> 00:12:49,733
+好了，在这种情况下，我们会得到一个错误，这很奇妙，那么它在这儿说了什么
+okay well in this case we actually get an error, which is fantastic, so what does it say here
+
+146
+00:12:52,733 --> 00:12:59,966
+好吧，处理链接，它对dll链接和效果不满意
+okay incasses and deal a linkage, okay, so it's not happy with our dll linkage and effect
+
+147
+00:13:00,100 --> 00:13:05,266
+可能是HAZEL_API宏有问题，让我们看看我们实际是怎么定义它的
+yeah, so there's something wrong with the HAZEL_API macro probably, let's just see what we actually define that as
+
+148
+00:13:06,300 --> 00:13:08,875
+因为它应该是HAZEL_BUILD_DLL，好的，我明白了
+because it should be HAZEL_BUILD_DLL, okay, I see
+
+149
+00:13:08,875 --> 00:13:12,475
+那么我们在这里使用了HZ_BUILD_DLL，而在这里使用HAZEL_BUILD_DLL
+so we used HZ_BUILD_DLL here and HAZEL_BUILD_DLL here
+
+150
+00:13:12,475 --> 00:13:18,150
+所以我们把HAZEL去掉，写上HZ_BUILD_DLL ，就像那样，好了
+so let's just get rid of HAZEL, we'll just say HZ_BUILD_DLL like that and here, okay
+
+151
+00:13:18,150 --> 00:13:25,466
+那么现在它应该正确地导出它，让我们构建这个Hazel项目，然后我们构建Sandbox，好了
+so now it should actually export that properly, let's build this Hazel project, and then we'll build Sandbox, okay
+
+152
+00:13:25,466 --> 00:13:30,300
+我不知道为什么这个void应该是int，我不确定我上次写了什么
+and I don't know why this is void clearly should be int, I'm not sure what I wrote last time
+
+153
+00:13:30,700 --> 00:13:32,350
+但让我们运行这段代码，看看会发生什么
+but let's run this code and see what happens
+
+154
+00:13:33,200 --> 00:13:36,050
+现在如果我们运行这个，会得到一个指出错误的入口点
+now if we're run this, we're going to get an entry point out found error
+
+155
+00:13:36,050 --> 00:13:40,233
+这个的基本原因当然是因为我们没有更新我们的dll
+the basic reason for this is because of course we we're not updating our dll
+
+156
+00:13:40,266 --> 00:13:46,250
+它现在有了其他东西，所以我们需要将Hazel.dll复制到我们的Sandbox中并替换旧的那个
+which now has other stuff in it, so we need to copy that Hazel.dll to our Sandbox and replace the old one
+
+157
+00:13:46,600 --> 00:13:47,566
+因为我们现在已经构建了它
+because we've built it now
+
+158
+00:13:47,566 --> 00:13:49,925
+这应该是一个从Hazel开始的传输构建步骤
+this really should be a post build step from Hazel
+
+159
+00:13:49,925 --> 00:13:53,833
+或者像一个从Sandbox开始的构建后置步骤，真的可以为我们做到这一点
+or like a post build step from Sandbox, really that does this for us
+
+160
+00:13:53,833 --> 00:13:58,600
+但你们可以看到，现在我们得到了一个应用程序，可以无限地运行，对吧
+but you can see that now we get an application, that runs kind of infinitely right
+
+161
+00:13:59,550 --> 00:14:02,400
+不会做任何事情，因为我们在那里有个危险的死循环
+it's not going to do anything, because we've just got a wild true loop there
+
+162
+00:14:02,400 --> 00:14:05,175
+但它是在Hazel::Application中加载的
+but it is kind of loading in the Hazel Application
+
+163
+00:14:05,175 --> 00:14:08,650
+好了，既然我们已经完成了，我们实际上已经完成了这儿的大部分工作
+okay, so now that we've done that, we've actually kind of done the majority of the work here
+
+164
+00:14:08,950 --> 00:14:13,625
+我们已经创建了所有这些宏，它们可以导出或导入我们的符号
+we've created all these macros that actually either export or import our symbols
+
+165
+00:14:14,525 --> 00:14:16,066
+我们还写了一个基本的入口点
+and we've written a basic entry point
+
+166
+00:14:16,400 --> 00:14:23,733
+现在我要做的是在Hazel中，创建一个叫做EntryPoint的头文件，它会为我们定义主函数
+now what I want to do is actually inside Hazel, make a header file called EntryPoint, which will basically define that main function for us
+
+167
+00:14:23,733 --> 00:14:32,975
+那么就是EntryPoint.h，然后这将是一个头文件，我们可能会看到，#ifdef
+so EntryPoint.h, and then this is just going to be a header file, which we'll probably just see, ifdef, 
+
+168
+00:14:33,350 --> 00:14:35,666
+我想象这个入口点会根据平台改变
+I imagine this entry point will change based on platform
+
+169
+00:14:35,666 --> 00:14:41,775
+那么我们就会看到，#ifdef HZ_PLATFORM_WINDOWS，我们可能会插入
+so we'll see, ifdef HZ_PLATFORM_WINDOWS, and we might just stick our
+
+170
+00:14:44,500 --> 00:14:48,433
+至于这个错误，不是必需的，可以把这个放到这里来
+our error, not really required, we could stick this in here
+
+171
+00:14:49,333 --> 00:14:55,000
+就像我们每次那样做，当然如果我们至少有一次，尤其是在一个叫做HZ的文件中
+just like that every time that we do that, but of course if we have it at least once, especially in a file like called on HZ
+
+172
+00:14:55,066 --> 00:15:02,525
+它应该不构建，如果，如果Hazel只支持Windows，确保没有键入错误，好了
+it should just not build, if if Hazel only supports Windows, okay,  make sure there's no typos, alright
+
+173
+00:15:02,525 --> 00:15:08,766
+所以它的作用很简单，就是这个main函数，就像那样的
+so basically what this will do is fairly simple, it's just going to be this main function like that
+
+174
+00:15:09,300 --> 00:15:17,075
+它会为我们创建我们的Hazel应用，这里就用argc和argv作为参数
+that's going to create our Hazel application for us now, this I will fill out with argc and argv
+
+175
+00:15:17,075 --> 00:15:20,100
+我们很可能希望它是Windows上的win main 
+we most likely want this to be win main on Windows
+
+176
+00:15:20,100 --> 00:15:26,833
+因为我们可能想保留某些信息，关于程序是如何错误的，就像win32 API那样
+because we might want to retain certain information about how the program was wrong just for kind of windows, like win32 api purposes
+
+177
+00:15:26,833 --> 00:15:32,866
+但我们现在不用担心这个，我们现在需要的是创建应用程序的方法
+but we won't worry about that for now, now what we actually need though is some way to create an application
+
+178
+00:15:32,866 --> 00:15:38,066
+现在是Sandbox，我们不知道，应该是Sandbox，我不想设置一些奇怪的宏之类的东西
+now Sandbox, we don't know, it's going to be Sandbox and I don't want to set up some weird like macros or anything like that
+
+179
+00:15:38,150 --> 00:15:48,400
+所以我要做的是，在某个地方，我们有一个返回Hazel::Application*的东西
+so all I'm going to do is say that somewhere we're going to have a something that returns a Hazel Application pointer
+
+180
+00:15:48,600 --> 00:15:51,100
+那么就是extern Hazel::Application*
+so extern Hazel Application like that
+
+181
+00:15:51,800 --> 00:15:57,250
+并且我们会看到一些类似于Hazel::CreateApplication的函数，我想这没问题
+and we'll see something like Hazel CreateApplication, think that that will be okay
+
+182
+00:15:58,150 --> 00:16:02,275
+所以这个函数我们会在别的地方定义
+so basically what this is is a function that we will define somewhere else
+
+183
+00:16:02,425 --> 00:16:09,000
+它会为我们返回那个Application，CreateApplication是我们在客户端实现的东西
+which will actually return that Application for us, so CreateApplication is something that we'll implement in the client
+
+184
+00:16:09,000 --> 00:16:16,000
+那么这些很快就会有意义了，我们最终会定义这个，在Application.h中声明这个函数
+so this is all going to make sense in a minute, we're actually going to end up defining this, well declaring this function inside Application.h
+
+185
+00:16:16,366 --> 00:16:23,625
+那么在这里，我将写一个函数，它本质上是Application* CreateApplication()
+so over here, I'm just going to write a function, which is essentially Application CreateApplication
+
+186
+00:16:24,700 --> 00:16:26,350
+那就是我们现在调用的
+that's what we're called for now
+
+187
+00:16:26,350 --> 00:16:32,425
+并且这是要在客户端中定义的，对吧
+and this is something that is to be defined in client, okay
+
+188
+00:16:32,700 --> 00:16:36,200
+这意味着在我们的SandboxApp中，我把它固定在这儿
+which means that inside our SandboxApp, which I'll just pin over here
+
+189
+00:16:36,750 --> 00:16:40,225
+实际上，我们需要看到的不是这个主入口点，
+we need to actually see, basically instead of this main entry point, 
+
+190
+00:16:41,100 --> 00:16:48,150
+需要看到的是，Hazel::Application* CreateApplication()
+we need to basically see, that Hazel Application CreateApplication
+
+191
+00:16:48,850 --> 00:16:48,866
+is going to return in our case a new Sandbox class instance, right
+
+192
+00:16:48,866 --> 00:16:54,009
+在我们这个例子中，它会返回一个新的Sandbox类实例，对吧
+is going to return in our case a new Sandbox class instance, right
+
+193
+00:16:54,009 --> 00:16:54,025
+在我们这个例子中，它会返回一个新的Sandbox类实例，对吧
+
+194
+00:16:54,025 --> 00:16:57,533
+也就是我们构建的实际应用程序，好了，就那样
+which is our actual application that we built, okay, and that's it
+
+195
+00:16:58,133 --> 00:17:03,533
+那么我们回到入口点，看看会是什么样子，不用担心任何错误
+so if we go back to entry point, just to see kind of how this will look like, don't worry about any of the errors at all
+
+196
+00:17:04,333 --> 00:17:11,700
+但这基本上是我们最终得到的，这是一个extern，它会在SandboxApp的其他地方找到
+but this is basically what we end up with, this is an extern that will be found somewhere else in our case inside SandboxApp
+
+197
+00:17:12,775 --> 00:17:18,500
+并且这里要做的是基本上取决于main函数，我现在没有输入任何代码，那挺好的
+and all that this is going to do is upon main, now I actually didn't type any code, that's great
+
+198
+00:17:18,850 --> 00:17:20,375
+但基本上还是取决于main函数
+but basically upon main
+
+199
+00:17:20,375 --> 00:17:28,050
+并且我们这里可以使用auto，auto app = Hazel::CreateApplication()
+and we can just auto this, auto app equals Hazel CreateApplication
+
+200
+00:17:28,825 --> 00:17:31,866
+就像那样，然后我们要做app->Run()
+just like that, and then we're going to do app Run
+
+201
+00:17:33,433 --> 00:17:41,166
+然后再删除那个app，好了，那么这将通过调用这个函数来创建我们的应用程序
+and then I'm going to delete out, okay, so this will basically just create our application for us by calling this function
+
+202
+00:17:41,500 --> 00:17:46,375
+然后它会在site Application上调用Run函数，这将执行我们的死循环
+and then it will call the Run function on site Application, which will do our wild true loop
+
+203
+00:17:47,300 --> 00:17:50,100
+然后在最后它会删除它，好了
+and then at the end it will kind of delete it, okay
+
+204
+00:17:50,300 --> 00:17:56,800
+所以那就是它的原理，现在我们需要在Hazel中包含这个EntryPoint，让它看起来更明显
+so that is how that works, now we need to include this EntryPoint inside Hazel, and just to make it kind of really obvious
+
+205
+00:17:57,033 --> 00:18:07,366
+我可能会说入口点之类的东西，只是为了让它更明显，这就是它的位置
+I might say something like entry point, just to kind of make it I guess obvious that this is where it is
+
+206
+00:18:08,266 --> 00:18:20,766
+我只需要包含Hazel/EntryPoint.h，好了，这样的话，我们这儿就完全不需要main函数了
+and I'm just going to include Hazel/EntryPoint.h, okay, and then hopefully, we will be able to not have to have a main function here at all
+
+207
+00:18:21,333 --> 00:18:24,325
+如果我右键点击构建，我们得到一个链接错误
+if I right click and hit build, we get a linking error
+
+208
+00:18:25,050 --> 00:18:27,466
+这个CreateApplication 是一个未解决的外部引用
+the CreateApplication is an unresolved external
+
+209
+00:18:27,500 --> 00:18:32,733
+并且这里发生的原因是，这里应该是Hazel::CreateApplication
+and the reason that has happened here is because of course this needs to be a Hazel CreateApplication
+
+210
+00:18:33,233 --> 00:18:38,425
+那么我们右击并构建它，然后你们会看到我们没有任何错误
+so we will right click and build that, and then you can see we get no errors at all
+
+211
+00:18:38,425 --> 00:18:40,700
+并且如果我运行这段代码，我们也会得到相同的结果
+and if I run this code, we kind of get the same result
+
+212
+00:18:40,933 --> 00:18:47,466
+好了，那么我想区别在于我们实际上把这个EntryPoint移到了Hazel引擎的内部，对吧
+okay, so the difference I guess is that we've actually moved this EntryPoint into being inside the Hazel engine, right
+
+213
+00:18:47,500 --> 00:18:54,133
+并且我甚至可以看到一些像printf，比如你们知道的，Hazel引擎之类的东西
+and I could even see something like printf, you know, Hazel engine or something
+
+214
+00:18:54,133 --> 00:19:00,121
+我暂时不知道，如果我运行它，可能需要包含一些东西
+I don't know just for the meantime, and if I run that, I might need to actually include something
+
+215
+00:19:00,250 --> 00:19:06,525
+所以我们只需要包含stdio.h，然后运行这个
+so let's just include stdio.h, if I run this
+
+216
+00:19:06,525 --> 00:19:08,666
+你们就可以看到我们得到了Hazel引擎，并打印出来
+you can see that we get Hazel engine and printing
+
+217
+00:19:09,300 --> 00:19:14,366
+所以基本上一切都很好，我先把这两个去掉，因为这只是一个测试
+so essentially everything is kind of fine, I'll get rid of these two things for now, because that was just a test
+
+218
+00:19:14,366 --> 00:19:21,800
+我们基本上把创建这种主要功能的痛苦，转移到实际的引擎方面
+and we essentially kind of moved the pain of creating this kind of main function, and doing everything properly to the actual engine side
+
+219
+00:19:21,800 --> 00:19:24,833
+因此，如果我们着眼于我们的客户端，我们所需要做的就是包含Hazel
+so if we look at our client side,  all we need to do is include Hazel
+
+220
+00:19:25,066 --> 00:19:28,966
+创建我们的Sandbox传递，然后写一个函数，返回这个
+create our kind of Sandbox pass and just write a function, which essentially returns this
+
+221
+00:19:28,966 --> 00:19:34,000
+如果你们愿意，可以进一步自动化，但我很喜欢这个，它很简单
+you could automate this even further, if you wanted to, but I quite like this, it's very simple
+
+222
+00:19:34,000 --> 00:19:37,900
+我们可以在这里写一些额外的代码，如果我们真的需要在创建我们的应用程序时
+we can do extra code here, if we really need to upon kind of creating our application
+
+223
+00:19:38,650 --> 00:19:42,033
+但它真的非常非常简单，非常干净
+but it's just really really simple really clean
+
+224
+00:19:42,500 --> 00:19:49,966
+以及你们可以看到我们已经为整个引擎和游戏设置了一个有效的入口点
+and you can see that we've basically set up and an effectively like an entry point for our entire engine and game
+
+225
+00:19:50,366 --> 00:19:53,400
+所以那很酷，好了，这就是我们的入口点
+so that's pretty cool, okay, so that's our entry point done
+
+226
+00:19:53,400 --> 00:19:57,925
+现在我们有了一个进入实际应用和引擎的基本入口点，这是非常重要的
+we now have a basic entry point into our actual application and our engine, which is very important 
+
+227
+00:19:57,925 --> 00:20:01,233
+因为所有东西都是从入口点开始的
+because that's where everything kind of goes from that entry point
+
+228
+00:20:01,400 --> 00:20:06,200
+那么现在我们已经定义了它，但对我们来说，开始构建应用程序是很简单的
+so now we've defined that it's, but it's very simple for us to actually start kind of building applications
+
+229
+00:20:06,200 --> 00:20:10,400
+或者至少有一个进入我们使用Hazel引擎构建的应用程序的入口点
+or at least having an entry point into the applications that we build using the Hazel engine
+
+230
+00:20:10,600 --> 00:20:14,600
+你们刚才看到我想打印一些东西，我的意思是，我真的不能
+now you just saw me try and printf something and like I mean I couldn't really
+
+231
+00:20:14,600 --> 00:20:17,500
+并且这让我想到了下一期会讲什么
+and this kind of brings me on to what's gonna happen in the next episode
+
+232
+00:20:17,500 --> 00:20:22,066
+并且我们下一个大任务就是给引擎添加日志支持
+and our next kind of big task which is going to be to actually add logging support to the engine
+
+233
+00:20:22,133 --> 00:20:25,533
+因为日志记录是我们可以做的最重要的事情之一
+because logging is one of the most important things that we can do like at all
+
+234
+00:20:25,533 --> 00:20:32,066
+我们需要一些关于实际情况的反馈，以及比如你们知道的，所有启动信息和所有的事情
+we need some kind of feedback on what's actually going on, and just you know all the startup information and just everything really
+
+235
+00:20:32,066 --> 00:20:36,500
+那么下期，实际上，我们将从使用日志库开始
+so next episode, we're actually going to use a logging library to start
+
+236
+00:20:36,633 --> 00:20:42,633
+能够记录事件和我们需要的任何类型的信息到控制台，也可能打到文件中
+being able to log events and log any kind of information that we need into the console and possibly into files as well
+
+237
+00:20:42,833 --> 00:20:47,233
+所以那就是我们下次要讲的内容，只是想定义一个基本的入口点
+so that's what we're going to move on to next time, I just wanted to kind of define a basic entry point
+
+238
+00:20:47,233 --> 00:20:51,600
+因为我认为这是人们经常忘记的事情
+because I think that this in general is something that people just forget all the time
+
+239
+00:20:51,933 --> 00:20:56,300
+实际上能够这样说，我正在写一个使用Hazel引擎的应用程序
+just being able to actually say, I'm writing an application that uses the Hazel engine
+
+240
+00:20:56,300 --> 00:21:02,333
+这个应用到底是怎么开始的，我要做什么，我们现在已经定义好了，令人兴奋啊
+how on earth does that application start what am I meant to do, and we've kind of defined that right now, which is pretty exciting
+
+241
+00:21:02,933 --> 00:21:06,400
+在我们结束之前，我想把这段代码推送到github
+now before we leave it at this today, I do want to actually push this code to github
+
+242
+00:21:06,400 --> 00:21:08,625
+但我要给你们展示一下，怎么实现那个的，只是为了好玩
+but I'm going to show you guys, how I do that just for fun
+
+243
+00:21:08,900 --> 00:21:11,675
+那么上次已经展示了这个Hazel仓库的创建
+so I showed the creation of this Hazel repository last time
+
+244
+00:21:11,675 --> 00:21:17,733
+事实上它在github上已经有108颗星了，这很有趣，因为我还没有发布那期视频
+in fact it's already got 108 stars on github, which is quite interesting, because I haven't actually even released that video yet
+
+245
+00:21:18,800 --> 00:21:24,866
+但这里有我们的Hazel仓库，让我们把今天做的所有代码都放到那个仓库吧
+but here we have our Hazel repository, let's actually push all the code that we've done today into that repository
+
+246
+00:21:24,866 --> 00:21:32,266
+那么我要进入这个dev/Hazel目录，也就是这个解决方案的目录，打开一个命令提示窗口
+so I'm going to go to this dev Hazel directory, which is the directory of this solution, I'm going to open a command prompt window over here
+
+247
+00:21:32,866 --> 00:21:37,500
+然后我要输入指令git status，只是为了确保一切正常
+and I'm going to type in git status, just to make sure that wearing that everything is kind of fine
+
+248
+00:21:37,733 --> 00:21:41,466
+现在最大的问题就是我最不想要的显然是.vs目录
+now the biggest thing that I don't want is obviously this .vs directory
+
+249
+00:21:41,466 --> 00:21:47,833
+我不想把它包括进来，所以现在要做的是设置一个.gitignore
+I do not want that to be kind of included at all, so what I'm going to do is actually set up a gitignore
+
+250
+00:21:47,833 --> 00:21:57,050
+那么打开VSCode，在这个Hazel目录中创建一个名为.gitignore的新文件
+so I'm going to just open VSCode here, and I'll make a new file called .gitignore inside this Hazel directory
+
+251
+00:21:57,050 --> 00:21:58,066
+你们可以看到，就在这儿
+you can see here it is
+
+252
+00:21:58,466 --> 00:22:02,125
+并且这里我要做的就是，有一个很好的注释，对于目录来说
+and all I'm going to do is, I just had a nice comment that just says kind of directories
+
+253
+00:22:03,225 --> 00:22:06,466
+我要包括，要忽略这里的几个目录
+and I'm going to include, I'm going to ignore a couple directories here
+
+254
+00:22:06,466 --> 00:22:13,066
+那么首先是.vs/，然后是bin/和bin-int/，我暂时先忽略它们
+so the first thing is going to be vs, and then with bin and bin int, I'm going to ignore them for now
+
+255
+00:22:13,300 --> 00:22:18,900
+将来我们可能会以某种形式提交二进制文件，所以这只是暂时的
+we will probably commit binaries in some form in the future, so this is somewhat temporary
+
+256
+00:22:19,066 --> 00:22:24,533
+但现在如果我运行相同的指令git status，你们会看到这里没有.vs/或bin-int/或bin/
+but now if I run that same git status, you should see that we don't actually have vs or bin int or bin in here
+
+257
+00:22:24,733 --> 00:22:29,633
+这意味着我可以简单地输入git add *，并且如果我们执行git status
+which means I can just simply type in git add asterisk, and if we're doing on the git status
+
+258
+00:22:29,700 --> 00:22:39,133
+你们就可以看到，我们有了想要的一切，我们的.user也是我不想提交的，所以.user
+you can see, we have basically everything we want, our .user is also something I do not want to commit, so files and we'll say .user
+
+259
+00:22:39,166 --> 00:22:43,200
+并且如果我们回到这里，删掉所有添加到git中的文件
+and if we go back here, just to get rid of all of these files that we've just added to git
+
+260
+00:22:43,200 --> 00:22:48,466
+我们只需要执行git reset .，如果你们再次处于git status，就会看到我们什么都没有
+we're just to git reset and just dot, and if you're on a status again, you'll see that we don't have anything
+
+261
+00:22:48,566 --> 00:22:54,825
+如果我们再次使用git add *和status，你们会看到我们仍然有user
+so if we do a git add asterisk again and do a status, you should see that we actually still have user 
+
+262
+00:22:54,825 --> 00:22:57,800
+因为我实际上需要在前面加一个星号
+because I actually need to add an asterisk at the front there
+
+263
+00:22:58,250 --> 00:23:03,933
+让我们再做一次整个过程，git reset, git add, git status
+so let's do that whole process again, git reset, git add, git status
+
+264
+00:23:04,066 --> 00:23:09,400
+你们可以看到这里不再有这些文件了，并且那对于我想要提交的所有东西都很好
+you can see we no longer have those files here at all, and that looks really good for everything that I actually want to commit
+
+265
+00:23:09,433 --> 00:23:19,766
+那么这里是git commit，然后这里是设置基本的应用程序和入口点
+so I want to say git commit, and then I'll just basically say set up set up basic application and entry points
+
+266
+00:23:20,700 --> 00:23:25,033
+然后我就会执行一个git push origin master，并且这条指令实际上就会推送这些代码
+and then I'm just going to do a git push origin master, and then it would actually push it
+
+267
+00:23:25,033 --> 00:23:28,133
+但在这期视频面向所有人发布之前，我实际上不会这么做
+but I'm not actually going to do this, until the episode goes live for everyone
+
+268
+00:23:28,266 --> 00:23:32,866
+因为我喜欢让仓库与视频发布日期保持同步
+because I kind of like to keep the repository actually synchronized with the video release dates
+
+269
+00:23:33,200 --> 00:23:37,500
+好了，那我们继续，希望你们喜欢这期视频，如果喜欢的话，就为它点赞吧
+okay, so there we go, I hope you guys enjoyed this video, if you did, you can hit that like button
+
+270
+00:23:37,566 --> 00:23:41,300
+你们也可以访问patreon.com/thecherno来帮助支持本系列
+you can also help support this series by going over to patreon.com/thecherno 
+
+271
+00:23:41,300 --> 00:23:45,400
+和往常一样，非常感谢那些让这个系列成为可能的所有赞助人
+huge thank you as always to all the patrons that make this series possible
+
+272
+00:23:45,700 --> 00:23:49,400
+这个游戏引擎系列的下一期视频实际上已经准备好了
+the next episode of this game engine series is actually already up for patreons
+
+273
+00:23:49,400 --> 00:23:53,000
+如果你们正在YouTube上观看这期视频，那么现在就可以观看下一期的视频
+if you're watching this live on YouTube, you can watch the next episode right now
+
+274
+00:23:53,033 --> 00:23:56,675
+如果你们访问patreon.com/thecherno来帮助支持这个系列
+if you just go over to patreon.com/thecherno and help support this series
+
+275
+00:23:56,975 --> 00:24:00,600
+还有我写的这些代码，实际上我已经写好了
+also all of this code that I've written, I've actually already written it
+
+276
+00:24:00,700 --> 00:24:08,433
+它是一个赞助人可以访问的私人的开发分支，所以如果你们想访问这个系列后面的代码
+it's in a private kind of development branch that patrons have access to, so if you would like access to basically the future of this series
+
+277
+00:24:08,600 --> 00:24:15,100
+并且大概在20期之前的样子，就像我已经在所有这些东西上实现了日志库的位置
+and met probably tend to 20 episodes ahead, like where I've already got the logging library implemented on all of that kind of stuff
+
+278
+00:24:15,500 --> 00:24:19,600
+并且你们可能想要为这种系列的开发分支做出贡献
+and you potentially want to help contribute to that kind of series development branch
+
+279
+00:24:19,700 --> 00:24:23,700
+然后你们也可以帮助支持这个系列，作为奖励，可以获得所有那些东西
+then you can also help support the series, and as a reward, you'll have access to all of that
+
+280
+00:24:24,366 --> 00:24:27,566
+和往常一样，希望大家喜欢本期视频，下次见，再见
+hope you guys enjoyed this video as always, I'll see you next time, goodbye
+

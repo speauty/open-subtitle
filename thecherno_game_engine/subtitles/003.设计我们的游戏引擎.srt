@@ -1,0 +1,1440 @@
+﻿1
+00:00:00,100 --> 00:00:03,533
+大家好，我是TheCherno，欢迎回到我的游戏引擎系列
+hey, what's up guys, my name is TheCherno, welcome back to my game engine series
+
+2
+00:00:03,533 --> 00:00:09,700
+那么上期我们讲了什么是游戏引擎，如果你们还没看过那期视频，记得要去看一下哦
+so last time we talked about what exactly a game engine was, make sure you checked out that video, if you haven't already
+
+3
+00:00:09,700 --> 00:00:15,050
+并且在我们开始之前，我想对所有让这个系列成为可能的赞助人表示衷心的感谢
+and before we begin, I just want to give a huge thank you to all of the patrons that make this series possible
+
+4
+00:00:15,050 --> 00:00:18,603
+如果你们还没有支持这个系列的，就可以通过访问pattern.com/thecherno进行支持
+if you guys aren't supporting the series, you could do so by going to pattern.com/thecherno
+
+5
+00:00:18,850 --> 00:00:21,300
+就可以提前一周访问这些视频
+get access to these videos like a week early
+
+6
+00:00:21,300 --> 00:00:26,833
+还有其他很多很酷的奖励，比如参与这些视频的策划过程
+as well as plenty of other cool rewards, such as being involved in the planning process of these videos 
+
+7
+00:00:27,175 --> 00:00:33,933
+并且探索这个系列的发展方向，影响这个系列的发展，所以非常感谢参与其中的所有人
+and finding out information about where this is going, and actually influencing where the series goes as well, so huge thank you to all the people involved in that
+
+8
+00:00:34,166 --> 00:00:37,800
+那么今天，我们要讲的，并且我想我们要讲的实际上是
+so today, what we're going to talk about, and what I thought we would talk about is actually just kind of
+
+9
+00:00:37,800 --> 00:00:42,025
+过一遍这个游戏引擎中要用到的一些不同的东西
+going through some of the different things that are going to go into this game engine
+
+10
+00:00:42,375 --> 00:00:45,266
+因为我们确实需要计划我们要做什么，对吧
+because we actually do need to plan what we're going to be doing, right
+
+11
+00:00:45,366 --> 00:00:47,650
+我这里还有一个平板，会在上面画一些东西
+I've even got a little bit of a notepad here, that I'm going to draw stuff on
+
+12
+00:00:47,650 --> 00:00:52,300
+这样我就能真正地向你们解释，这个系列的内容是什么
+so that I can kind of really explain to you guys, where this series are going to go
+
+13
+00:00:52,300 --> 00:00:53,966
+在接下来的几个视频中我们要做什么
+what we're going to do over the next few videos
+
+14
+00:00:53,966 --> 00:00:59,866
+以及我将如何构建这些东西，以及它们将会是什么样子，所以为了构建一个游戏引擎
+and how I'm going to actually structure all of this and what this is going to look like, so to build a game engine
+
+15
+00:00:59,866 --> 00:01:07,333
+首先，这不是一个简单的任务，对吧，要构建一个游戏引擎还是相当困难的
+first of all first and foremost is not an easy task, right, it's actually quite difficult to build a game engine
+
+16
+00:01:09,200 --> 00:01:15,966
+因为如果你们只关注游戏引擎或游戏工作室，以及它们与游戏引擎之间的关系
+because if you take a look at just game engines kind of in the wild or game studios, and how they kind of relate with game engines
+
+17
+00:01:15,966 --> 00:01:22,733
+比如你们知道的，除了最大的团队，所有人通常都会使用已经制作好的游戏引擎
+you know, that everyone except the largest of teams really usually goes with an already made game engine
+
+18
+00:01:22,733 --> 00:01:27,300
+并且如果团队决定创建自己的游戏引擎，那通常需要大量资源
+and if a team does decide to build their own game engine, it usually requires a lot of resources
+
+19
+00:01:27,300 --> 00:01:33,733
+那就是为什么开发自己的游戏引擎不是一个好主意，如果你们只想做一款游戏的话
+which is why it's not the best idea to kind of choose to kind of write your own game engine, if all you want to do is make a game
+
+20
+00:01:34,075 --> 00:01:38,566
+因为还要耗费其他资源，没有真正的理由让你们自己做这一切
+because there are other resouces out there, there's no real reason for you to actually do everything yourself
+
+21
+00:01:39,266 --> 00:01:46,050
+话虽如此，因为我们不是一个强大的团队，因为真的只有我，我的意思是
+that being said, because we're not a massive team, and because it's really only just me
+
+22
+00:01:46,050 --> 00:01:48,300
+我真的希望你们做出贡献
+I mean I really want you guys to contribute
+
+23
+00:01:48,466 --> 00:01:55,033
+但很明显，我不认为，我依赖稳定的贡献者是现实的
+but obviously understandably I don't think that it's realistic for me to depend on consistent contributors
+
+24
+00:01:55,066 --> 00:01:59,866
+比如你们知道的，我雇的不是专业工程师，所以因为那一切都不存在
+you know, who aren't professional engineers who I'm paying, so because that whole thing doesn't exist
+
+25
+00:01:59,866 --> 00:02:04,533
+这完全取决于我去创造并指导游戏，所以我必须合理地设置引擎的范围
+it's really up to me to build this thing and direct this thing, so I have to be reasonable with my scope
+
+26
+00:02:04,533 --> 00:02:07,605
+我不能说我们要创建Unreal，我不能说我们要创建Unity
+I can't say that we're going to build Unreal, I can't say we're going to build Unity
+
+27
+00:02:07,605 --> 00:02:10,533
+或者类似的东西，因为那完全是疯狂的，对吧
+or anything like that because that's just completely crazy, right
+
+28
+00:02:10,725 --> 00:02:15,650
+并且我这儿就是想尝试做一个游戏引擎，这个引擎可能会存在
+and I'm here to actually try and make a game engine, that will exist maybe
+
+29
+00:02:15,800 --> 00:02:20,200
+比如你们知道的，在观看这个系列的观众有生之年之内
+you know, within the lifetime of the viewers who are watching this series
+
+30
+00:02:20,566 --> 00:02:28,075
+所以因此我必须做一堆妥协，并且我们要慢慢来
+so because of that is a bunch of compromises that I have to make, and we're going to kind of take this slowly
+
+31
+00:02:28,360 --> 00:02:34,850
+并且，通过慢慢来，我的意思是，我们最终会非常快速地迭代某些功能
+and kind of well, by take this slowly, I mean we're going to end up iterating quite rapidly over certain features
+
+32
+00:02:35,125 --> 00:02:41,566
+并且我的意思是，我们要专注于构建最小的基础，需要真正地让一些东西运行起来
+and what I mean by that is we're going to focus on building up the minimal groundwork, we need to actually get something working
+
+33
+00:02:41,766 --> 00:02:46,050
+然后我们会对它进行迭代和改进，添加更多的功能，增加更多的稳定性
+and then we'll iterate over it and improve it, and add more features, and add more stability
+
+34
+00:02:46,050 --> 00:02:49,466
+增加更多的性能和优化，诸如此类
+add more performance and optimization, and do things like that
+
+35
+00:02:50,800 --> 00:02:57,500
+我们不打算从一开始就尝试使用完美的100%完整的，以及强大的可扩展代码
+we're not going to try and ride perfect 100% complete, and powerful extensible code from the beginning 
+
+36
+00:02:57,500 --> 00:03:04,500
+因为我们要花一年的时间才能真正拥有一个像窗口这样的应用栈之类的
+because that would take us like a year to actually get to the point where we have an application stack like a window and all of that
+
+37
+00:03:04,500 --> 00:03:11,150
+因为比如你们知道的，我们要必须做得很完美，就会把它移除，并且快速地重复这些东西
+because you know, we'd have to do it so perfectly, we're gonna kind of cut that out, we're gonna rapidly go over this stuff
+
+38
+00:03:11,150 --> 00:03:18,375
+以及随着时间的推移，我可能最终会改进代码，你们也会在这方面做出贡献和帮助
+and I'll just, you know, probably end up just improving code over time as well as, you guys will contribute and help with that as well
+
+39
+00:03:18,700 --> 00:03:22,566
+所以那就是这个系列我所做出的妥协的基本思路
+so that's kind of a basic idea of how this series is gonna run the compromises that I'm making
+
+40
+00:03:23,100 --> 00:03:29,600
+当我们讲到它们的时候再说，今天这儿就不花时间讲了
+we can get into probably, when we get to them, I don't want to spend today talking about
+
+41
+00:03:29,600 --> 00:03:35,400
+比如你们知道的，整个平台上的游戏引擎是什么，这就是我现在不会讲的东西
+you know along the entire platform of what the game imagine is, this is the stuff that I'm not going to have
+
+42
+00:03:36,100 --> 00:03:39,766
+因为如果我们现在开始讨论这个问题，就需要一段时间，而且不大会有人感兴趣的
+because if we start talking about that now, it's gonna take a while, and it probably isn't gonna interest too many people
+
+43
+00:03:40,300 --> 00:03:44,666
+但我指的是关卡编辑器，关卡编辑器将被内置到游戏引擎中
+but I mean things like having like a level editor, like the level editor's going to be built into the game engine
+
+44
+00:03:44,666 --> 00:03:50,500
+它会存在于游戏引擎运行时中，我不打算构建一个完整的C# WPF应用
+it's gonna exist in the game engine runtime, I'm not going to go ahead and build an entire C# WPF application
+
+45
+00:03:50,966 --> 00:03:53,175
+它有自己的，比如你们知道的
+that has its own kind of, you know
+
+46
+00:03:53,175 --> 00:03:57,900
+它就是一个完全独立的像Windows应用，只是链接到游戏引擎
+it's a full standalone like windows application that just links in with the game engine
+
+47
+00:03:57,900 --> 00:04:01,266
+以及然后去实现所有那些东西，因为那是无法忍受的，会花很长时间
+and then does all that stuff, because that's just that's just unfastible, it's going to take way too long
+
+48
+00:04:01,933 --> 00:04:09,133
+我的建议是，如果你们有一个庞大的团队，我可能会这么做，但因为我们没有这样的团队
+it would be the kind of my recommendation for, if you had a huge team, I would probably do that, right, but because we don't have that
+
+49
+00:04:09,133 --> 00:04:15,100
+我们只需要在游戏引擎中创建一个像ImGui之类的关卡编辑器
+we're going to just end up kind of building a level editor out of like ImGui or something like that within the game engine itself
+
+50
+00:04:15,100 --> 00:04:19,833
+并且那样的话，它就会是老式的C++，可能不是最好的解决方案
+and then that way it'll be old kind of C++, and it won't be the best solution
+
+51
+00:04:19,933 --> 00:04:23,666
+但这是我们可以实现的，那只是一个例子，对吧
+but it will be something that is achievable by us, that's an example, right
+
+52
+00:04:24,166 --> 00:04:28,700
+着色器编译是另一个例子，就像我们可以，就像我们可以写自己的着色器语言
+shader compilation is another example like we could, like ideally we'd write our own shader language
+
+53
+00:04:28,700 --> 00:04:33,200
+并且然后把它编译成，就像你们知道的，可以干预着色器语言
+and then have that compile to, like you know, medals to meddle the shader language to like
+
+54
+00:04:33,966 --> 00:04:39,133
+或者GLSL到HLSL到所有这些基于你们所处平台的着色器语言
+in or GLSL to HLSL to all of these kind of shader languages based on the platform that you're on
+
+55
+00:04:39,633 --> 00:04:43,400
+并且那将是一个惊人的系统，可能需要一两年的时间才能建成，对吧
+and that would be an amazing system, that would probably take a year or two to build, right
+
+56
+00:04:43,733 --> 00:04:48,300
+所以，只有一个人，所以那不是什么，就像我们必须在前进的道路上作出妥协
+so by one person, so it's not something, like we have to make compromises along the way
+
+57
+00:04:48,300 --> 00:04:53,333
+我只是想让你们所有人都知道，尽管我真的很想在这个系列中构建一个很棒的引擎
+and I just want all of you to be aware that, even though I really want to build an amazing engine in this series
+
+58
+00:04:54,033 --> 00:04:58,466
+对吧，就像在这个系列中，它曾经创造了一个很棒的引擎
+oh right, like during, I guess, this series, it used to build an amazing engine
+
+59
+00:04:59,033 --> 00:05:03,433
+但我必须现实地看待我们所能达到的目标，话虽如此，我们没有理由不能回到过去
+I have to be realistic with what we're able to achieve, now that being said, there's no reason why you can't go back
+
+60
+00:05:03,433 --> 00:05:10,850
+然后再添加那些功能，对吧，就是那样，当我说到，我们正在构建的核心技术将需要什么
+and then later add those features, right, it's just that, when I'm talking about, what the core technology that we're building will will entail
+
+61
+00:05:11,275 --> 00:05:17,433
+就像我之前说的那样，可能会有一些我们将要做出的妥协
+like I have been quiet brutal maybe with kind of some of the compromises that we're going to be making
+
+62
+00:05:17,500 --> 00:05:22,533
+因为你们必须记住那点，除了我是一个构建游戏引擎的人
+because you have to remember that, apart from the fact that, I'm one person building a game engine
+
+63
+00:05:23,466 --> 00:05:34,966
+我还有一份为EA制作游戏引擎的全职工作，但我并不只是在业余时间制作引擎
+I'm also I also have a full time job building game engines for EA, and also not really that, but I'm not just building an engine in my spare time
+
+64
+00:05:34,966 --> 00:05:40,025
+我教的都是我计划的内容，我教的都是这方面的内容，
+I'm teaching everything that goes into it I'm planning, I'm doing all this kind of stuff, 
+
+65
+00:05:41,075 --> 00:05:45,466
+所以正因为如此，最终，你们知道的，效率不高
+so because of that, it kind of ends up, you know, not being as efficient
+
+66
+00:05:45,466 --> 00:05:51,466
+很明显，就好像我一周花10个小时或2个小时坐下来写代码
+obviously as if I just sat down for like you know 10h a week or like 2h a week and actually wrote code
+
+67
+00:05:51,500 --> 00:05:56,198
+因为如果那么做了，我很快就有了一个引擎，而后面我必须教所有这些
+because if I did that, I have an engine in no time, since I have to teach all of this
+
+68
+00:05:56,198 --> 00:05:59,466
+这显然会消耗时间和效率
+it obviously does take its toll in terms of time and efficiency
+
+69
+00:05:59,666 --> 00:06:04,450
+不管怎样，说得够多了，让我们深入研究一下，游戏引擎到底有什么，我们要做什么
+anyway, enough of that, let's actually dive in and take a look at, what a game engine actually has, what we're going to do 
+
+70
+00:06:04,450 --> 00:06:09,325
+并且为接下来的几期视频画出我们的路线图，以及这个系列，现在在计划下
+and basically plan out our roadmap for the next few videos, and this series, now with plannings
+
+71
+00:06:09,525 --> 00:06:13,866
+我将有一个主要的设计阶段可能在我开始一个巨大的新功能之前
+I'm going to have a major kind of design episode probably before I begin a massive new feature
+
+72
+00:06:13,866 --> 00:06:16,533
+例如在我们开始构建渲染器之前
+for example before we start building the renderer
+
+73
+00:06:16,533 --> 00:06:22,966
+我们会详细计划，接口会如何寻找它，对，那么寻找它的接口又是什么样的
+we're going to plan out exactly, how the api is going to look for that, look for, yeah so what the api for that is going to look like
+
+74
+00:06:23,700 --> 00:06:28,800
+我们要如何构建这个东西，以及所有东西如何工作的语义
+how we're going to actually build that thing, and just the semantics of how everything's going to work
+
+75
+00:06:28,800 --> 00:06:35,466
+那么让我们深入看看接下来的几个视频，好了，所以我真的需要做一些概述
+so let's dive down and take a look at the next few videos, okay, so I really do want to kind of provide some kind of overview
+
+76
+00:06:35,575 --> 00:06:42,133
+至于我们的游戏引擎，顺便说一下，目前还没有一个名字，就像我命名这个视频一样
+as to what our game engine which by the way, does not have a name at the moment, as of me reporting this video
+
+77
+00:06:42,433 --> 00:06:47,900
+也许当大家都看到这个的时候我就能想出一个了，但是我现在还没有给这个引擎起个名字
+maybe I maybe I would have come up with one by the time everyone sees this, but I don't have a name for this engine right now
+
+78
+00:06:47,900 --> 00:06:52,466
+所以如果你们有什么好名字的话，请在下面留言，因为我很快就要创建一个github仓库了
+so if you have a name suggestion, drop it in the comments below, because I'm gonna have to make a github repository pretty soon
+
+79
+00:06:53,033 --> 00:06:57,833
+并且那显然需要一个名字，所以如果你们对这个游戏引擎的名字有任何建议，请在下面留言
+and that needs a name obviously, so if you have any name suggestions for this game engine, just drop a comment below
+
+80
+00:06:58,133 --> 00:07:02,333
+并且希望我们能想出一些很酷的名字，好了，那么关于游戏引擎，对吧
+and hopefully we'll come up with something pretty cool, okay, so game engines, right
+
+81
+00:07:02,633 --> 00:07:06,300
+让我们从讨论它们的具体组成开始吧
+let's start off by just kind of talking about exactly what goes into them
+
+82
+00:07:06,300 --> 00:07:14,666
+所以我想说的第一点是，我们需要一个入口，而引擎应该提供某种入口
+so the first point I want to kind of make is that we need like an entry point, and an engine should provide some kind of entry point
+
+83
+00:07:15,033 --> 00:07:22,333
+入口点是，当我们启动应用或游戏时，它是用这个引擎做的，会发生什么
+now an entry point is essentially,  when we launch our application or our game, that's been made with this engine, what happens
+
+84
+00:07:23,000 --> 00:07:27,400
+对，这是很多人忽略的东西，好像他们真的不他们真的认为好
+right, this is something that a lot of people overlook, like they don't really they think okay
+
+85
+00:07:27,400 --> 00:07:32,133
+你们得到了你们的主函数，你们完成了，但是就像发生了什么
+well you got your main function and you're done, well yeah but like what happens with that like
+
+86
+00:07:32,566 --> 00:07:37,100
+什么控制了主函数的位置，又是什么控制了与主函数一起执行的代码
+what controls where the main function is, what controls the code that gets executed with the main function is
+
+87
+00:07:37,100 --> 00:07:42,500
+那是客户端控制，游戏控制，还是引擎实际控制的东西
+that something that the client controls, the game controls, or is it something that the engine actually controls 
+
+88
+00:07:42,500 --> 00:07:48,933
+也许我们会通过宏来实现或者它被导入，会发生什么呢，当我们
+and maybe we kind of implement via either a macro or it gets imported, somehow what happens with that, when we
+
+89
+00:07:49,533 --> 00:07:59,400
+如果我们将其分解成原始的构建模块，当我们启动游戏或启动引擎时，会发生什么，对吧
+if we break this down to primitive building blocks, when we launch our game, or when we launch our engine, what happens, right
+
+90
+00:07:59,600 --> 00:08:05,400
+控制是什么，发生了什么，那就是入口点的全部内容，一旦我们处理好它
+what controls, what happens, that's what the entry point is all about, once we've kind of dealt with that
+
+91
+00:08:05,633 --> 00:08:10,900
+我们有一个叫做应用层的东西，至少我是这么称呼它的
+we have something called the application layer, or at least that's kind of what I call it
+
+92
+00:08:12,066 --> 00:08:21,766
+并且应用层是我们代码的一部分，它处理应用的生命周期和事件之类的东西
+and the application layer is just really a section of our code, that deals with application kind of life cycle and events and stuff like that
+
+93
+00:08:21,766 --> 00:08:27,066
+那么例如我们的运行循环，对吧，什么能保持应用打开并渲染帧，对吧
+so for example our run loop, right, what keeps the application opening and rendering frames, right
+
+94
+00:08:27,266 --> 00:08:33,500
+什么能够推动时间向前发展，什么能够执行我们的游戏想要执行的所有代码，什么是事件
+what keeps the time going forward, what executes all of the code that our game wants to execute, what about events
+
+95
+00:08:33,500 --> 00:08:39,666
+比如窗口被调整大小或者关闭或输入事件，比如鼠标和键盘，对吧
+what about things like windows being resized or like closed or input events like mouse and keyboard, right
+
+96
+00:08:39,666 --> 00:08:42,800
+所有这些都是在应用层处理的
+all of this kind of stuff is dealt with in the application layer
+
+97
+00:08:42,800 --> 00:08:50,833
+我们需要一种方法来运行我们的游戏或引擎，作为一个实际的应用运行在任何平台上
+we need a way to basically run our game or run our engine, as an actual application on whatever platform it's going to be on
+
+98
+00:08:51,166 --> 00:08:56,700
+那就是应用层所适配的我想要进入窗口层
+that's what the application layer kind of fits in from that I kind of want to go into the window layer
+
+99
+00:08:57,133 --> 00:09:00,800
+现在，这是引擎中很有趣的一部分
+now this is kind of a interesting part of the engine
+
+100
+00:09:01,000 --> 00:09:06,333
+因为如果你们考虑窗口，而窗口只是存在于桌面平台上的东西
+because if you think about a window really a window was only something that exists on desktop platforms
+
+101
+00:09:06,333 --> 00:09:12,400
+就像Windows MAC linux，它们都有窗口，如果你们之前做过编程的话
+it's like windows mac linux, they have windows, and as you kind of, if you've done any kind of programming before
+
+102
+00:09:12,400 --> 00:09:15,666
+如果你们看看一些像OpenGL系列的东西，我的频道上也有哦
+if you look at something like the OpenGL series, that I have on my channel as well
+
+103
+00:09:16,066 --> 00:09:19,700
+比如你们知道的，创建一个窗口，那是我们在实际应用中做的第一件事
+you know, we create a window, that's kind of one of the first things we do in our actual application
+
+104
+00:09:19,700 --> 00:09:23,766
+我们创建窗口是因为它将是所有图形渲染的目标
+we create a window because that's going to be the target for all of our graphics rendering
+
+105
+00:09:23,900 --> 00:09:30,533
+比如你们知道的，输入事件将来自哪里，我们的整个应用就是那个窗口吗，对吧
+as well as you know, where kind of input events are going to come from, this our entire application is that window, right
+
+106
+00:09:31,133 --> 00:09:36,025
+在其他平台，比如手机平台，它有点不同，或多或少有点像一个平面
+on other platforms like mobile platforms, it's a little bit different, it's more or less kind of like a surface 
+
+107
+00:09:36,025 --> 00:09:42,750
+因为应用是给你们一个应用而不是创建一个应用，控制台平台也是类似的
+because the app that you're kind of given an app rather than creating an app, and console platforms are kind of similar as well 
+
+108
+00:09:42,750 --> 00:09:47,500
+所以我说的确实是桌面平台，当我处理窗口层的时候
+so I'm really kind of talking about desktop platforms, when I deal with window layer stuff
+
+109
+00:09:47,500 --> 00:09:50,433
+但是因为我们一开始主要针对的就是桌面平台
+but because we are primarily going to be targeting desktop to begin with
+
+110
+00:09:50,433 --> 00:09:55,400
+并且我们会在这个视频后面讲到平台支持和渲染接口支持等等
+and we'll talk a little bit more about platform support and rendering api support and all that stuff later in this video
+
+111
+00:09:55,833 --> 00:09:59,800
+但因为我们主要处理的是那个，我们将有一个窗口层
+but because we're kind of going to be primarily dealing with that, we're going to have a window layer
+
+112
+00:10:00,433 --> 00:10:09,250
+并且在窗口层中，我们需要处理一些东西，比如输入和事件，输入会被放到事件中
+and inside that window layer, we need to deal with things, like input and events, so input kind of gets put into events 
+
+113
+00:10:09,250 --> 00:10:17,633
+那么事件管理器会处理输入，我们会处理由窗口和应用获取的输入事件
+so our event manager will handle inputs, we'll handle input events that get kind of picked up by our window and our application
+
+114
+00:10:18,300 --> 00:10:23,333
+事件管理器也很重要，我们将创建一个
+now event managers are kind of a really important thing as well, we're gonna build one
+
+115
+00:10:23,333 --> 00:10:26,800
+那是一个非常基本的信息和广播系统的功能
+that kind of functions on a very basic kind of messaging and broadcast system
+
+116
+00:10:27,133 --> 00:10:30,766
+也就是说应用程序中的某些层
+which basically just means that certain kind of layers in our application
+
+117
+00:10:30,766 --> 00:10:38,500
+是否可以订阅事件并获得通知，当事件发生时，由应用层堆栈的类型，当它发生
+can subscribe to events and get notified, when events happen by the kind of application layer stack, when that happens
+
+118
+00:10:38,500 --> 00:10:44,366
+事件会传播到这些层，而层可以选择，如果它们想要传播到其他东西，比如实体组件系统
+events will get propagated to those layers, and the layers can kind of choose, if they want to propagate them to things, like the entity component system
+
+119
+00:10:45,300 --> 00:10:50,400
+我们也会讲到，所以那就是事件的原理，它基本上就是一个消息传递系统
+which we'll also talk about, so that's kind of how events will work, it's just basically a messaging system 
+
+120
+00:10:50,400 --> 00:10:54,200
+当事件发生时，我们陷入中断了，或者更确切地说是没有中断
+where we get interrupted, when an event happened, or rather not really interrupted
+
+121
+00:10:54,200 --> 00:10:56,375
+但当事件发生时，我们得到了通知
+but when an event happens we get notified 
+
+122
+00:10:56,375 --> 00:11:01,375
+因为我们的onEvent函数被调用了，但是它有两个部分
+because our kind of onEvent function essentially gets called, however there's two parts to this 
+
+123
+00:11:01,375 --> 00:11:06,766
+因为，比如，对于输入事件，是的，当一个按键被按下时，得到通知是很好的
+because with input events, for example, yes, it's really good to be notified, when a key press
+
+124
+00:11:06,766 --> 00:11:12,200
+但有时，我们也想检查实际输入设备的状态
+but also sometimes, we want to check the state of an actual input device
+
+125
+00:11:12,200 --> 00:11:17,400
+那么比如，当前鼠标的位置就是当前按下的空格键，对吧
+so for example where is the current mouse position is the space bar currently pressed, right
+
+126
+00:11:17,733 --> 00:11:25,200
+这些不是一种消息传递系统，它或多或少会问应用，嘿，这个按键的状态是这样吗，对吧
+these those aren't kind of a messaging system, it's more or less asking the application, hey, is this state the key, right
+
+127
+00:11:25,200 --> 00:11:29,266
+以及如果是这样，我想做点什么，这有点太过了，我们会再讨论的
+and if so I want to do something, so it's kind of too pass to that, which again we'll discuss
+
+128
+00:11:29,433 --> 00:11:33,666
+当我们计划事件和脉冲系统时，从那里开始，渲染器
+when we plan out the events and kind of impuls system, from there, the renderer
+
+129
+00:11:33,966 --> 00:11:40,333
+它可能是我们要处理的最大的系统之一，现在渲染器是在我们的屏幕上渲染图形的
+it's probably one of the biggest systems that we actually have to deal with, now the renderer is what actually renders graphics on our screen
+
+130
+00:11:40,466 --> 00:11:46,966
+我们告诉渲染器，通常是每帧一次，嘿，是时候检查你的列表了
+we basically tell the renderer, usually once per frame, hey, it's time for you to kind of go through your list of things
+
+131
+00:11:46,966 --> 00:11:49,666
+你需要在屏幕上画出来，然后画出来，对吧
+that you need to draw on the screen and actually draw them, right
+
+132
+00:11:52,000 --> 00:11:56,566
+到目前为止，这将是最大的引擎系统，也是最复杂的
+by far, this is going to be the biggest system of the engine, and the most complicated
+
+133
+00:11:56,800 --> 00:12:01,633
+现在我不想说渲染器就是引擎
+now I don't want to go ahead and say that the renderer is what basically the engine is
+
+134
+00:12:02,033 --> 00:12:09,266
+因为很多游戏引擎系列或者当人们教游戏引擎编程时，他们总是从渲染器开始
+because a lot of game engine series or like when people teach game engine programming, they always start with the renderer
+
+135
+00:12:09,266 --> 00:12:14,400
+他们总是专注于渲染器，渲染器是一个巨大的东西，它可以立即被构建，对吧
+they always focus on the renderer, and the renderer is just this huge thing, that gets kind of built immediately, right
+
+136
+00:12:14,400 --> 00:12:21,100
+并且我对此没有异议，因为这个问题就是，比如很可能出现在你们制作游戏的时候
+and I can't really argue with that, because the problem is, like most likely when you're building a game
+
+137
+00:12:21,100 --> 00:12:25,800
+你们首先想看到的是屏幕上的彩色像素，想看到图形
+the very first thing you want to see are colored pixels on the screen, right, you want to see graphics
+
+138
+00:12:25,833 --> 00:12:31,200
+所以尽快得到它当然是一个好主意，对我计划这个系列来说也是如此
+so of course it's going to be a good idea to kind of get that as soon as possible, and for me planning this series
+
+139
+00:12:31,200 --> 00:12:37,900
+这是一场很长时间的，我和自己以及其他人的讨论
+this was this was a really kind of long, like discussion I essentially had with myself and others
+
+140
+00:12:38,033 --> 00:12:42,100
+我是否应该从图像开始，或者我是否应该完成很多事情
+about whether or not I should start with graphics, or whether or not I should maybe get a lot of stuff done
+
+141
+00:12:42,433 --> 00:12:46,800
+我们排序这些东西的方式是我们不会马上得到图形
+and the way that we're going to kind of order this stuff is we're not actually going to get the graphics immediately
+
+142
+00:12:47,166 --> 00:12:53,775
+我们很快会有一个基本的调试层，比如你们知道的，就是显示文本的能力
+we are going to pretty quickly have like a basic debugging layer up, and you know just the ability to basically display text
+
+143
+00:12:53,775 --> 00:12:58,700
+也许在应用程序中屏幕上还有其他GUI元素
+and maybe some other gui kind of elements on the screen in kind of an application case
+
+144
+00:12:58,800 --> 00:13:04,133
+但我们不会在这个系列的前几个月就开始制作3D渲染器
+but we're not going to go ahead and build a 3D renderer in the first, like few months probably of this series
+
+145
+00:13:04,133 --> 00:13:13,133
+那是不可能发生的原因是游戏引擎不仅仅是一个3D渲染器，对吧
+that's just not gonna happen the reason that's not gonna happen is because festival a game engine is much more than just a 3D renderer, right
+
+146
+00:13:13,133 --> 00:13:21,666
+所以我们没必要急着去做，但你们也会看到，构建一个合适的3D渲染器是多么容易
+so there's no need for us to kind of rush into that, but also you're going to see, how much easier it's going to be to actually build a proper 3D renderer
+
+147
+00:13:21,800 --> 00:13:29,200
+当我们所有的其他系统都已经运行起来的时候，这将会是一件轻而易举的事情
+when we have all of the other systems kind of already operational, it's just going to be an absolute breeze compared to what it would be
+
+148
+00:13:29,200 --> 00:13:36,266
+如果我们有一个原始应用，我们开始写像OpenGL代码或DirectX代码或任何东西
+if we have basically a raw bear braids application, and we start writing like OpenGL code or DirectX code or whatever immediately
+
+149
+00:13:36,266 --> 00:13:41,700
+那不是一个好的长期战略，并且我们显然想要采取一种长期战略
+that's just that's not a good long term strategy, and we want to obviously take kind of the long term strategy
+
+150
+00:13:41,700 --> 00:13:46,675
+因为我们试图构建一个引擎，对于Renderer
+because we're trying to actually build an engine, the Renderer
+
+151
+00:13:46,975 --> 00:13:50,633
+你们知道的，一旦我们有了所有这些，顺便说一下，这个必须是一个有序的列表
+you know, once we have all that, this by the way is necessarily a list that's in order
+
+152
+00:13:51,033 --> 00:13:54,133
+所以不要认为，比如你们知道的，我们会先做入口，然后直接应用起来
+so don't think that, you know, we're going to do the entry board first and applicationally went alive
+
+153
+00:13:54,133 --> 00:13:57,933
+这是所有的东西，那是进入这个的，那么一旦我们有了渲染器
+this is just kind of all the stuff, that's kind of going into this, so once we have the renderer
+
+154
+00:13:58,765 --> 00:14:00,975
+我一直在说，一旦我们有了渲染器，就好像它是有序的
+I keep saying once we have the renderer as if it is ordered
+
+155
+00:14:01,400 --> 00:14:08,667
+但我们基本上需要一些渲染，也需要一些渲染接口抽象
+but we basically need some kind of render also render api abstraction
+
+156
+00:14:10,633 --> 00:14:16,700
+那基本上意味着我们要通过我们的引擎来支持多个渲染接口
+which basically just means that we're going to support multiple rendering apis through our engine
+
+157
+00:14:16,966 --> 00:14:19,772
+首先，我们会用OpenGL来处理
+now to begin with, we're just going to deal with OpenGL
+
+158
+00:14:20,250 --> 00:14:24,766
+我一开始选择OpenGL的原因是因为我已经有了一个OpenGL的系列教程
+the reason I've chosen OpenGL at the beginning is because I already have an OpenGL series
+
+159
+00:14:24,766 --> 00:14:30,233
+如果人们可以参考它，也因为老实说，它是最简单的接口
+if that people can refer to and also because to be quite honest, it is the simplest api out there
+
+160
+00:14:30,400 --> 00:14:34,800
+并且它是跨平台的，这意味着如果我们决定在MAC和Linux上进行生产
+and it's cross platform, meaning that if we decide to have our production on the mac and linux
+
+161
+00:14:34,800 --> 00:14:37,733
+我想在这个系列的早期就开始
+which I would like to get running pretty early on in the series
+
+162
+00:14:39,433 --> 00:14:42,800
+OpenGL是开箱即用的，如果我们使用DirectX
+OpenGL is going to work out of the box, if we went with something like DirectX
+
+163
+00:14:42,800 --> 00:14:49,566
+这可能会是我的第一选择，你们知道的，它首先会更复杂
+which might have actually been my first choice, you know, it would be first of all more complicated to begin with
+
+164
+00:14:49,566 --> 00:14:53,500
+并且实际上，我将不得不花更多的时间来教DirectX，而不是撸码
+and I would have to spend more time teaching actual DirectX than writing the code
+
+165
+00:14:53,500 --> 00:14:59,733
+因为它们没有专门的系列教程，因为它比OpenGL更复杂，而不是做所有那些
+because they don't have a dedicated series for it, and because it is more complicated than OpenGL, instead of doing all that
+
+166
+00:15:00,733 --> 00:15:06,200
+除了做所有那些，我还需要一旦我们有MAC和Linux，我必须实现另一个渲染接口
+apart from doing all that, I would also need to as soon as we have mac and linux, I have to implement another rendering api
+
+167
+00:15:06,675 --> 00:15:12,775
+但因为我们的引擎最终将支持多种渲染接口，比如Vulcan Metal DirectX
+but because our engine will support multiple rendering apis eventually, like Vulcan Metal directX
+
+168
+00:15:12,775 --> 00:15:14,708
+你们知道的，OpenGL所有这类东西
+you know, OpenGL all that kind of stuff
+
+169
+00:15:16,133 --> 00:15:21,900
+设计渲染器很重要，因为你们实际使用的接口是抽象的
+it's important to kind of design the renderer in a way where the api that you're actually using is abstracted
+
+170
+00:15:22,200 --> 00:15:25,200
+这意味着当我们决定添加一个额外的渲染接口
+meaning that when we decide to add an additional render api
+
+171
+00:15:25,200 --> 00:15:32,066
+这不会是整个噩梦般的重写，因为我们已经把所有东西都设置为忽略接口
+it's not going to be this whole nightmare rewrite, because we've already set everything up to be pretty much api ignosted
+
+172
+00:15:32,175 --> 00:15:38,200
+显然，有些东西必须是特定于接口的，我们不能只写一个叫做上传纹理的函数
+obviously some things are going to have to be api specific, it's not like we can just write a function called upload texture
+
+173
+00:15:38,333 --> 00:15:45,925
+然后为每个接口实现四次，因为我们想要创建渲染器的方式会根据接口不同
+and then implement that four times for each api, because the way that we want to create a renderer would be different based on the api 
+
+174
+00:15:45,925 --> 00:15:52,166
+因为在实现一些特定的事情方面，你们使用Vulcan比OpenGL可能会更高效
+because vulcan might be a little bit more efficient and doing certain things, if you do it this way versus like the OpenGL way
+
+175
+00:15:52,433 --> 00:15:57,800
+所以我们仍然需要写两部分代码，不像OpenGL的每个函数
+so we kind of do still need to write two code parts, not just like every function that OpenGL has
+
+176
+00:15:57,800 --> 00:16:00,633
+我们来创建一个副本这样就不行了，对吧
+let's create a copy of it and then that's not going to work, right
+
+177
+00:16:01,150 --> 00:16:06,250
+并且任何做过多种接口编程的人都知道那一点，事实就是那样
+and anyone who's done kind of multiple api programming will obviously know that, that is the case
+
+178
+00:16:06,933 --> 00:16:12,533
+但我们将以一种抽象的方式从头开始设计渲染器，这样我们就可以处理它
+but we are going to design the renderer from the ground up in an abstracted kind of way, so that we can deal with that
+
+179
+00:16:12,533 --> 00:16:17,175
+我将通过基本的调试支持来总结整个部分
+I'm going to summarize this entire section by saying basically debugging support
+
+180
+00:16:17,550 --> 00:16:20,733
+现在，这并不一定意味着像中那样进行调试
+now this doesn't necessarily mean debugging as in
+
+181
+00:16:20,733 --> 00:16:23,766
+我试着修正我的代码，但是真的，如果你们把调试去掉
+I'm trying to fix my code, but just really, if you take the debug word out of that
+
+182
+00:16:23,800 --> 00:16:31,933
+并且你们会想，向引擎或应用程序添加调试支持意味着什么
+and you think about that what does it mean to add debugging support to your engine or to an application
+
+183
+00:16:31,933 --> 00:16:39,250
+基本上我说的是在它周围构建脚手架，对吧，当我们构建任何类型的应用程序时
+basically I'm just talking about essentially building or building with scaffolding around it, right, when we construct any kind of application 
+
+184
+00:16:39,250 --> 00:16:46,900
+我们需要好的方法来实际看到发生了什么，调试它，解决我们的问题，并构建一些东西
+we need good ways to actually see what's going on and debug it and solve our problems and build something
+
+185
+00:16:47,333 --> 00:16:52,500
+所以这就像一个日志系统，对吧，那可能是非常简单的东西
+so it's something like a logging system, right, that's something that might be really simple
+
+186
+00:16:52,900 --> 00:16:59,733
+但它只是我们需要的东西，我们需要它，这样我们就可以很容易地记录任何数据类型
+but it's just something that we need to have, and we need to have it, so that we can log any kind of data types that we have really easily
+
+187
+00:16:59,800 --> 00:17:03,466
+并且我们可以将它记录到文件中，性能如何呢，对吧
+and we can log it to files and all that stuff, what about performance, right
+
+188
+00:17:03,500 --> 00:17:09,600
+我们已经写了我们的渲染器，很棒，但它有点慢，花了所有的时间，为了完成它
+we've written our renderer, fantastic, but it's a little bit slow, well wears all the time being spent, well in order to work that out
+
+189
+00:17:09,600 --> 00:17:16,066
+我们需要一些分析系统，我们希望能够让我们的应用程序在一种特殊模式下运行
+we need some kind of profiling system, right, we want to be able to basically have our application potentially run in a special mode
+
+190
+00:17:16,066 --> 00:17:21,400
+那是在VS设置之外，就像我们希望应用程序自己实现那个一样
+that is outside of visual studio settings, like we want our application to actually do it itself
+
+191
+00:17:21,400 --> 00:17:27,864
+这样我们就可以在任何平台上运行它，而不用担心，使用特定平台上可用的特定工具
+so that we can run it on any platform, and not have to worry about, using certain tools that are available on certain platforms
+
+192
+00:17:28,100 --> 00:17:31,873
+比如你们知道的，我们想要在代码中插入代码，这意味着我们想要在代码中放入代码
+you know, we want to essentially instrument the code, which means we want to put code into our code
+
+193
+00:17:32,066 --> 00:17:37,200
+它只在调试模式下运行之类的，基本上是乘以每个函数，然后说
+that only runs in like debug mode or something like that, which basically times every function and says 
+
+194
+00:17:37,200 --> 00:17:45,025
+然后把它收集到一个漂亮的视图中，这样我们就可以使用某种工具来观察它，很酷
+and then collects it into like a nice kind of view, so that maybe then we can use some kind of tool to actually look at that and see, okay cool
+
+195
+00:17:45,025 --> 00:17:50,000
+在我的渲染函数中，我可以看到纹理上传，或者统一变量绑定占用了大部分时间
+in my render function, I can see the texture uploading, or the uniform binding is taking out the most time
+
+196
+00:17:50,000 --> 00:17:53,400
+也许我写得不好，也许需要优化它，对吧
+maybe I've written that poorly, maybe I need to optimize that, right
+
+197
+00:17:53,966 --> 00:17:58,500
+那是件好事，那是件很重要的事，不过有些人可不那么认为
+that's a good, that's something, that's so important to have that, people just kind of don't think about
+
+198
+00:17:58,500 --> 00:18:01,900
+因为，如果你们正在编写一个简单的应用程序，可能不太关心那些东西
+because of course, if you're writing a simple application, you might not care about that stuff
+
+199
+00:18:02,233 --> 00:18:05,800
+但由于我们在这里添加了一些重要的东西，我们希望所有这些系统都对我们可用
+but since we're adding something serious here, we want to have all these systems available to us
+
+200
+00:18:05,966 --> 00:18:09,700
+因为它们在未来会对我们有很大帮助，我将加快讲解
+because they'll help us a lot out in the future, I'm going to kind of accelerate through this a little bit 
+
+201
+00:18:09,700 --> 00:18:15,566
+因为我觉得这是球体在拖着，当我们谈到其他特征时，我们会处理它们
+because I feel like this is spheres dragging on, and as we come to other features will deal with them
+
+202
+00:18:15,566 --> 00:18:21,433
+但是像脚本这样的东西，比如你们知道的，我们想要有像lua或c# python之类的东西
+but stuff like scripting, you know, we want to have like lua or some kind of lead to C# python
+
+203
+00:18:21,433 --> 00:18:26,275
+我真的不关心，在这一点上我还没有决定，但我们想要有一个内置的脚本语言
+I don't really care, at this point I haven't decided, but we want to have a scripting language kind of built in
+
+204
+00:18:26,275 --> 00:18:34,575
+这样我们就不用一直处理C++代码了，实际上，我们就可以用更高级的语言来写脚本
+so that instead of kind of dealing with, dealing with C++ code all the time, we can actually write scripts in much higher level languages 
+
+205
+00:18:34,575 --> 00:18:39,866
+即使是艺术家或内容创造者也可以轻松编辑，而不需要考虑内存之类的东西
+that even like artists or content creators can write easily without having to think about stuff like memory
+
+206
+00:18:39,966 --> 00:18:44,933
+说到内存，我们显然需要内存系统，我的意思是，自定义分配器和内存跟踪
+speaking of memory, we obviously want memory systems, I mean, custom allocators and memory tracking
+
+207
+00:18:45,733 --> 00:18:51,225
+因为我将尝试内存系统，因为内存对于性能来说是一个很大的问题
+because I'll try memory systems, because memory is a huge deal for performance
+
+208
+00:18:51,225 --> 00:18:54,166
+也是我们需要好好管理的资源
+and also a resource that we really do need to manage well
+
+209
+00:18:54,366 --> 00:19:01,600
+当需要调试某些东西时，内存使用，甚至是CPU时间，花费在内存分配上
+and when it comes time for debug certain things as well, memory usage, and perhaps even like cpu times, spent on memory allocation
+
+210
+00:19:01,600 --> 00:19:06,733
+很明显，我们想要检查并尽可能地最小化一些东西
+is something that we obviously want to kind of be able to inspect and minimize as much as possible
+
+211
+00:19:06,733 --> 00:19:18,933
+一个实体组件系统或类似于ECS的东西，我们需要有实体组件系统，这是一个ECS
+an entity component system or kind of an ecs is as well something that, we need to have entity components system, which is an ecs
+
+212
+00:19:19,833 --> 00:19:25,166
+这只是我们能够在世界上创建游戏对象的一种方式，然后将它们模块化
+this is just a way for us to be able to kind of create game objects in the world and then kind of modularize them
+
+213
+00:19:25,166 --> 00:19:33,433
+比如能够包含特定的组件，将特定的系统包含到我们世界中的每种独立的edc或游戏对象中
+like be able to kind of include certain components, include certain systems to each kind of individual edc or game object we have in our world
+
+214
+00:19:33,733 --> 00:19:38,500
+这样我们就可以定义它的行为，以及引擎实际处理的是什么
+so that we can kind of define its behavior, and what actually the engine deals with
+
+215
+00:19:38,933 --> 00:19:44,266
+在第一期中，我已经说了游戏引擎实际上只是数据转换机器
+in the first episode, I talked about the fact that game engines are really just data transformation machines
+
+216
+00:19:44,266 --> 00:19:47,600
+我们基本上只是获取数据，并且然后交由引擎来处理它们
+where basically we just take in data, and then the engine does something with them
+
+217
+00:19:47,600 --> 00:19:55,233
+这种实体组件系统可以让我们说，我的世界里有这个对象
+well this kind of entity component system is a way for us to say, I have this object in my world
+
+218
+00:19:55,233 --> 00:20:00,325
+我想让你们把它画出来就像我想让你们把这个三维模型画出来一样在它的位置
+I want you to draw it as I want you to draw this 3D model at its position
+
+219
+00:20:00,325 --> 00:20:01,766
+对吧，在它的变换处
+ right, at its transform
+
+220
+00:20:01,833 --> 00:20:05,266
+我想把这个脚本附加到它上面，这样它就可以在空间里弹跳了
+I want this script to be attached to it, so that it can bounce around the room
+
+221
+00:20:05,266 --> 00:20:10,275
+或者我想要的东西，比如你们知道的，我想要它有一种物理材质
+or something I want, you know, I want it to have kind of a physics material
+
+222
+00:20:10,275 --> 00:20:13,300
+这样它就可以实际与物理和所有的东西相互作用
+ so that it can actually interact with physics and all that stuff
+
+223
+00:20:13,466 --> 00:20:15,566
+我想让它播放这个音频，你们应该明白了，对吧
+I want it to play this audio, you kind of get the point, right
+
+224
+00:20:15,666 --> 00:20:20,200
+这只是一种方式，让我们能够定义，引擎对我们拥有的实体做了什么，对吧
+it's just a way for us to be able to define, what actually the engine does with an entity that we have, right
+
+225
+00:20:20,400 --> 00:20:23,900
+当我们进入一个世界，一个场景或一个关卡之类时
+when we launch into a world or a scene or a level or something like that
+
+226
+00:20:24,066 --> 00:20:29,933
+我们希望能够加载所有的对象然后看看它们实际发生了什么，它们是如何工作的
+we want to be able to load in all of our objects and then see well what actually happens to them, how did they work
+
+227
+00:20:30,000 --> 00:20:35,866
+比如你们知道的，引擎要怎么处理这些数据呢，这就是ECS的本质
+you know, what is the engine supposed to do with all of this data it's coming in, and that's kind of essentially what an ecs is
+
+228
+00:20:36,466 --> 00:20:42,333
+说到物理，我们需要一些物理解决方案，我们以后可能会处理很多
+speaking of physics we want some kind of physics solution, we'll deal with that probably a lot later on
+
+229
+00:20:43,066 --> 00:20:47,266
+我想就是那样了，我的意思是，比如你们知道的，显然还有文件IO之类的东西
+I think that's about it, I mean well you know, obviously there's like file IO and stuff like that
+
+230
+00:20:47,266 --> 00:20:54,600
+也像VFS，这是一种虚拟文件系统，我们稍后也会讨论和设计它
+and also like a VFS, which is a virtual file system that we also want to talk about later and design
+
+231
+00:20:56,100 --> 00:21:02,466
+我想，就是这样，我的意思是，很明显我们也会有一个构建的系统和自定义资产类型
+I think, that's about it, I mean, you know, obviously we'll kind of have a built system as well and custom asset types
+
+232
+00:21:02,700 --> 00:21:12,400
+所以如果我们有一个3D模型或纹理，我们有内容创造者创作的3D模型或纹理
+so if we have a 3D model or a texture, we have 3D models or textures that get authored by content creators
+
+233
+00:21:12,400 --> 00:21:17,366
+我们希望能够将它们转换成我们的引擎所优化的自定义格式
+we want to be able to convert them into a custom format that our engine that is optimized for our engine
+
+234
+00:21:17,900 --> 00:21:23,366
+这样我们就不用浪费时间在运行时将数据转换成我们的数据
+so that we don't have to waste time transforming that data into our data at runtime
+
+235
+00:21:23,366 --> 00:21:27,800
+所以我们可以在线下做这件事，我们可以在线下建立我们的资产
+so we can kind of do that offline, we can do that by building our asset offline 
+
+236
+00:21:27,800 --> 00:21:37,300
+阅读游戏真的很简单，一切都是正确的格式，一切都是最好的
+and then it's really just really simple and easy to actually kind of just read up out game, and everything's the right format, and everything's the best
+
+237
+00:21:37,300 --> 00:21:44,400
+所以我们肯定需要它，还有我要提到的另一件事，关于可交换资产
+so we definitely need that as well as what was the other thing I was gonna mention, with that yeah hot swapable assets, right
+
+238
+00:21:44,400 --> 00:21:49,566
+我们想要改变，比如mod，我们想要打开photoshop
+so we want to be able to you know change, you know mod, we want to have photoshop open
+
+239
+00:21:49,566 --> 00:21:54,325
+我们希望能够在photoshop中在纹理上画一些东西，control s
+we want to be able to kind of draw something on our texture in photoshop here, control s
+
+240
+00:21:54,575 --> 00:21:56,866
+我们希望我们的构建系统能找到它
+we want our build system to pick that up build it
+
+241
+00:21:56,933 --> 00:21:59,975
+然后重新加载到我们的游戏中，同时它是实时运行的
+and then reload that into our game, while it's all running in real time
+
+242
+00:21:59,975 --> 00:22:02,466
+这样我们就可以更新东西，甚至像3D模型
+so that we can kind of update stuff even like a 3D model
+
+243
+00:22:02,466 --> 00:22:09,133
+我们可以调整一些顶点，或者以某种方式修改它，它应该热插拔到我们的引擎中，对吧
+we can just kind of tweak some of the vertices, or you know, modified it in some way, and it should just hot swap, right, into our engine
+
+244
+00:22:09,166 --> 00:22:12,900
+这样我们就可以对它做出改变，相对于运行，这是另一个非常重要的系统
+so that we can kind of make changes to it, well against running, that's another really important system
+
+245
+00:22:13,200 --> 00:22:19,533
+但是，可能现在不值得讨论，但它只是一些东西，一些东西，有点
+but again, probably isn't really that worth talking about right now, but it's just something, some of the stuff, that's kind of
+
+246
+00:22:19,533 --> 00:22:27,766
+我打算深入研究我们正在构建的整个引擎和项目，不管怎样，看看这个列表，我想就这些了
+I'm planning to actually go into this whole kind of engine and project that we're building, anyway, looking at the list, I think that's about it
+
+247
+00:22:29,500 --> 00:22:31,900
+我还没有讲到任何细节只是一些高层次的系统
+I haven't covered any specifics just kind of high level systems
+
+248
+00:22:32,400 --> 00:22:35,800
+这个系列的方式是，下次我们将开始一个项目
+ the way that this series is going to go is, next time we're just going to start a project
+
+249
+00:22:37,100 --> 00:22:42,825
+正如你们知道的，我是EA的全职软件工程师，所以我没有太多的时间来做这个系列
+as you know, I am a full time software engineer at EA, so I don't have one billion years to make this series
+
+250
+00:22:43,166 --> 00:22:47,225
+所以对于我来说，实现这个的最好方法是，一边跑代码，一边解释
+so the best way for me to actually do this is, we're just going to start running code, I want to start explaining it 
+
+251
+00:22:47,225 --> 00:22:52,933
+只要我写的代码需要一个具体的解释，我可能就会做一个视频
+and wherever I write code that warrants a specific explanation, I might just make a video
+
+252
+00:22:53,233 --> 00:22:57,966
+在我画完图之后再详细讨论的地方
+where I kind of draw diagrams and talk about it in more detail after it's actually been done
+
+253
+00:22:58,200 --> 00:23:03,466
+但关键是，写出这个巨大的引擎的最好方法
+but the point is that the best way to actually write this massive engine
+
+254
+00:23:03,900 --> 00:23:09,533
+而这大量的工作是真正开始写出来，而不是花十亿年时间谈论它
+and this overwhelming amount of work is to actually start writing it, instead of spend one billion years talking about it
+
+255
+00:23:10,350 --> 00:23:17,500
+也就是说，我写的代码大部分都是直播的，当我们讲到更复杂的系统时，我已经写过了
+that being said the code that I write will mostly be live, I will have already written, when we get to more complicated systems 
+
+256
+00:23:17,500 --> 00:23:23,900
+比如日志系统，我已经准备好了一个日志解决方案
+like logging for example, I've already got, I will have already had kind of a logging solution ready to go
+
+257
+00:23:24,100 --> 00:23:28,600
+我将会为你们编写，并解释它是如何工作的，对吧，以及这类代码
+that I will essentially just kind of write for you, and explain how it works, right, and that kind of code
+
+258
+00:23:28,600 --> 00:23:36,733
+它将在开发分支上提前提供给赞助人，所以那对我来说是一件很好的事情
+it will be available on a development branch to patrons a headway ahead of time, so that's a really good kind of thing for me to do
+
+259
+00:23:36,733 --> 00:23:43,233
+因为那意味着，由于它对赞助人可用，那些人就可以重新浏览它，帮助我指出一些流程
+because that means that, since it is available to patreons, those people can kind of rethrough it, help me out point out some flows
+
+260
+00:23:43,233 --> 00:23:47,733
+也许会说，哦，这太难用了，你们知道的，也许你们可以简化接口之类的
+maybe say that, oh, this is way too hard to use, you know, maybe you can simplify the api or something like that
+
+261
+00:23:47,733 --> 00:23:51,900
+并且我们可以在它真正投入生产和制作这些视频之前对它进行迭代
+and we can kind of iterate over that before it actually makes it into production and into these videos
+
+262
+00:23:51,950 --> 00:24:01,733
+这也是我需要你们支持的另一个原因，所以那有点令人兴奋，那就是这个系列的发展方向
+which is another reason why I really need your support, so that's kind of exciting, and that's kind of the way the series is gonna go
+
+263
+00:24:01,733 --> 00:24:07,625
+所以下次我们会做一个项目讨论一下这个系列的限制条件
+so next time we're gonna make a project talking a little bit about the constraints of this series, I guess
+
+264
+00:24:07,625 --> 00:24:12,566
+或者说现在我们只支持Windows
+or kind of the way that this is going for now we're just going to support windows only
+
+265
+00:24:12,566 --> 00:24:21,150
+我们只会支持OpenGL，我会考虑其他平台来写所有代码，这意味着我不会写所有东西
+and we're just going to support OpenGL only, I will write all the code with other platforms in mind, meaning I'm not going to just write everything
+
+266
+00:24:22,166 --> 00:24:26,375
+你们知道的，比如我的Application.cpp文件不会包含Windows代码
+you know, like my Application.cpp file is not going to contain windows code in it
+
+267
+00:24:26,725 --> 00:24:28,966
+比如win32 API代码，对吧
+like wind 32 api code in it, right
+
+268
+00:24:28,966 --> 00:24:34,700
+因为很明显这个引擎将来会支持其他平台
+because obviously the engine is going to support other platforms in the future
+
+269
+00:24:34,866 --> 00:24:36,400
+所以我仍然会提取东西
+so I am still going to extract things
+
+270
+00:24:36,400 --> 00:24:41,600
+并确保我把任何平台特定的代码或渲染接口特定的代码划分到它自己的文件中
+ and make sure that I actually divide any platform specific code or render api specific code into its own kind of files
+
+271
+00:24:41,933 --> 00:24:46,825
+它不会在其他平台上编译，或者如果我们编译其他渲染接口
+that will not be compiled on other platforms, or if we're compiling for other rendering apis
+
+272
+00:24:48,450 --> 00:24:51,366
+所有这些，都会被处理，别担心
+that all, it's going to be taken care of, don't worry
+
+273
+00:24:51,900 --> 00:24:59,233
+但现在我们只假设这是windows，并且只处理OpenGL
+but for now we're just making the assumption that this is windows only, and we're going to be only dealing with OpenGL
+
+274
+00:24:59,233 --> 00:25:08,266
+好了，那基本上会加快进度，这样我们就能有实际的产品和实际的项目就像我们手里有实际的东西一样
+okay, that's going to basically hurry this up, so that we can actually have and actual product and actual project like an actual thing in our hands
+
+275
+00:25:09,000 --> 00:25:12,900
+在我们开始讲更复杂的东西之前
+before we actually go ahead and start moving on to more complicated things 
+
+276
+00:25:12,900 --> 00:25:17,900
+因为它在这个上面的重复是目前为止实现这个的最好方法
+because it reiterating over this is by far completely the best way to actually have this done
+
+277
+00:25:17,900 --> 00:25:25,566
+所以我们也不会处理像构建系统这样的包，或者像CMake这样的东西，因为那将会是
+so we're also not going to deal with like kind of pack like build systems, or you know like CMake or anything of that at all for now cause that's gonna be
+
+278
+00:25:26,133 --> 00:25:30,075
+那并不是必要的，一旦我们开始讨论其他平台
+that's just not really necessary,  once we do start talking about other platforms
+
+279
+00:25:30,325 --> 00:25:35,200
+无论何时，当我们真正接触那些时，自然会处理这些事情
+whenever that might be, we'll deal with those things, when we actually get there
+
+280
+00:25:35,366 --> 00:25:37,725
+并且我希望你们喜欢这个视频，如果喜欢的话，就为它点赞吧
+and I hope you guys enjoyed this video, if you did, you can hit the like button
+
+281
+00:25:37,725 --> 00:25:40,133
+也可以访问patreon.com/thecherno来支持我们这个系列
+you can help support the stories by going to patreon.com/thecherno
+
+282
+00:25:40,466 --> 00:25:43,750
+这是一个非常大的系列，我的意思是，即使我现在谈论它
+this is such a huge like series, I mean even me talking about it right now
+
+283
+00:25:43,750 --> 00:25:46,666
+我也没有为这个视频编写脚本，我只是在旁边做了一些注释
+ I didn't script this video or anything, I just had a few notes off to the side
+
+284
+00:25:48,133 --> 00:25:57,000
+就像这是我目前为止做过的最大的项目，我需要你们的帮助，但这是一件令人兴奋的事情
+like this is like the by far the biggest project I've ever done in my life, I'm gonna need so much help from you guys, but it's such an exciting thing
+
+285
+00:25:57,000 --> 00:26:03,766
+我不认为我需要任何人来做这么详细，这么高质量的东西
+I don't think anyone I need to actually done something this detailed, and this kind of highly produced, I guess, quality wise
+
+286
+00:26:03,766 --> 00:26:07,525
+所以我真的很期待能一如既往地为你们做这些，和往常一样
+so I'm really looking forward to being able to do this for you guys as always
+
+287
+00:26:07,525 --> 00:26:11,066
+你们可以访问patreon.com/thecherno来支持我
+you can help support me by going to that linked patreon.com/thecherno
+
+288
+00:26:11,175 --> 00:26:16,100
+我等不及要见你们了，下一期我们实际会开始写代码，下次见，拜
+I can't wait to see you guys, the next episode where we actually start writing code, see you guys later, goodbye
+

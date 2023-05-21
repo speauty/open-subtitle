@@ -1,0 +1,848 @@
+﻿1
+00:00:07,650 --> 00:00:12,333
+嘿，你们好，我是TheCherno，欢迎来到我的游戏引擎系列
+hey, what's up guys, my name is TheCherno, and welcome to my game engine series
+
+2
+00:00:12,550 --> 00:00:17,233
+那样说的感觉真好，这个系列已经制作了两年，我们终于可以开始了
+feels so good to say that this series has been in the making for like two years, and we're finally beginning
+
+3
+00:00:17,366 --> 00:00:21,625
+并且今天我们要讨论的是，什么是游戏引擎
+and today suitably I think we're gonna be talking about, what a game engine actually is
+
+4
+00:00:21,625 --> 00:00:27,100
+因为在我们开始做之前，最好先定义一下我们要做什么
+because before we start making one, it's probably a good idea to actually define what we're going to be making
+
+5
+00:00:28,566 --> 00:00:33,600
+并且在接下来的几期视频中，我们将开始专门设计这个游戏引擎
+and over the next kind of few videos, we are going to start planning this game engine specifically
+
+6
+00:00:33,800 --> 00:00:37,233
+所以一定要看看后面几期视频，它们很快就发出来
+so definitely check out those later videos, they will come out very very soon
+
+7
+00:00:37,833 --> 00:00:42,600
+但首先，在我开始之前，我想对所有的赞助人说声非常感谢，是他们促成了这个系列
+but first of all before I begin, I just want to say a huge thank you to all of the patreons who made this series happen
+
+8
+00:00:42,933 --> 00:00:46,500
+patreon.com/TheCherno是我的patreon，如果你们想支持我的话，可以去看看
+patreon.com/TheCherno is my patreon, if you guys want to support me
+
+9
+00:00:46,633 --> 00:00:53,100
+那就太棒了，因为正是那样才有了这一切，你们的持续支持对我来说非常非常重要
+then that would be absolutely amazing, because that is what makes this possible, and your continued support is very very important to me
+
+10
+00:00:53,366 --> 00:00:55,950
+所以非常感谢你们每一个人，因为没有你们，我就不会坐在这儿
+so huge thank you to everyone, because I wouldn't be here without you
+
+11
+00:00:55,950 --> 00:00:57,366
+所以我能做到这一切真是太棒了
+so it's just so amazing that I can do this
+
+12
+00:00:57,366 --> 00:01:01,974
+因为我想做这件事很久了，是你们给了我机会和时间来做这件事
+because I've wanted to do this for so long, and you've given me the opportunity and the time to actually do this 
+
+13
+00:01:02,325 --> 00:01:08,333
+好了，无论如何，在第一期计划视频中，正如我想说的，我们基本上只是讨论
+okay, so anyway, in this first kind of set of planning videos, as I want to say, we're going to be basically just talking about
+
+14
+00:01:08,333 --> 00:01:13,833
+游戏引擎到底是什么，就是游戏引擎，对吧，游戏引擎已经存在一段时间了
+what a game engine actually is, so game engines, right, they've been around for a while
+
+15
+00:01:14,100 --> 00:01:17,650
+它们是什么，我们为什么需要它们，我们真的需要它们吗
+what are they, why do we need them, do we even need them
+
+16
+00:01:17,650 --> 00:01:20,650
+以及在这个系列中我们实际上要做些什么
+and what is it that we're actually going to be making in this series
+
+17
+00:01:21,233 --> 00:01:28,000
+所以人们对游戏引擎的定义非常宽泛，比如
+so people have very very broad definitions of game engines ranging from everything from like
+
+18
+00:01:28,100 --> 00:01:31,033
+那只是帮助你们快速创造游戏的工具
+oh, it's just something that helps you kind of build games quickly
+
+19
+00:01:31,066 --> 00:01:38,133
+内容创建者可以使用全套工具来制作模型等等
+to like full kind of suite of like tools the content creators can use to make models and everything like that
+
+20
+00:01:38,500 --> 00:01:43,300
+我的意思是，如果你们上网搜一下游戏引擎到底是什么
+and I mean, if you kind of just go on the internet, and search for a minute like what a game engine actually is
+
+21
+00:01:43,300 --> 00:01:49,300
+以及关于游戏引擎的例子，你们可能会搜到Unity或Unreal等引擎，对吧
+and what examples of game engines are, you'll probably stumble up on engine such as Unity or Unreal, right
+
+22
+00:01:49,550 --> 00:01:56,900
+并且那些引擎都是游戏引擎的例子，它们已经商业化了，我想已经向公众开放了
+and those engines are examples of game engines, that have been kind of commercialized, and kind of I guess released out into the public
+
+23
+00:01:56,900 --> 00:02:01,825
+要么是免费的，要么是订阅计划，或者是某种版税协议，对吧
+either for free or kind of on subscription plans, or on some kind of royalty agreement, right
+
+24
+00:02:03,200 --> 00:02:06,275
+并且它们本质上表现为一组工具
+and they kind of present themselves essentially as a set of tools
+
+25
+00:02:06,275 --> 00:02:11,866
+就像关卡编辑器这样的大型工具，你们可以在其中创造游戏
+like a one big tool usually like a level editor, pretty much in which you can actually build your game
+
+26
+00:02:12,000 --> 00:02:18,575
+它就更像是一种平台，用来构建交互式应用程序
+it's like a kind of platform pretty much, for building an interactive kind of application
+
+27
+00:02:18,575 --> 00:02:23,066
+不一定非得是游戏，它的核心就是交互应用
+doesn't even have to necessarily be a game, it's just really at its core an interactive application
+
+28
+00:02:23,550 --> 00:02:28,200
+现在，那些就是你们看到的，暴露在外面的，对吧
+now, those are the ones that you kind of see, that are out in the wild, right
+
+29
+00:02:28,200 --> 00:02:33,533
+因为它们已经在宣传中商业化了，我想就像游戏引擎一样，那就是产品
+because they've been kind of commercialized in publicize, I guess as specifically as game engines, that is the product
+
+30
+00:02:33,600 --> 00:02:38,775
+产品就是游戏引擎，但对很多公司来说，这甚至不是，比如你们知道的
+the product is the game engine, but for a lot of companies, it's not even about, you know
+
+31
+00:02:38,775 --> 00:02:41,733
+制作游戏引擎，那并不是他们的产品
+making a game engine, that's not their product
+
+32
+00:02:41,733 --> 00:02:45,275
+他们的产品只是一款游戏，那么我们来看看所有这些电子游戏公司
+their product is a game, and so we look at all of these video game companies
+
+33
+00:02:45,275 --> 00:02:50,375
+比如育碧，比如你们知道的，动视，暴雪和维尔福
+like AAUbisoft, you know, whatever Activision, Blizzard, Valve
+
+34
+00:02:50,633 --> 00:02:57,133
+他们都拥有自己的内部引擎，但从未作为真正的游戏引擎面世
+they have their own in house engines that they've built, that never see the light of day as an actual game engine
+
+35
+00:02:57,133 --> 00:03:02,050
+它们并没有作为游戏引擎对外发布，公司之外的人无权使用它们作为游戏引擎，
+they're not released as a game engine, no one has access to them outside of the company as a game engine
+
+36
+00:03:02,050 --> 00:03:03,466
+它们都是内部的，对吧
+they're all internal, right
+
+37
+00:03:03,933 --> 00:03:14,166
+但他们所提供的是一个平台，让游戏团队的工作人员能够真正构建游戏，真正构建游戏
+but what they do provide is a platform for the staff working on those game teams to actually construct that game, to actually build that game
+
+38
+00:03:14,800 --> 00:03:20,432
+所以当我们提到一款游戏时，我真正想要强调的是，它只是一个平台
+so when we think about a game mention, what I really want to kind of push forward is the idea of it's a platform
+
+39
+00:03:20,700 --> 00:03:28,075
+你们可以用它来制作电子游戏，并且游戏这个词也是我经常提到的
+which you can use to build video games, and the term game again is something that I keep coming back to 
+
+40
+00:03:28,075 --> 00:03:34,166
+因为假设，比如你们知道的，现实点说吧，那不一定是一个游戏
+because hypothetic, you know, realistically speaking, it doesn't have to be a game
+
+41
+00:03:35,066 --> 00:03:39,200
+现在这些游戏工作室，他们的产品是游戏，所以他们就用这些引擎制作游戏
+now these game studios, their products are games, so they do build games with these engines
+
+42
+00:03:39,200 --> 00:03:44,100
+但如果你们看看Unreal或Unity之类的引擎，它们可以用于更多领域，而不仅仅是游戏
+but if you look at something like Unreal or Unity, they can be used for much more than just in games
+
+43
+00:03:44,166 --> 00:03:49,862
+它们可以用于构建VR应用，如建筑可视化，甚至在某些情况下也可以用来模拟
+they can be used for building VR applications like architectural visualizations, even in some cases simulations 
+
+44
+00:03:49,862 --> 00:03:56,433
+那显然需要很多额外的代码，但它们可以作为一种构建应用的方式
+which again obviously would require a lot of additional code, but they could just be used as a way to kind of build an application
+
+45
+00:03:56,566 --> 00:04:02,633
+呈现生命周期类型的实时应用，对吧，本质上，我说的是
+kind of rendering life cycle type real time application thing, right, essentially what I'm saying is
+
+46
+00:04:02,700 --> 00:04:05,766
+如果你们想要一个实时显示图形的应用
+if you want an application that displays graphics in real time
+
+47
+00:04:05,950 --> 00:04:09,975
+那么你们就可以使用Unity或Unreal去可视化你们所拥有的任何数据，对吧
+you could just use Unity or Unreal to visualize whatever data you have, right
+
+48
+00:04:10,200 --> 00:04:17,300
+最重要的是，它不仅仅是可视化，它还涉及到许多平台上的互动，甚至是VR，对吧
+and on top of that, it's not just even about visualization, it's also about interaction on a number of platforms even VR, right
+
+49
+00:04:18,000 --> 00:04:24,700
+它是一个完整的平台，可以让你们把拥有的数据转换成一个更具交互性的
+it's a whole kind of platform for you to actually kind of convert the data that you have into a more interactable kind of
+
+50
+00:04:25,133 --> 00:04:31,633
+或者它会得到交互式的视觉格式，并且那就是我对游戏引擎的定义
+or it gets interactive visual format, and that's where my definition of game engines kind of comes in
+
+51
+00:04:31,800 --> 00:04:37,566
+并且我想让你们花一分钟时间思考一下，我们正在构建的是什么，游戏引擎到底是什么
+and I want you to just think about for a minute, what it is we're building, and what a game engine actually is
+
+52
+00:04:37,900 --> 00:04:42,533
+那才是核心，对吧，让我们简化整个事情，把它降低一个档次，以及真正思考一下
+that's core, right, let's simplify this whole thing, let's take it down a notch and actually think about
+
+53
+00:04:42,966 --> 00:04:46,200
+好，那行吧，它是一个制作游戏的平台，但它到底是什么
+well okay good, it's a platform to build games, but what is it really
+
+54
+00:04:47,600 --> 00:04:56,625
+归结到这一点，并且在我继续之前，先喝杯咖啡
+it comes down to this, and before I continue, coffee
+
+55
+00:04:57,900 --> 00:05:05,900
+感觉不能没有咖啡啊，不管如何，游戏引擎在哪里，是了，那么什么是游戏引擎呢
+where would we be without coffee, anyway, where are the game engines, yes, so what is a game engine as call
+
+56
+00:05:05,900 --> 00:05:18,066
+它的基本功能是，或者至少它的目标是将数据从一种格式转换成另一种格式
+well basically what it is is, a or at least its goal is to transform data from one format into another
+
+57
+00:05:19,000 --> 00:05:25,733
+那就是数据转换的全部内容，对吧，我们从桌面读取一组文件
+that's what this is all about data transformation, right, we essentially read in a set of files from desk
+
+58
+00:05:26,625 --> 00:05:26,633
+we take the data from those files, and we transform it into something else, that shows up on our screens
+
+59
+00:05:26,633 --> 00:05:33,738
+我们从那些文件中提取数据，然后把它转换成的其他东西，显示在我们的屏幕上
+we take the data from those files, and we transform it into something else, that shows up on our screens
+
+60
+00:05:33,738 --> 00:05:33,746
+我们从那些文件中提取数据，然后把它转换成的其他东西，显示在我们的屏幕上
+
+61
+00:05:35,066 --> 00:05:45,266
+好了，就是那样，而且我们几乎总是提供一种与数据交互的方式，但那就是游戏引擎
+okay, that's it, and furthermore we almost always provide a way to interact with that data as well, but that's really all the game engine is
+
+62
+00:05:45,833 --> 00:05:53,066
+并且那就是我们要构建的东西，它能读取数据，并把它转换成我们在屏幕上看到的东西
+and that's what we're going to be building something that reads data in, and transforms it into something that we see on our screens
+
+63
+00:05:53,425 --> 00:06:00,333
+现在，因此我想说的是，我们必须意识到，从本质上来说，那才是真正的游戏引擎
+now, because of the way, I phrase that it's important to realize that, at its core, that's really what a game engine is
+
+64
+00:06:00,833 --> 00:06:06,600
+它不是硬编码的程序应用，来做一些特定的事情，对吧
+it's not a hard coded kind of programmed application, that just does certain things, right
+
+65
+00:06:07,033 --> 00:06:14,100
+如果你们在构建那种的话，很可能只是在构建一个应用程序或一个框架
+if you're building that, you're probably most likely actually just building an application or a framework for an application like that
+
+66
+00:06:14,933 --> 00:06:20,933
+我们要做的是读取文件，转换它们，并且然后把它们放到屏幕上
+what we're building is something that reads files in transforms them and then puts them on the screen
+
+67
+00:06:21,000 --> 00:06:28,066
+并且也增加了交互能力，那才是我们要构建的，并且那真的很简单
+and adds you know interactive capabilities to that as well, that's what we're building, and that's really as simple as it is
+
+68
+00:06:28,400 --> 00:06:32,833
+正因为如此，我们必须意识到游戏引擎是基于数据的
+so because of that, it's important to realize the game engines that extremely data oriented
+
+69
+00:06:33,075 --> 00:06:38,250
+这意味着游戏引擎的目的不是凭空创造数据，对吧
+meaning that the purpose of a game engine is not to kind of create data based on nothing, right
+
+70
+00:06:38,250 --> 00:06:45,200
+我们在任何时候都不会那样做，对吧，我们只是加载现有文件
+we're not doing that at any point like ever, right, what we're doing is we're just loading existing files
+
+71
+00:06:46,100 --> 00:06:52,133
+现在让我们关注一下文件，这些文件来自哪里，它们是什么，我们如何制作它们
+now let's focus on the files for a second, where are these files coming from, what are they, how do we make them
+
+72
+00:06:53,100 --> 00:06:58,233
+那也是游戏引擎的一部分，它是制作那些文件的平台
+that is also part of what a game engine is, it's a platform to make those files
+
+73
+00:06:58,633 --> 00:07:08,466
+现在我们称这些文件为资产，资产是指游戏引擎将其作为输入的文件
+now we call these files assets, an asset is just something a file that the game engine actually takes in as input
+
+74
+00:07:09,066 --> 00:07:15,033
+我说过文件，它不一定是物理文件，但本质上，它只是一堆数据
+now I did say a file, it doesn't have to be a physical file, but essentially, it's just a bunch of data
+
+75
+00:07:15,400 --> 00:07:20,233
+它可能是一个虚拟文件，也可能是游戏引擎在运行时创建的东西，对吧
+it could be a virtual file, or it could be something that the game engine creates while running, right
+
+76
+00:07:20,500 --> 00:07:25,481
+那是基于其他资产，比如资产可以告诉游戏引擎去创造另一个资产
+that is based on some other asset, like an asset could tell the game engine to create another asset for example
+
+77
+00:07:25,600 --> 00:07:30,758
+在运行时，那也是一种资产，即使它是在一个物理文件中，但我想说的是
+on the fly, that would also be an asset, even though it's on a physical file, but what I'm saying is
+
+78
+00:07:31,333 --> 00:07:37,700
+提到的游戏通常包含一个平台，一套能够创造这些资产的工具，对吧
+a game mentioned typically includes a platform, a suite of tools that can create these assets, right
+
+79
+00:07:37,700 --> 00:07:46,633
+它为我们创造了一种创建资产的方式，现在我的意思是，想象某人为游戏创建一个关卡
+it creates a way for us to actually author assets, now what I mean by that is, picture someone building a level for a game
+
+80
+00:07:47,200 --> 00:07:50,633
+或者构建一个3D模型或者一个纹理，或者类似的东西
+or maybe building a 3D model or a texture or something like that
+
+81
+00:07:51,300 --> 00:07:56,366
+一个艺术家或内容创造者将进入游戏工作室的结构中
+an artist or a content creator will actually go in in a game studio structure
+
+82
+00:07:56,366 --> 00:08:02,833
+内容创造者将使用游戏引擎工具，对吧，去创建那些资产
+a content creator will use game engine tools, right, to actually author those assets
+
+83
+00:08:02,966 --> 00:08:08,333
+现在他们可能会在Photoshop中制作纹理，但他们可能会在3DMax或Maya中创建3D模型
+now they might make a texture in a Photoshop , but they might make a 3D model in like 3D Studio Sax or Maya
+
+84
+00:08:08,366 --> 00:08:14,700
+或者类似的东西，对吧，或者Blender什么的，对吧，但归根结底的说
+or something like that, right, or Blender whatever, right, but at the end of the day
+
+85
+00:08:14,700 --> 00:08:21,025
+他们仍然需要将这个3D模型转换成游戏引擎能够接受的格式
+they still need to get that model that 3D model into a format that the game engine can actually receive
+
+86
+00:08:21,500 --> 00:08:25,966
+因为对于真正的大型游戏引擎来说
+because for like kind of real serious kind of big game engines
+
+87
+00:08:25,966 --> 00:08:32,700
+他们从来不会只接收，比如你们知道的，jpeg或png图像
+it's pretty much never happens that they just take in, like you know, jpeg or png images
+
+88
+00:08:32,833 --> 00:08:36,400
+或者就像对象模型或者类似的东西，那不会发生，对吧
+or like just kind of obj models or something like that, that doesn't happen, right
+
+89
+00:08:36,766 --> 00:08:40,833
+通常情况下，它们被构建成一种自定义的格式，那只是一个游戏引擎
+usually they get built into a format, that's custom designed for that's just a game engine
+
+90
+00:08:40,966 --> 00:08:48,000
+无论是材质，模型，关卡等等，所以通常来说，内容创建者也会负责
+whether it be textures models levels whatever, so typically speaking, that content creator would also be responsible for kind of
+
+91
+00:08:48,766 --> 00:08:53,666
+比如你们知道的，把那种3D部分格式的模型变成游戏引擎格式
+you know, turning that kind of model in that 3D part format into the game engine format
+
+92
+00:08:53,666 --> 00:08:59,733
+这样就定义了一切，需要存在的东西，让游戏引擎用那个模型做一些事情
+and thus kind of defining everything, that needs to exist for that game engine to actually do something with that model, right
+
+93
+00:09:00,133 --> 00:09:06,175
+因为通常来说，游戏引擎可能不只是包含在模型中的数据
+because typically speaking, game engines probably have more than just the data that is included in a model as exported from like minor
+
+94
+00:09:06,175 --> 00:09:10,966
+它们可能有额外的信息，例如在世界的什么地方放置它，它上面可能有什么类型的其他组件
+they might have additional information, such as where to place it in the world, what kind of other components it might have on it
+
+95
+00:09:10,966 --> 00:09:16,433
+它可能有什么功能，对吧，所有这些东西，所以那些基本上是内容创建者做的事情
+what functionality might have on it, right, all that kind of stuff, so that is essentially what a content creator does
+
+96
+00:09:16,433 --> 00:09:22,633
+为游戏引擎创造内容，换句话说，内容创造者负责为游戏引擎创建资产
+creates content for the game engine, so in other words, content creators are responsible for authoring assets for the game engine
+
+97
+00:09:22,800 --> 00:09:27,133
+然后游戏引擎在运行时读取这些资源，并在屏幕上呈现一些内容
+and then the game engine reads those assets at runtime, and essentially presents something on the screen
+
+98
+00:09:27,300 --> 00:09:32,633
+并为用户提供一种与之交互的方式，并且那就是游戏，好了
+and presents a way for the user to interact with that, and that is what a game is, okay
+
+99
+00:09:32,925 --> 00:09:35,425
+所以我们可以分解一个游戏引擎的所有系统
+so we can break down all the systems of a game engine
+
+100
+00:09:35,425 --> 00:09:41,833
+一个游戏引擎有非常非常多的系统，显然取决于引擎
+there are very very very many systems of a game engine, depends on the engine obviously
+
+101
+00:09:42,533 --> 00:09:50,433
+但我甚至，我在想也许可能不会，为什么现在要讲它
+but I'm not even, I'm thinking that maybe probably wouldn't even be, why so kind of cover that now
+
+102
+00:09:50,433 --> 00:09:55,900
+我们可能会在下一期讲到这个，因为在下一期，我们会讲到游戏引擎的所有不同系统
+we might just do that in the next episode, because in the next episode, we're going to kind of go through all the different systems of a game engine
+
+103
+00:09:55,900 --> 00:09:59,600
+并讨论我们将如何设计和实际实现它们
+and talk about how we're going to design and actually implement them
+
+104
+00:10:00,733 --> 00:10:05,266
+但本质上是为了促进，我们所拥有的这种数据转换
+but essentially in order to facilitate, this kind of data transformation that we have
+
+105
+00:10:05,600 --> 00:10:11,166
+我们需要很多不同的系统，包括我们想要的平台抽象层
+we need a number of various systems, right, including like platform abstraction layers if we want
+
+106
+00:10:11,533 --> 00:10:15,366
+我们的引擎或数据转换将发生在各种平台上，不管是不是你们知道的
+our engine or this data transformation to happen on a variety of platforms, whether that be you know
+
+107
+00:10:15,500 --> 00:10:18,050
+桌面平台，比如Windows MAC Linux
+desktop based platforms like windows mac linux
+
+108
+00:10:18,050 --> 00:10:23,166
+或移动平台，比如Android IOS，或控制台平台，比如XBox PlayStation
+or like mobile platforms like android ios, or console platforms like xbox playstation
+
+109
+00:10:23,433 --> 00:10:30,066
+比如你们知道的，任天堂之类的，我们需要平台抽象层，这样代码就可以在不同平台上运行
+you know, Nintendo whatever, right, we need platform abstraction layers, so that our code can kind of run on different platforms
+
+110
+00:10:30,066 --> 00:10:37,033
+并且平台抽象层的重点当然是抽象那些平台，让我们平时不再关注那些平台的具体细节
+and the point of a platform abstraction layer of course is to abstract those platforms, specific the platform details away from us
+
+111
+00:10:37,266 --> 00:10:40,200
+这样我们就可以编写适用于所有平台的通用代码
+so that we can just write code that is generalized for all platforms
+
+112
+00:10:40,866 --> 00:10:45,175
+并且还有很多其他的，这里我就不一一讲了
+and then there's many other I'm not even going to get into everything that game engines have
+
+113
+00:10:45,175 --> 00:10:53,700
+比如你们知道的，我们有渲染，音频，文件输入输出，序列化，有很多不同的东西，对吧
+you know, we have rendering, we have kind of audio, we have like file input out, we have serialization, we have just so many different things, right
+
+114
+00:10:54,566 --> 00:11:00,900
+那些有助于这种数据转换，并且再次编写它们将是一次相当大的冒险
+that facilitate this kind of data transformation, and again writing them is gonna be quite an adventure
+
+115
+00:11:00,900 --> 00:11:05,500
+所以我对整个系列都很兴奋，但除了这种运行时
+so I'm really excited for this entire series, but apart from that kind of runtime
+
+116
+00:11:05,500 --> 00:11:11,050
+它将数据转换并将其放在那个集合的屏幕上并添加交互除此之外，比如你们知道的
+which takes that data transforms it and puts it on the screen of that set and adds interaction to it apart from that, you know 
+
+117
+00:11:11,050 --> 00:11:18,150
+我们也拥有人们最初用于创建数据的实际工具，比如关卡编辑器
+we also have the actual tools that people use to author that data initially, like a level editor for example is probably
+
+118
+00:11:19,050 --> 00:11:23,675
+我想这是最简单的例子，你们大多数人可能听说过或用过
+I think the simplest example that most of you have probably heard about or are used to
+
+119
+00:11:23,925 --> 00:11:27,617
+比如你们知道的，像那种东西，也是游戏引擎的一部分
+you know, stuff like that, that's also part of a game engine
+
+120
+00:11:27,617 --> 00:11:33,600
+因为如果没有那些东西，我的意思是，你们可能就只有手动编写关卡了
+because without that, I mean you're probably going to be stuck actually writing out your levels manually 
+
+121
+00:11:33,600 --> 00:11:38,600
+并且像C++代码之类的东西，显然对任何人来说都不是很有用
+and like C++ code or something like that which obviously isn't going to be very very useful for anyone
+
+122
+00:11:40,033 --> 00:11:50,025
+所以游戏引擎是一个很重要的话题，这些神奇的引擎能够获取数据并进行转换
+so game engines are really this huge kind of topic there, these amazing kind of engines really that take data transform them 
+
+123
+00:11:50,025 --> 00:11:54,800
+但也提供了一种方法来真正地编写数据，并且那就是本系列将要讨论的
+but also provide a way to actually author that data, and that's what this series is going to be about
+
+124
+00:11:54,866 --> 00:12:00,866
+这只是第一期，这个游戏系列的第一期，在这个系列中，我们将和你们一起看
+this is the first episode, first official episode of the game mentioned series in which we're going to I'm going to along with you guys
+
+125
+00:12:01,033 --> 00:12:04,000
+这将会有很多社区互动，也会有很多社区支持
+it's going to be a lot of community interaction, a lot of community support as well
+
+126
+00:12:04,766 --> 00:12:09,375
+我们将继续，我们将用C++从头开始构建一个游戏引擎
+we're going to go ahead and we're going to build a game engine from scratch in C++
+
+127
+00:12:09,375 --> 00:12:14,866
+并且在我们决定也需要使用的任何其他语言中，比如C#，这是一种常见的语言
+and in any other languages that we decided we need to use as well, like C# for example, it's a common one
+
+128
+00:12:16,733 --> 00:12:20,566
+并且这个学习过程将会花费很长时间，它将会非常深入
+and this journey is going to take a really long time, it's going to be really in depth
+
+129
+00:12:20,566 --> 00:12:25,700
+我将把这当成一个教程系列，而不是看着自己编写一个游戏引擎，却只给出很少的解释
+I'm going to treat this as a tutorial series, not like as I kind of watch me write a game engine with minimal explanation
+
+130
+00:12:25,700 --> 00:12:34,133
+实际上我将把它作为一门课程来教，我们将构建一个巨大的系统，对吧
+I'm actually going to teach this as a course pretty much, and we're just going to build this huge kind of system, right
+
+131
+00:12:34,466 --> 00:12:41,766
+并且游戏引擎存在的原因之一是，现在的游戏已经变得非常复杂
+and one of the reasons the game engines exist as well, remember is that games nowadays have become so complicated
+
+132
+00:12:42,366 --> 00:12:51,133
+如果我们没有这个平台来制作游戏，每次就只能从头开始
+that if we were to not have that platform to build games upon, we would end up building everything from scratch every time
+
+133
+00:12:53,000 --> 00:12:59,200
+想想一个200人的团队在创造一款像《侠盗猎车手》之类的游戏，对吧
+think about a team of 200 people making a game like, I don't know, grand theft auto or something like that, right
+
+134
+00:12:59,500 --> 00:13:02,650
+只是我突然想到的一个例子，可能有超过200人，也可能超过1000人
+just example the top of my head, that's probably way more than 200 people, probably more like 1000 
+
+135
+00:13:02,650 --> 00:13:09,666
+但不管怎样，想象一下他们试图一遍又一遍地重复构建同样的技术，就好像，那是不可能的
+but anyway, right, picture them trying to reiterate kind of build the same technology over and over again, like, that's impossible
+
+136
+00:13:10,000 --> 00:13:17,633
+此外，像程序员这样的工程师不可能拥有制作这样一款游戏所需要的一切，对吧
+and furthermore, engineers like programmers, right, can't be available for everything that is needed to make a game like that, right
+
+137
+00:13:17,633 --> 00:13:22,325
+这就是为什么工程师最终创造了所有这些工具，而内容创造者是艺术家
+which is why engineers end up building all of these tools, that content creators are artists
+
+138
+00:13:22,325 --> 00:13:27,033
+不熟悉编程或工程的人实际上可以用来构建所有的内容
+that aren't familiar with programming or engineering can actually use to build all the content
+
+139
+00:13:27,300 --> 00:13:35,233
+因为就像我刚才提到的，游戏引擎转换它们将数据和资产转换成你们在屏幕上看到的东西
+because as I just mentioned, game engines convert they transform that data those assets into something that you see on the screen
+
+140
+00:13:35,500 --> 00:13:41,266
+这些资产从哪儿来，对吧，当然是内容创造者，所以当你们思考什么是游戏时
+where do those assets come from right content creators, so really when you think about it what is a game
+
+141
+00:13:41,300 --> 00:13:48,433
+是一款关于编程的游戏，是一款关于编写代码的游戏，并不是这样的，对吧
+well is a game about programming, is a game about writing code, and doing all that, well not really, right
+
+142
+00:13:48,633 --> 00:13:54,800
+而大型专业游戏则完全不是这么做的，他们只是获取数据并将它们呈现在屏幕上
+big scale professional games aren't about that at all, they're about taking data and putting it on the screen
+
+143
+00:13:55,100 --> 00:13:59,700
+所以那就是游戏引擎所做的一切，并且那就是它的意义，它的关键在于，好的
+so that's really all the game engine is doing, and that's kind of the point of it, the point of it is to say, okay
+
+144
+00:13:59,733 --> 00:14:03,500
+足够多的编程，足够多的代码来完成所有的事情，对吧
+enough programming, enough writing code to do everything, right
+
+145
+00:14:03,500 --> 00:14:06,850
+我们要做的就是，为人们设计某种方式
+all we're going to do is, design some kind of way for people
+
+146
+00:14:06,850 --> 00:14:10,600
+那些不熟悉编程的人来创建所有这些数据来编辑这些数据
+who aren't familiar with programming to actually create all that data to authoral that data
+
+147
+00:14:10,600 --> 00:14:15,100
+当然，它们需要像脚本一样填充，但不是直接编程，对吧
+of course they will need to be stuffed like scripting, but not direct programming, right
+
+148
+00:14:15,433 --> 00:14:20,100
+那是一种游戏引擎的概念，当然在那种情况下，我是比较一般化的
+that's kind of the idea of a game engine, and of course I am being kind of general in that case
+
+149
+00:14:21,233 --> 00:14:28,200
+游戏需要许多实际的工程支持，但最理想的情况是像Unity这样的东西
+there is a lot of actual engineering support required for games, but in the ideal case look at something like Unity
+
+150
+00:14:28,300 --> 00:14:35,133
+你们可以用非常少的脚本制作任何类型的非大型游戏，对吧
+you can make pretty much any kind of non huge scale game with very minimal scripting, right
+
+151
+00:14:35,900 --> 00:14:43,066
+因为大部分的工作只是创建能够接收这些数据的系统，并在正确的时间将它们定位到屏幕上
+because the bulk of the work is just creating systems that can take that data, and position them on the screen at the right time
+
+152
+00:14:43,266 --> 00:14:45,666
+也可以修复可能发生的不同事件
+and also kind of cure different events that might happen
+
+153
+00:14:45,933 --> 00:14:50,500
+并增加与用户的互动，无论如何，我希望你们喜欢这个视频
+and also add that kind of interaction with the user, anyway, I hope you guys enjoyed this video
+
+154
+00:14:50,500 --> 00:14:51,950
+如果你们喜欢的话，就为它点赞吧
+if you did, you can hit that like button
+
+155
+00:14:51,950 --> 00:14:55,075
+当然也可以访问patreon.com/TheCherno来帮助支持这个系列
+you can help support this series by going to patreon.com/TheCherno
+
+156
+00:14:55,075 --> 00:15:00,700
+你们会得到很多奖励，比如提前一周访问源代码，以及访问视频
+you'll get many rewards, such as access to source code early, access to videos about a week early as well
+
+157
+00:15:00,700 --> 00:15:05,700
+所以所有这些视频都将提前一周发布，如果你们想看第二个视频，实际上已经在patreon上了
+so all these videos will be up a week early, so if you want to watch their second videos, actually already up on patreon
+
+158
+00:15:05,700 --> 00:15:11,533
+所以你们现在就可以去看，但我们还有每月discord的聚会
+so you can just watch that right now, but also we have like monthly hangouts on discord
+
+159
+00:15:11,666 --> 00:15:16,500
+还有私人的discord频道，支持这个系列的人会得到很多奖励
+and there's private discord channels, and there's just so many rewards that you guys get for helping support this series
+
+160
+00:15:16,733 --> 00:15:19,600
+因为这对我来说真的很重要，我们要建立一个社区
+because it's really important to me that we kind of build this as a community
+
+161
+00:15:19,600 --> 00:15:24,533
+你们的支持对我很重要，我希望你们喜欢这个视频，我等不及要看下一个了
+and your support is very important to me, I hope you guys enjoyed this video, I can't wait to see in the next one
+
+162
+00:15:24,533 --> 00:15:29,266
+下节课我们将讨论所有我们将放入游戏引擎中的系统
+next time we're going to talk about all the systems that we're going to kind of put into our game engine
+
+163
+00:15:29,366 --> 00:15:34,400
+然后，我们会度过最初的计划和设计阶段，我想简短地说一下
+and then after, we kind of get over that initial planning and design stage which I do want to keep very brief
+
+164
+00:15:34,400 --> 00:15:39,133
+因为我们会，比如你们知道的，我们要设计完整个东西，然后才能开始编程
+because we'll kind of, you know, we're going to design the whole thing, and then only then start programming
+
+165
+00:15:39,133 --> 00:15:43,575
+我们会边写边设计，但我们仍然需要定义它的范围
+we're going to kind of design as we go, but we still have to kind of define the scope of this
+
+166
+00:15:43,945 --> 00:15:49,400
+这样我们就可以从正确的地方开始，而不是结束于反复重写代码，所以下次会计划好一切
+so that we can start in the right place, and not end up rewriting code 1 billion times, so next time we're gonna kind of plan everything
+
+167
+00:15:49,400 --> 00:15:53,733
+在那之前，我们最终会从零开始创建一个新项目
+and then up to that, we're gonna finally create that new project from scratch and get on with this
+
+168
+00:15:53,733 --> 00:15:57,966
+我会讲到设置这个所需的环境，以及所有那些东西
+and I'll cover kind of setting up the environment that you need for this, and all of that stuff as well
+
+169
+00:15:58,233 --> 00:16:02,933
+所以别担心，这个是一步一步从头开始的，每一期
+so don't worry, this is gonna be kind of step by step and from scratch, every episode
+
+170
+00:16:03,066 --> 00:16:05,600
+我已经等不及了，下次见，拜
+I can't wait, I'll see you guys next time, goodbye
+

@@ -1,0 +1,795 @@
+﻿1
+00:00:04,133 --> 00:00:05,000
+真不敢相信
+I can't believe it
+
+2
+00:00:06,300 --> 00:00:07,100
+就在这里
+it's here
+
+3
+00:00:07,833 --> 00:00:08,633
+是时候了
+it's time
+
+4
+00:00:09,733 --> 00:00:13,966
+嘿，你们好，我是TheCherno，欢迎来到这期预告视频
+hey, what's up guys, my name is TheCherno, welcome to this announcement video
+
+5
+00:00:14,000 --> 00:00:17,066
+因为我们即将开始学习游戏引擎系列
+because we are about to begin the game engine series
+
+6
+00:00:17,066 --> 00:00:20,866
+是的，你们没有听错，我真不敢相信已经多久了
+yes, you heard me right, I can't believe how long it's been
+
+7
+00:00:21,700 --> 00:00:26,690
+我很高兴能这么说，但就是那样，游戏引擎系列已经准备好了
+I'm so excited to say this, but that's it, the game engine series is ready
+
+8
+00:00:26,900 --> 00:00:29,400
+它马上就要出来了，下周就开始
+and it's about to start coming out, starting next week
+
+9
+00:00:32,200 --> 00:00:33,900
+就这样，下次见
+that's it, I'll see you guys next time
+
+10
+00:00:34,733 --> 00:00:40,133
+不，我在开玩笑，但说真的，我好像也不知道，大概已经计划了两年
+no, I'm kidding, but seriously, it's like I don't know, I've been planning this for like the last two years probably
+
+11
+00:00:40,633 --> 00:00:43,866
+并且我已经有一个庞大的计划，一切都准备好了
+and I've got this massive plan, everything's ready to go
+
+12
+00:00:45,033 --> 00:00:50,433
+我已经迫不及待想开始搞这个了，这对整个社区来说都是件大事
+I've just, I can't wait to get started on this, it's gonna be a huge thing for the whole community
+
+13
+00:00:50,666 --> 00:00:53,733
+它不仅仅是我的工作，同时也是每个人的工作
+it's not gonna be just me kind of working on, this is gonna be everyone
+
+14
+00:00:53,850 --> 00:01:01,018
+它会非常深入，非常详细，所有的视频中都会有大量的东西，它就是
+it's gonna be really like in depth really detailed, there's gonna be heaps of just stuff, that's gonna go into all of the videos, it's just
+
+15
+00:01:01,500 --> 00:01:07,324
+我们要一起构建一些非常棒的东西，我太激动了，迫不及待地想开始这件事
+we're gonna build something really really amazing together, and I'm so excited, and I just can't wait to actually start this thing
+
+16
+00:01:07,666 --> 00:01:11,700
+所以我现在很开心，我甚至都不知道
+so I'm like, I'm just so happy right now, I can't even like
+
+17
+00:01:12,675 --> 00:01:18,266
+我不知道还能说什么，在这个视频中，只是想简单介绍一下游戏引擎系列到底是什么
+I don't know what else to say, I'm gonna be, in this video, I'm just gonna go over a little bit about what on earth the game engine series is
+
+18
+00:01:18,266 --> 00:01:22,700
+对于你们这些已经知道的，对于那些可能才关注我频道的新人们
+for those of you who are known, for those of you who might be new to my channel um
+
+19
+00:01:22,866 --> 00:01:26,200
+但那是我唯一真正为这个系列做的计划
+but that's kind of my only plan really for this series
+
+20
+00:01:26,200 --> 00:01:33,200
+很明显，就是那样，就好像它来了，它准备好了，它会随时上线，就像，哦，我等不及了
+and obviously just to say that, that's it, like it's coming, it's ready, it's gonna go up, like any time, it's just like, oh, I just can't wait
+
+21
+00:01:34,266 --> 00:01:38,125
+所以对于那些刚关注我频道的朋友来说，你们可能没有注意到这一点
+so for those of you kind of new to my channel, you might not have noticed that
+
+22
+00:01:38,400 --> 00:01:45,952
+我有点喜欢这个频道，有点像一个编程频道，但它不仅限于像编程或游戏编程之类的东西
+I kind of like this channel is kind of like a programming channel, but it's not just limited to like programming or game programming or anything like that
+
+23
+00:01:46,666 --> 00:01:51,100
+本质上，它只是一个围绕着我和我的兴趣的频道
+essentially it's really just a channel that revolves around me and my interests
+
+24
+00:01:51,100 --> 00:01:58,350
+因为我喜欢教学，喜欢和大家分享我学到的一切，那一直是我的一个爱好
+because I love teaching, and I love sharing everything that I learn with everyone, that's always been a passion of mine
+
+25
+00:01:58,900 --> 00:02:04,733
+对我来说，比如教我不感兴趣的东西，或者目前生活中没有做的，那是没有任何意义的
+and it doesn't make any sense for me to like teach things that I'm not interested in or things that I'm not currently doing with my life
+
+26
+00:02:05,175 --> 00:02:10,925
+我现在在，近四年来，我一直是EA的游戏引擎开发者
+I am, at the moment, and for the last almost four years now, I've been a game engine developer at EA
+
+27
+00:02:11,133 --> 00:02:13,757
+目前在Frostbite组织的移动引擎部门工作
+currently working in the Frostbite organization on the mobile engine
+
+28
+00:02:15,166 --> 00:02:19,950
+所以，那就是我的生活，那就是我所做的，对吧，所以我喜欢和大家分享那个
+so that's my life, that's what I do, right, so I love sharing that with everyone 
+
+29
+00:02:19,950 --> 00:02:25,275
+并且说实话，就像教学一直是我的一大爱好
+and to be honest, like just teaching has just always been a huge passion of mine
+
+30
+00:02:25,275 --> 00:02:31,625
+所以这个频道是什么样的，它实际上只是我在讨论我的爱好
+so what this channel like, it really is is just me kind of talking about my passions
+
+31
+00:02:31,966 --> 00:02:35,600
+讨论我感兴趣的东西，无论是什么样的日志或教程视频
+talking about stuff that interests me, whether that be kind of invlogs or tutorial videos 
+
+32
+00:02:35,600 --> 00:02:41,150
+教你们我已经掌握的那些东西，或者只是我学到的新东西或者想到的东西
+and teaching you guys kind of the same thing that I've learned, or just new things that I've picked up or things that I'm realizing
+
+33
+00:02:41,225 --> 00:02:45,375
+就像你们知道的，因为我感觉搞游戏引擎开发或游戏开发
+because I feel that programming, and like you know, game engine development or game development
+
+34
+00:02:45,375 --> 00:02:48,900
+总的来说，就像，就像
+is like, in general, has just been like, such a, like it's just been
+
+35
+00:02:50,200 --> 00:02:52,300
+太复杂了
+it's been over complicated so so so much
+
+36
+00:02:53,166 --> 00:02:59,866
+就像在很多情况下一样，我喜欢我的教学方式，因为我也做私人课程
+and I feel like with the way that I teach, like in a lot of cases, because I do private sessions as well
+
+37
+00:03:00,125 --> 00:03:07,900
+非常有限，说真的，因为我很忙，但我确实有大约五个学生，我会一对一地私下教他们
+very limited, like seriously, because like I'm so busy, but I do have like five or so students who I do teach privately one on one
+
+38
+00:03:09,050 --> 00:03:11,850
+就像我解释一些东西的时候，他们对一切都有种豁然开朗的感觉
+just the way that everything clicks for them when I explain something
+
+39
+00:03:12,666 --> 00:03:17,482
+因为我试着把它简单化，然后实际上，你们知道的，如果仔细想想，其实没那么难
+because I try and kind of simplify it, and just be like well actually, you know if you think about it, you know it's not actually that difficult
+
+40
+00:03:18,266 --> 00:03:22,700
+就像我很喜欢那样，我想那反映了我的频道是关于什么的
+like I just love doing that so much, and that's kind of a reflection of what my channel I guess is about
+
+41
+00:03:22,966 --> 00:03:29,766
+这是关于我教我的爱好和感兴趣的东西，有一点预感，就像用一种简单的方式
+it's about kind of me teaching my passions and what the stuff that I'm interested in, in a bit of a scent, like in a simple way and kind of hopefully
+
+42
+00:03:29,866 --> 00:03:33,300
+在这种情况下，我会帮助你们很多人，因为那就是我喜欢做的
+in that case helping a lot of you people out, because that's what I love to do
+
+43
+00:03:33,700 --> 00:03:39,133
+现在我想说的是，我的爱好，根本不在于游戏编程
+now what I want to say is that my passions, don't lie in game programming at all
+
+44
+00:03:39,133 --> 00:03:42,933
+就像我不喜欢游戏一样，我几乎可以那么说，就那么简单
+like I don't like games, I almost I'll say that, like it's as simple as that
+
+45
+00:03:42,933 --> 00:03:47,389
+我不在业余时间玩游戏，我年轻的时候，我想我还是个孩子的时候，玩过一些
+I don't I don't play games in my spare time, I did kind of, when I was younger, when I was like a kid, I guess
+
+46
+00:03:47,850 --> 00:03:54,775
+但基本上成年后，就像你们知道的，除了偶尔和朋友一起玩多人游戏
+but like basically as soon as I became an adult apart from the occasional like you know, in a game of something multiplayer with friends 
+
+47
+00:03:54,775 --> 00:03:59,850
+在业余时间根本不玩游戏，我只是对那个不感兴趣，也不是说
+like I don't play games in my spare time at all, I'm just not interested in that, I'm not saying that
+
+48
+00:04:00,133 --> 00:04:03,500
+比如我反对那样或者像游戏或者邪恶或者游戏是坏的，就像这是浪费时间一样
+like I'm against that or like games or evil or games are bad, like it's a waste of time
+
+49
+00:04:03,700 --> 00:04:08,333
+就我个人而言，我觉得很无聊，好像这不是我真正喜欢做的事情
+just for me personally I get bored, like it's just not something I enjoy doing really
+
+50
+00:04:09,200 --> 00:04:14,133
+当然，制作游戏也是我不喜欢做的事情
+so of course making games is also something that I don't necessarily enjoy doing
+
+51
+00:04:14,300 --> 00:04:20,166
+我真正感兴趣和喜欢的是制作游戏引擎
+what I am really interested in and what I do enjoy a lot is making game engines
+
+52
+00:04:20,433 --> 00:04:25,933
+最近在德国制作了一段log的视频，我将把链接放在那里，这是关于
+and I actually made a video of log in Germany recently, which I will link up there which is about
+
+53
+00:04:26,750 --> 00:04:32,525
+你们知道的，游戏vs引擎，决定你们想做什么，只是在讨论差异，外面太亮了
+you know, games vs engines, and kind of deciding what it is that you want to make, and kind of just talking about the differences, it's so bright out here
+
+54
+00:04:32,800 --> 00:04:37,933
+只是说说它们之间的区别，你们知道的，制作游戏和制作引擎的感觉之类的
+and just talking about the differences kind of between you know, what it's like to make a game vs what it's like to make an engine and all of that
+
+55
+00:04:38,125 --> 00:04:43,200
+那么就去看看那个视频，如果你们想和我见面，进一步了解我在这里谈论的内容
+so check out that video, if you want kind of to meet me to expand a little bit more about what I'm talking about here
+
+56
+00:04:43,533 --> 00:04:45,733
+因为那不是这期视频的主题，但重点是
+because that's not what this video is about, but the point is
+
+57
+00:04:45,733 --> 00:04:51,300
+就像我真的不喜欢游戏，我真的喜欢做游戏，但真正喜欢的是开发引擎
+like I don't really like games, I really like making games, but what I do love doing is making engines
+
+58
+00:04:51,300 --> 00:04:57,250
+我猜这就是这个频道的内容，就像你们知道的，我在过去两年中一直在教的OpenGL中的C++
+and I guess this is kind of what this channel is about and like you know the C++ in the OpenGL stuff that I've been teaching over the last almost two years
+
+59
+00:04:57,250 --> 00:05:04,257
+已经有点特别针对，对吧，让我们把所有那些都拿出来，现在让我们实际开发一个引擎
+now has kind of been specifically geared towards, right, let's take all that and let's actually build an engine now
+
+60
+00:05:04,600 --> 00:05:08,500
+就像我要说的，我要把这个命名为游戏引擎系列，对吧
+and again like I am gonna say, I am titling this the game engine series, right
+
+61
+00:05:08,800 --> 00:05:14,400
+但它不一定会成为游戏引擎，我的意思是，如果你们想想游戏引擎是什么
+but it's not really necessarily going to be a game engine, I mean if you think about what a game engine is
+
+62
+00:05:14,400 --> 00:05:19,466
+并且我特别想做的是，它就像一个3D实时渲染应用程序
+and what specifically I want to be building is, it's just really like kind of a 3D real time rendering application
+
+63
+00:05:20,000 --> 00:05:25,333
+就是这样，对吧，这是一种方法，也就是一个制作3D实时渲染应用程序的引擎，对吧
+that's what it is, right, it's a way, it's an engine to make a 3D real time rendering application, right
+
+64
+00:05:25,475 --> 00:05:32,475
+我希望能够做到的，以及互动式的，我想做的就是让这个框架成为这个引擎
+what I want to be able to do, and an interactive one at that as well, what I want to be able to do is make kind of this framework this engine
+
+65
+00:05:32,833 --> 00:05:41,300
+这样人们就可以构建实时交互的3D应用程序，那就是我的想法，对吧，使用3D显卡
+so that people can construct real time interactive 3D applications, that is the idea, right, with 3D graphics, that's the idea
+
+66
+00:05:42,333 --> 00:05:46,233
+所以你们当然可以把它应用到游戏中，当然我的意思是很多人会这么做
+so of course you could apply that to games, absolutely I mean a lot of people will
+
+67
+00:05:46,400 --> 00:05:49,650
+那将是非常好的优化，为了满足，比如你们知道的
+it's going to be very well optimized for kind of, you know
+
+68
+00:05:49,650 --> 00:05:52,166
+大场景和很多实体，以及诸如此类的东西
+big scenes and lots of entities, and all of that kind of stuff
+
+69
+00:05:52,166 --> 00:06:00,600
+我可能会加入脚本和所有与游戏相关的代码，因为那也不一定只适用于游戏，对吧
+and I'll probably throw in scripting and all of that kind of gameplay related code, because that's not necessarily applicable to just games either right
+
+70
+00:06:00,600 --> 00:06:05,466
+我们将要开发的这个引擎，它的功能远远不止制作游戏
+what we're gonna be building is this engine, that's capable of so much more than just making games
+
+71
+00:06:05,466 --> 00:06:09,766
+它只是能够呈现交互式3D图形，那真的很酷
+it's just capable of rendering interactive 3D graphics like, that's really cool
+
+72
+00:06:10,666 --> 00:06:15,566
+所以我迫不及待地想和大家一起构建它，我会简单地谈谈它将包括什么
+so I can't wait to kind of build that with everyone, I'll talk a little bit about what it's going to include
+
+73
+00:06:15,566 --> 00:06:20,733
+我们不会有一个概述视频来讨论整个项目的各个阶段
+I'm not like we'll have an overview video where we discus kind of the stages of this whole project
+
+74
+00:06:22,133 --> 00:06:26,869
+我可能会喜欢在白板上，而不是真的在白板上，就像平板电脑一样，这样你们就能看到
+and I'll probably like right kind of on a whiteboard, not really on a whiteboard, like a tablet, so that you guys can see
+
+75
+00:06:26,869 --> 00:06:33,166
+我们会一步一步来，我现在不想那么做，如果只是一时兴起的话，肯定就会错过一些东西
+and we'll kind of go through everything step by step，I don't want to really do that now, just off the top of my head, because I'm sure I'll miss things
+
+76
+00:06:33,166 --> 00:06:37,250
+我不想现在就掏出笔记，我们需要坐在办公室的工作室里
+and I don't want to pull up notes now, we want to kind of sit down in the studio in the office
+
+77
+00:06:37,250 --> 00:06:41,275
+如果你们愿意的话，可以先把它过一遍，但话虽如此
+if you will, and actually go through that, but that being said
+
+78
+00:06:43,666 --> 00:06:46,725
+你们知道的，我们会把这个项目分解成一步一步来搞
+you know we are gonna kind of break down the project and go through everything step by step 
+
+79
+00:06:46,775 --> 00:06:52,666
+但我的想法是，我们要一起构建这个东西，现在，让我来计划这个系列
+but the idea is like we're gonna kind of build this thing together, now, over me planning this series
+
+80
+00:06:52,666 --> 00:06:58,500
+我花了这么长时间的原因之一是，这是一个非常复杂的任务
+and one of the reasons why I took so long was because it's just such a massively complicated task
+
+81
+00:06:59,033 --> 00:07:03,466
+开发一个这样的引擎需要整个团队的人花费数年时间，对吧
+building an engine like this takes years for a whole team of people, right
+
+82
+00:07:04,766 --> 00:07:08,414
+现在我很幸运，因为我多少知道自己在做什么
+now I'm fortunate in the fact that I kind of more or less know what I'm doing
+
+83
+00:07:08,525 --> 00:07:13,133
+因为我确实有多年制作游戏引擎的经验
+because I do have so many years of experience of actually making kind of a game engine
+
+84
+00:07:13,342 --> 00:07:16,866
+在游戏引擎团队中，所以我知道如何制作游戏引擎
+and being in a game engine team, so I do know how to make a game engine
+
+85
+00:07:17,050 --> 00:07:21,400
+我从来没有真正坐下来，从零开始做一个完整的引擎
+I've never really sat down, and made a full kind of engine from scratch
+
+86
+00:07:21,400 --> 00:07:26,400
+我会把它考虑到，就这样，我们现在可以用这个引擎来发布应用程序了吗
+where I would consider it to the point of like, that's it, we can ship applications with this engine now 
+
+87
+00:07:26,400 --> 00:07:29,066
+因为它从来没有完全功能正确，我从来没有真正做过
+because it has ever fully featured right, I've never actually done that in my life
+
+88
+00:07:29,066 --> 00:07:31,933
+我知道每件事是如何工作的，我已经在不同的模块中分别做了
+I know how everything works, and I've done it all separately in different modules
+
+89
+00:07:32,100 --> 00:07:36,666
+而是把它们整合成一个大项目，这不是我真正做过的事情，对吧
+but to combine it all into one huge project, not something that I've really done, right
+
+90
+00:07:37,733 --> 00:07:43,066
+并且那是我一直想做的事情，所以这并不一定是我想做的
+and that's something that I've just been wanting to do, so this isn't, even just necessarily me being like all right
+
+91
+00:07:43,066 --> 00:07:47,133
+让我们做一个关于如何制作游戏引擎的系列，这就是我想做的，我现在就想做一个游戏引擎
+let's make a series on how to make a game engine, this is me being like, that's it, I want to make a game engine now
+
+92
+00:07:47,133 --> 00:07:52,700
+我想做我自己的引擎，我想让大家从头开始做我们自己的引擎
+I want to make my own engine, I want us to make our own engine right from the ground up
+
+93
+00:07:52,800 --> 00:07:58,100
+但不像sparky，那是我三年前做的另一个引擎，我想是三年半前
+but unlike sparky which was another engine that I did make about three years ago, three and a half years ago I think now
+
+94
+00:07:59,675 --> 00:08:02,975
+对吧，差不多就是这样的，比如你们知道的
+right, yeah that was kind of more or less, you know
+
+95
+00:08:02,975 --> 00:08:07,800
+特别是对于游戏来说，那是一种快速组合，因为它之前确实是那样的
+for games specifically and that was very kind of like quickly put together, because it was
+
+96
+00:08:07,800 --> 00:08:13,300
+我花了40天的时间制作了一个基础版本，是为了一个游戏编程比赛
+I made it in like the base, the base version of it in like 40 days for for a game programming competition
+
+97
+00:08:14,200 --> 00:08:22,133
+但这就像，就像正因为如此，我就像这样，撸码，然后解释一些东西，鉴于这只是一个教程
+but like this is gonna be, like and because of that it was kind of me, typing code and then explaining something along the way, whereas this is gonna be a tutorial
+
+98
+00:08:22,533 --> 00:08:27,075
+就像这需要时间，慢慢来，对我来说，一切都是新鲜的
+like this is gonna take time, it's gonna be like slow, it's gonna be, it's gonna fish in me
+
+99
+00:08:27,075 --> 00:08:31,600
+比如写东西，给你们画图表，做笔记等等
+like writing stuff, drawing diagrams for you guys, notes all of that kind of stuff
+
+100
+00:08:31,600 --> 00:08:35,566
+这几乎是一个完整的目标，对吧，它不会只是我刚刚做的事情
+it's gonna be like a full cause almost, right, it's not going to be just something that I just
+
+101
+00:08:35,933 --> 00:08:38,466
+你们知道的，即兴发挥，这是计划好的
+you know, whip up and kind of improvise on, it's been planned
+
+102
+00:08:38,466 --> 00:08:41,133
+就像这整件事，我要解释所有的事情
+it's like this whole thing, where I'm actually going to explain everything
+
+103
+00:08:41,733 --> 00:08:44,466
+正因为如此，这些视频会很长，实际上不会很长
+and because of that these videos are going to be long, not actually long
+
+104
+00:08:44,466 --> 00:08:48,533
+但是会非常详细，我们可能不会马上得到很多
+but there's going to be very detailed, and we might not get very far immediately
+
+105
+00:08:48,533 --> 00:08:50,933
+好像要花很长时间才能构建好
+like it's going to take a lot of time to actually build this up
+
+106
+00:08:51,200 --> 00:08:56,566
+基本上就像这个引擎，我确信，很明显，很明显，我的生活
+and basically it's almost like this engine, and I'm sure that obviously obviously my life
+
+107
+00:08:56,566 --> 00:09:00,750
+就像随着技术的不断进步，我可能会放弃这个，最终创造一个新的引擎
+like I will probably scrap this eventually make a new engine as technology continues to improve 
+
+108
+00:09:00,750 --> 00:09:06,933
+随着我变得更聪明，我也会学习新东西，显然我们都在学习新东西，对吧
+and as I get smarter and I'd learn new things as well, obviously we're all learning new things, right
+
+109
+00:09:07,200 --> 00:09:10,466
+但这对我来说就像是一个小小的生活计划
+but this is almost like just a almost like a little life project for me
+
+110
+00:09:10,466 --> 00:09:12,733
+这是我一生中想要做的事情，我想要创造一个游戏引擎
+it's just something that I want to do in my life, I want to build a game engine
+
+111
+00:09:12,866 --> 00:09:18,550
+你们要关注我，并且我也会和你们一起练习，解释一切
+you guys gonna watch me, and I'm also going to work on it with you guys, and I'm also going to explain everything
+
+112
+00:09:18,550 --> 00:09:21,766
+教你们，我在做什么，怎么做，我们要一起做决定
+and teach you, what I'm doing, how I'm doing, and we're going to decide things together, and we're going to decide things together
+
+113
+00:09:21,975 --> 00:09:26,233
+所以这将是一个非常令人兴奋的项目，我等不及要开始了
+so it's going to be a really exciting project, and I absolutely can't wait to get this thing started
+
+114
+00:09:26,233 --> 00:09:31,366
+这是我一生都想做的事，基本上是我在YouTube上的所有韩国生活
+it's been just, I've been wanting to do this my whole life, basically all of my whole kind of YouTube korea life
+
+115
+00:09:32,166 --> 00:09:37,966
+终于要开始了，我太激动了，现在你们要加入了
+and it's finally happening, and I'm so excited, now you guys are gonna come in 
+
+116
+00:09:38,766 --> 00:09:44,166
+事实上，我将积极与你们合作，这将是github上的一个公共项目
+in the fact that like I am going to actively work with you guys, this is gonna be a public project on github
+
+117
+00:09:44,233 --> 00:09:48,500
+它将是完全免费的，当然，它只会出现在Github上
+it's gonna be completely free, of course it's just gonna be like up on Github
+
+118
+00:09:48,500 --> 00:09:52,366
+你们可以查看每一个提交，可以记录问题，他们会像问题跟踪会像一个项目
+you can look through every commit,  you can log issues, they'll be like issue tracking will have like a project
+
+119
+00:09:52,366 --> 00:09:56,466
+因为它就像一个预告栏，你们可以在Github上看，现在是Github项目
+because it's like almost like a trailer board you could have on github, now github project or whatever's called
+
+120
+00:09:57,233 --> 00:10:03,825
+我们会像专业游戏那样，把所有东西都准备好，我想人们会过来的
+we're going to have that full thing set up, like a professional games you do, well I think people are coming
+
+121
+00:10:03,825 --> 00:10:08,533
+无论如何，专业的游戏，你们是一支专业的团队，它会非常非常酷，完全免费
+anyway, professional games, you're a professional team, and it's gonna be so so so cool, that's gonna be completely free
+
+122
+00:10:09,166 --> 00:10:13,366
+所以你们会与仓库进行交互甚至可能得到合作者的帮助
+so you guys are gonna interact with that repository potentially even get collaborators in to help
+
+123
+00:10:13,366 --> 00:10:17,733
+对吧，关于这个代码，因为这将是一件非常大的事情，因为这是一个非常大的项目
+right, the code for this, because again it is gonna be such a big thing, and because it's such a big project
+
+124
+00:10:18,033 --> 00:10:23,550
+那确实需要大量的时间和大量的工作，很明显，我将不得不在某些地方一笔带过
+that does kind of require a lot of man hours a lot of work, obviously I'm going to have to cock corners in some places
+
+125
+00:10:23,812 --> 00:10:29,933
+我不能一边解释这些东西，一边用视频记录下来，一边独自建立Unity或Unreal
+I can't just build like Unity or Unreal by myself, while explaining all of it and documenting it on video
+
+126
+00:10:30,833 --> 00:10:33,933
+那在实际上是不可能的，我也不想现实一点
+that's physically impossible, and I'm not trying to be realistic and be like
+
+127
+00:10:33,966 --> 00:10:38,200
+那就是我要做的，它不像，比如，带有关卡编辑器和游戏引擎工具的
+that's what I'm gonna do, it's not like, for example, with the level editor and game engine tools
+
+128
+00:10:38,200 --> 00:10:42,366
+就是那样，都将被内置到实际的游戏运行时中，就像使用ImGui一样
+that's all, gonna be kind of built into the actual game runtime, like using ImGui
+
+129
+00:10:42,733 --> 00:10:45,700
+因为这不是我能随随便便就能做到的
+because it's not something that I can just be like
+
+130
+00:10:45,700 --> 00:10:48,900
+再说一次，那样的话，我将创造一个完整的窗口应用，即带有我自己的UI框架的关卡编辑器
+again, I'm going to make a full windows application, that's going to be a level editor with my own UI framework
+
+131
+00:10:48,900 --> 00:10:54,166
+那是不可能的，绝不可能，对吧，这种东西太费时间了
+with, that's not going to happen, it's impossible, right, like this stuff takes so much time
+
+132
+00:10:54,466 --> 00:11:00,766
+所以我不得不做出一些妥协，以使这个项目切实可行，我想了很多
+so there have been compromises that I've had to make in order to actually make this project realistic, and I have thought about a lot of them
+
+133
+00:11:00,766 --> 00:11:06,066
+是的，我的意思是，但它仍然会很棒，我真的等不及了
+and yeah I mean like it's, but it's still gonna be amazing, and I absolutely can't wait
+
+134
+00:11:06,066 --> 00:11:09,366
+我们会从头开始使用很多东西，当然就会使用库
+and we are gonna be riding a lot of things from scratch, we'll be using libraries obviously
+
+135
+00:11:09,500 --> 00:11:16,000
+所有3D库的开发工具，比如代码框架之类的东西，那是会发生的
+and all the kind of 3D party vendor comes to blood tools and like code frameworks or whatever, that's gonna happen
+
+136
+00:11:16,966 --> 00:11:22,866
+希望风，不会吧，阿西吧，但总的来说，很多内容都是从头开始写的
+hopefully the wind, isn't, bad, but overall, a lot of it is gonna be written from scratch from the ground up
+
+137
+00:11:23,633 --> 00:11:28,566
+这将是非常非常非常令人兴奋的，如果你们想要支持这个项目的话
+which is gonna be really really really exciting, now if you want to support this project
+
+138
+00:11:28,566 --> 00:11:32,000
+因为我确实需要你们的帮助，这要花很多时间，已经费了我不少时间了
+because I do need your help, this is gonna take a lot of my time, it already has
+
+139
+00:11:32,900 --> 00:11:37,600
+所以如果你们想看到这个项目真正变得更生动，更多这样的内容会出现
+so if you want to see this project actually kind of come to life and more of these episodes to go up
+
+140
+00:11:37,600 --> 00:11:42,075
+我真的需要你们的支持，所以我有一个patreon patreon.com/TheCherno
+I really do need your support, so I do have a patreon patreon.com/TheCherno
+
+141
+00:11:42,075 --> 00:11:44,800
+当然你们的支持也会得到奖励
+you will get rewards for helping to support of course
+
+142
+00:11:45,133 --> 00:11:51,366
+比如提早获得游戏引擎源代码，实际项目将在github上免费开源
+such as early access to game engine source code, the actual project will be on github will be public will be free
+
+143
+00:11:51,366 --> 00:11:56,600
+但你们会在它实际运行之前得到代码，还会得到实验性开发分支
+but you'll get kind of code before it actually goes up, you'll also get experimental development branches 
+
+144
+00:11:56,600 --> 00:12:01,266
+就像我在制作视频之前已经实现了某些功能一样
+which is like me already having implemented certain features before I make the video about them
+
+145
+00:12:01,533 --> 00:12:03,433
+并且那就可能要等几个月，对吧
+like and that could be months before right
+
+146
+00:12:03,633 --> 00:12:08,100
+你们会看到我写代码，就像在做视频之前，我自己写代码一样之类的
+so you'll kind of see me write the code, as I write the code myself before I make videos and all that stuff
+
+147
+00:12:08,233 --> 00:12:12,975
+你们也可以和我一起聚会，比如在discord上，每个月就会有一次视频聊天
+and you can also hang out with me on like um on discord, we have like a video chat once a month
+
+148
+00:12:12,975 --> 00:12:16,733
+我们有各种各样的伙伴，比如有提供一行代码的伙伴
+where we all have all the kind of partner, which is like there's a tier code partner
+
+149
+00:12:17,033 --> 00:12:20,100
+所有的伙伴都会在一起进行视频聊天，我们会讨论一些事情
+all of the partners kind of will kind of hang out in a video chat and we talk about stuff
+
+150
+00:12:20,100 --> 00:12:22,733
+并且去年我们就一直在讨论游戏引擎系列
+and we've been talking about the game engine series for the last year
+
+151
+00:12:22,900 --> 00:12:26,000
+所以那些人其实对我现在说的还是很了解的
+so those guys actually know a lot about what I'm saying here now
+
+152
+00:12:26,300 --> 00:12:30,566
+这很酷，因为你们知道，我想大概有20个左右的伙伴，他们什么都知道
+which is pretty cool, because you know that kind of like, I think that's 20 or so partners, they know like everything
+
+153
+00:12:30,600 --> 00:12:36,366
+真的很酷，当我们有了自己的只在discord上聊天之类的伙伴，那么你们会得到一些奖励
+which is really cool, when we have like our own partner only discord chat and all of that, so you do get a handful of rewards
+
+154
+00:12:36,366 --> 00:12:43,300
+但最重要的是，你们让我工作时间少了些，而是把更多的时间用来开发这个游戏引擎系列
+but most of all, you're just allowing me to kind of maybe work less, and kind of spend more of my time developing this game engine series
+
+155
+00:12:44,400 --> 00:12:48,200
+因为你们会在经济上支持我，所以那是一件很棒的事情
+because you'll kind of be supporting me financially, so that's just such an amazing thing
+
+156
+00:12:48,866 --> 00:12:53,233
+并且我非常感谢那些让我花这么多时间在这个项目上的人
+and I'm so grateful for the people who have made it realistic for me to actually spend so much of my time on this
+
+157
+00:12:53,766 --> 00:12:58,325
+所以一定要抓住这个机会，让我们看看我们能一起创造出多大的游戏引擎
+so definitely jump on that, and let's see let's see how big of a game engine we can all built together
+
+158
+00:12:58,325 --> 00:13:01,225
+以及我们能做得多好，我都等不及了
+and how good we can make it, I absolutely can't wait
+
+159
+00:13:01,566 --> 00:13:05,700
+下次见，爱你们哟，拜
+I will see you guys next time, oh I love all of you, goodbye
+

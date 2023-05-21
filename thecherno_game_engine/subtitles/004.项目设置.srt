@@ -1,0 +1,1405 @@
+﻿1
+00:00:00,025 --> 00:00:03,566
+嘿，你们好，我是TheCherno，欢迎回到我的游戏引擎系列教程
+hey, what's up guys, my name is TheCherno, welcome back to my game engine series
+
+2
+00:00:03,700 --> 00:00:09,933
+那么上次讨论了这个系列的整个范围，我们要做的就是确保你们在计划视频中做好准备
+so last time we talked about the entire scope of this series, and what is that who we're doing make sure you work that planning video there
+
+3
+00:00:10,133 --> 00:00:15,475
+并且就像我在那期视频中解释的那样，我真的不想一开始就计划得太多太快
+and as I explained in that video, I don't really want to be planning too much too quickly in the beginning
+
+4
+00:00:15,475 --> 00:00:22,575
+因为我的意思是，比如我真的那样做，光是计划和把一切搞清楚就可能需要十期视频
+because I mean, I actually would like to kind of do that, I would like to have just 10 episodes of just planning and just figuring everything out
+
+5
+00:00:22,575 --> 00:00:26,225
+因为这是一个大项目，比如你们必须意识到
+because this is such a large project, like you guys have to realize
+
+6
+00:00:26,225 --> 00:00:30,633
+这是一个多么大的项目，但无论如何，因为那会有点无聊
+just how big of a project this is, but anyway, because that will kind of be boring
+
+7
+00:00:30,633 --> 00:00:37,033
+并且我还必须平衡娱乐和制作，平衡，就像，是的，整个系列
+and I also have to kind of balance the entertainment versus production, kind of balance, like, yes, all this entire series
+
+8
+00:00:37,033 --> 00:00:39,900
+我们实际上要开始了，比如今天，就会开始撸码
+we're actually going to dive in and start writing code like today
+
+9
+00:00:39,900 --> 00:00:43,800
+然后随着事情的发展，我们会随时为它们做计划
+and then as things creep up, we're gonna plan for them then and there
+
+10
+00:00:44,000 --> 00:00:46,766
+并且正因为如此，因为我们要实现的那种迭代模型
+and because of that, because of that kind of iterative model that we're gonna do
+
+11
+00:00:46,833 --> 00:00:53,000
+希望我们能让事情尽快开始，那样的话，你们就能看到结果了
+hopefully we'll get stuff actually  happening as soon as possible, and that way, you guys will kind of see results
+
+12
+00:00:53,000 --> 00:00:57,766
+并且这样会更有趣，但这也是一种很好的发展方式，我个人也很喜欢
+and it'll be more entertaining, but also it's a really good way of development that I personally also really like
+
+13
+00:00:57,766 --> 00:01:02,466
+因为我们不需要花很多时间来构建各种基础
+because instead of just kind of spending ages building up all the kind of kind of foundation
+
+14
+00:01:02,500 --> 00:01:07,100
+并且然后，比如一年之后，我们就会在屏幕上看到一个三角形
+and then like a year later, seeing a triangle on the screen we kind of get to
+
+15
+00:01:07,100 --> 00:01:12,450
+可能也会很快达到那个阶段，因此它是一种更好更直观的结果
+we're able to get to that stage a lot faster, and thus is just kind of it's better to see
+
+16
+00:01:12,450 --> 00:01:15,075
+如果我们所做的能在一开始就能跑起来
+if what we're doing is even going to work in the first place
+
+17
+00:01:15,075 --> 00:01:18,633
+那么我们总是可以改进它，不管怎样，没有更多的麻烦
+and then we can always kind of improve it, anyway, without much further ado
+
+18
+00:01:20,633 --> 00:01:27,366
+我花了一整周的时间策划这个系列，所以我才意识到这其中涉及到多少东西
+I was spending this entire week kind of planning this series, and that's why I kind of just just realize exactly how much is involved here
+
+19
+00:01:27,366 --> 00:01:32,500
+在接下来的几周，我有比如观点之类的很多东西想和你们分享
+and there's a bunch of like opinions that I really want to share with you guys in probably the coming weeks
+
+20
+00:01:32,500 --> 00:01:37,225
+因为我们做这件事的方式将会对这个系列产生影响
+because the way that we do this is going to kind of impact the series
+
+21
+00:01:37,225 --> 00:01:42,500
+因为我们要么快速地在屏幕上看到东西，要么等待更长的时间，然后进一步获得好处
+because we either see something on the screen quickly, or we wait longer, and then get benefits further down the line
+
+22
+00:01:42,666 --> 00:01:47,500
+但无论如何，我今天不想谈论计划，所以这只是我脑子里的一些零散的事情
+but anyway, again I don't want to talk about planning today, so that's just kind of just some loose things on my mind
+
+23
+00:01:47,766 --> 00:01:51,366
+今天要配置一切，所以我们先要建立一个github仓库
+today we're going to set up everything, so we're going to set up a github repository
+
+24
+00:01:51,466 --> 00:01:57,966
+我们会设置一个VS解决方案和项目，会设置相应的配置
+we're going to set up a visual studio solution and projects, we're going to set up the configuration for that to some extent
+
+25
+00:01:57,966 --> 00:02:01,275
+我们要把这些链接起来，把所有的东西链接起来
+and we're going to just kind of link those to link everything together
+
+26
+00:02:01,275 --> 00:02:04,075
+并且简单地说，就是要在屏幕上打印hello world
+and make a simple allegation to print hello world to the screen
+
+27
+00:02:04,075 --> 00:02:08,200
+但它的结构和配置对我们实际的游戏引擎来说是正确的
+but it will be kind of structured and configured correctly for our actual game engine
+
+28
+00:02:08,766 --> 00:02:13,066
+所以问题可能是，如果你们要建立一个github库，如果要建立一个VS解决方案
+so the question might be well okay, if you're going to make a github repository, if you're going to make a visual studio solution
+
+29
+00:02:13,066 --> 00:02:20,800
+这个引擎叫什么，这个引擎叫Hazel，也就是Hazel引擎，别问我从哪里想到的
+what are you going to call the engine, the engine is going to be called Hazel, Hazel engine, don't ask me where I came up with that from
+
+30
+00:02:20,800 --> 00:02:30,533
+我工作的时候喜欢吃各种坚果，有核桃和榛子之类的，并且我非常喜欢榛子
+I kind of liked I was going through various nuts or something at work, and there was like walnuts and hazelnuts and stuff like that, and I really like hazelnut
+
+31
+00:02:30,633 --> 00:02:37,466
+并且Hazelnut可能是关卡编辑器或其组件，但我认为Hazel是一个非常简单的名字
+and Hazelnut might end up being like the level editor or some kind of component of it, but I just think Hazel, it's a really nice simple name
+
+32
+00:02:38,133 --> 00:02:40,825
+并且我不认为有任何其他游戏被称为Hazel
+and I don't think that any other game mentions called Hazel
+
+33
+00:02:40,825 --> 00:02:44,466
+所以就叫Hazel，那就是我们提到的游戏的名字，恭喜
+so Hazel, that's the name of our game mentioned, yay congratulations
+
+34
+00:02:44,500 --> 00:02:47,125
+那实际上可能是最难的部分，想出名字
+that's actually probably the hardest part is coming up with the name
+
+35
+00:02:47,125 --> 00:02:50,233
+但无论如何，现在已经想出了名字，让我们直接去创建那个仓库吧
+but anyway, now that we've done that, let's go ahead and make that repository
+
+36
+00:02:50,233 --> 00:02:54,866
+好了，那么看到这儿，我的github账户是，github账户是TheCherno，在这里，你们可以在这里关注我
+okay, so here we have, my github account is just, github account is TheCherno, here it is, you can follow me here
+
+37
+00:02:55,666 --> 00:03:00,966
+我要做的就是创建一个新的仓库，我喜欢在大家面前这样做，把它命名为Hazel
+what I'm gonna do is just make a new repository, I love the fact that I'm doing this in front of all of you guys, I'm gonna call it Hazel
+
+38
+00:03:02,200 --> 00:03:05,050
+我现在暂时用Hazel Engine，作为我的描述
+I'm just going to say Hazel Engine for now, as my description
+
+39
+00:03:05,050 --> 00:03:09,433
+它当然是一个公共仓库，我将用README来初始化仓库
+it's going to be a public of course, I'm going to initialize the repository with it README
+
+40
+00:03:09,750 --> 00:03:13,400
+对于这个.gitignore，我们暂时不担心，而这个许可证
+for the .gitignore, we weren't worried about that, for the time being and for the license 
+
+41
+00:03:13,400 --> 00:03:17,966
+我现在会给它Apache License 2.0，那意味着如果有人使用它
+I'm going to give it the Apache License 2.0 for now, basically that just means that if someone uses this
+
+42
+00:03:17,966 --> 00:03:25,633
+他们必须公开，实际上也就是Hazel引擎，还有其他的东西，比如他们修改了源代码
+they have to disclose that, it is in fact the Hazel engine as well as, as well as like other kind of things, like if they modify the source code
+
+43
+00:03:25,633 --> 00:03:27,375
+那也需要记录下来的
+that also needs to be kind of documented
+
+44
+00:03:27,375 --> 00:03:32,766
+但无论如何，那是一个基本的设置，对于github，以及所有这些代码的去向
+but anyway, that's kind of a basic setup, now in terms of github, and where all this code is going
+
+45
+00:03:32,766 --> 00:03:37,475
+因为我总是被问到这个问题，代码将是100%免费和公开的
+because I get asked this all the time, the code is going to be 100% free and public
+
+46
+00:03:37,475 --> 00:03:39,466
+任何人都可以使用它，只要你们声明了那个
+anyone can use it, just as long as you do state that
+
+47
+00:03:39,466 --> 00:03:46,433
+你们用的是Hazel引擎，我觉得这很公平，它会是100%公开的，所有旧代码都会在线上
+it is the Hazel engine that you're using, which I think is fair, it's gonna be 100% public, every old code is gonna be online
+
+48
+00:03:46,433 --> 00:03:51,233
+所以你们不需要成为我的赞助人，但是说到这个，我想感谢所有的赞助人
+so you don't need to like be a patron or anything, but speaking of, which I do want to thank all of my patrons
+
+49
+00:03:51,233 --> 00:03:56,533
+因为没有你们就没有这个系列，所以如果你们想支持这个系列和我所做的一切
+because this series would not be here without you guys, so if you want to support this series and everything I'm doing
+
+50
+00:03:56,533 --> 00:03:58,950
+你们可以去patreon.com/thecherno
+you can go ahead and go to patreon.com/thecherno
+
+51
+00:03:58,950 --> 00:04:03,733
+你们会提前一周看到视频，本系列的视频，会提前一周看到
+you'll get videos like a week early, so videos for this series, you'll get a week early
+
+52
+00:04:04,500 --> 00:04:07,566
+这个系列还有很多其他的好处
+and then there's also many other benefits to do with this series specifically
+
+53
+00:04:07,600 --> 00:04:13,550
+例如，我们在每个视频中写的所有这些实际代码对所有人都是公开的
+for example whilst, all of this actual code that we write in each video is going to be public for everyone
+
+54
+00:04:13,550 --> 00:04:15,275
+不管你们是不是赞助人
+no matter if you're a patreon or not
+
+55
+00:04:15,275 --> 00:04:20,500
+实际上，我确实有一个私人的开发分支，已经在那里写了很多关于引擎的东西
+I do actually have a private kind of development branch where I've already written like a good chunk of the engine
+
+56
+00:04:20,500 --> 00:04:27,900
+就像可能，我想说前10到20集可能已经完成，已经可以在这个视频公开
+like probably, I'd say the first 10 to 20 episodes are probably already done and already available as of this video going public
+
+57
+00:04:27,966 --> 00:04:34,500
+它已经对所有赞助人开放了，我的意思是，那是那是赤裸裸的，对吧
+it's already available for all patrons, and like I mean, that's that's just bare, right
+
+58
+00:04:34,500 --> 00:04:36,125
+因为很明显这是一个巨大的引擎
+because obviously this is a huge engine
+
+59
+00:04:36,125 --> 00:04:41,400
+我不能在你们面前把所有的东西都打出来，所以这些都是我在私人时间做的事情
+I don't, I can't type everything in front of you guys, so the stuff that I kind of do in my private time
+
+60
+00:04:41,400 --> 00:04:46,166
+当我计划和编写代码时，看看所有的东西是如何组合在一起的
+when I actually plan and actually write that code to see how everything's gonna fit together all of that
+
+61
+00:04:46,166 --> 00:04:51,975
+所以基本上一个工作的引擎已经在那个私人github仓库为我所有的赞助人
+so basically a working engine does already go up on that private github repository for all of my patrons
+
+62
+00:04:51,975 --> 00:04:57,800
+那么那也是你们帮助支持它们的另一种方式，当然也会得到一些回报
+so that's another way that you can kind of help support them, and in return of course get something as well
+
+63
+00:04:58,633 --> 00:05:02,766
+话虽如此，它的美妙之处在于，赞助人可以提前看到代码
+that being said, the beauty of that is that, the patrons get to see the code before
+
+64
+00:05:02,766 --> 00:05:07,566
+它会写在视频里，这意味着如果代码有问题，或者人们想要提出建议
+it gets written in the video, which means that if there's problems with the code, or if there's suggestions people want to make
+
+65
+00:05:07,566 --> 00:05:12,133
+他们实际上是在贡献和帮助，基本上是影响
+they actually end up contributing and actually helping, like basically influence
+
+66
+00:05:12,266 --> 00:05:17,200
+这个视频里写了什么代码，所以再次非常感谢大家，因为那真的很酷
+what code actually is written in this video, so again huge thank you to everyone for that, because that's really really cool
+
+67
+00:05:17,300 --> 00:05:20,275
+不管如何，我们先不说那个了，回到创建存仓库的话题上来
+anyway, let's stop talking about that, let's get back to creating this repository
+
+68
+00:05:20,275 --> 00:05:23,166
+好了，那么这看起来不错，点击创建仓库
+okay, so this looks pretty good, I'm just going to hit create repositry
+
+69
+00:05:26,133 --> 00:05:29,450
+就这样，这就是Hazel引擎仓库，那真的很酷
+and there you go, the Hazel engine repository, that's really cool
+
+70
+00:05:29,450 --> 00:05:32,200
+我不知道有没有人注意到，这实际上是公开的
+I wonder if anyone's gonna notice, this actually becoming public
+
+71
+00:05:32,500 --> 00:05:35,400
+因为显然在我录制这个视频的时候
+because obviously at the time of me recording this video
+
+72
+00:05:35,400 --> 00:05:39,100
+还没有把这个视频放出来，但是有一个新的仓库，这个加密顶
+I haven't actually put out the video yet, and yet there's a new repository,  this cryptops
+
+73
+00:05:39,100 --> 00:05:44,433
+那很有趣，当然，你们可以从这里开始创建仓库，这样，你们就能知道变化之类的东西
+that's kind of interesting, you can start the repository of course by going here, and that way,  you'll kind of know about changes and all that stuff
+
+74
+00:05:45,133 --> 00:05:50,966
+它有点像喜欢它，它也帮助支持它，但我们有一个许可和README文件相当乏味
+it's kind of like favoring it, and it helps support that as well, but we have a license and README file pretty bland
+
+75
+00:05:50,966 --> 00:05:57,766
+现在我们有了所有这些，我们可以使用git克隆这个并创建我们的VS解决方案，这很好
+so now that we've got all of this,  we can kind of clone this using git and actually create our visual studio solution, and that will be all great
+
+76
+00:05:57,900 --> 00:06:05,266
+我喜欢这样做，因为无论是VS还是gear都会抱怨某些东西已经在那里了
+now the way that I like to do this, because either visual studio or gear will end up complaining about certain things being already kind of there
+
+77
+00:06:05,266 --> 00:06:08,400
+换句话说，如果你们尝试克隆git
+so in other words, if you try and make a, if you try and clone git
+
+78
+00:06:08,400 --> 00:06:11,833
+如果尝试克隆，克隆一个仓库到一个目录，那不是空的，它会抱怨
+if you try and clone, and get a repository to a directory, that's not empty, it will complain
+
+79
+00:06:11,833 --> 00:06:15,500
+如果你们尝试将VS解决方案放到一个目录中，那不是空的，那也可能不起作用
+if you try and make a visual studio solution into a directory, that's not empty, that might also not work
+
+80
+00:06:15,500 --> 00:06:26,166
+所以我要做的是跳转到VS，点击文件新建项目，我要创建一个空项目，命名为Hazel
+so what I like to do with this is just hop on over to visual studio, I'll hit file new project, I'm going to make an empty project, it's going to be called Hazel
+
+81
+00:06:27,266 --> 00:06:31,700
+当然，我们将在解决方案中有多个项目，但我只想将解决方案命名为Hazel
+now of course we will have multiple projects in the solution, but I just want the solution named to be Hazel
+
+82
+00:06:32,100 --> 00:06:40,733
+并且我将把它放到C:\dev中，通常把你们的源代码或开发代码放到一个仓库中是一个好主意
+and I'm just going to put it into C:\dev, it's usually a good idea to actually put your source code or your kind of development code into a repository
+
+83
+00:06:40,900 --> 00:06:45,866
+而不是一个与你们的用户帐户无关的文件夹，所以换句话说，我只是在使用C:\dev
+rather into a folder that isn't tied to your user account, so in other words, I'm just doing C:\dev
+
+84
+00:06:45,866 --> 00:06:49,700
+它不是，你们知道的，C:\Users\Yan Chernikov来保存任何东西
+it's not kind of, you know, C:/Users/Yan Chernikov for whatever
+
+85
+00:06:49,700 --> 00:06:53,600
+不是这样的，然后我还想知道这里
+nothing like that, and then also I want to know here that
+
+86
+00:06:53,833 --> 00:06:57,775
+我的名字中没有空格，有时会与某些东西冲突
+I don't have any spaces in the name spaces, can sometimes conflict with certain things
+
+87
+00:06:57,775 --> 00:07:02,400
+不是所有的插件都像空格，我在看一个特定的android
+not all plugins like spaces, I'm looking at a certain android
+
+88
+00:07:02,833 --> 00:07:05,125
+就像某个公司的插件一样，不管怎样，这并不重要
+like plug in by a certain company, anyway, doesn't matter
+
+89
+00:07:05,125 --> 00:07:09,300
+关键是尽量避免在你们的实际名字中使用空格
+the point is try and avoid spaces as much as possible in your actual names
+
+90
+00:07:09,300 --> 00:07:15,233
+至少在你们的仓库的实际根文件夹之前，我们有C:\dev，然后才是Hazel
+at least leading up to the actual kind of root folder off your repository here, we have C:\dev, and then Hazel
+
+91
+00:07:15,233 --> 00:07:21,033
+我想为方案创建一个目录，然后点击确认，这样就有了Hazel方案，很酷
+and I want to create a directory for solution, and then I'm just going to hit ok, so there we have it the Hazel solution, pretty cool
+
+92
+00:07:21,133 --> 00:07:28,633
+如果我打开这个文件夹，我们可以看到，我们有一个文件夹叫做Hazel，有Hazel.sln文件
+if I just open this kind of folder, so that we can look at it, we have a folder called Hazel inside, we have hazel the Hazel.sln file
+
+93
+00:07:28,633 --> 00:07:30,900
+在这里，我们有一个文件夹叫Hazel
+and then inside there, we actually have a folder called Hazel
+
+94
+00:07:30,900 --> 00:07:35,100
+里面有一个项目叫Hazel，所以到处都是Hazel，但那就是我的想法
+which has a project called Hazel, so there's a lot of hazel everywhere, but that's kind of the idea
+
+95
+00:07:35,233 --> 00:07:43,233
+现在我要做的是，基本上只是打开一个命令窗口，在这里输入cmd，我已经安装了
+now what I'm going to do next is, basically just open a command front window by typing in cmd here, and I do have get installed
+
+96
+00:07:43,233 --> 00:07:53,400
+所以我要做的就是输入git clone https://github.com/thecherno/hazel
+so all I have to do is type in git clone https://github.com/thecherno/hazel
+
+97
+00:07:53,400 --> 00:07:56,633
+就这样，现在hazel当然不存在了
+and that's it, now of course hazel doesn't exist
+
+98
+00:07:56,633 --> 00:08:03,100
+抱歉，我忘了我已经在这里了，我们可以叫它不是Git之类的，它会克隆到一个文件夹中
+sorry, I forgot that I'm already in here, so we can just call it like not a no Git or something, it's just going to clone into a folder
+
+99
+00:08:03,100 --> 00:08:07,066
+我不关心它在哪里，因为我接下来要做的是进入这个文件夹
+I don't really care where it is, because what I'm going to do next is actually go into this folder
+
+100
+00:08:07,233 --> 00:08:11,300
+我要确保看的是隐藏项，这是我们关心的.git文件夹
+I'm going to make sure that I look at hidden items, this is the .git folder that we care about
+
+101
+00:08:11,500 --> 00:08:15,050
+并且我要把它剪切下来，放到这里的Hazel中
+and I'm going to cut this and actually put it into Hazel over here
+
+102
+00:08:15,050 --> 00:08:19,100
+对吧，然后删除那个Git文件夹，这就是我们最后得到的
+right, and then delete that Git folder, now this is what we end up with
+
+103
+00:08:19,133 --> 00:08:23,800
+我成功地将git仓库克隆到一个文件夹中，而这个文件夹并不是空的
+so basically what I've done is, I've managed to clone, that git repository into a folder, that was not in fact empty
+
+104
+00:08:24,300 --> 00:08:27,900
+并且你们可以看到，这包含了我们创建的许可证和README文件
+and you can see that, this contains our license and README filed that we created
+
+105
+00:08:28,500 --> 00:08:33,133
+通过github仓库，但我们所有的东西都在这里，这也很重要
+kind of through that github repository, but then we've also got all of our stuff here, which is also really important
+
+106
+00:08:33,350 --> 00:08:36,966
+我肯定这儿可能有更好的方法来做这件事，但这就是方法，我做它没什么大不了的
+I'm sure there might be a better way of doing this, but this is just the way, I do it not a big deal
+
+107
+00:08:36,966 --> 00:08:42,133
+基本上我们想要的是，我们想要创造性的空闲工作室解决方案，并在相同的目录下获得仓库
+basically all we want is, we want creative idle studio solution, and get repository in the same directory substone
+
+108
+00:08:42,133 --> 00:08:48,333
+主要是那样，好了，好了，现在完成了，我们可以继续设置我们的项目
+mainly like that, okay, cool, anyway, now that's done, we can move on to actually setting up our project
+
+109
+00:08:49,033 --> 00:08:55,466
+那么你们可以看到，我这里有一个Hazel的项目文件和一个Hazel的解决方案
+so what I have here as you can kind of see is essentially a Hazel project file and then a Hazel solution
+
+110
+00:08:55,733 --> 00:08:58,700
+现在我们的方案就不仅仅是引擎了，对吧
+now our solution is going to contain more than just the engine, right
+
+111
+00:08:58,700 --> 00:09:03,966
+Hazel是我们的引擎，我们想要做的是把它构建到动态链接库中到dll中
+hazel is our engine, what we want to do is actually build that into a dynamic link library into a dll
+
+112
+00:09:04,100 --> 00:09:06,475
+对吧，在Windows上，至少它是一个dll文件
+right, on Windows, at least it's going to be a dll file
+
+113
+00:09:06,475 --> 00:09:11,000
+然后我们要做的是创建某种外部应用程序项目
+and then what we want to actually do is create some kind of external application project
+
+114
+00:09:11,000 --> 00:09:19,450
+那将是一个可执行的Windows的,exe文件，然后我们要链接到我们的引擎到我们的exe文件
+that will be an executable some Windows .exe file, and then we want to actually link that engine into our exe file 
+
+115
+00:09:19,450 --> 00:09:24,900
+现在这儿有两种方法可以实现这个，主要是使用静态库，或者使用动态库
+now there's two ways of doing this, primarily you could use a static library, or you could use a dynamic library
+
+116
+00:09:24,966 --> 00:09:32,766
+我的C++系列有一个很好的视频，介绍了动态链接和静态链接的区别，以及动态库和静态库
+my C++ series has an excellent video about the differences between dynamic and static linking, and also well about dynamic and static libraries
+
+117
+00:09:33,266 --> 00:09:38,066
+把它去掉，如果你们不确定区别是什么，基本上那就是我选择dll的原因
+subject that out, if you're not sure what the differences are, basically the reason that I'm choosing to go with dll
+
+118
+00:09:38,066 --> 00:09:46,666
+除了我们可以根据自己的选择来加载和卸载之外主要是因为，我们会有很多依赖项
+apart from the fact that we can kind of load on and unload it as we kind of choose is primarily, because we're going to have quite a lot of dependencies
+
+119
+00:09:46,666 --> 00:09:50,837
+我们需要将很多库链接到我们的引擎中才能使其工作
+quite a lot of libraries that we actually have to link into our engine to make it work
+
+120
+00:09:50,837 --> 00:09:54,400
+如果我们使用静态库，我们忽略了这个事实
+if we go with a static library, and we ignore the fact that
+
+121
+00:09:54,400 --> 00:10:00,066
+你们可以创建臃肿的静态库，但那有点麻烦，所以如果你们看看传统的静态链接
+you can kind of create fat static libraries, but that's kind of dodgy, so if you look at traditional static linking
+
+122
+00:10:00,400 --> 00:10:06,450
+它的意思是我们所有的依赖库，我们必须将它们链接到我们的游戏中
+basically what it means is that all of our dependent libraries that we have, we actually have to link that into our game
+
+123
+00:10:06,450 --> 00:10:09,733
+我们的引擎可能依赖于一堆库
+our engine might depend on set libraries
+
+124
+00:10:09,733 --> 00:10:15,800
+但我们需要链接，而不是能够链接所有这些库到引擎中，类似库文件
+but we need to link, instead of being able to link all of those libraries into the engine, kind of library file
+
+125
+00:10:15,800 --> 00:10:18,233
+我们实际上需要将所有东西链接到游戏中
+we actually have to link everything into the game
+
+126
+00:10:18,333 --> 00:10:25,066
+如果那是有意义的，再说一下，静态链接，那就是它的原理，而dll基本上就像一个exe文件
+if that makes sense again static linking is that's just how it works, whereas a dll is basically like an exe file
+
+127
+00:10:25,066 --> 00:10:30,433
+所以我们可以把所有东西都链接到那里，然后我们的游戏就会只依赖于那个dll文件
+so we can actually link everything into there, and then our game will just depend on that single dll file
+
+128
+00:10:30,433 --> 00:10:35,633
+它将包含它所需要的所有东西，而不是拥有10亿个其他类型的库文件
+which will contain everything, it needs instead of having 1 billion other kind of library files
+
+129
+00:10:35,766 --> 00:10:41,266
+所以我们最终要做的就是把所有东西都链接到engine.dll中
+so essentially what we end up doing is actually linking everything into that engine.dll
+
+130
+00:10:41,800 --> 00:10:45,400
+我们所有类型的依赖关系，这意味着它们都需要是静态库
+all of our kind of dependencies, which means they all need to be static libraries
+
+131
+00:10:45,566 --> 00:10:50,366
+所以我们将所有这些静态库链接到我们的engine.dll中，然后将该engine.dll链接到游戏中
+so we link all of those static libraries into our engine.dll, and then we link that engine.dll into our game
+
+132
+00:10:50,366 --> 00:10:54,275
+并且就是那样，那就是我们需要的，所以那就是我们要做的
+and that is it, that's all we need, so that's what we're gonna kind of make here
+
+133
+00:10:54,275 --> 00:10:56,900
+那么右键点击Hazel，点击Properties
+so I'm going to right click on hazel, hit Properties
+
+134
+00:10:57,666 --> 00:11:02,466
+这些是我们的属性，既然我们在这里，让我们讨论一下平台和配置
+these are our properties now, since we're here, let's talk a little bit about platforms and configurations
+
+135
+00:11:02,600 --> 00:11:05,800
+我们有两种配置可以开始调试和发布
+we have two kind of configurations to start off with debug and release
+
+136
+00:11:05,800 --> 00:11:10,300
+随着时间的推移，我们可以做得更多，我们会做得更多
+we can make more further kind of as time goes on, we'll make more
+
+137
+00:11:11,066 --> 00:11:16,566
+但是平台是我特别想花时间在上面的东西，因为如果我打开配置管理器
+but platform is something that I want to particularly spend some time on, because if I go to the configuration manager here
+
+138
+00:11:17,200 --> 00:11:25,100
+我们有两种解决方案平台x86和x64，现在我不想支持32位，因为现在是2018年了
+we have two kind of solution platforms x86 and x64, now I don't really want to support 32bit, because it's kind of, it's 2018
+
+139
+00:11:25,100 --> 00:11:29,750
+就像我们，32位不是我想要支持的东西，也许出于传统的原因
+like we, 32bit is not something that I want to support, maybe for legacy reasons
+
+140
+00:11:29,750 --> 00:11:33,750
+它可能是一个好主意，所以可能会重新添加，如果有人做这个案例
+it might be a good idea, so I might readd it back, if like people do make the case
+
+141
+00:11:33,750 --> 00:11:41,000
+或者如果有人真的想要，但对我来说，我不想要x86，所以我们要做的就是到这里来编辑
+or if someone really wants it but for me, right, now I don't want x86, so what we're actually gonna do is come down here and to edit
+
+142
+00:11:41,566 --> 00:11:47,400
+然后完全删除这个x86平台，好了，我们还需要从这里删除它
+and remove this x86 platform entirely, okay, gone, we also need to remove it from here
+
+143
+00:11:47,400 --> 00:11:50,033
+因为它也是在这里创建的，所以添加它
+because it's also been created here, so add it
+
+144
+00:11:50,766 --> 00:11:58,000
+Win32和x64在VS命名中是一样的，就这样了，这让一切都更清晰
+Win32 same as x64 in terms of visual studios namings, and then that's it, that's done, so this kind of keeps everything a lot cleaner
+
+145
+00:11:58,000 --> 00:12:03,125
+我们现在只有一个平台x64，然后还有两个配置调试发布
+we've only got one platform now x64, and then still two configurations debug release
+
+146
+00:12:03,125 --> 00:12:06,600
+因为通过配置这个，我将得到所有配置
+since by configuring this, I'm going to go to all configurations
+
+147
+00:12:06,666 --> 00:12:12,900
+我要改变配置类型，这是一个很大的改变从exe到dll，对吧，动态库
+I'm going to change the configuration type, this is the big kind of change from exe to dll, right, dynamic library
+
+148
+00:12:12,966 --> 00:12:18,500
+那是非常重要的改变，因为现在不是构建exe文件，而是构建dll文件
+that's very important change, because now instead of dis building an exe file it builds a dll
+
+149
+00:12:19,533 --> 00:12:25,975
+我将保留Windows SDK，以及2017年的VS版本，这是一对一的
+I'm going to keep the Windows SDK, where it is as well as the visual studio version at 2017, which is v one for one
+
+150
+00:12:25,975 --> 00:12:28,075
+所以你们下载一个VS是非常重要的
+so it's very important that you guys download a visual studio
+
+151
+00:12:28,075 --> 00:12:32,000
+我有一个关于如何在Windows上设置C++的视频，建议你们去看一下
+I do have a video on how to set up C++ on Windows, I suggest you watch at that
+
+152
+00:12:32,100 --> 00:12:38,366
+我今天不想花时间安装VS，我想你们应该已经很熟悉了
+I didn't want to spend today setting up an installing visual studio, I think you guys should be already pretty familiar with that
+
+153
+00:12:38,433 --> 00:12:41,650
+这是一个相当高级的系列，如果我开始做一些事情
+this is quite an advanced series, and if I start doing things
+
+154
+00:12:41,650 --> 00:12:44,966
+比如告诉你们如何安装VS，我们会在这里待上很长时间的
+like telling you how to install visual studio, we'll be here for decades
+
+155
+00:12:44,966 --> 00:12:52,466
+所以请看看我的其他视频，我想这对一般的C++设置也有帮助
+so please look at my other videos for for kind of tips, I guess also help with setting up C++ in general
+
+156
+00:12:53,066 --> 00:13:00,333
+但是说到VS 2017，我们将主要针对C++ 17，所以那儿有很多现代的东西
+but that being said visual studio 2017, we are going to primarily target C++ 17, so lots of modern kind of stuff there
+
+157
+00:13:00,333 --> 00:13:03,275
+并且我们肯定需要VS 2017来支持
+and we definitely need visual studio 2017 for that support
+
+158
+00:13:03,275 --> 00:13:07,775
+这里我想设置的另外两个东西，就是输出目录和中间目录
+so the two other things I want to set up here, really are the Output directory and the Intermediate directory 
+
+159
+00:13:07,775 --> 00:13:12,866
+因为VS的默认设置不是很好，如果你们看一下我链接到那儿的视频
+because visual studios default setup is not very good, if you kind of look at my video that I'll link up there
+
+160
+00:13:12,866 --> 00:13:19,000
+建立C++ VS项目的最好方式，这将基于那个，但我有一点改变
+which is kind of the best way to set up C++ visual studio projects, this is gonna be kind of based on that, but I've changed a little bit
+
+161
+00:13:19,800 --> 00:13:22,075
+那么我们想要做的是，这些都没问题
+so really what we want to do is this is all fine
+
+162
+00:13:22,075 --> 00:13:26,675
+但我想在解决方案目录下创建一个文件夹叫bin，所有东西都会放到那里
+but I kind of want to make a folder in the solution directory called bin, everything is going to go there 
+
+163
+00:13:26,675 --> 00:13:31,925
+所有的东西，所有的二进制文件，所有的库，所有我们在解决方案中有的项目
+everything, all of our binaries, all of our libraries, all of our kind of projects that we have in the solution
+
+164
+00:13:31,925 --> 00:13:33,466
+所有的东西都要放到bin里
+everything is going to go in bin
+
+165
+00:13:33,833 --> 00:13:42,100
+我将用实际的配置来区分它，我将看到配置，在这里是调试或发布
+and I'm actually going to separate this by the actual configuration, so I'm going to see configuration, which means debug or release in this case
+
+166
+00:13:42,166 --> 00:13:50,100
+然后是连字符或破折号，然后是平台，好了，所以这里应该是，你们知道的，Debug-x64
+and then a hyphen or a dash and then the platform, okay, so this will be something like in this case debug, you know x64
+
+167
+00:13:51,266 --> 00:13:56,566
+我不想，我不想把它分成两个不同的目录，因为我不想有这么大的文件夹层次结构
+I don't want to spend, I don't want to split this up into two different directories, because I don't want like this massive folder hierarchy
+
+168
+00:13:57,300 --> 00:14:08,966
+然后在这里，它将是项目名，就这样，好了，那么将对这个hazel.dll文件做什么
+and then in this case, it's just going to be the project name, and that's it, right, so what this is gonna do is for this hazel.dll file
+
+169
+00:14:08,966 --> 00:14:14,400
+它会把它放到bin中，debug-x64，然后是hazel.dll，搞错了
+it's gonna put it in bin, debug x64 and then hazel.dll, oh sorry
+
+170
+00:14:14,400 --> 00:14:18,366
+然后是Hazel，然后才是hazel.dll，我们在末尾留一个斜杠
+and then hazel and then hazel.dll, and we'll leave a slash at the end of that
+
+171
+00:14:19,066 --> 00:14:24,933
+我需要把这个复制粘贴到中间目录，现在这儿有两种方法实现这个
+I want to copy this and paste it into the intermediate directory, now there's two ways that I kind of do this
+
+172
+00:14:24,933 --> 00:14:27,200
+你们可以添加另一个名为bin-int的文件夹
+you can just add another folder called bin-int
+
+173
+00:14:27,200 --> 00:14:31,700
+但我不喜欢在那个核心文件夹，类似根解决方案目录下有太多文件夹
+but I don't really like having too many folders at that core, kind of root solution directory
+
+174
+00:14:31,933 --> 00:14:37,200
+所以我最后做的是bin，然后\int，它代表中间目录
+so what I do is I end up just kind of doing bin, and then slash int, which just stands for intermediates
+
+175
+00:14:37,200 --> 00:14:41,733
+所以这些是VS需要创建的所有文件，比如obj文件
+so these are kind of all the files the visual studio needs to create, like the obj files for example
+
+176
+00:14:42,000 --> 00:14:45,675
+当它在编译我们的代码时，绝对可以安全删除，一旦被编译
+when it's actually compiling our code definitely safe to delete, once has been compiled
+
+177
+00:14:45,675 --> 00:14:48,625
+我们就不希望把它放到和bin一样的目录中
+we don't want to put into the same directory as bin necessarily
+
+178
+00:14:48,925 --> 00:14:54,266
+因为bin有我们所有的东西，事实上那就是我不喜欢做这个的原因
+because bin has the kind of all of our actual stuff, in fact that's why I don't like doing this
+
+179
+00:14:54,266 --> 00:15:00,733
+实际上我可能不会这么做，因为复制粘贴bin文件夹很好，它有你们需要的一切
+in fact I might not actually do this, because it's nice to just be able to copy and paste that bin folder, and it has everything you need
+
+180
+00:15:01,100 --> 00:15:04,850
+所以我可以说bin-int之类的
+so I might just say bin, you know hyphen int or something like that 
+
+181
+00:15:04,850 --> 00:15:09,933
+也就是说，如果我想，我可以删除这个目录并把它复制粘贴到某个地方
+which just basically means that I can delete that directory, if I want and if I just want a copy and paste bin somewhere
+
+182
+00:15:09,933 --> 00:15:16,500
+因为我想要所有的二进制文件，不需要手动进入那里，删除中间目录，以保持文件的大小
+because I want all my binaries, I don't have to actually manually go in there and delete the intermediate directory to kind of keep the file sized low
+
+183
+00:15:16,500 --> 00:15:21,900
+所以这个可能更好，很好，这些都很好，点击ok
+so this actually might be better, okay cool, there we go, that stuff is all pretty good, let's hit okay
+
+184
+00:15:22,733 --> 00:15:28,524
+接下来我要做的是右键点击我的解决方案文件，点击添加新项目
+next thing I'm going to do is right click on my solution file, and hit add new project
+
+185
+00:15:28,524 --> 00:15:33,133
+现在我要添加一个实际的游戏项目，这样我们就有了引擎
+now here I'm going to add an actual game project basically, so we have our engine
+
+186
+00:15:33,133 --> 00:15:36,200
+但现在我们需要一个应用程序来使用我们的引擎
+but now we need an application that we'll use our engine
+
+187
+00:15:36,200 --> 00:15:40,666
+我将把这个称为Sandbox，就放在C:\dev\Hazel
+so I'm going to call this Sandbox and it's just going to go into C:\dev\Hazel
+
+188
+00:15:40,733 --> 00:15:47,533
+我们可能会把它移到一个目录中，比如你们知道的，Examples或者Sandbox项目之类的
+we might move it into a directory further along the way, like you know, examples or like Sandbox projects or something like that
+
+189
+00:15:47,666 --> 00:15:53,466
+一旦我们有了一些，Sandbox就没问题了，好了，一旦VS创建了它
+once we have a few bit for now sandbox will be fine, okay, now once visual studio creates that
+
+190
+00:15:53,466 --> 00:16:00,066
+我想从这里复制很多设置，当然它有自己的平台，这很烦人
+I want to copy a lot of the settings from here, so of course it's made its own platform, which is really annoying
+
+191
+00:16:00,166 --> 00:16:03,233
+我们可能每次都要这样做，以后再做
+and we might actually have to do this every time, should done this later
+
+192
+00:16:03,433 --> 00:16:05,725
+但我们会得到，因为我们使用的是VS模板
+but we'll get, because we're using visual studios templates
+
+193
+00:16:05,725 --> 00:16:10,466
+但我们会很快就会去掉x86, Hazel应该还是可以的
+but we'll get rid of x86 again quickly, hazel should still be fine yeah
+
+194
+00:16:10,566 --> 00:16:19,466
+然后我们会删掉Win32，那些东西都没了，所有配置，我要复制粘贴这个输出目录
+and then we'll get rid of Win32, okay, that stuff is gone, all configurations, I'm just going to copy and paste, this output directory
+
+195
+00:16:21,300 --> 00:16:29,533
+并且还有这个中间目录，当然，Sandbox实际上是一个exe文件
+and then also this intermediate directory, and then of course Sandbox will actually be an exe file
+
+196
+00:16:29,866 --> 00:16:37,900
+好了，酷，并且那就是我们现在要做的，那么就点击确认，我要设置Sandbox为启动项目
+okay cool, and that's really all we have to do for now, so let's hit okay, I'm going to set Sandbox as the startup project
+
+197
+00:16:38,300 --> 00:16:45,300
+此外，我现在要做一些事情，这可能会在将来省去一些麻烦
+and furthermore, I'm actually going to do something now that, it's going to save some headache probably in the future
+
+198
+00:16:45,566 --> 00:16:52,200
+我要打开解决方案目录，然后我要control shift w, control shift w是我的？指令
+I'm going to just open the solution directory, and then I'm going to control shift w, well control shift w is my cable command
+
+199
+00:16:52,200 --> 00:16:54,500
+但基本上只需要关闭这个解决方案文件
+but basically just going to close that solution file
+
+200
+00:16:54,500 --> 00:17:01,266
+关闭解决方案就是我在这里做的，我要打开这个解决方案文件
+close, solution is the actual thing that I did there, I'm going to actually open this solution file
+
+201
+00:17:01,266 --> 00:17:04,550
+我刚意识到这不能用文本编辑器打开它
+I just realized that that's going to not open it as a text editor
+
+202
+00:17:04,550 --> 00:17:07,966
+让我们打开一个文本编辑器，看看这个解决方案文件
+so let's open a text editor, and take a look at this solution file
+
+203
+00:17:07,966 --> 00:17:13,533
+我会用VSCode打开它，我在看这个解决方案文件，基本上我要做的就是
+I'll open it with visual studio code, okay, so I'm looking at the solution file here, and basically all I'm going to do is
+
+204
+00:17:13,533 --> 00:17:18,266
+我要把这个Sandbox项目从列表中的第二项转移到第一项
+I'm actually going to shift this Sandbox project from being the second thing in this list to the first one
+
+205
+00:17:18,466 --> 00:17:24,100
+那对那些刚从github上检出这个库的人来说意味着什么
+what that means is for people, who kind of checkout this repository fresh from github
+
+206
+00:17:24,100 --> 00:17:27,625
+实际上，Sandbox将自动成为启动项目，而不是Hazel
+Sandbox is actually automatically going to be the startup project, instead of Hazel
+
+207
+00:17:27,625 --> 00:17:31,475
+因为如果Hazel是启动项目，它显然不会运行，它只是一个dll文件
+because if Hazel's the startup project, it's obviously not going to run, it's a dll file
+
+208
+00:17:31,700 --> 00:17:34,100
+但这种方式，他们可以直接打开解决方案
+but this way, they can just literally open the solution
+
+209
+00:17:34,100 --> 00:17:39,466
+按f5，一切都会运行，好了，完成了，那么现在打开这个
+hit f5 and everything will run, so there we go, that's done, so I'll open this now
+
+210
+00:17:40,066 --> 00:17:42,925
+当然，对于我们来说，如果我们有一个.vs目录带有用户设置
+of course for us, if we have a .vs directory with user settings
+
+211
+00:17:42,925 --> 00:17:47,100
+它会记得我们把哪个作为启动项目
+it's going to remember like which one we left as the startup project
+
+212
+00:17:47,133 --> 00:17:50,625
+所以那对我们来说都很简单，好了
+so that's all kind of easy for us, okay awesome
+
+213
+00:17:50,625 --> 00:17:56,900
+现在让我们构建一个基本的结构，那么我们有Sandbox和Hazel
+so now let's actually set up a basic kind of structure, so we have Sandbox and we have Hazel
+
+214
+00:17:56,900 --> 00:18:05,167
+我现在要做的是把这两个链接在一起，我要右键点击Sandbox，添加，然后引用
+what I want to do now is just kind of a link these two together, so I'm going to right click on Sandbox go to add and then reference
+
+215
+00:18:05,533 --> 00:18:11,075
+然后我将添加Hazel作为我的引用，那意味着现在，Hazel实际编译时
+and then I'm going to add hazel as my reference, what that means is that now, when hazel actually compiles
+
+216
+00:18:11,075 --> 00:18:19,800
+生成一个静态库文件和一个dll文件，这将链接到那个，Hazel将被链接到Sandbox
+and generates a static library file and a dll file, this is going to actually link with that, so Hazel's going to be linked into Sandbox
+
+217
+00:18:19,966 --> 00:18:26,200
+但这是用VS界面完成的，如果我们右击，将属性转到链接器命令行
+but it's done for us kind of using visual studios interface, if we right click and head properties go to linker command line
+
+218
+00:18:26,866 --> 00:18:35,566
+然后看一下调试，例如，你们可以看到，如果我们看一下这个命令行，我们有这一行，对吧
+and then look at debug, for example, you can see here that, if we look through this command line, we have this line, right
+
+219
+00:18:35,600 --> 00:18:44,433
+就是C:\dev\Hazel\bin\Debug-x64\Hazel\Hazel.lib，好了，它会自动链接引擎库文件
+which says C:\dev\Hazel\bin\Debug-x64\Hazel\Hazel.lib, okay, so it automatically links for us that engine library file
+
+220
+00:18:44,433 --> 00:18:47,275
+现在你们可能会想，我们不是把它做成dll文件了吗
+now you might be like, well didn't we make it a dll file
+
+221
+00:18:47,275 --> 00:18:51,025
+为什么是lib文件呢，这是因为我们在VS中编译dll文件时
+why is it a lib file, it's because when we compile the dll file in visual studio
+
+222
+00:18:51,025 --> 00:18:57,325
+它实际上生成了一个lib文件，包含了我们从dll文件中导出的所有函数
+it actually generates both a lib file, which contains kind of every function that we've actually exported from the dll file
+
+223
+00:18:57,325 --> 00:19:04,166
+这样我们就不用手动从dll文件中加载函数或符号，然后也生成dll文件
+so that we don't have to manually actually load functions or symbols from the dll file, and then also generates that dll file
+
+224
+00:19:04,166 --> 00:19:11,300
+它有实际的机器码和其他链接，所以那就是为什么我们可以静态链接到Hazel.lib
+which has the actual machine code and any other kind of link stuff as well, so that's why we basically can statically link against Hazel.lib
+
+225
+00:19:11,425 --> 00:19:13,425
+但是dll文件是我们运行时所需要的
+but the dll file is what we need for a run time
+
+226
+00:19:14,000 --> 00:19:18,166
+好了，酷，不管怎样，那就是它的原理，对我来说很好，让我们点击ok
+okay cool, anyway, that's how that works, looks pretty good to me, let's hit okay
+
+227
+00:19:18,200 --> 00:19:26,000
+就那样，那就是我们的项目设置，我要快速到Hazel，点击显示所有文件按钮
+that is it, that's our project set up now, I'm going to quickly go over here to Hazel and hit the show all files button
+
+228
+00:19:26,666 --> 00:19:33,000
+我将为src添加一个新文件夹，它将包含所有的src代码，我将对Sandbox做同样的事情
+I'm going to add a new folder for the src, which will contain all of our src code, I'm going to do the same for Sandbox 
+
+229
+00:19:33,000 --> 00:19:38,466
+确保我们处于显示所有文件模式，因为我们想在磁盘上创建那个src目录
+making sure that we're on show all files mode, because we want to actually create that src directory on disk
+
+230
+00:19:39,233 --> 00:19:46,000
+然后在这里，我将添加一个基本头文件，它将被称为字面上的
+and then over here, I'm just going to add a basic header file, which is going to be called like literally
+
+231
+00:19:46,000 --> 00:19:52,600
+我现在要测试一下，因为我们已经有20分钟了，我想把实际的代码编写留到下次再做
+I'm just going to test this out now, because we're already at like 20min, and I definitely want to save the actual code writing for next time
+
+232
+00:19:52,600 --> 00:20:04,133
+但我还是要创建Test.h和Test.cpp，我要写一个基本函数命名空间Hazel
+but I'm just going to make Test.h and Test.cpp, I'm going to write a basic function here namespace Hazel
+
+233
+00:20:05,300 --> 00:20:25,225
+然后void Print，我要包含Test.h，namespace Hazel，void Print，这将打印hello world
+and then void Print, I'm going to include Test.h, namespace Hazel, void Print, this is going to printf hello world or rather
+
+234
+00:20:25,225 --> 00:20:38,550
+让我们想想，就是欢迎使用hazel引擎，这似乎更合适，我们将包含stdio.h来获得printf函数
+let's just see, welcome to Hazel engine, that seems a bit more appropriate, we'll include stdio.h to get that printf function
+
+235
+00:20:38,825 --> 00:20:45,650
+然后我们需要做的实际上是给那个函数添加__declspec(dllexport)
+and then what we need to do is actually a declspec dllexport that function
+
+236
+00:20:45,650 --> 00:20:49,850
+但是我们也需要将它包含到Sandbox中
+however we are going to need to include it as well into Sandbox
+
+237
+00:20:49,850 --> 00:20:55,066
+所以这有点粗糙，因为，我不想把这个设置好，我们要把它设置好
+so this is going to be a little bit rough, because again, I don't want to set this up properly, we'll set this up properly
+
+238
+00:20:55,066 --> 00:20:57,700
+下次我们会讲到dll的导出和导入
+next time we'll talk about dll exporting and importing
+
+239
+00:20:57,700 --> 00:21:02,766
+以及如何用Hazel接口正确设置我们的库，下次我们会讲到
+and how to actually get our library set up correctly with the Hazel api, so we'll talk about that next time
+
+240
+00:21:02,966 --> 00:21:11,800
+但现在我们只处理一个导出打印函数，我们将点击右键，构建Hazel.dll
+but for now we'll simply deal a export that print function from here, we'll hit right click build the Hazel.dll
+
+241
+00:21:11,800 --> 00:21:17,366
+现在你们可以看到，如果我们进入Hazel路径目录，我们有个bin目录
+now you can see that what's happened is, if we go into the hazel route directory, we have bin
+
+242
+00:21:17,700 --> 00:21:22,533
+我们有Debug-x64，有Hazel，还有Hazel.dll文件和Hazel.lib文件
+we have Debug-x64, we have Hazel, and we have a Hazel.dll file and a Hazel.lib file
+
+243
+00:21:22,750 --> 00:21:28,400
+因此，实际运行我们的代码需要dll文件，但lib文件被链接到Sandbox中
+so that dll file is needed to actually run our code, but the lib file gets linked into Sandbox
+
+244
+00:21:28,400 --> 00:21:32,233
+这样它就知道哪些函数可用，以及它们在dll中的位置
+so that it knows which functions are available, and where they are in the dll
+
+245
+00:21:33,466 --> 00:21:39,250
+让我们在Sandbox点击添加新项，我就叫这个Application.cpp
+let's hit new item in Sandbox, I'm going to call this Application.cpp
+
+246
+00:21:40,700 --> 00:21:44,133
+它将包含，当我要包含任何东西时
+this is just going to include well, when I'm actually going to include anything
+
+247
+00:21:44,500 --> 00:21:52,065
+我要输入一个void Main，这是我们的Main函数，我要把这个叫做void Print
+I'm just going to type in a void Main, which is our main function, okay, and I just want to call this void Print
+
+248
+00:21:52,065 --> 00:22:01,466
+现在我们要做的是，复制这个粘贴到这里，调用这个__declspec(dllimport)
+now what we're going to have to actually do is for now, copy this paste it up here, call this __declspec(dllimport)
+
+249
+00:22:02,125 --> 00:22:10,125
+一个来自Hazel名称空间的void Print，然后我要调用Hazel::Print()，就像那样，好了
+a void Print from the Hazel namespace, and then I'm just gonna call Hazel::Print just like that, okay
+
+250
+00:22:10,125 --> 00:22:13,091
+如果我右击并创建Sandbox
+and if I right click and build Sandbox
+
+251
+00:22:13,366 --> 00:22:16,875
+你们就会看到，我们没有得到任何链接错误或类似的东西，它完成了
+you should see that we don't get any linking errors or anything like that, it's done
+
+252
+00:22:16,875 --> 00:22:18,966
+如果我试着运行它，尽管它不会工作
+if I try and run it, though it's not going to work
+
+253
+00:22:19,166 --> 00:22:25,833
+因为它会抱怨dll文件丢失了，所以，现在，我们将在将来自动化所有这些
+because it's going to complain about that dll file actually missing, so again, for now, we're going to automate all of this in the future
+
+254
+00:22:25,833 --> 00:22:33,266
+但现在只是为了向你们展示它的原理，我将进入bin\Debug-x64\Hazel，复制那个dll文件
+but for now just to show you guys how this works, I'm going to go into bin\Debug-x64\Hazel, copy that dll file 
+
+255
+00:22:33,266 --> 00:22:36,625
+我们已经手动构建的，把它放在Sandbox.exe旁边
+that we've built manually, put it alongside Sandbox.exe
+
+256
+00:22:36,625 --> 00:22:40,300
+现在按f5运行，现在运行，我们没有得到任何错误
+and now hit f5 to run, now that worked, we didn't get any errors
+
+257
+00:22:40,300 --> 00:22:43,050
+让我们在这里放一个断点，这样我们就能看到发生了什么
+let's put a break point here, so we can actually see what's happened
+
+258
+00:22:43,050 --> 00:22:45,566
+如果我按下f10，然后回头看控制台
+if I hit f10 and I look back on our console
+
+259
+00:22:45,700 --> 00:22:52,500
+你们可以看到，它说，欢迎使用hazel引擎，这是在dll文件中做的，好了，开始运行
+you can see it's said welcome to hazel engine, which we did from within that dll file, so there we go, we're up and running
+
+260
+00:22:52,733 --> 00:23:00,550
+下次我们会继续写一些基本的引擎代码，甚至可能写引擎的入口点，好了，就这样了
+next time we're going to continue on and actually write some basic engine code, and maybe even write the entry point of our engine, alright, so that's it
+
+261
+00:23:00,550 --> 00:23:01,975
+希望你们喜欢这个视频
+I hope you guys enjoyed this video
+
+262
+00:23:01,975 --> 00:23:07,166
+你们可以看到它可能已经变得有点长了，我想把它保持在10到20分钟之间
+you can see that it's probably getting a little bit long already, and I kind of want to keep this between between ten twentymin
+
+263
+00:23:07,700 --> 00:23:12,533
+我们会看到我们是怎么做的，因为不可避免的，当我们遇到更复杂的事情时，它会变得很难
+so we'll see kind of how we go, because inevitably, as we get into more complicated things, it's going to be hard
+
+264
+00:23:12,933 --> 00:23:15,175
+但我在这里给你们展示的所有东西
+but everything that I kind of showed you here
+
+265
+00:23:15,175 --> 00:23:19,033
+即使在最后，可能看起来我只是用了一些捷径来让它工作
+even though at the end, might seem like I kind of just took a few shortcuts to get stuff working
+
+266
+00:23:19,333 --> 00:23:22,100
+我喜欢这样做的原因是，你们实际上看到了事情是如何运行的
+the reason I like doing that is because you actually see how things work
+
+267
+00:23:22,100 --> 00:23:26,233
+对吧，而不是我设置自动的步骤，为我们做所有的事情
+right, instead of me kind of setting up automated steps that do everything for us
+
+268
+00:23:26,400 --> 00:23:31,200
+你们可以看到手动需要做什么，所以当我们实现自动化时，你们就知道实际发生了什么
+you can actually see what manually needs to be done, so that when we do automate it, you know what's actually happening
+
+269
+00:23:31,650 --> 00:23:34,350
+但今天我们基本上做了一些非常重要的事情
+but we basically did some very important things today 
+
+270
+00:23:34,450 --> 00:23:38,850
+我们创建了Hazel.dll文件，就像项目一样，对吧
+we created that hazel.dll file like project, right
+
+271
+00:23:38,850 --> 00:23:42,633
+还有一个实际链接到Hazel的Sandbox项目，建立了一个github仓库
+and an actual sandbox project that links with Hazel, we set up a github repository
+
+272
+00:23:42,633 --> 00:23:45,250
+我们建立了一个VS解决方案，一切都准备好了
+we set up a visual studio solution, everything's ready to go for us
+
+273
+00:23:45,250 --> 00:23:48,928
+这样下一次，我们就可以开始编写真正的引擎代码
+so that next time, we can actually dive in and start writing real engine code
+
+274
+00:23:49,166 --> 00:23:53,966
+所以那就是设置，搞完了，对吧，就是那样，我们现在需要担心的，我向你们保证
+so that's the setup, done, right, that's all, we need to worry about for now, I promise you
+
+275
+00:23:54,466 --> 00:24:00,533
+然后下一次，我会继续写一些引擎代码，这让我非常非常兴奋
+and then next time, I'm gonna continue on and actually start writing some engine code, which I'm really really excited about
+
+276
+00:24:00,700 --> 00:24:03,133
+我希望你们能喜欢这个视频，如果你们喜欢的话，就为它点赞吧
+I hope you guys enjoy this video, if you did, you can hit that like button
+
+277
+00:24:03,133 --> 00:24:06,125
+你们可以通过访问patreon.com/thecherno来支持这个系列
+you can help support this series by going to patreon.com/thecherno
+
+278
+00:24:06,125 --> 00:24:09,766
+那些人已经有了下一个视频，非常酷
+those people already have the next video up which is really cool
+
+279
+00:24:10,400 --> 00:24:14,633
+如果你们今天想看引擎代码，可以做到的，它确实有助于支持这个系列
+so if you want to see that engine code today, well you can, and it really does help support this series
+
+280
+00:24:14,633 --> 00:24:18,750
+我非常感谢你们，因为没有你们，就没有今天
+and I'm so thankful for you guys, because this would not be here without you all
+
+281
+00:24:18,750 --> 00:24:21,333
+我迫不及待地想在下个视频中见到你们，再见
+I can't wait to see you in the next video, goodbye
+
