@@ -1,0 +1,1010 @@
+﻿1
+00:00:00,166 --> 00:00:03,599
+嘿，你们好，我是TheCherno，欢迎回到我的游戏引擎系列
+hey, what's up guys, my name is TheCherno, and welcome back to my game engine series
+
+2
+00:00:03,600 --> 00:00:08,925
+所以上次我们讨论了层，创建了LayerStack系统，如果你们还没有看过的话，一定要看一看
+so last time we talked about layers, and we made the LayerStack system, make sure you check that out, if you haven't already
+
+3
+00:00:09,200 --> 00:00:14,400
+并且现在我们已经了解了所有这些，我想继续朝着我现在想要的方向前进
+and now that we've got all of that, what I would like to kind of proceed with in the direction that I want to take this right now
+
+4
+00:00:14,400 --> 00:00:19,900
+接下来的步骤实际上就是让ImGui跑起来，如果你们还不知道的话，ImGui就像
+and the next steps is actually getting ImGUI running, if that's what you guys don't know, ImGui is like a
+
+5
+00:00:20,466 --> 00:00:23,175
+它是一种即时模式的GUI系统
+it's an immediate mode kind of GUI system
+
+6
+00:00:23,175 --> 00:00:27,275
+所以如果你们还没有在我的OpenGL系列看过ImGui的视频，一定要去看看哦
+so if you haven't checked out my OpenGL series video on ImGui, definitely check that out
+
+7
+00:00:27,550 --> 00:00:35,775
+链接就放在那儿的，它让我们可以很容易引入的即时模式ImGui
+it'll be linked up there as well, it just lets us kind of really easily kind of immediate mode ImGui
+
+8
+00:00:36,666 --> 00:00:41,500
+只是为了让我们比如调试东西或点击按钮，让事情发生，它是一个UI，对吧
+just so that we can like debug things or click on buttons and have things happened, it's a UI, right
+
+9
+00:00:41,500 --> 00:00:43,425
+那就是它允许我们做的，而且很容易使用
+that's what it lets us do, and it's really easy to use
+
+10
+00:00:44,825 --> 00:00:48,150
+对于我来说，那是我喜欢在游戏引擎中设置的第一个东西
+for me, that's one of the first things that I love setting up in a game engine
+
+11
+00:00:48,500 --> 00:00:50,725
+或者任何一种真正像任何一种图形项目
+or any kind of really like any kind of graphics project
+
+12
+00:00:50,725 --> 00:00:58,650
+真的是因为既能看到信息，又能调整值，或者能让事情发生
+really because being able to kind of both see information, as well as kind of adjust values, or kind of make things happen
+
+13
+00:00:59,300 --> 00:01:03,775
+那就好像没有它我就活不下去，好像我不认为这是可能的，好像我不需要它
+that's like I couldn't live without that, like I don't think that's possible, like I don't want it
+
+14
+00:01:03,775 --> 00:01:08,650
+例如，每次重新编译代码时，我想更改一个变量，对吧，我只想在屏幕上有一个小滑块
+for example recompiled code every time, I want to change a variable, right, I just want to have a little slider on the screen
+
+15
+00:01:09,575 --> 00:01:13,566
+那类东西对我可能知道的OpenGL系列视频非常有用
+that kind of stuff, it's really useful for that, and definitely that, that OpenGL series video that I may know
+
+16
+00:01:13,566 --> 00:01:16,333
+ImGui有点让你们熟悉
+ImGui kind of familiarize you guys with that
+
+17
+00:01:16,333 --> 00:01:21,127
+如果你们还没有听说过，或者你们无法想象为什么这样的东西可能真的有用
+if you haven't heard of it yet, or if you can't kind of imagine why something like that might actually be useful
+
+18
+00:01:21,400 --> 00:01:32,450
+好吧，无论如何，为了让ImGui真正跑起来，我们需要做什么，或者我们不需要这样做
+alright, anyway, so in order to get ImGui actually working though, what we need to do, well we don't need to do this
+
+19
+00:01:32,450 --> 00:01:37,900
+但我们首先要实现这个，因为这或多或少会证明我会如何实现
+but we're going to do this first, because it's going to be more or less future proof how I'm going implementation
+
+20
+00:01:39,300 --> 00:01:45,725
+我们需要一种实际使用现代OpenGL的方法，所以现在我们使用的图形接口是OpenGL
+we need a way to actually use modern OpenGL, so right now the graphics api that we're kind of going with is OpenGL
+
+21
+00:01:46,000 --> 00:01:52,975
+Hazel将是一种，Hazel的体系架构肯定会支持任何类型的图形接口，对吧
+Hazel will be kind of, the architecture of Hazel will for sure support any kind of graphics api, right
+
+22
+00:01:53,266 --> 00:01:57,666
+现在只是从OpenGL开始，这儿有很多原因
+right now it's just gonna be OpenGL to begin with, there's a lot of reasons for that
+
+23
+00:01:57,666 --> 00:02:02,566
+我想我在计划视频中谈到了那一点，嗯，别担心，不会的，不会的
+I think I covered that in the planning video, um and don't worry like it's not gonna be, it's not gonna be really
+
+24
+00:02:02,566 --> 00:02:06,425
+这对我们来说一点都不难，就像切换到Vulcan或者你们知道的添加到DirectX一样
+it's not gonna be hard at all for us, like switch to Vulcan or like you know add on DirectX
+
+25
+00:02:06,425 --> 00:02:09,300
+那应该很容易，可能需要一天的工作
+that should be really quite easy, probably like a days worth of work
+
+26
+00:02:09,650 --> 00:02:16,466
+嗯，但在一开始，我们将使用OpenGL，因为它是最简单的接口
+um but in the beginning, we're gonna go with OpenGL, just because it is both the simplest api that is out there
+
+27
+00:02:16,466 --> 00:02:22,275
+而且它也是目前我们实际拥有的跨平台的接口，那也是简单的级别，对吧
+and also it's kind of, it's the most cross platform api that we actually have at the moment, that is also the level of simplicity, right
+
+28
+00:02:22,275 --> 00:02:25,675
+所以关于DirectX11，你们可能会争辩说也没那么难
+so DirectX11 and you could argue is not that difficult as well
+
+29
+00:02:25,675 --> 00:02:27,775
+而对于新手来说，或多或少是在DirectX12级别上
+whereas welcome is more or less on DirectX12 level
+
+30
+00:02:28,533 --> 00:02:32,566
+它可是处于更底层的接口，但是DirectX11这种仅在Windows上可用
+which is a lot more lower level, however DirectX11 are only available on Windows
+
+31
+00:02:32,566 --> 00:02:38,366
+我希望人们能够轻松地将其移植到其他平台，尤其是，因为我们有premake设置
+and I want people to easily be able to port this to other platforms especially, because we have premake setup
+
+32
+00:02:38,366 --> 00:02:41,850
+它应该可以正常运行，不管怎样，我认为我们正在使用的任何特定于Windows的代码
+it should just work pretty much right, I think we're using any windows specific code anyway
+
+33
+00:02:42,366 --> 00:02:44,900
+好吧，我不想为这一期辩护
+alright, I don't want to defend this episode talking about what we're doing
+
+34
+00:02:44,900 --> 00:02:54,366
+基本上我们需要做的是，需要一种将所有现代OpenGL函数从GPU加载到C++中的方法，对吧
+basically what we need to do is we need a way to load all of the modern OpenGL functions from our GPU drivers into just our C++ code, right
+
+35
+00:02:54,366 --> 00:02:59,525
+所以我希望能够调用存储在图形驱动程序中的函数，那基本上就是我的想法
+so I want to be able to call functions that are stored inside our graphics drivers, that's basically the idea
+
+36
+00:02:59,866 --> 00:03:06,375
+现在在OpenGL系列中，我们使用了一种叫做GLEW的东西，就是OpenGL扩展包装器
+now in the OpenGL series, we did, we use something called GLEW, GLEW,  which is the OpenGL, like extension wrangler or something
+
+37
+00:03:06,733 --> 00:03:11,800
+如果你们想看看那个版本，左上角还有一个指向那个视频的链接
+there's a link in the top left corner as well to that video, in case you want to check out that version
+
+38
+00:03:12,533 --> 00:03:16,400
+在这个系列中，对于这个引擎，我实际上要使用一些不同的东西
+this in this series, for this engine, I'm actually going to use something different
+
+39
+00:03:16,400 --> 00:03:21,392
+实际上我要用一个叫做GLAD的库，我不知道，它是否代表什么
+I'm actually going to use something called GLAD, which is, I don't know, if it stands for something
+
+40
+00:03:22,366 --> 00:03:28,475
+可能是的，它只是说基于官方规范的多语言gl加载生成器
+it probably does, it just says multi language gl loaded generator based on the official specs 
+
+41
+00:03:28,475 --> 00:03:35,300
+无论如何，根据我的经验，它比GLEW好一点，更现代一点
+anyway, it's a little bit better and more modern in my experience than GLEW
+
+42
+00:03:35,300 --> 00:03:39,649
+GLEW是我过去经常使用的库，但这个更容易配置
+GLEW something that I used to use kind of in the past, but this is a little bit more configurable
+
+43
+00:03:40,500 --> 00:03:45,348
+只是有一点，我只是更喜欢这个，但我只是想让你们知道那个
+and it's just a little bit, I just like it a little bit more, but but I just want you to know that
+
+44
+00:03:45,775 --> 00:03:52,725
+这里有一个真正的区别，比如，OepnGL系列只是我们使用GLEW构建的一种小框架的教程
+there's a real difference, like for example, the OpenGL series is kind of the little framework, where we have there is built using GLEW
+
+45
+00:03:52,725 --> 00:03:57,199
+虽然这儿我用GLAD，但它们都做同样的事情，我不认为，它不是空的
+whereas I'm using GLAD to this, they do the same thing, I don't think, it's not empty
+
+46
+00:03:57,200 --> 00:04:00,566
+你们会注意到任何性能上的差异或类似的东西，我只想在这里使用GLAD
+you'll notice any performance differences or anything like that, I'm just gonna use GLAD here
+
+47
+00:04:00,566 --> 00:04:07,050
+因为它有点现代，但除此之外，基本上这两个东西的功能就是
+because it's a little bit more modern, but apart from that, basically the function of both these things is to
+
+48
+00:04:07,375 --> 00:04:13,800
+检查我们的图形驱动程序dll，然后加载我们知道的某些函数
+check out our kind of graphics driver dll, and just load certain functions that we know are in there
+
+49
+00:04:14,066 --> 00:04:20,250
+因此，我们可以从C++代码中调用它们，那就是这些库所做的，让我们看看如何设置它
+so that we can then call them from our C++ code, that is what these libraries do, let's take a look at how we can set this up
+
+50
+00:04:20,900 --> 00:04:25,850
+它应该非常简单，我们将首先使用网站进行配置，然后下载它
+it should be dead simple, we're going to actually configure it using the website first, then download it
+
+51
+00:04:25,966 --> 00:04:30,725
+然后将其作为一个独立项目添加，然后再添加一个premake文件，使其成为一个单独的项目
+then add it as a separate project, and then add a premake file to it, so that it is a separate project
+
+52
+00:04:31,325 --> 00:04:34,275
+我们只是将其作为存储库的一部分提交
+and we're just going to commit it as part of our repository
+
+53
+00:04:34,275 --> 00:04:38,550
+所以它不会像我在GLEW中所做的那样，像来自另一个存储库的拷贝
+so it's not going to be like a fork from another repository like I did with GLEW
+
+54
+00:04:38,766 --> 00:04:42,675
+就像我也要用ImGui一样，好吧，让我们开始吧
+and like I'm going to do with ImGui as well, alright, let's just jump into it
+
+55
+00:04:42,866 --> 00:04:45,900
+好了，那么就是我们这里的这个网站，我会把链接在下面的描述中
+okay, so this website that we have here, I'm going to link in the description below
+
+56
+00:04:45,900 --> 00:04:50,999
+但基本上，让我们配置一下我们真正想要的GLAD文件的样子
+but basically just let's kind of configure what we actually want the GLAD file to look like
+
+57
+00:04:51,000 --> 00:04:56,200
+所以这实际上会为我们生成一些代码，所以语言当然是C/C++
+so this will actually generate some code for us essentially, so the language of course will be C/C++
+
+58
+00:04:57,800 --> 00:05:03,099
+OpenGL将成为我们的规范，我们将使用核心，完成核心配置文件
+OpenGL is going to be our specification, we're going to go with the core, complete with the core profile
+
+59
+00:05:03,100 --> 00:05:08,725
+因为我们不需要任何类型的兼容性函数，这意味着我们不希望它支持不推荐使用的函数
+because we don't want any kind of compatibility functions, which means we don't want it to support deprecated functions
+
+60
+00:05:10,166 --> 00:05:17,493
+对于gl扩展，我将使用core 4.6的接口，对吧
+the api I'm gonna go with core 4.6, right, for gl extensions
+
+61
+00:05:18,166 --> 00:05:23,366
+我现在真的不想说那些，我很难说，我想要某些扩展
+I don't really right now is very difficult to me to say that, I want certain extensions
+
+62
+00:05:23,366 --> 00:05:29,800
+因为当我们开始优化事情，或者我们想做一些新奇的事情时，这很可能会有帮助
+because this will most likely lend itself, when we get to optimizing things, or we want to do some fancy things
+
+63
+00:05:30,900 --> 00:05:36,400
+就像我不知道一样，就像在DirectX和OpenGL之间共享内存一样，可能是那样的东西
+like I don't know, just like sharing memory between DirectX and OpenGL, potentially stuff like that
+
+64
+00:05:37,966 --> 00:05:41,725
+大多数扩展都不应该是，我认为我们现在不需要任何扩展
+most of these extensions should not be, I don't think we'll need any of them right now
+
+65
+00:05:42,733 --> 00:05:46,205
+所以很明显，一旦我们做了它们需要的事情，我们就可以重新生成这个文件
+so and obviously, once we're doing they need them, we can just regenerate this file
+
+66
+00:05:46,600 --> 00:05:52,750
+所以那就是我现在使用的设置，当然是4.6 gl，然后是核心配置文件
+so that's kind of the settings that I'm using right now 4.6 gl of course, and then the core profile
+
+67
+00:05:53,100 --> 00:05:56,800
+那么现在我要做的就是生成一个加载器，我只需点击generate
+so now all I have to do is we'll generate a loader, I'll just hit generate
+
+68
+00:05:57,600 --> 00:06:06,175
+然后在这里创建这样的网页，我只需点击glad.zip，下载它
+and then this will create this kind of web page here, I'm going to just click on glad.zip to download it
+
+69
+00:06:06,175 --> 00:06:10,425
+然后，那应该是我们需要的一切，所以如果我打开它，我们已经包含在src中了
+and then that should pretty much have everything we need, so if I open that, we have included in src
+
+70
+00:06:10,766 --> 00:06:18,873
+好了，那么我要把它复制到Hazel里面，我要转到我们的解决方案目录
+okay, so I'm gonna copy that inside Hazel, I'm gonna go to our solution directory here
+
+71
+00:06:19,266 --> 00:06:24,000
+我将进入Hazel，我将进入vendor，我将创建一个名为GLAD的新文件夹
+I'm going to go into Hazel, I'm going to go into vendor, I'm going to make a new folder called GLAD
+
+72
+00:06:24,175 --> 00:06:29,300
+我想把它粘贴到那里，你们可以看到，我的意思是，有一个源文件，它相当大
+I want to paste that in there, and you can see that, I mean, there's one source file, it's quite large
+
+73
+00:06:29,300 --> 00:06:33,900
+还有一堆包含文件，我们可能根本不需要KHR
+and then there's also like a bunch of include files, we probably won't need KHR are at all
+
+74
+00:06:34,700 --> 00:06:39,000
+GLAD的版本是我们所看到的，然后就是那样，对吧
+Glad age is kind of what we're looking at, and then that's kind of kind of it, right
+
+75
+00:06:39,666 --> 00:06:41,800
+所以我们现在需要做的就是创建一个premake文件
+so all we need to do now is make a premake file
+
+76
+00:06:41,800 --> 00:06:45,208
+然后把这个premake文件添加到我们的premake文件中
+and then add kind of this premake file into our premake file
+
+77
+00:06:45,766 --> 00:06:51,399
+所以如果我打开这个premake文件，打开premake文件大约5次4秒
+so if I open up this premake file, upset premake file about five times and 4 seconds
+
+78
+00:06:51,400 --> 00:06:53,650
+但无论如何，你们可以看到，我们包含了
+but anyway, you can see that we include
+
+79
+00:06:53,650 --> 00:06:57,666
+你们知道的，也就是这个，我们也将基本上包含了GLAD
+you know this one, we also are going to essentially be including GLAD
+
+80
+00:06:57,666 --> 00:07:03,200
+对吧，然后这些包含目录也一样，我要复制，所以我们在这里也有了GLAD
+right, and then these include directories as well, I'm going to duplicate, so that we have GLAD here
+
+81
+00:07:04,925 --> 00:07:11,666
+然后你们知道，当我们在这里包含某些东西时，希望你们喜欢这个直播撸码的事业
+and then you know, when we come down here to include certain things, hopefully you guys are enjoying this live coding cause
+
+82
+00:07:11,666 --> 00:07:15,925
+我不知道，很多人都在抱怨这一点，我会尽可能多地进行直播撸码
+I don't know, a lot of people looking complaining about that, I'll try and do live coding as much as I can
+
+83
+00:07:15,925 --> 00:07:20,850
+但有时它只是变得有点困难，GLAD的链接也好了
+but sometimes it just gets a little bit difficult, well linked GLAD as well
+
+84
+00:07:21,150 --> 00:07:24,400
+一个好方法就是搜索GLFW所在的任何地方
+a good idea is just a search kind of for wherever GLFW is
+
+85
+00:07:24,950 --> 00:07:31,125
+然后看看我们是否需要做这件困难的事，那就是我现在的策略
+and then just maybe see if we need to do this difficult, and that's going to be my pro strat right now
+
+86
+00:07:32,750 --> 00:07:34,025
+是的，看起来不错，好吧
+yeah that looks pretty good, okay
+
+87
+00:07:34,025 --> 00:07:37,425
+所以我的意思是，最重要的就是我们需要把它作为一个项目联系起来
+so I mean the biggest thing is we need to link it as a project
+
+88
+00:07:38,375 --> 00:07:43,050
+因为它当然要编译成一个静态库，然后我们还需要
+because of course it's going to compile into a static library, and then also we need to
+
+89
+00:07:43,050 --> 00:07:46,375
+确保包含目录实际上是你们现在包含Hazel的目录
+make sure that the include directories are actually you now include directories for Hazel
+
+90
+00:07:46,850 --> 00:07:52,875
+差不多了，好了，完成了，实际上现在我们需要为GLAD创建一个premake
+that's pretty much it, okay, so that's done, now we need to actually make a premake file for GLAD
+
+91
+00:07:52,875 --> 00:08:02,200
+所以我要做的是，如果进入GLFW，就可以拷贝这个premake文件，把它放在这里
+so what I'll do is, if I go into GLFW, I can just kind of steal that premake file, put it in here
+
+92
+00:08:02,200 --> 00:08:06,075
+然后我们可以看看它是什么样子的，所以项目名称应该是GLAD
+and then we can take a look at what it looks like, so project name would be GLAD
+
+93
+00:08:06,375 --> 00:08:12,875
+这实际上是一个，GLAD作为一个C项目，用C写的GLAD
+this is actually a I'm actually GLAD as a C project as well isn't it one language is GLAD written and it is C
+
+94
+00:08:12,925 --> 00:08:16,975
+好了，很好，所以这将非常相似，它将是一个静态库，项目名称就是GLAD
+okay, great, so this is going to be quite similar, it's going to be a static library, project name is GLAD
+
+95
+00:08:17,650 --> 00:08:27,325
+输出目录与现在包含的文件一样的，我们有GLAD/glad.h，所以包含GLAD
+output directory is the same right now files in include, we have GLAD/glad.h, so include GLAD
+
+96
+00:08:28,350 --> 00:08:43,416
+这个只是小写的，也就是glad/glad.h，这里的文件非常明确，还有KHR/khrplatform.h
+it's just low case glad/glad.h, whoops, I want to actually be quite explicit with the files here, khr include KHR/khrplatform.h
+
+97
+00:08:47,200 --> 00:08:50,675
+我的意思是，我很明显可以让它包含所有我们用Hazel做的东西
+I mean, I could just obviously have it include everything kind of like what we have with Hazel
+
+98
+00:08:51,550 --> 00:08:58,950
+但我确实想在这里明确一点，只是为了让大家更清楚glad.c
+but I do want to actually be explicit here, just so that a little bit more aware glad.c
+
+99
+00:09:00,333 --> 00:09:05,050
+因为我们应该只有三个文件，不管怎样，好了，那就是，那就是GLAD的三个文件
+because we should only have three files, anyway, okay, so those are, those are the three files the GLAD kind of has
+
+100
+00:09:06,366 --> 00:09:13,275
+我不认为这里有太多错误。不，看起来不错，这些东西，老实说，我真的不想要这些
+I don't think of many mistakes here no that looks good, this stuff, I don't really want any of this, to be honest
+
+101
+00:09:13,733 --> 00:09:18,500
+所以我不认为我们需要任何真正的miss deck runtime之类的东西
+so kind of I don't think we need any of this really miss deck runtime and stuff
+
+102
+00:09:19,300 --> 00:09:28,700
+我们需要，我不会做多线程，好吧，我会处理掉这个，这显然是最新的
+we will need, I'm not gonna do multi threaded, okay, I'll kind of get rid of this, and this should obviously be latest
+
+103
+00:09:29,425 --> 00:09:33,075
+我可能也应该GLFW改成那样，根本没有构建选项
+I probably should have to edit the GLFW to be that as well, no build options at all
+
+104
+00:09:33,366 --> 00:09:38,800
+最后我要做的是把这个包含目录添加到includedirs
+and the last thing I want to do is actually add this include directory to the includedirs
+
+105
+00:09:39,566 --> 00:09:47,300
+我们这里有，所以就是include，好了，那是我想做的一件事
+that we have here, so include, alright, and that is it one thing I want to do actually
+
+106
+00:09:47,300 --> 00:09:52,200
+因为我刚看了一下这个网站，意识到Glad并不都是大写的
+because I've kind of just looked at this website, and realized that Glad really isn't all in upper cases
+
+107
+00:09:52,300 --> 00:09:55,275
+也许我真的想让它变成小写的
+maybe I do actually want to make it more kind of lower case
+
+108
+00:09:56,100 --> 00:10:03,094
+如果我们回到我们的另一份premake文件，我可能把这个GLAD改成像那样的(Glad)
+so if we go back to our other premake file, I'll just maybe make this GLAD like that
+
+109
+00:10:04,000 --> 00:10:09,238
+并且可能还会更改文件夹名称，因为我认为它显然不代表任何东西
+and probably change the folder name as well, because I don't think it stands for anything apparently
+
+110
+00:10:10,466 --> 00:10:14,600
+或者至少网站暗示了那一点，但事实并非如此，所以我们会确保任何地方都会是Glad
+or at least the website implies that, it doesn't, so we'll kind of make sure that any places is Glad
+
+111
+00:10:14,733 --> 00:10:23,399
+这才是正确的写法，很好，如果我们转到目录，我不确定这是否会添加我们重命名
+it's in the correct way, good, and then if we go to disc, I'm not sure if this will add us rename
+
+112
+00:10:23,466 --> 00:10:30,525
+好了，它做得很好，只是因为在Windows中，目录名和文件名不区分大小写
+okay, it did good, just because in Windows of course directory names and file names are not case sensitive
+
+113
+00:10:30,966 --> 00:10:35,000
+好了，好了，那么一切都准备好了，应该可以了
+okay, cool, so there we go we've got everything here, this should just work
+
+114
+00:10:35,866 --> 00:10:40,575
+我们现在所能做的就是尝试和更新我们的产品，希望一切都能正常运行
+what we can do now is just try and regenerate our products, and hopefully everything will just work
+
+115
+00:10:40,800 --> 00:10:46,966
+所以没有从premake得到任何错误，如果重新加载它，会得到那个Glad，好吧，太棒了
+so we didn't get any error from premake, and if we reload it, we should get Glad here, okay, fantastic
+
+116
+00:10:46,966 --> 00:10:50,250
+然后除了这里有我们所有的文件，这是完美的
+and then apart from having all of our files here, which is perfect
+
+117
+00:10:50,750 --> 00:10:54,825
+我们还应该看到Hazel现在引用到了Glad，就是那样的
+we should also see that Hazel now references Glad, which it does
+
+118
+00:10:54,966 --> 00:10:58,666
+所以你们可以看到，这是我根据记忆制作的一个premake脚本
+so you can see, that was me kind of making a premake script pretty much from memory
+
+119
+00:10:58,666 --> 00:11:04,350
+我复制并粘贴了GLFW的，但你们可以看到premake是多么简单，我喜欢premakes
+and I did copy and paste the GLFW one, but you can see just how simple premake is, I love premakes
+
+120
+00:11:04,800 --> 00:11:08,600
+好了，让我们构建整个解决方案，看看会发生什么
+okay, let's build our whole solution and see what happens
+
+121
+00:11:10,650 --> 00:11:13,400
+但，好了，成功了，太棒了，那么一切都可以了
+and but, okay, one succeeded, fantastic, so everything's succeeded
+
+122
+00:11:13,566 --> 00:11:17,800
+所以现在我们真正需要做的就是初始化它，对吧
+so now all we really need to do to use Glad is initialize it, right
+
+123
+00:11:18,075 --> 00:11:23,470
+所以这里有一个函数，可以让我们实际加载一些东西
+so there is a function inside here, that lets us actually load something
+
+124
+00:11:26,200 --> 00:11:33,250
+好吧，那不是，我想是glLoad或其他什么，glLoad glLoader在那里
+okay, that's not, I think it's glad  glLoad or something, glad load glLoader there it is
+
+125
+00:11:33,400 --> 00:11:42,250
+好了，那么如果我们指定这个，我希望这个没有，我想我不记得这些东西的文档在哪里了
+okay, so this if we specify this, and I wish that this had not even, I don't think I remember where the documentation is for this stuff
+
+126
+00:11:43,675 --> 00:11:47,850
+看看Github，也许我们会看到如何使用它
+look at Github, maybe we'll see how to use it
+
+127
+00:11:49,375 --> 00:11:51,419
+无论如何，我知道如何使用它，因为我以前使用过它
+anyway, I know how to use it, because I've used it before
+
+128
+00:11:51,766 --> 00:11:58,825
+但本质上我们需要做的就是调用这个函数，使用我们拥有的加载类函数
+but essentially what we need to do is just call this function, with the load kind of function that we have
+
+129
+00:11:58,966 --> 00:12:07,197
+那将允许我们从那里加载dll文件或函数，所以要做到这一点，我将进入WindowsWindow
+that will allow us to load kind of dll files or functions from there, so to do that, I'm just going to go into WindowsWindow
+
+130
+00:12:08,175 --> 00:12:14,925
+然后在这儿，我们初始化GLFW，并创建OpenGL上下文
+and then over here is where we kind of initialize GLFW, and also create the OpenGL context
+
+131
+00:12:15,300 --> 00:12:21,425
+所以，一旦我们有了那个上下文，那就是我想实际使用Glad的地方
+so once we've kind of made that context, that's where I kind of want to actually do the Glad stuff
+
+132
+00:12:21,425 --> 00:12:23,599
+所以我们将调用gladLoadGLLoader
+so we'll do gladLoadGLLoader
+
+133
+00:12:23,966 --> 00:12:28,966
+首先，让我快速地包含Glad，所以它在包含部分
+and let me just quickly include Glad, first of all, so it's in the include part
+
+134
+00:12:28,966 --> 00:12:36,111
+所以我们只能看到glad/glad.h，就像那样，这里应该是小写的
+so we should just be able to see glad/glad.h like that, this can be lower case
+
+135
+00:12:38,500 --> 00:12:42,200
+然后gloadLoadGLLoader当然需要一个GLADloadproc
+and then gloadLoadGLLoader of course needs a GLADloadproc
+
+136
+00:12:42,450 --> 00:12:46,000
+然后我们要给它的函数实际上是glfw
+and then the function that we're going to give it is actually glfw
+
+137
+00:12:47,500 --> 00:12:53,025
+实际上就是glfwGetProcAddress，好了
+it's actually glfwGetProcAddress like that, okay
+
+138
+00:12:53,750 --> 00:12:57,333
+然后我们要做的就是，在这里对status做一个CORE_ASSERT
+and then all we'll do is, we'll do a CORE_ASSERT here on status
+
+139
+00:12:57,333 --> 00:13:07,325
+然后你们知道的，不能初始化Glad之类的，好了，酷
+and then you know fail to initialize Glad or something like that initialize, okay, cool
+
+140
+00:13:07,500 --> 00:13:12,877
+所以那应该是我们需要做的全部，我们要在这里打一个断点，然后按f5来运行这个代码
+so that should be pretty much all that we need to do, we're gonna put a break point here, and then hit f5 to run this code
+
+141
+00:13:13,666 --> 00:13:20,200
+错误OpenGL标头已包含，好的，很酷，所以移除这个包含Glad已经提供了它
+error OpenGL header already included, okay, cool, so remove this include Glad already provides it
+
+142
+00:13:20,200 --> 00:13:24,280
+所以我们两次包含OpenGL很不爽，让我们看看到底发生了什么
+so it's unhappy that we're including OpenGL twice, let's see what this is actually happening
+
+143
+00:13:24,566 --> 00:13:30,475
+所以这里包含了GLFW，我不知道为什么我们要这么做，因为我认为我们不需要它
+so here GLFW is included, I don't know why we did that, because I didn't think we need any of it
+
+144
+00:13:31,200 --> 00:13:41,525
+我想做的可能是最终做这样的事情，所以我们将在这里定义struct GLFWWindow，一起
+what I want to do is probably end up doing something like this, so we'll do struct GLFWWindow here, just together that
+
+145
+00:13:42,325 --> 00:13:50,350
+然后在Glad之后包含GLFW，它不会，可能有一种方法就是不包含gl.h
+and then include GLFW after Glad, it doesn't, there's probably a way to just not have it include gl.h
+
+146
+00:13:52,533 --> 00:13:56,225
+因为，是的，我相信你们也能说出来，因为这儿就有GLFW_INCLUDE_NONE
+and because, yeah I'm sure you can tell it not too, because there's GLFW_INCLUDE_NONE
+
+147
+00:13:56,466 --> 00:14:04,700
+所以我想也许我们应该这样做，所以在Hazel里面，是的，就是那个premake
+so I think that maybe we should just do that, so inside Hazel, and that's right, when it is and premake don't we
+
+148
+00:14:04,900 --> 00:14:15,200
+我们将回到Hazel，我们将回到premake，然后我们将在这里使用其中一个定义
+so we'll go back to Hazel, we'll go back to premake, and then one of the defines that we will use somewhere here
+
+149
+00:14:16,300 --> 00:14:22,375
+我们对系统Windows的定义在哪里，所以我不知道，如果我只想对Windows这样做
+where are our defines for system Windows, so I don't know, if I want to do this just for Windows
+
+150
+00:14:23,733 --> 00:14:28,903
+我现在在WindowsWindow，是的，我们把它放在这里，就是GLFW_INCLUDE_NONE
+my minutes in the WindowsWindow for now, yeah let's just put it here, we'll do a GLFW_INCLUDE_NONE
+
+151
+00:14:29,066 --> 00:14:36,075
+好了，那将不包含任何GLFW，它将不包含任何OpenGL头文件
+okay, and that just will not include any GLFW, it will not include any OpenGL headers
+
+152
+00:14:36,500 --> 00:14:43,375
+当你们包含GLFW，那就是想法，所以现在如果我们撤销这个，我们这儿就有了Glad
+when you include GLFW, that's the idea, so now if we undo this, and we have Glad here
+
+153
+00:14:43,700 --> 00:14:51,566
+我的意思是，尝试并构建这个，它应该可以运行，不，它不运行，好了，OpenGL头
+what I mean this, try and build this, it should work, no, it's not working, okay, OpenGL header, oh
+
+154
+00:14:51,600 --> 00:14:59,275
+当然我没有重新生成项目，所以让我们生成项目，重新加载这个，尝试编译那个
+well of course I didn't regenerate the projects, so let's generate the projects, reload this, try and compile that
+
+155
+00:15:01,533 --> 00:15:06,975
+好了，成功了，太棒了，现在我们有了断点，让我们点击f5
+and there you go, okay, succeeded fantastic, so now with our break point in place, let's hit f5
+
+156
+00:15:08,700 --> 00:15:15,850
+好吧，它对这些明确的调用不满意，因为我们需要包含这个glad/glad.h
+okay, it's not happy with these clear calls, because we're including this glad/glad.h
+
+157
+00:15:15,966 --> 00:15:21,050
+因为Glad现在已经了解了OpenGL定义的所有内容，所以看看是否还有其他错误，f5
+because glad now has all about OpenGL defines, let's see if we get any other errors nope five
+
+158
+00:15:22,200 --> 00:15:28,166
+这儿有个短点，status是1，好了，这显然意味着它成功了
+there is a break point, and status is one, okay, which obviously means, it succeeded
+
+159
+00:15:28,166 --> 00:15:32,175
+因为我们设置的是如果它不是零，我们设置的是它不是零
+because we're setting if it's not zero, we're setting that it's not zero
+
+160
+00:15:32,300 --> 00:15:37,600
+好了，太棒了，所以我们基本上可以看到，就那样，一切都完成了，换另一种快速检查下
+okay, fantastic, so we can basically see that, that's it, it's all done, another way to quickly check
+
+161
+00:15:38,533 --> 00:15:43,325
+可能有点像hockey，但如果我们尝试的话，我认为Window::Create()可以创建一切，对吧
+which is maybe a little bit hockey, but if we try, I think Window::Create should create everything, right
+
+162
+00:15:43,666 --> 00:15:58,500
+所以如果我们尝试调用glGenVertexArrays，很明显是有意义的，这里是unsigned
+so if we try and do something like glGenVertexArray is clearly something, that is clearly something, that is unsigned something 
+
+163
+00:15:58,500 --> 00:16:05,475
+那就是现代OpenGL，就这样，这个函数不应该为null，对吧
+that is modern OpenGL, then that's all, this function should not be null, right 
+
+164
+00:16:05,475 --> 00:16:10,775
+是的，它执行了，它给了我们一个有效的id，所以你们可以看到一切都成功了
+so yeah it executed, and it gave us a valid id, so you can see that everything worked successfully
+
+165
+00:16:11,333 --> 00:16:16,366
+好了，所以那就是我们的设置Glad方式，我不是不认为，我需要和你们一起看看变更
+alright, so that is how we set up glad, I'm not don't think, I need to go over the changes with you guys
+
+166
+00:16:16,366 --> 00:16:22,350
+这将被推送到Github上，你们可以像自己一样看看那些变更，但是是的，所以那就是Glad
+this will be pushed to Github, you can look at the changes like yourselves, but yeah so that is Glad
+
+167
+00:16:22,350 --> 00:16:28,500
+然后在下一期中，我们将能够使用Glad实现ImGui，也就是使用现代OpenGL
+and then in the next episode, we'll be able to use Glad to actually implement ImGui using modern OpenGL
+
+168
+00:16:28,733 --> 00:16:31,999
+好了，所以你们喜欢这期视频吗，如果喜欢的话，就为它点赞吧
+alright, so have you guys enjoyed this video, if you did, you can hit the like button
+
+169
+00:16:32,000 --> 00:16:36,099
+同时，非常感谢所有支持这一系列节目的赞助人
+also huge thank you to all the patron supporters that made this series possible
+
+170
+00:16:36,466 --> 00:16:38,933
+如果你们还没在patreon上支持这个系列的话，一定要去看看
+if you're not supporting the serie on patreon, definitely go check that out
+
+171
+00:16:38,933 --> 00:16:43,375
+非常感谢你们，像往常一样，你们会提前一周收到所有的视频
+huge thank you to you guys, as always you'll get all the episodes a week early
+
+172
+00:16:43,600 --> 00:16:47,573
+以及访问我的私有开发分支，我已经在那里做了很多这方面的工作
+as well as access to my kind of private development branch in which I've already done a lot of this work
+
+173
+00:16:47,800 --> 00:16:53,300
+所以你们可以看到未来的几个月，关于这个引擎的发展方向，你们就可以
+so you can kind of see months and months ahead, as to where this engine is going, and you can kind of
+
+174
+00:16:53,800 --> 00:16:57,625
+我的意思是，我在做这件事的时候，我也会
+I mean, I kind of as when I work on that I also kind of
+
+175
+00:16:58,050 --> 00:17:01,133
+你们知道，边提交边做，这样你们就能看到最小的变化
+you know, commit as I go, so you can see minimal changes
+
+176
+00:17:01,133 --> 00:17:05,300
+你们不需要这样，好吧，现在我有了这个完整的引擎，我不知道它是怎么运行的
+you don't need to be like, okay, now I've got this complete engine, and I don't know how it works
+
+177
+00:17:05,300 --> 00:17:08,725
+所以你们可以回顾之前的一些提交，看看它是如何发展的
+so you can kind of go back a few commits, and just see how it evolves as well
+
+178
+00:17:08,966 --> 00:17:13,075
+因为这种dev分支在很大程度上是本系列的发展方向
+because that kind of development branch is largely, where this series is going
+
+179
+00:17:13,075 --> 00:17:18,533
+我确实做了一些改变，比如这里和那里，但大多数情况下都是一样的
+I do make changes, like here and there, but mostly it's the same
+
+180
+00:17:18,533 --> 00:17:22,100
+如果你们有兴趣的话，一定要看看，好了，所以那就是Glad
+so if you're interested to, definitely check that out, okay, so that's Glad
+
+181
+00:17:24,066 --> 00:17:29,396
+这很简单，很容易设置，premake让这很容易，你们也可以看到，所以我很喜欢
+it's pretty straightforward, it's pretty easy to set up, premake makes this so fairly easy, as you can see as well, so I love that
+
+182
+00:17:29,933 --> 00:17:35,799
+在下一期中，我们将了解ImGui的基本实现
+in the next episode, we're gonna take a look at basically having a very basic implementation of ImGui
+
+183
+00:17:36,700 --> 00:17:39,000
+现在我们要添加ImGui子模块
+now the thing is we're gonna add ImGui submodule
+
+184
+00:17:39,000 --> 00:17:43,844
+很明显，我们要做所有这些事情，实际上我们要以他们的OpenGL实现为例
+and obviously do all of that stuff, and we're actually gonna take their example OpenGL implementation
+
+185
+00:17:44,333 --> 00:17:50,199
+从这里开始，如果我要引用他们的示例GLFW实现，我可能不会
+and go from there, and probably there, I'm not gonna, if I'm gonna reference their example GLFW implementation
+
+186
+00:17:50,199 --> 00:17:55,925
+但我不会一字不差地说，因为我想实际制作一个ImGui层，它包含所有那些东西
+but I'm not going to just take it word for word, because I want to actually make an ImGui layer, which has all of that stuff
+
+187
+00:17:55,925 --> 00:18:00,699
+基本上是因为我们真的不需要，你们知道，实现所有的GLFW初始化
+basically because we don't really need to, you know, do all of the GLFW initialization
+
+188
+00:18:00,700 --> 00:18:04,900
+那应该在窗口中显示出来，所以我们将在下一期的ImGui中进行Hack
+that should be uptracted in the window, so we're going to kind of hack in ImGui next episode
+
+189
+00:18:04,900 --> 00:18:10,550
+因为对于我们来说，现在就能够正确地进行渲染还为时过早，原因是我们目前没有渲染器
+because it's way too early for us to be able to do it properly, the reason is we don't have a renderer at the moment
+
+190
+00:18:10,550 --> 00:18:18,575
+好了，显然我们需要能够编译着色器，对吧，所以嗯，但我需要把ImGui配置好，跑起来
+okay, and obviously we need to be able to do things like compile shaders, right, so mmm, but I want to get ImGui up and running
+
+191
+00:18:18,575 --> 00:18:24,350
+因为我们可以很容易地做到这一点，即使我们要编写，我们也必须编写OpenGL代码
+because we'll be able to do that rather easily, even if we do like we will have to write, we will have to write OpenGL code
+
+192
+00:18:24,550 --> 00:18:28,550
+基本上我是这么说的，因为我们还没有渲染器，所以我分心了
+basically what I'm saying, because we don't have a renderer yet, so I'm distracted
+
+193
+00:18:28,800 --> 00:18:32,150
+但一旦我们有了渲染器，一旦它被抽象了
+but once we do have a Renderer, once that easy abstracted
+
+194
+00:18:32,566 --> 00:18:37,066
+将能够转换ImGui层和ImGui渲染器的代码
+will be able to convert that ImGui layer and that ImGui code that ImGui renderer
+
+195
+00:18:37,066 --> 00:18:41,250
+基本上是使用Hazel的接口，那将非常棒，因为它意味着
+essentially to use Hazel's api, and that'll be awesome, because it'll mean
+
+196
+00:18:41,250 --> 00:18:48,375
+首先，我们将有一种，我将为所有渲染接口提供渲染实现
+first of all, we'll have one kind of, I'm going rendering implementation for all rendering apis
+
+197
+00:18:48,375 --> 00:18:49,966
+就像我们有了DirectX和所有东西一样
+like once we have DirectX and everything
+
+198
+00:18:49,966 --> 00:19:00,075
+会很好的，但也会很好
+it'll just be just be great, but also, uh also it will be um, it'll kind of well in general just
+
+199
+00:19:00,366 --> 00:19:04,575
+它将只使用Hazel，因此只使用原始OpenGL调用，这是我们无论如何都不想做的
+it'll just use Hazel, and so just using raw OpenGL calls, which we which we don't want to do anyway
+
+200
+00:19:04,733 --> 00:19:10,866
+所以那将是下一期的计划，应该是快速而杂乱的，但我确实想放进去
+so that's gonna be the plan for the next episode, should be kind of quick and dirty, but I do want to get it in
+
+201
+00:19:10,866 --> 00:19:17,475
+因为当我们构建渲染器时，能够有一个UI，这将非常重要，那就是为什么我想先做这件事
+because when we are building our renderer, being able to have a UI, it's gonna be really important, that's why I kind of want to do this first
+
+202
+00:19:18,550 --> 00:19:21,379
+希望你们喜欢这期视频，下次见，拜
+ho hope you guys enjoyed this video, I'll see you in the next one, goodbye
+

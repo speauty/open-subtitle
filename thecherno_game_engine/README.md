@@ -23,3 +23,13 @@
 9. ##### 实现事件系统  [字幕](./subtitles/009.实现事件系统.srt)  [合成视频](https://www.bilibili.com/video/BV1WS4y1n7DS?share_source=copy_web)  [源视频](https://www.youtube.com/watch?v=meARMOmTLgE&list=PLlrATfBNZ98dC-V-N3m0Go4deliWHPFwT&index=9)
 
 10. ##### 预编译头  [字幕](./subtitles/010.预编译头.srt)  [合成视频](https://www.bilibili.com/video/BV1DB4y1i7o6?share_source=copy_web)  [源视频](https://www.youtube.com/watch?v=meARMOmTLgE&list=PLlrATfBNZ98dC-V-N3m0Go4deliWHPFwT&index=10)
+
+11. ##### Window抽象和GLFW  [字幕](./subtitles/011.Window抽象和GLFW.srt)  [合成视频](https://www.bilibili.com/video/BV1Ua411p789?share_source=copy_web)  [源视频](https://www.youtube.com/watch?v=meARMOmTLgE&list=PLlrATfBNZ98dC-V-N3m0Go4deliWHPFwT&index=11)
+
+12. ##### 窗口事件  [字幕](./subtitles/012.窗口事件.srt)  [合成视频](https://www.bilibili.com/video/BV1AN4y1u7kY?share_source=copy_web)  [源视频](https://www.youtube.com/watch?v=meARMOmTLgE&list=PLlrATfBNZ98dC-V-N3m0Go4deliWHPFwT&index=12)
+
+13. ##### 渲染层(Layers)  [字幕](./subtitles/013.Layers.srt)  [合成视频](https://www.bilibili.com/video/BV1PW4y1m7kD?share_source=copy_web)  [源视频](https://www.youtube.com/watch?v=meARMOmTLgE&list=PLlrATfBNZ98dC-V-N3m0Go4deliWHPFwT&index=13)
+
+14. ##### 现代OpenGL和Glad  [字幕](./subtitles/014.现代OpenGL和Glad.srt)  [合成视频](https://www.bilibili.com/video/BV1xr4y1j7bX?share_source=copy_web)  [源视频](https://www.youtube.com/watch?v=meARMOmTLgE&list=PLlrATfBNZ98dC-V-N3m0Go4deliWHPFwT&index=14)
+
+15. ##### 引入ImGui  [字幕](./subtitles/015.引入ImGui.srt)  [合成视频](https://www.bilibili.com/video/BV1DS4y1t7W5?share_source=copy_web)  [源视频](https://www.youtube.com/watch?v=meARMOmTLgE&list=PLlrATfBNZ98dC-V-N3m0Go4deliWHPFwT&index=15)

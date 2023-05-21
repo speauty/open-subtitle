@@ -1,0 +1,1590 @@
+﻿1
+00:00:00,100 --> 00:00:03,733
+嘿，大家好，我是TheCherno，欢迎回到我的游戏引擎系列
+hey, what's up guys my name is TheCherno, welcome back to my game engine series
+
+2
+00:00:03,733 --> 00:00:08,150
+那么上次我们讲了预编译头文件，如果你们还没看的话，一定要去看那个视频
+so last time we took a look at precompiled headers, definitely check out that video, if you haven't already
+
+3
+00:00:08,400 --> 00:00:13,800
+今天我们将最终创建一个窗口，这样就可以在窗口上随意添加东西
+and today we're gonna be finally creating a window, so that we can random stuff onto our window
+
+4
+00:00:13,966 --> 00:00:18,550
+所以我一直在思考，什么时候在整个游戏引擎系列中这么做
+so I was really contemplating, when to do this in this whole game engine series
+
+5
+00:00:18,550 --> 00:00:24,600
+因为我的意思是，从技术上讲，在我考虑添加一个窗口之前，我可能已经做了很多事情
+because I mean, technically speaking, I probably would have done a lot of stuff before I even considered adding a window
+
+6
+00:00:24,600 --> 00:00:27,700
+如果我只是以一名自我工程师的身份在自己的时间内制作游戏引擎
+if I was just making a game engine in my own time as kind of a self engineer
+
+7
+00:00:27,700 --> 00:00:31,366
+我会确保在我做窗口之前我已经做了很多东西
+I would make sure that I had a lot of stuff already done before I kind of just made the window
+
+8
+00:00:31,366 --> 00:00:36,800
+制作窗口和做所有这些图形的东西是很多人做的第一步
+making the window and kind of doing all of that graphic stuff is what a lot of people do as their first kind of steps
+
+9
+00:00:38,200 --> 00:00:43,195
+当你们学到更多，当你们更熟悉游戏引擎的类型
+as you kind of learn more though, and as you get more familiar with what kind of a game engine
+
+10
+00:00:43,375 --> 00:00:49,566
+游戏引擎实际上是怎样的架构，它看起来是什么样的，很明显，它不仅仅是一个窗口
+how a game engine is actually architectures, and what that looks like, it becomes apparent that, there's so much more than a window
+
+11
+00:00:49,566 --> 00:00:54,200
+同时添加一个窗口是有用的，因为你们可以，像渲染文本和显示调试信息
+and whilst adding a window is useful, because you can, like render text and display debug information
+
+12
+00:00:54,200 --> 00:00:57,933
+可视化在你们的游戏引擎中运行的东西
+and visualize things actually working in your game engine
+
+13
+00:00:58,500 --> 00:01:02,447
+事实上，你们知道的，游戏通常会渲染图像，那很重要
+as well as the fact that you know, games typically render graphics, and that's kind of important
+
+14
+00:01:02,733 --> 00:01:06,966
+一旦你们把那个放在一边，游戏引擎实际上还有很多东西
+once you kind of, if you put that aside, there's actually a lot of stuff to a game engine
+
+15
+00:01:06,966 --> 00:01:13,866
+比如事件系统，比如应用系统，比如层栈系统，比如输入管理器
+like the event system, like the application system, like a layer stack system, like I don't know, input managers
+
+16
+00:01:13,866 --> 00:01:19,675
+所有这些实际上已经，实际上必须要做的事情，可能在你们有一个窗口之前很久
+all of that stuff that actually have, that actually has to be done, potentially long before you have a window
+
+17
+00:01:19,675 --> 00:01:23,050
+所以我决定现在就创建一个窗口
+so I've kind of made this decision to actually make a window now though
+
+18
+00:01:23,333 --> 00:01:27,966
+因为我觉得很多人可能开始失去兴趣了，而我不得不
+because I feel like a lot of people are beginning to maybe lose a bit of interest, and I have to kind of
+
+19
+00:01:27,966 --> 00:01:35,066
+在整个游戏引擎系列中，我必须记住我不只是一个制作游戏引擎的软件工程师
+in this whole game engine series, I have to actually remember that I'm not just a software engineer building a game engine
+
+20
+00:01:35,066 --> 00:01:41,666
+实际上我也在尝试教学，也在尝试一些娱乐，这样人们就会真正喜欢这些视频
+I'm actually also trying to teach, and also trying to be somewhat entertaining, so that people are actually enjoying these videos
+
+21
+00:01:41,666 --> 00:01:47,050
+所以正因为如此，我做出了一些妥协，我们在同伴闲聊中谈了很多这个问题
+and so because of that, there are kind of compromises that I make, and we talked a lot about this during the partner hang out
+
+22
+00:01:47,050 --> 00:01:50,866
+顺便说一下，如果你们还不知道，可以在patreon.com/thecherno上支持我
+by the way, if you guys aren't aware, you can support me on p patreon.com/thecherno
+
+23
+00:01:50,866 --> 00:01:57,175
+如果达到了一定的等级，你们就会被邀请参加我们每月一次的伙伴聚会
+and if you pledge a certain tier, you actually get invited to a partner hangout that we have once a month
+
+24
+00:01:57,175 --> 00:02:02,999
+我们可以和其他合作伙伴进行视频聊天，合作伙伴是我的patreon上的赞助人支持
+where we actually just have a video chat with all the other partners, partner is a tier of patreon support on my patreon
+
+25
+00:02:03,900 --> 00:02:06,850
+我们实际上在讨论这个领域的发展方向，以及如何做事情
+we actually have a discussion about where this area is going, and how to do things
+
+26
+00:02:06,850 --> 00:02:10,400
+我想这实际上是在去年11月的时候发生的
+and this actually came out I think at the last month partner hang out in november
+
+27
+00:02:10,400 --> 00:02:16,066
+所以如果你们感兴趣的话，一定要去看看，但我必须做出让步
+so definitely check that out, if you're interested, but I have to make compromises
+
+28
+00:02:16,066 --> 00:02:20,975
+因为我必须在娱乐教育和软件工程之间做出妥协
+because I have to compromise between entertainment education and soft engineering
+
+29
+00:02:21,250 --> 00:02:24,599
+但无论如何，我现在决定创建一个窗口，我认为现在是一个好时机
+but anyway, I've decided to make a window kind of now, I think now is a good point
+
+30
+00:02:24,600 --> 00:02:31,099
+我们至少有日志和事件，在我看来，这些东西就像一个桅杆，在你们创建一个窗口之前
+we at least have logging and we have events, that stuff is like a mast in my opinion before you make a window
+
+31
+00:02:31,100 --> 00:02:34,975
+因为我的意思是，这并不重要，你们可以先创建你们的窗口，然后再创建其他系统
+because I mean, it doesn't really matter, you can make your window first, and then make the other systems
+
+32
+00:02:34,975 --> 00:02:39,175
+但它们是相辅相成的，你们需要日志记录，因为需要看到发生了什么，如果事情出错了
+but they go hand in hand, you need logging, because you need to see what's happening, if things go wrong
+
+33
+00:02:40,100 --> 00:02:46,500
+当你们在写Window类的时候，能插入日志，像断言之类的东西是很好的
+and as you're kind of writing your Window class, it's nice to be able to insert logging, and like assertions and stuff
+
+34
+00:02:46,500 --> 00:02:54,690
+实际上，我们今天也讨论了断言，但是还需要事件，因为窗口与事件绑定得非常紧密
+we actually talk about assertions closely today as well, but you also want events, because a window is very tiredly tied with events
+
+35
+00:02:54,775 --> 00:02:59,800
+我们今天会看一下如何以抽象的方式实现Window类
+and we're just going to take a look at actually implementing kind of a Window class today in an abstract way
+
+36
+00:02:59,800 --> 00:03:06,875
+记住，我们想要支持多个平台，而窗口在其他平台上的实现会有所不同
+because remember, we want to support multiple platforms, and the implementation of windows on those other platforms will actually kind of differ
+
+37
+00:03:07,175 --> 00:03:13,550
+所以我们想要一个窗口的抽象表示，这是我们今天会讲到的，然后还有事件之类的东西
+so we want an abstract presentation of a Window, which we'll talk about today, and then also stuff like events
+
+38
+00:03:13,550 --> 00:03:18,750
+我想我们会在下一集讲到，我们可以把窗口系统连接到所有的事件
+I think we'll cover in the next episode, we can actually hook up our window system to all of our events
+
+39
+00:03:19,266 --> 00:03:24,733
+让那个正确地运行，让我们谈谈技术，他们想要使用一点
+and just have that kind of work correctly, let's talk about the technology, they want to use a little bit
+
+40
+00:03:24,733 --> 00:03:28,650
+所以我将使用一个叫做GLFW的库，我有一个OpenGL系列
+so I'm going to use a library called GLFW, I have an OpenGL series
+
+41
+00:03:28,650 --> 00:03:32,466
+我有一个关于GLFW的视频，这可能会比今天的视频中更详细
+and I have a video about GLFW, which will probably be more detailed in today's video
+
+42
+00:03:32,466 --> 00:03:38,266
+我想假设你们知道如何使用它，GLFW是一个非常非常简单的跨平台
+I want to assume that you guys kind of know how to use that, GLFW is a very very simple kind of cross platform
+
+43
+00:03:39,966 --> 00:03:43,666
+跨平台意味着，像Windows, MacOS，我认为他们可能也支持其他平台
+cross platform meaning, like Windows, MacOS, I think they support maybe other platforms as well
+
+44
+00:03:43,800 --> 00:03:50,400
+但这是创建窗口的简单方法，使用相关平台接口创建窗口
+but it's just a really easy way to kind of create a window, a window using your relevant platform api
+
+45
+00:03:50,666 --> 00:03:56,300
+我真的不想花太多时间来使用Win32API来创建一个窗口
+I don't really want to take too much time to actually use the Win32API to create a window
+
+46
+00:03:56,933 --> 00:04:03,400
+只是因为这不是这个系列的真正内容，我们我们最终可能不得不这样做
+just because not what this series is really about, we we might eventually have to
+
+47
+00:04:03,400 --> 00:04:08,575
+因为你们知道的，例如GLFW实际上并不支持DirectX，对吧
+because you know, GLFW, for example doesn't actually support DirectX, right
+
+48
+00:04:08,766 --> 00:04:11,975
+在某些时候，我们可能希望在Hazel中支持DirectX
+we probably want to support DirectX in Hazel at some point
+
+49
+00:04:11,975 --> 00:04:14,799
+因为那是我在Windows上首选的渲染接口
+because that's my preferred rendering platform on Windows
+
+50
+00:04:14,800 --> 00:04:20,333
+它应该是每个人在Windows上首选的渲染接口，因为它是微软为Windows开发的
+and it should be everyone's preferred rendering api on Windows, because it's made by Microsoft for Windows
+
+51
+00:04:20,333 --> 00:04:24,250
+所以显然，当你们在Windows上运行时，它会比其他接口更好
+so obviously, it's going to be better than any other api, when you're running on Windows
+
+52
+00:04:25,900 --> 00:04:29,333
+话虽如此，我还是想让一些东西运行起来
+that being said, I do want to get something up and running
+
+53
+00:04:29,333 --> 00:04:31,966
+我想我提到过，我们会在一开始坚持使用OpenGL
+and I think I mentioned that, we're gonna stick to OpenGL in the beginning
+
+54
+00:04:31,966 --> 00:04:37,533
+这样我们就能尽快得到东西，因此我们陷入了两难境地
+just so that we can get stuff as quickly as possible, so because of that we have kind of a dilemma
+
+55
+00:04:37,533 --> 00:04:42,500
+所以我现在不想浪费时间写Win32API，但将来我们可能不得不写
+so I don't want to waste time now writing Win32API, but we might have to in the future
+
+56
+00:04:42,800 --> 00:04:45,750
+还有GLFW，它可以在多个平台上使用
+and also GLFW something that's available on multiple platforms
+
+57
+00:04:46,100 --> 00:04:49,650
+所以我们马上就会想到，抽象在哪里
+so immediately we kind of have to think about, well where does the abstraction lie
+
+58
+00:04:50,600 --> 00:04:54,850
+我选择做的是为每个平台实现一个Window类
+what I've chosen to do is to implement a Window class per platform
+
+59
+00:04:55,400 --> 00:04:58,075
+现在你们可能会想，等一下，如果使用GLFW
+now you might be like well hang on,  if you're using GLFW
+
+60
+00:04:58,075 --> 00:05:01,250
+在Windows, Mac和Linux上的实现不是很大程度上是一样的吗
+isn't the implementation going to be largely the same on Windows, Mac and Linux
+
+61
+00:05:01,600 --> 00:05:07,599
+是的，一开始可能是这样的，或者是相似的，可能有一些细微的不同
+well yes initially it probably will be, or it will be similar, maybe there's some slight differences
+
+62
+00:05:07,600 --> 00:05:12,800
+一些我们可能想添加的东西，比如只在Windows上，或者可能在其他平台上有所不同
+some stuff that we might wanna add, that's on Windows only for example, or that might differ on other platforms
+
+63
+00:05:12,975 --> 00:05:20,850
+但GLFW当然是一样的，因为作为GLFW，它是抽象到其他类型的平台
+but GLFW, guys of course it's going to be the same, because as a glfw, is that abstraction away into the other kind of platforms
+
+64
+00:05:21,800 --> 00:05:25,896
+所以我仍然会为每个平台创建一个单独的Window类
+so I'm still going to make a separate Window class per platform
+
+65
+00:05:26,100 --> 00:05:30,800
+然而，我想这是我们第一次把东西抽象出来，我们也会讲到那个
+however, and I think this is the first time we're actually abstracting stuff, so we'll talk about that as well
+
+66
+00:05:31,466 --> 00:05:35,562
+但是在未来，我们可能会，就像你们知道的，在Windows上的GLFW，我将放弃它
+however in the future, we might be, like you know, GLFW on Windows, I'm dropping that
+
+67
+00:05:35,700 --> 00:05:41,766
+因为我们将要切换到使用Win32API，因为需要创建一个DirectX上下文等等
+because we're actually going to switch to using Win32API, because we need to make a DirectX contents and all of that
+
+68
+00:05:41,766 --> 00:05:44,000
+我的意思是，我们可以修改GLFW来实现这一点
+I mean we could modify GLFW potentially to do that
+
+69
+00:05:44,150 --> 00:05:47,975
+或者我们可以只获得所需的Win32，像hz_window_handles之类的东西
+or we could just get the required Win32, like hz_window_handles, and stuff like that
+
+70
+00:05:48,733 --> 00:05:55,550
+和设备句柄一样，设备上下文处理GLFW，它用来创建窗口
+and like the device handles, the device context handles from GLFW, which it uses to create the windows
+
+71
+00:05:55,800 --> 00:06:00,466
+使用Win32API创建窗口，不论如何，然后从那里，我们将有我们的必要的句柄
+Window using the Win32API anyway, and then from there, we would have our necessary handles
+
+72
+00:06:00,466 --> 00:06:06,000
+我们需要创建一个DirectX上下文，但我还没有决定，但重点是肯定会有一个重点
+that we need to actually create a DirectX context, but I haven't decided yet, but the point is there's definitely gonna be a point
+
+73
+00:06:06,300 --> 00:06:11,566
+但我们只做窗口的创建代码之类的东西，对吧
+but we do Windows only Windows creation code and all that stuff, right
+
+74
+00:06:11,666 --> 00:06:14,150
+所以我们肯定想要一个Windows类型的窗口
+so we definitely want a Windows kind of window
+
+75
+00:06:14,150 --> 00:06:17,699
+即使我们使用的是GLFW，希望跨平台，希望这是有意义的
+even though we're using GLFW, wishes cross platforms, hopefully that makes sense
+
+76
+00:06:18,400 --> 00:06:25,250
+我还修改了，我还把GLFW分支拷贝到我自己的私人报告到我自己的github仓库
+um I've also modified, I've also forked GLFW into my own private report into my own github repository 
+
+77
+00:06:25,250 --> 00:06:30,350
+它是公共的，只是cherno，它是github.com/TheCherno/glfw，我们马上就会使用它
+it's public, it's just TheCherno, it's github.com/TheCherno/glfw, will use it here in a minute
+
+78
+00:06:30,933 --> 00:06:35,175
+我刚刚添加了premake，一个非常快速的premake文件，目前只在Windows上运行
+I've just added premake to it, just a really quick premake file, that only works on Windows for now
+
+79
+00:06:36,566 --> 00:06:39,299
+我可能会在未来更新它以支持更多的平台
+I'll probably update that in the future to support more platforms as well
+
+80
+00:06:39,900 --> 00:06:44,166
+但有一个简单的方法来整合GLFW与我们的premake，同时有GLFW
+but there's just an easy way to integrate GLFW with our premake build whilst having GLFW
+
+81
+00:06:44,466 --> 00:06:49,099
+我们visual studio解决方案中的所有源代码，然后链接到项目中
+all the source code in our visual studio solution and all of that, and then just link it kind of project
+
+82
+00:06:49,100 --> 00:06:54,225
+为什么，这也是我所做的，我想我们可以谈谈
+why so that's what I've done as well, and I think we can probably talk about
+
+83
+00:06:54,933 --> 00:06:59,966
+关于抽象平台的概念以及它的原理，我可能会专门做一个视频来介绍
+just the notion of platform abstraction and how that works, I'll probably make a video dedicated to that
+
+84
+00:06:59,966 --> 00:07:02,733
+因为今天我只想得到一个窗口，如果我开始谈论这个
+because today I just want to get a window up and running, and if I start talking about this
+
+85
+00:07:02,733 --> 00:07:07,966
+它最终会占据整集，但本质上我做的是创建了一个平台文件夹
+it's going to end up taking up the whole episode, but essentially what I've done is I made a platform folder
+
+86
+00:07:08,133 --> 00:07:10,800
+这是针对特定平台的代码
+which is for platform specific code
+
+87
+00:07:11,275 --> 00:07:15,025
+然后我创建了一个Windows文件夹，这是针对Windows代码的，对吧
+and then I've made a Windows folder, which is for Windows code, right
+
+88
+00:07:15,700 --> 00:07:19,300
+我们最终也会有一个Mac和Linux文件夹
+we'll also have eventually a Mac and Linux folder
+
+89
+00:07:19,300 --> 00:07:22,500
+也许如果我们支持移动平台，Android iOS之类的东西
+and maybe if we support mobile platforms, Android iOS that kind of stuff
+
+90
+00:07:22,800 --> 00:07:29,200
+在平台文件夹中，我们也将放置渲染接口特定代码，如OpenGL, DirectX, Valkan, Metal
+and in the platform folder, we'll also lie our rendering api specific codes, such as OpenGL, DirectX, Valkan, Metal
+
+91
+00:07:29,400 --> 00:07:34,266
+这些东西也会有自己的文件夹，我们甚至会有一个正面文件夹
+that kind of stuff will also have its own folder there, we might even have a positive folder
+
+92
+00:07:34,266 --> 00:07:40,152
+这只是一种Mac分析相关和Android相关的代码，如果它们最终是相同的
+that's just kind of Mac analytics related and Android related code, if it ends up being the same
+
+93
+00:07:41,100 --> 00:07:44,200
+但那就是你们需要知道的关于平台抽象的全部内容
+but that's kind of the idea, that's all you need to know about platform abstraction
+
+94
+00:07:44,200 --> 00:07:50,166
+现在，让我们继续添加我已经fork为子模块的GLFW存储库
+now let's go ahead and add the GLFW repository that I've forked as a submodule now
+
+95
+00:07:50,166 --> 00:07:55,756
+这样我们就可以把它放到我们的项目中，好了，我这里有，你们可以看到
+so that we can actually get it into our project, okay, so what I have here is, as you can see
+
+96
+00:07:56,366 --> 00:08:01,450
+TheCherno/GLFW，我想我刚刚把它从GLFW中分出来
+TheCherno/GLFW, I've just forked it from GLFW a while ago I think
+
+97
+00:08:02,900 --> 00:08:05,975
+因为你们可以看到，它落后master分支有11个提交
+because you can see, it's 11 commits behind master
+
+98
+00:08:06,333 --> 00:08:09,599
+但它只是拷贝GLFW的master分支，然后我所做的就是添加了这个
+but it's just fork from GLFW master, and then what all I've done is I've added this
+
+99
+00:08:09,600 --> 00:08:12,733
+这实际上是28天前，哇哦，4周前，我加了这个premake脚本
+this is actually 28 days ago, wow four weeks ago, I added this premake
+
+100
+00:08:12,733 --> 00:08:18,975
+所以你们可以看到，赞助人可以访问的Hazel dev分支的距离有多远
+so you can see, how much, how far aheaf the Hazel dev repository is which patrons get access to
+
+101
+00:08:19,600 --> 00:08:26,025
+因为这是我四周前做的，但无论如何，这个premake5.lua文件很简单，对吧
+because I did this actually like four weeks ago, but anyway, this premake5.lua file very simple, right
+
+102
+00:08:26,025 --> 00:08:30,500
+它有45行代码，所有这些都是为Windows做的
+it's 45 lines of code, all this does is just for Windows essentially for now
+
+103
+00:08:31,500 --> 00:08:37,966
+我认为意图有点错误，但无论如何，这个东西甚至不能运行，这需要更新到最新
+intentation I think is a bit wrong, but anyway, this stuff doesn't even work, and this needs to be updated to latest
+
+104
+00:08:37,966 --> 00:08:41,566
+有一些事情需要做，实际上我认为，我以为我推送了，但我没有
+and there's a few things that need to be done, actually I thought, I thought I pushed that, but I didn't
+
+105
+00:08:42,366 --> 00:08:48,999
+这个？很糟糕，但无论如何，你们可以看到，在Windows过滤中，包含了所有相关文件
+so yeah the invitation is horrible, but anyway, you can see it includes all the relevant files here on the filter windows
+
+106
+00:08:49,000 --> 00:08:54,050
+这些都是平台无关的平台独立文件，这些是Windows专用文件
+these are all the platform agnostic kind of platform independent files, these are the Windows only files
+
+107
+00:08:54,933 --> 00:09:00,175
+然后它也有定义，所有这些东西都很简单，什么都没有
+and then it's got defines as well, and all that stuff really simple, stuff nothing really to it
+
+108
+00:09:00,966 --> 00:09:05,675
+我们将把它克隆为一个子模块，因为它包括我们的premake文件以及所有的GLFW
+we're going to clone this as a sub module, because this includes our premake file as well as all of GLFW
+
+109
+00:09:06,025 --> 00:09:10,700
+所以我想在c:\dev\Hazel使用命令提示符，这是仓库的路径
+so I want to command prompt in c:\dev\Hazel, which is our kind of repository route
+
+110
+00:09:11,066 --> 00:09:16,675
+也就是git submodule add，然后添加glfw子模块
+I'm just going to say, I've been git submodule add, I'm going to add this glfw submodule
+
+111
+00:09:17,066 --> 00:09:28,600
+并且把它添加到Hazel/vendor/GLFW，好了，它会把整个仓库克隆到那个目录中
+and I want to add to Hazel/vendor/GLFW, okay, and it's going to clone this whole repository into that directory
+
+112
+00:09:28,925 --> 00:09:34,866
+然后如果我们启动这个，我们应该看到在vendor里面，现在有GLFW，对吧
+and then if we kind of boot this up, we should see inside vendor, we now have GLFW, okay
+
+113
+00:09:34,866 --> 00:09:43,266
+里面有我们版本的GLFW和premake，所以现在要做的是添加一个我们自己的premake
+and that has our version of GLFW along with that premake file, so now what we want to do is actually add a to our premake file
+
+114
+00:09:43,266 --> 00:09:47,475
+我已经做过了，所以我要给你们展示一下不同之处，实际上我们只做一个git
+and I've already done that, so I will just show you the differences, in fact we'll just do a git
+
+115
+00:09:49,000 --> 00:09:54,966
+就是git difftool --dir，好了，这就是全部内容，让我们看看premake文件文件
+we'll do a difftool dir, okay, so this is all of it, let's look at the premake file file
+
+116
+00:09:54,966 --> 00:10:00,050
+所以这就是我对premake文件所做的，实际上最终创建了一个结构，一个较低的表
+so this is what I've done to the premake file, I actually ended up creating basically a struct, a lower table
+
+117
+00:10:00,800 --> 00:10:04,400
+这将是一个包含目录的列表，那些不是我们的
+which is going to be a list of include directories that we have, that aren't ours
+
+118
+00:10:04,400 --> 00:10:09,950
+现在这些都很重要，因为我们想要在Hazel中有GLFW include目录
+now these are important, because we want to obviously have GLFW include directory, you know, in Hazel
+
+119
+00:10:09,950 --> 00:10:17,000
+这样我们就可以使用glfw/glfw.h，它必须包含，所以我设置了一个编译器包含目录
+so that we can just use glfw/glfw.h, which will have to include, so I'm setting a compiler include directory
+
+120
+00:10:17,000 --> 00:10:20,933
+但我只是把它放到了它自己的结构中放到了它自己的表中，因为它会增长
+but I've just put it into its own kind of struct here into its own table, because this will grow
+
+121
+00:10:20,933 --> 00:10:22,650
+显然要包含每个依赖项
+obviously to include each dependency
+
+122
+00:10:24,025 --> 00:10:30,565
+至于这里这个include，实际上包含我们的premake文件，那么也就是这个premake
+this include here, actually includes that premake file that we have, so this premake file
+
+123
+00:10:32,200 --> 00:10:38,200
+你们知道，我们刚刚看了这个，这个目录是Hazel/vendor/GLFW，好了，包含这个
+you know, we just looked at this, this directory is Hazel/vendor/GLFW, okay, I'm including this 
+
+124
+00:10:38,550 --> 00:10:46,575
+它的作用是将premake5文件包含到这里，所以基本上这就像一个cpp风格的包含
+which what this will do is include that premake5 file into here, so basically this is almost like a cpp style include where this
+
+125
+00:10:47,066 --> 00:10:55,900
+如果我们在VS中看看这个，这个会被复制并粘贴到我们的premake5文件中，对吧
+if we look at this in Visual Studio, this kind of gets copied and pasted into our premake5 file, right
+
+126
+00:10:55,900 --> 00:11:00,533
+所以在我们的premake文件中，我们现在有另一个项目叫做GLFW，你们可以看到
+so inside our premake file, we now have another project called GLFW, you can see
+
+127
+00:11:00,533 --> 00:11:05,925
+它没有工作空间或类似的东西，它没有工作空间GLFW，它没有解决方案
+this does not have workspace or anything like that, it doesn't have workspace GLFW, it doesn't have a solution 
+
+128
+00:11:05,925 --> 00:11:13,625
+它只是一个项目，只是一个附加项目，它作为静态库输出编译到相同的目录中
+it's just a project, just an additional project, which compiles as a static library outputs into the same directory
+
+129
+00:11:14,266 --> 00:11:19,050
+它只包含一些文件，好了，就是那样，我们刚刚添加的另一个项目
+and it just includes a bunch of files, okay, that's all it is, we've just added another project
+
+130
+00:11:19,566 --> 00:11:26,366
+重要的是，一旦我们有了这个项目，我们就会把它直接链接到我们的Hazel项目上
+and then the important thing is once we have that project, we're actually going to link it right to our Hazel project
+
+131
+00:11:26,366 --> 00:11:31,766
+所以Hazel现在依赖于GLFW，Hazel是一个共享库，这意味着它是一个dll文件
+so Hazel is now dependent on GLFW, Hazel is a shared library, meaning it's a dll file
+
+132
+00:11:31,766 --> 00:11:36,800
+当然，我们可以只包含一个静态库，或者链接一个静态库
+so of course we can just include a static library into it, right, or link rather a static library into it
+
+133
+00:11:37,333 --> 00:11:42,725
+我们需要修复别人的一个缩进，我不知道，那么糟糕的是，当你们不知道会发生什么
+we need to fix others in an indentation, I did not know, so bad this is, what happens when you don't
+
+134
+00:11:43,100 --> 00:11:47,450
+让我们来看看这个，我们去查看，这个在哪里
+let's look at this for a minute, and let's go to view, and where is this
+
+135
+00:11:47,933 --> 00:11:54,399
+我认为这是一个没有高级编辑和空白的视图，这样我们就能看到到底发生了什么
+I think it's a view no edit advanced and view white space, just so we can see what on earth is going on
+
+136
+00:11:54,400 --> 00:12:00,250
+你可以看到，这是制表符，这是空格，这就是为什么它很乱，所以我要把这些都转换成空格
+so you can see, this is tabs, and this is spaces, that's why it's messing up, so I'm just going to convert all of this to spaces
+
+137
+00:12:01,775 --> 00:12:09,275
+这应该会让一切变得更好，因为很明显，在这个文件中使用空格的地方
+and this should make everything a lot better, because clearly where mostly using spaces in this file
+
+138
+00:12:09,275 --> 00:12:12,533
+我认为这也是一个标签
+I think that's no this is a tab as well
+
+139
+00:12:13,900 --> 00:12:24,275
+好了，这个东西也是，它很有用，如果你们想像这样解决问题
+okay, and so is this stuff, so it's quite useful, if you want to fix stuff up like this
+
+140
+00:12:25,533 --> 00:12:31,333
+好了，我们可以删掉这个，很好，现在如果我们刷新这个，一切应该会更好
+okay, we can get rid of that, okay, brilliant, so now if we refresh this, everything should be better
+
+141
+00:12:31,666 --> 00:12:39,775
+它不在那里，这是在困难上，它出于某种原因是临时的，让我们重新运行difftool
+it's not there, this is on difficult, it's made a temporary for some reason, so let's just rerun difftool
+
+142
+00:12:41,150 --> 00:12:50,175
+我们应该看到，这是完美的，但显然不是，这是正确的文件，我认为是GLFW，哎呀
+and we should see, this is now perfect, but it's clearly not, it's just the right file, I think GLFW, whoops
+
+143
+00:12:50,700 --> 00:12:58,999
+好吧，我们来解决GLFW的问题，我们也来解决我们的问题，因为这显然是一团糟
+okay, so we fix the GLFW one, let's fix our one as well, because this is apparently a mess
+
+144
+00:12:59,000 --> 00:13:03,350
+哦，哇，这是标签，我看到了，这是旧标签
+oh wow, so this is mercily tabs, I see, about this is old tabs
+
+145
+00:13:07,533 --> 00:13:12,342
+好吧，这是空格，我们需要使用制表符或空格，不要同时使用两个
+okay, this is spaces though, wow okay, we need to really stick to tabs or spaces, and not use both
+
+146
+00:13:13,533 --> 00:13:20,050
+因为这有点拖后腿，无论如何，我认为这应该很好，我们现在到处都有标签
+because this is a bit of a drag, anyway, I think that should be good, we've got tabs everywhere now
+
+147
+00:13:21,400 --> 00:13:27,200
+好了，那么已经修复了那个，所以我们需要重新启动，因为它在临时目录中
+okay, so does that fix it, so we have to restart this again, because it is in a temporary directory
+
+148
+00:13:27,766 --> 00:13:34,499
+好了，很好，现在好了，那么回到这里，我们把GLFW连接起来
+and there we go, good, it's good now, okay, so back to this, so we're linking GLFW
+
+149
+00:13:34,500 --> 00:13:36,676
+就是我们刚刚提到的那个项目，对吧
+which is that project that we've just included, okay
+
+150
+00:13:37,000 --> 00:13:40,842
+这个IncludeDir只需要添加为编译器的包含目录，这就是我们在这里所做的
+now this IncludeDir just needs to get added as a compiler include directory, which is what we've done here
+
+151
+00:13:41,066 --> 00:13:46,099
+现在包含目录，我们的包含目录，我们添加了%\{IncludeDir.GLF\}
+now included directories, and our include directories, we've added include directory GLFW
+
+152
+00:13:46,166 --> 00:13:50,575
+这意味着，Hazel/vendor/GLFW/include现在是一个编译器包含目录
+which means that, Hazel/vendor/GLFW/include is now a compiler include directory
+
+153
+00:13:50,575 --> 00:13:52,700
+好了，那就是我所做的所有更改
+okay, and that's all the changes that I've made
+
+154
+00:13:52,900 --> 00:13:57,325
+所以要包含那个premake文件，然后设置包含目录和链接
+so literally include that premake file, and then just set the include directory and the link
+
+155
+00:13:57,666 --> 00:14:02,300
+我们还链接openl32.lib，因为我们需要那个，那就是我所做的，好了
+we're also linking openl32.lib, because we need that, that's all that I've done, okay
+
+156
+00:14:02,600 --> 00:14:07,699
+现在让我们看看我添加的一些新文件实际上，首先让我们运行premake
+now let's take a look at some of the new files that I've added actually, well first thing let's just run premake
+
+157
+00:14:07,700 --> 00:14:13,800
+因为我还没有运行premake，我们会执行GenerateProject，然后希望我们会做所有这些
+because I haven't even ran premake yet, so we'll do GenerateProject, and then hopefully we'll do all that
+
+158
+00:14:13,800 --> 00:14:19,175
+你们可以看到，它生成了GLFW项目，如果我们回到VS重载，它就是解决方案
+you can see, it's generate that GLFW project, if we go back to visual studio reload, it's the solution
+
+159
+00:14:19,666 --> 00:14:26,866
+我们应该在这里看到GLFW，你们应该看到Hazel实际上引用了GLFW，好了，漂亮
+we should see GLFW here, and you should see that Hazel actually references GLFW, okay, beautiful
+
+160
+00:14:27,666 --> 00:14:33,733
+让我们试着在调试x64中编译它，希望这能成功编译，我还没有这么做
+let's try and compile that in debug x64, hopefully this compils successfully, I haven't actually done this
+
+161
+00:14:33,733 --> 00:14:37,099
+好吧，有一些未知的选择，我会在GLFW里把它清理掉
+okay, so there's some unknown options, I'll clean that up in the GLFW thing
+
+162
+00:14:37,100 --> 00:14:41,399
+我不知道，这只是尝试使用c11，这不是用于VS编译的
+I don't know, this is just trying to use c11 brothers here, this is not for visual studio compiler
+
+163
+00:14:41,400 --> 00:14:49,050
+因为它在链接上的方式，这或多或少，可能clang或GCC都可能接受这个
+because of the way that it's on linking, this is more or less for, probably clang or gcc would probably both accept this
+
+164
+00:14:49,566 --> 00:14:54,825
+但很明显，MSVC编译器中的命令行参数有不同的语法
+but obviously there's a different syntax for command line arguments in the MSVC compiler
+
+165
+00:14:54,933 --> 00:15:00,599
+不管怎样，一个的成功就是忽略这些，那很好，我们现在已经构建了GLFW
+anyway, one succeeded is just ignoring those, that was fine, and we've now built GLFW
+
+166
+00:15:00,600 --> 00:15:06,125
+你们可以看到，这是多么简单，所以我喜欢premake，因为它很好，很容易使用，好了
+you can see, how easy that was, so I love premake, because it's so nice and easy to use, okay
+
+167
+00:15:06,375 --> 00:15:13,166
+那么下一步，让我们看一下我创建的一些Window类，在Hazel中，就在Hazel中
+so next step, let's take a look at some of the Window classes that I've made, so inside Hazel, just inside Hazel
+
+168
+00:15:13,166 --> 00:15:18,823
+你们可以看到，这里也有一个Platform目录，但在Hazel中，我有这个Window类
+you can see there's a Platform folder as well, but inside Hazel itself, I have this Window class now
+
+169
+00:15:19,100 --> 00:15:26,124
+并且这是Window的抽象表示，好了，所以这是平台无关的
+and this is an abstract representation of a Window, okay, so this is platform independent
+
+170
+00:15:26,300 --> 00:15:28,950
+这是我们的Application所使用的，如果没看到的话
+this is what our application uses, haven't read it yet
+
+171
+00:15:28,950 --> 00:15:32,125
+我会在你们面前写，Application还没有被修改
+I'll write in front of you guys, Application hasn't been modified yet
+
+172
+00:15:32,866 --> 00:15:36,375
+但我们基本上会使用这个Window，好了，你们可以看到它有些什么
+but we're basically going to use this Window, okay, and you can see what it has
+
+173
+00:15:36,475 --> 00:15:42,200
+它有一个EventCallbackFn，我们会在下一期讲，它增加了一个虚析构函数
+now, it's got an EventCallbackFn,  which we'll talk about in the next episode, added a virtual destructor
+
+174
+00:15:42,766 --> 00:15:49,975
+然后它基本上就像你们看到的那样，它实际上只是一个接口，所有这些都是纯虚拟方法
+and then it's mostly as you can see pretty much, it's it's all actually just an interface, right, all of these are pure virtual methods
+
+175
+00:15:50,300 --> 00:15:55,750
+这个类中没有任何数据，也没有任何函数，都是纯虚方法，对吧
+there's no data in this class at all, and there's no functions in this class at all, just pure virtual stuff, right
+
+176
+00:15:56,000 --> 00:16:00,972
+因为这需要在每个平台上实现，所以我只做了一个接口，对吧
+because this has to be implemented per platform, so I've just made an interface, okay
+
+177
+00:16:01,766 --> 00:16:05,800
+当然是桌面系统，因为以移动应用为例，它并没有真正的窗口
+a desktop system of course, because mobile apps for example, don't really have a window
+
+178
+00:16:06,600 --> 00:16:14,299
+它们总想要有一个表面，好了，这是基本的，随着我们的进行，不会添加太多东西到它上面
+they want to always have a surface, okay, so that's that, okay, kind of basic, not much will add stuff to it, as we go
+
+179
+00:16:14,300 --> 00:16:18,166
+但就是那样的，然后至于这个，我有一些基本的窗口属性
+but that's just what it is, and then this, I just have some basic window properties
+
+180
+00:16:18,166 --> 00:16:23,733
+你们可以在这里指定，因为这是平台无关的
+which you can specify over here, now because this is kind of platform independent this
+
+181
+00:16:23,733 --> 00:16:27,075
+我们有这个Create函数，它必须在每个平台上实现
+we have this create function, which actually has to be implemented per platform
+
+182
+00:16:27,600 --> 00:16:33,000
+所以这儿没有Window.cpp文件，只有一个Window.h文件，一个头文件
+so this is not, there's no Window.cpp file, there's just a Window file, just a header file
+
+183
+00:16:33,000 --> 00:16:36,966
+然后这个会在每个平台上实现，因为显然这个Create函数会返回
+and then this gets implemented per platform, because obviously this create  function should return
+
+184
+00:16:36,966 --> 00:16:42,700
+例如WindowsWindow，如果我们在Windows或MAC窗口或Linux窗口上编译
+for example WindowsWindow, if we're compiling on windows or mac window or linux window
+
+185
+00:16:42,700 --> 00:16:47,275
+或者我们决定怎么称呼它取决于我们在哪个平台上编译
+or whatever we decide to call it depending on what platform we're actually compiling on
+
+186
+00:16:47,966 --> 00:16:52,523
+例如，这儿不需要有一个独立于平台的switch声明
+there's no need to for example have a platform independent one, which has a switch statement 
+
+187
+00:16:52,523 --> 00:16:56,400
+其中包括，它不，这都是编译时决定的
+which includes, it doesn't, this is all decided to compile time 
+
+188
+00:16:56,400 --> 00:17:02,266
+不管怎样，我们不会在Windows或其他版本上编译Mac代码，属性就是Title，Width和Height
+anyway, we're not going to be compiling Mac code on windows or vice version, property is Title Width Height
+
+189
+00:17:02,266 --> 00:17:05,766
+那就是我们现在得到的，这里还有默认有效的默认参数
+that's all we've got for now, default valid default parameters here as well
+
+190
+00:17:05,766 --> 00:17:11,650
+Hazel Engine是默认标题，如果你们不指定的话，然后在高度范围内的默认值是720
+Hazel engine is the default title, if you don't specify one, and then to our value by 720 is the default within height
+
+191
+00:17:11,900 --> 00:17:16,800
+然后你们可以看到，如果不指定一个作为属性，它会创建默认值，也就是这个
+and then you can see, we have, if you don't specify one as properties, it creates the default, which is this
+
+192
+00:17:17,200 --> 00:17:26,099
+好了，就是那样，在Platform/Windows里面，我们有WindowsWindow，还有cpp文件
+okay, that's that, now inside Platform, inside Windows, we have WindowsWindow, and the cpp file as well, okay
+
+193
+00:17:26,366 --> 00:17:30,464
+这很简单，这只是所有东西的实现，对吧
+this is pretty simple, this is just an implementation of everything, okay 
+
+194
+00:17:30,750 --> 00:17:37,475
+那么有些函数应该标记为override，我不知道为什么没有
+so some of this stuff actually really should be marked as override, I don't know why it's not
+
+195
+00:17:38,866 --> 00:17:40,025
+所以让我们看看它到底继承了什么
+so let's see what it actually inherits
+
+196
+00:17:40,300 --> 00:17:44,400
+VSync然后是EventCallback，Width，Height和OnUpdate
+so VSync and then EventCallback Width Height and OnUpdate
+
+197
+00:17:45,400 --> 00:17:49,338
+所以说，我只是忘了这两个，好吧
+so that's all said, I just miss these two apparently, okay
+
+198
+00:17:51,066 --> 00:17:55,850
+那么这个实现的主要方式是我们有一个WindowData结构，你们会看到为什么我们有这个
+so the way that this is primarily implemented is we have a struct of WindowData, you'll see why we have this
+
+199
+00:17:56,066 --> 00:18:00,375
+因为我们需要将它传递给GLFW，但这或多或少是用于事件的，不管怎样，将在下期中讨论
+because we need to pass it into GLFW, but that's more or less for events, which we'll talk about next time anyway
+
+200
+00:18:01,125 --> 00:18:07,300
+但这是我们存储所有实际数据的地方，这些数据可能在事件回调期间被GLFW请求
+but basically this is where we store all of our actual data, that might be requested by GLFW during event callbacks
+
+201
+00:18:08,166 --> 00:18:09,000
+然后我们就有了一个结构
+and then we just have a struct
+
+202
+00:18:09,000 --> 00:18:13,350
+这样我们就可以把这个结构传递给GLFW，就像用户自定义数据一样
+this way we can pass just the struct to GLFW, as like custom user data
+
+203
+00:18:14,533 --> 00:18:18,800
+我们不需要通过这个类，这不是很重要
+and we don't have to pass this entire class, not that it matters too much
+
+204
+00:18:18,800 --> 00:18:23,166
+但这只是让我们所有的Windows专门的数据很好地集中在这里
+but this just keeps all of our kind of Windows special data grouped nicely here 
+
+205
+00:18:23,166 --> 00:18:31,100
+我有点喜欢我们有Init和Shutdown，也就是我们创建的两种函数
+which I kind, which I kind of like we have Init and Shutdown, which is two kind of functions that we've created
+
+206
+00:18:32,166 --> 00:18:38,066
+在OnUpdate中，我们会更新GLFW，而缓冲区会轮询输入事件，诸如此类的东西
+OnUpdate, we'll just kind of should just update GLFW, while the buffers polling the input events all that kind of stuff
+
+207
+00:18:38,066 --> 00:18:42,250
+它应该按帧运行一次，并从我们的Application中调用，我们马上就会调用它
+it should be run like once by frame, and called from our application, we'll call that in a minute
+
+208
+00:18:42,666 --> 00:18:46,099
+其他一切都很简单，让我们跳到实现
+everything else I think is pretty straightforward, let's pop over to the implementation
+
+209
+00:18:46,366 --> 00:18:52,100
+那么这就是我们在Window中Create函数的实现
+so here's the implementation of that creation function that we had in windows and window
+
+210
+00:18:52,100 --> 00:18:56,850
+我们有了这个Create函数，它是在平台特定文件中实现的
+we had this create function, was this actually gets implemented in a platform specific file
+
+211
+00:18:56,950 --> 00:19:00,925
+那么在这里，它实现了，它是Window::Create()，而不是WindowsWindow::Create()
+so in this case, it's implemented,  you can see, it's Window::Create, not WindowsWindow::Create
+
+212
+00:19:00,925 --> 00:19:08,599
+只创建窗口并返回一个新的WindowsWindow，好了，就那样，很简单，只返回一个指针
+just window create, and returns a new WindowsWindow, okay, that's it, pretty simple, it just returns a pointer, okay
+
+213
+00:19:08,600 --> 00:19:13,566
+我们将把这个指针存储在实际Application类中的一个惟一指针中
+we'll store this pointer in probably a unique pointer in the actual Application class
+
+214
+00:19:14,533 --> 00:19:22,800
+好了，那么在初始化和析构函数中暂时什么都不做，这只是导致它
+okay, so in the in the initialization destructor does nothing for now, this just causing it
+
+215
+00:19:23,533 --> 00:19:28,425
+我还没有在析构函数中做任何事情的原因是我们不需要这么做
+we the reason I don't I haven't done anything in the destructor yet is because we not don't necessarily need to
+
+216
+00:19:28,425 --> 00:19:33,975
+我们实际上可以销毁窗口，我想应该是glfwDestoryWindow()，我们应该这样做并关闭窗口
+we can destroy the window actually, I think glfwDestroyWindow, we should do that and shut down
+
+217
+00:19:33,975 --> 00:19:44,799
+我们现在就添加这段代码，也就是Shutdown()，可以那样做，但我们不想关闭GLFW
+let's just add that code right now um, Shutdown, we can do that, but we don't want to necessarily shut down GLFW
+
+218
+00:19:44,799 --> 00:19:51,075
+因为我们可能，我们可能需要它，我们可能有多个窗口，这也是我这里有这个静态的原因
+because we might, we might need it, like we might have more than one window, that's also why I have this static here
+
+219
+00:19:51,500 --> 00:19:57,050
+因为我们只想在初始化Window时初始化GLFW一次，但我们可能会创建多个Window
+because we only want to initialize GLFW, once when we initialize our Window, but we might create multiple windows 
+
+220
+00:19:57,425 --> 00:20:01,500
+但如果它还没有初始化，我们会初始化它
+so yeah, but if it's not, if it hasn't been initialized yet, we'll initialize it
+
+221
+00:20:02,275 --> 00:20:06,675
+所以这就是它的作用，当我们创建这个Window时，它调用构造函数
+so this is that's essentially what in it does, when we create this window, it calls the constructor
+
+222
+00:20:06,675 --> 00:20:16,125
+调用它设置基于属性的数据，记录些可能想要看到的东西，初始化GLFW，如果它还没有
+which calls in it sets up all about data based on the properties, logs some stuff that we might want to see, initializes GLFW, if it hasn't yet
+
+223
+00:20:16,266 --> 00:20:20,500
+然后我们来说说这个HZ_CORE_ASSERT()，因为那是新东西，在Core.h中
+and then let's talk about this CORE_ASSERT, because that's new, inside Core.h
+
+224
+00:20:20,500 --> 00:20:24,100
+我添加了断言，如果我们启用它们
+I've added assertions, if we enabled them
+
+225
+00:20:24,100 --> 00:20:29,050
+好了，我们应该把它添加到premake文件中以便调试，可能还没发布
+okay, we should add that to the premake file for debug probably, probably not released
+
+226
+00:20:31,300 --> 00:20:38,499
+它做的基本上是，它检查一个特定的条件，然后记录一条消息，如果它失败了
+what this does is basically it says, it checks a certain condition, and then logs a message, if it fails
+
+227
+00:20:38,500 --> 00:20:41,933
+而且它的Windows现在只会导致调试中断
+and also its Windows only for now, just cause debug break
+
+228
+00:20:42,000 --> 00:20:46,133
+这就像在这行代码上设置断点一样
+which basically just is like in setting a breakpoint at that line of code
+
+229
+00:20:46,533 --> 00:20:51,150
+这样它就会在这行代码中中断调试器，如果断言失败
+so that it just breaks the debugger on this actual line of code, okay, so that if an assertion fails 
+
+230
+00:20:51,425 --> 00:21:00,300
+我们可以看到哪里出错了，例如在这个例子中，我们在这里用它来检查这个是否行
+we can see what has gone wrong, okay, so for example in this case, we're using it here to check to see if this has worked out
+
+231
+00:21:00,950 --> 00:21:07,925
+那么如果这是在运行时删除的东西，抱歉，在发布版本或发行版本中
+so if this is something that gets removed in runtime, sorry in like release builds for example or distribution builds
+
+232
+00:21:08,400 --> 00:21:11,600
+那就是为什么我没有像这样写代码，因为如果发生了这种情况
+that's why I didn't write this code like this, for example, because if that happened
+
+233
+00:21:11,600 --> 00:21:15,700
+那么GLFW将不会在发布版本中被初始化
+then GLFW would not be initialized at all in release builds
+
+234
+00:21:15,700 --> 00:21:23,299
+这不是我们想要的，我们仍然希望被初始化，但我们只是在调试构建中检查条件
+which is not what we want, we still wanted to be initialized, but we're just checking the condition only in debug builds
+
+235
+00:21:23,300 --> 00:21:27,425
+我们可以添加一个叫做verify的东西，而不是assert，它基本上和assert是一样的
+we might add something called verify instead of assert, which basically is the same as an assert
+
+236
+00:21:27,900 --> 00:21:34,099
+但是它没有去掉条件，所以它基本上是这样做的，原因是它可以
+except it doesn't strip the condition, so it basically does that instead, the reason is that this can
+
+237
+00:21:34,100 --> 00:21:39,400
+因为在某些配置中，如果启用会话是关闭的，那么这将不会编译成任何东西
+because this compiles to nothing at all in like certain configurations, if enable sessions is off
+
+238
+00:21:40,366 --> 00:21:46,504
+我们可以运行在其他情况下根本不会运行的函数，来验证一些东西，所以这很有用
+we can run functions that we wouldn't otherwise run at all, just to verify stuff, so it's quite useful
+
+239
+00:21:46,975 --> 00:21:51,425
+断言是会被大量使用的东西，我喜欢使用它们
+and assertions are just something that will be using a lot of, I love using them
+
+240
+00:21:51,700 --> 00:21:57,150
+这是一种验证状态是否正确的快速方法，而且在这样做时，你们不必担心会浪费性能
+just a quick way to verify that your state is correct, and you don't have to worry about wasting performance, when you do that
+
+241
+00:21:57,150 --> 00:22:02,300
+因为它们被从发布版本中去掉，然后至于glfwCreateWindow()
+because they get stripped from release builds, we glfwCreateWindow
+
+242
+00:22:02,300 --> 00:22:06,875
+再说一次，我的OpenGL系列中的GLFW视频可能会对此有更多解释
+again, that GLFW video in my OpenGL series will probably explain more about this
+
+243
+00:22:07,666 --> 00:22:12,666
+但基本上只是创建了一个GLFW窗口，调用MakeContextCurrent，设置WindowUserPointer
+but we basically just create a glfw window, MakeContextCurrent and set a WindowUserPointer
+
+244
+00:22:12,666 --> 00:22:18,966
+这是我们会在m_Data的事件回调中用到的，因为当我们
+now this is something that we'll use in our event callbacks for m_Data, because when we
+
+245
+00:22:19,133 --> 00:22:22,966
+但GLFW的原理就是那样，我们只设置特定的事件回调
+but the way the GLFW works is that, we just set certain event callbacks
+
+246
+00:22:22,966 --> 00:22:30,133
+例如glfwSetKeyCallbacl()，这只是一个我们指定的回调函数
+for example GLFW set, you know, a key callback, and this is just a callback function that we specify
+
+247
+00:22:30,425 --> 00:22:33,325
+每当我们按下一个键，它都会被调用
+that will get called, whenever we press a key
+
+248
+00:22:34,500 --> 00:22:42,125
+这意味着我们将这个结构数据或指定给这个数据结构到回调函数
+this means that we are passing this struct data or appointed to this struct of data into that callback function
+
+249
+00:22:42,533 --> 00:22:46,075
+例如，我可以调用那个事件回调函数
+so that we can for example be like I can call that event callback function 
+
+250
+00:22:46,400 --> 00:22:53,700
+如果一个键被按下，或者如果窗口大小改变，我可以设置宽高，也可以调用回调
+if if a key is pressed, or if the window size changes, I can set this width and high, and also call the callback
+
+251
+00:22:54,166 --> 00:22:58,150
+所以那就是我们设置这个的目的，然后我们认为我们已经把它设为真了
+so that's kind of what we set this for; and then we think we've just set it true
+
+252
+00:22:59,000 --> 00:23:03,575
+因为没有理由关闭它，关闭它会破坏窗口，我们认为
+because there's no reason really for it to be off, shut down destroys the window, we decided that 
+
+253
+00:23:03,575 --> 00:23:08,375
+至于更新，我们只需要轮询事件并交换缓冲区，然后我们还有一个SetVSync函数
+now update, we'll just poll the events and swap the buffers, and then we have a SetVSync function which
+
+254
+00:23:08,375 --> 00:23:14,575
+如果我们决定启用VSync，它说切换到4:1，这实际上不一定是1
+if we decide to enable a VSync, it says to swap into four to one, this doesn't actually have to be one
+
+255
+00:23:14,575 --> 00:23:21,775
+1只是意味着它会等待一个帧被调用，一个帧被返回，因为它开始的时候就像下一帧
+one just means it'll wait for like one frame to be called, one frame to be returned bigger, for it starts like the next thing
+
+256
+00:23:22,966 --> 00:23:27,133
+0没有任何意义，所以那就是我们现在所做的
+where zero means nothing, so that's what we've done for now
+
+257
+00:23:27,133 --> 00:23:33,966
+再说一次，我想一个支持替换Win32代码的地方，实际上可能是一些不同的东西
+again I imagine one support of places with with Win32 code, will actually might be something a bit different
+
+258
+00:23:33,966 --> 00:23:39,100
+但那只是装饰的一个基本实现，然后我们跟踪它是否被启用
+but that's just a basic implementation of facing, and then we keep track of whether or on it's enabled
+
+259
+00:23:39,100 --> 00:23:46,900
+因为我们无法从GLFW中获取数据，然后我们只有一个简单的IsVSync函数
+because we can't actually retrieve that data from GLFW, and then we just we have an IsVSync function
+
+260
+00:23:46,900 --> 00:23:53,425
+它会在它们打开时返回也就是打开，好了，就那样，那就是我们的窗口，很简单吧
+which returns while they're on that is switched on, okay, that's it, that's our window, really simple stuff
+
+261
+00:23:53,933 --> 00:23:58,300
+让我们把它添加到我们的Application中，那么我要做的就是在Application中
+let's add this to our our Application now, so what I'm going to do is inside Application
+
+262
+00:23:58,425 --> 00:24:07,250
+再说一次，这是平台无关的，我要创建一个唯一指针，它将保存Window类的一个实例
+again, this is platform independent, I'm going to create a unique pointer, which is going to hold an instance of the Window class
+
+263
+00:24:08,733 --> 00:24:15,427
+至于唯一指针，因为很明显只有这个类拥有它，这里应该包含Window.h
+unique, because obviously only this class owns it, this will be just Window.h
+
+264
+00:24:17,466 --> 00:24:23,933
+我们有Window的唯一指针，然后在构造函数中，我们会把它设为
+so we have a unique pointer of Window, and then all we do is in the constructor, we'll set this to be
+
+265
+00:24:24,766 --> 00:24:29,733
+我们不会创建唯一指针之类的，这个应该就是Window::Create()
+we're not gonna make unique or anything, it's just gonna be window, create window, or window to create window create
+
+266
+00:24:30,566 --> 00:24:35,399
+我们可能不会指定属性，因为这是一个显式构造函数
+and we'll specify probably no properties, now because this is an explicit constructor
+
+267
+00:24:35,400 --> 00:24:46,899
+我们需要在这里输入唯一指针，然后像那样使用Window::Create()来创建它，好了，酷
+we actually have to type unique pointer here, and then do WindowCreate like that to create it, okay, cool
+
+268
+00:24:46,900 --> 00:24:48,866
+那么我们就得到了那个，有了我们的唯一指针
+so we've got that, we've got our unique pointer
+
+269
+00:24:48,866 --> 00:24:52,150
+意味着当应用程序终止时，我们不需要自己删除窗口
+means we don't have to delete the window ourselves, when the application terminates
+
+270
+00:24:52,600 --> 00:24:57,750
+我们的Application显然是一种单例，意味着我们整个应用程序只有一个Application
+we Application obviously is kind of a Singleton, meaning we only have one Application for our entire application
+
+271
+00:24:57,750 --> 00:25:04,375
+所以这个一定不错，好了，那我们暂时先去掉这些事件测试
+so this is definitely fine, okay, we'll get rid of all this kind of event testing for now
+
+272
+00:25:04,526 --> 00:25:15,100
+然后在这儿，我要创建一个布尔属性m_Running，我们可能一开始就把它设为true
+and then inside here, I'm actually going to make a bool here, called Running, which we're probably set to true to begin with
+
+273
+00:25:15,100 --> 00:25:18,500
+我们可以在这里初始化它，所以当它运行时
+we can just initialize it here, so while this is running
+
+274
+00:25:21,100 --> 00:25:25,933
+我们会通过调用m_Window.OnUpdate()来更新窗口
+we're going to update our window by calling m_Window.OnUpdate
+
+275
+00:25:26,700 --> 00:25:30,325
+我的意思是我们可以在这里签入一些OpenGL代码来测试它
+and I mean we could just check in some OpenGL code here to test it in a minute
+
+276
+00:25:30,700 --> 00:25:33,166
+但那应该是我们需要做的所有事情
+but that should be all we need to do really
+
+277
+00:25:33,166 --> 00:25:41,000
+因为Window::Create()会调用构造函数，构造函数会调用Init()，Init()会创建初始化的GLFW
+because Window::Create will call the constructor, which will call Init, which will actually create initialized GLFW
+
+278
+00:25:41,000 --> 00:25:42,725
+以及创建窗口，实际上，那应该很不错
+and create out windows, that actually should be good
+
+279
+00:25:43,200 --> 00:25:49,366
+所以如果我们按f5或这里的play按钮来调试代码，我们会看到什么
+so if we hit f5 or the play button here just to actually debug our code, we'll see what happens
+
+280
+00:25:49,366 --> 00:25:53,250
+这显然是第一次构建GLFW链接，所以希望一切都正常
+and this is obviously building a linking GLFW for the first time, so hopefully everything works out
+
+281
+00:25:53,700 --> 00:25:59,533
+好了，看看，那么我们看到了Hazel Engine，它说我们创建了一个窗口，也就是Hazel引擎
+okay, check that out, so we have Hazel Engine here over here, it says that we've created a window, which is our Hazel engine
+
+282
+00:25:59,533 --> 00:26:04,975
+我可以删掉这个App Hello，也可以保留它，因为它在测试客户端日志
+I might just get rid of this App Hello, maybe we can keep it there, because it's testing um client side logging
+
+283
+00:26:05,366 --> 00:26:08,700
+但是你们可以看到的是，创建窗口，Hazel Engine (1280, 720)
+but yeah create window Hazel Engine 1280 by 720, you can see, it's there
+
+284
+00:26:09,300 --> 00:26:11,500
+我们不能关闭它，因为还没有相应的处理事件
+we can't close it or anything, because we're not handling events yet
+
+285
+00:26:11,500 --> 00:26:16,575
+那将在下一期讲到，但我们得到了这个，很好，不过还应该有一个OpenGL上下文
+that will be in the next episode, but we have this, awesome, and we should also have an OpenGL context
+
+286
+00:26:16,933 --> 00:26:23,535
+所以我们现在应该能做的是，也就是在这个文件中包含glfw3
+so what we should be able to do is for now I'll be naughty and include glfw3 in this file
+
+287
+00:26:24,266 --> 00:26:33,500
+但我现在能做的就是调用glClearColor(1, 0, 1, 1)，也就是粉红色，洋红色？
+and I'll just do something like glClearColor(1, 0, 1, 1), which is pink, oh magenta
+
+288
+00:26:33,800 --> 00:26:38,300
+然后我们来调用glClear(GL_COLOR_BUFFER_BIT)
+and then we'll just call glClear on the COLOR_BUFFER_BIT
+
+289
+00:26:38,300 --> 00:26:42,650
+好了，让我们看看这是否有效，应该会得到一个粉红色的窗口
+okay, let's see if this works, we should get a pink window here
+
+290
+00:26:42,900 --> 00:26:48,966
+很好，就是那样，好了，那么我们终于有了一个窗口，和一个OpenGL上下文，还没有事件
+awesome, there you go, okay, so we have now a window finally, and an OpenGL context, no events yet
+
+291
+00:26:48,966 --> 00:26:52,000
+所以我们想要的是下一步我将从这里开始
+so we want the next step kind of where I would go from here
+
+292
+00:26:52,333 --> 00:26:58,750
+实际上也就是创建键盘事件，鼠标事件以及窗口事件
+is to actually make it, so that key events and mouse events and window events
+
+293
+00:26:58,825 --> 00:27:04,550
+比如关闭和调整大小所有这些有趣的东西实际上都会传递到这个Application类
+like closing and resizing and all of that fun stuff is actually propagated to this Application class
+
+294
+00:27:04,550 --> 00:27:09,625
+所以本质上我们想要的是一个函数，类似于OnEvent，对吧
+so essentially what we want to have is a function here, which is like OnEvent, right
+
+295
+00:27:09,933 --> 00:27:15,425
+至于OnEvent函数，当我们调用它时，我们会从Window类中调用它
+and OnEvent function, which when we call, which we will kind of call from the Window class
+
+296
+00:27:15,425 --> 00:27:18,600
+但我们显然不希望Window类知道Application的存在
+but we obviously don't want the Window class to be aware of Application at all
+
+297
+00:27:18,900 --> 00:27:23,425
+应该完全模块化，不应该依赖于Application
+should be completely modular and kind of out the side, should not depend on application at all
+
+298
+00:27:23,733 --> 00:27:30,166
+那就是为什么有一个SetEventCallback函数的原因，我们会从Application来通知Window
+which is why we have a SetEventCallback function, which we'll just kind of call from the Application to notify the Window
+
+299
+00:27:30,166 --> 00:27:35,400
+嘿，所有的事件请把它们调用回这里，然后我们可以把它们传递到所有关于层的地方
+hey, all the events please call them back into here, and then we can propagate them to all about layers
+
+300
+00:27:35,400 --> 00:27:40,733
+并且那就是这个引擎处理各种事件的方式，包括窗口事件
+and that is how this engine will basically deal with events of any kind, including window events
+
+301
+00:27:40,733 --> 00:27:43,275
+所以下一次，我们会实现它，我真的很兴奋
+so next time, we'll implement that, that I'm really excited about that
+
+302
+00:27:44,166 --> 00:27:46,500
+我想如果我们只是看看这些差异，我不认为我漏掉了什么
+I think if we just look at the different, I don't think I've missed anything
+
+303
+00:27:46,933 --> 00:27:53,524
+我唯一做过的其他改动就是，修改了pch，哦，是的，我把log添加到pch文件中
+the only other stuff I did, I modify the pch, oh yeah I added the log to the pch file
+
+304
+00:27:54,300 --> 00:27:57,500
+因为日志不会改变，这是我们在每个文件中都想要的
+because logs are not gonna change, and this is something we want in pretty much every file
+
+305
+00:27:59,175 --> 00:28:05,275
+以及在Core.h中，做了一个断言，就像我之前提到的，就是那样
+and Core.h, I had the assertions as I mentioned earlier, and that's it
+
+306
+00:28:05,533 --> 00:28:12,100
+所以没有修改太多，最大的改动显然是glfw，就是那样，所以那就是我们的Window类
+so I didn't modify much the big thing was obviously glfw, so that is it, okay, so that's our Window class
+
+307
+00:28:12,100 --> 00:28:15,150
+我希望你们喜欢这个视频，如果喜欢的话，就为它点赞吧
+I hope you guys enjoyed this video, if you did, you can hit that like button
+
+308
+00:28:15,150 --> 00:28:18,799
+你们也可以通过访问patreon.com/thecherno来帮助支持本系列
+you can also help support this series by going to patreon.com/thecherno
+
+309
+00:28:18,800 --> 00:28:21,999
+一如既往地非常感谢所有支持本系列节目的赞助人
+huge thank you as always to all the patreons that make this series possible
+
+310
+00:28:23,700 --> 00:28:29,133
+下次我们会在Window类中实现事件，我对此很兴奋，因为那很酷
+next time, we're going to be implementing events into our Window class, I'm really excited about that, because that'll be cool
+
+311
+00:28:29,133 --> 00:28:31,550
+我们实际上可以移动鼠标，看看鼠标的位置
+we'll actually be able to move the mouse, and see what the mouse position is
+
+312
+00:28:32,266 --> 00:28:35,533
+然后从那里开始，我们可能会接触一些图形的渲染
+and then from there, we can probably get on to rendering graphics of some kind
+
+313
+00:28:35,533 --> 00:28:38,099
+并且可能在那之前，虽然建立了一个层系统
+and probably before that, though setting up like a layer system
+
+314
+00:28:38,100 --> 00:28:42,275
+我们还可以讲到引擎架构之类的东西
+and we can get on to more kind of engine architecture kind of stuff as well
+
+315
+00:28:42,275 --> 00:28:47,625
+但现在我们有了一个图形环境，可以在上面绘制图形，所以我们可能会很快添加ImGui
+but now we have a graphics context,  where we can draw things onto, so we'll probably add ImGui to that pretty quickly
+
+316
+00:28:48,200 --> 00:28:52,733
+这样我们就可以真正开始看到，就像你们知道的，事物的视觉表现
+so that we can actually start seeing, like you know, a visual representation of of things
+
+317
+00:28:52,733 --> 00:28:57,200
+并且这样我们就能获得更多的数据，那可能有点尴尬，或者记录起来很烦人
+and actually just have more data available to us, that might be a bit awkward, or just annoying to log
+
+318
+00:28:58,466 --> 00:29:02,576
+所以那就是我们的计划，希望大家对此感到兴奋，我们下次见，拜
+so yeah that's the plan, hope you guys are excited for that, I'll see you next time, goodbye
+

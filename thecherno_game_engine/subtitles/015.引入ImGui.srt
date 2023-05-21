@@ -1,0 +1,1185 @@
+﻿1
+00:00:00,133 --> 00:00:03,025
+嘿，大家好，我是TheCherno，欢迎回到我的游戏引擎系列
+hey, what's up guys, my name is TheCherno, welcome back to my game engine series
+
+2
+00:00:03,200 --> 00:00:07,697
+那么上次我们看了Glad，如果你们还没看过那期视频，可以先去看看
+so last time we took a look with Glad, if you guys haven't seen that video, check it out up there
+
+3
+00:00:07,925 --> 00:00:12,150
+Glad只是我们加载我们需要的现代OpenGL函数的一种方式
+Glad was just a way for us to load kind of the modern OpenGL functions that we need
+
+4
+00:00:12,150 --> 00:00:15,766
+以便使用现代OpenGL作为我们渲染器的一部分
+in order to use modern OpenGL as part of our renderer
+
+5
+00:00:15,766 --> 00:00:21,590
+这是非常重要的，今天也是时候把ImGui引入我们的引擎了
+which is gonna be very important, now today it's finally time to get ImGui into our engine
+
+6
+00:00:21,590 --> 00:00:24,600
+所以在屏幕看到东西应该是第一个主要的事情，真的很酷
+so this is the first major thing that will actually see on the screen, which is really cool
+
+7
+00:00:25,150 --> 00:00:30,199
+我想这将是我们渲染的第一种东西，同时也是我们未来开发的基础
+it's gonna be the first kind of thing that we render I guess, and also the base is for a lot of our future development
+
+8
+00:00:30,200 --> 00:00:34,199
+因为这对于我们能够正确调试非常重要
+because this is gonna be absolutely vital for us to be able to debug things properly
+
+9
+00:00:34,200 --> 00:00:38,875
+只是在屏幕上显示信息，甚至ui这些东西，所以我真的很兴奋能引入这个
+just display information on the screen and even uis and just all of that stuff, so I'm really excited about getting this in
+
+10
+00:00:39,475 --> 00:00:43,291
+只要我们能把它引入进去感觉就更像引擎了
+there's gonna feel a lot more like an engine as soon as we can get this in there
+
+11
+00:00:43,866 --> 00:00:50,400
+我们还会看到很多非常关键的事情，我们可能需要在未来做，让这个实现更合适
+and also we're going to see a lot of really critical things that we need to maybe do in the future to make this implementation more proper
+
+12
+00:00:50,600 --> 00:00:56,925
+因为今天我们要做的是一个叫做hack的东西，如果你们熟悉软件开发是如何工作的
+because today what we're going to do is something called a hack, now if you guys are familiar with how kind of software development works
+
+13
+00:00:57,333 --> 00:01:03,325
+我的意思是，我相信你们在某种程度上是，我甚至会在下面链接一篇文章
+I mean, I'm sure you are to some extent is, I might even link an article below about kind of
+
+14
+00:01:04,066 --> 00:01:08,725
+有几种不同的开发软件的方法，尤其是其中一种开发软件的方法
+a few different ways of I guess how you can write software, particularly there's one way of writing software
+
+15
+00:01:09,100 --> 00:01:14,750
+第一步就是让它跑起来，然后让它运行正确，对吧，让它没有问题
+which is the first thing is kind of make it work, the second one is kind of make it like correct, right, make it right
+
+16
+00:01:15,066 --> 00:01:20,800
+然后最后一步就是为了让它更快，好了，那么我们先直接让它跑起来吧
+and then the last one, the last step is kind of just to make it fast, okay, so we're gonna be kind of just making it work
+
+17
+00:01:20,966 --> 00:01:23,425
+我们要把所有东西都hack进去，因为我想在屏幕上看到ImGui
+we're just gonna hack everything in, because I want to see ImGui on the screen
+
+18
+00:01:23,425 --> 00:01:28,275
+那就是我今天要讲的内容，很简单，我们会想尽一切办法做到这一点
+that's how I go by the end of today, it's pretty simple, we're gonna by any means to get there
+
+19
+00:01:28,275 --> 00:01:32,100
+我们只要hack进去，就会成功的，很明显，我不会让它变得很糟糕
+we're just gonna hack it in, we're gonna make it work, I'm not gonna, obviously, make it horrible
+
+20
+00:01:32,300 --> 00:01:37,950
+但我们要让它变得有用，好了，现在他们正在做正确的一步就是正确地抽象一切
+but we're going to make it kind of usable, okay, now they're making it right step is kind of abstracting everything properly
+
+21
+00:01:37,950 --> 00:01:42,675
+而不是使用原始的OpenGL函数调用，这是我们今天要做的
+so that instead of using raw OpenGL function calls, which is what we're going to do today
+
+22
+00:01:43,400 --> 00:01:48,375
+整个ImGui渲染器通过Hazel的渲染器，这意味着它告诉Hazel
+the entire ImGui renderer goes through Hazel's Renderer, which means that it tells Hazel
+
+23
+00:01:48,375 --> 00:01:51,750
+这儿有个渲染三角形，这儿有个渲染文本，我想要渲染这个，我想要渲染那个
+here one render a triangle, here one render text, I want to render this, I want to render that
+
+24
+00:01:52,325 --> 00:01:54,175
+对吧，而不是实际依赖OpenGL
+right, instead of actually relying on OpenGL
+
+25
+00:01:54,800 --> 00:01:59,350
+不过那要等很久，因为我们没有渲染器，对吧，我们需要先有一个渲染器
+that's gonna be way later, because we don't have a renderer, yeah right, we need to have a renderer first
+
+26
+00:01:59,350 --> 00:02:02,725
+然后我们就可以实现那个了，但我想在我们有渲染器之前引入ImGui
+and then we can do that, but I want ImGui in before we have a renderer
+
+27
+00:02:03,100 --> 00:02:08,199
+这样我们就能在编写渲染器时调试它，然后实现所有那些好东西
+so that we actually can debug our renderer as we write it, and do all of that good stuff
+
+28
+00:02:08,200 --> 00:02:13,525
+这样做会容易得多，最后一步就是让它变得更快，我的意思是，不，反正它应该很快
+it's gonna be a lot easier to do that this way, I'm the last to make it fast, I mean, no, it should just be fast anyway
+
+29
+00:02:13,525 --> 00:02:17,675
+但重点是，那就是我们现在的情况，这将是一个hack
+but the point is that's kind of where we're out right now, this is gonna be a hack
+
+30
+00:02:18,466 --> 00:02:25,425
+但我们会在这期视频的最后把ImGui引入Hazel，所以我很兴奋，让我们开始实现它
+but it's we're gonna get ImGui to Hazel by the end of this video, so I'm pretty excited, let's pop over and start making this happen
+
+31
+00:02:25,725 --> 00:02:29,700
+好了，那么第一件事是，我已经拷贝ImGui仓库相当长时间了
+okay, so the first thing is, I have forked ImGui quite a while ago
+
+32
+00:02:29,700 --> 00:02:31,899
+已经为它创建了一个premake文件
+and I made a premake file for it
+
+33
+00:02:31,900 --> 00:02:38,300
+那么这和使用GLFW是一样的，你们可以看到，这就是我的premake文件，非常简单
+so this is the same kind of thing as with GLFW, you can see, there is my premake file, it is pretty simple
+
+34
+00:02:39,200 --> 00:02:40,600
+和往常一样，因为premake很棒
+as always, because premake is great
+
+35
+00:02:41,075 --> 00:02:44,950
+不过这儿还有一些制表符和空格之类的原因，缩进也有一些问题
+there's a few problems with indentation as usual, because of tabs and spaces whatever
+
+36
+00:02:45,766 --> 00:02:49,599
+但我真的需要修复那个问题，我认为GLFW也有同样的问题
+but I really need to fix that, I think the GLFW thing has the same issue as well
+
+37
+00:02:49,600 --> 00:02:53,550
+我还认为，不，不，这确实有那个问题，很好
+and also I think, no no, this does have supervision ladies, good
+
+38
+00:02:54,733 --> 00:03:00,350
+不像GLFW，不管怎样，我们有这个，将把它作为子模块添加到我们的git仓库中
+unlike GLFW, anyway, we have this, we're gonna add this as a sub module to our git repository
+
+39
+00:03:00,350 --> 00:03:07,200
+所以就在这儿，在C:/dev/Hazel中，也就是Hazel所在的地方，我要执行git submodule add
+so over here, inside C:/dev/Hazel, which is where Hazel is for me, I'm just gonna do git submodule add
+
+40
+00:03:08,625 --> 00:03:17,399
+现在我不记得语法了，我想，它应该先是仓库地址，然后是所在路径
+now I actually don't remember the syntax, I think, it's the repository and in the path
+
+41
+00:03:18,050 --> 00:03:25,700
+就是那样，然后路径是Hazel/vendor/ImGui，就像那样
+so that's the thing, and then the path in which we'll put this is Hazel/vendor/ImGui just like that
+
+42
+00:03:26,600 --> 00:03:31,988
+我不知道，如果我应该，不，不会做任何大写，让我们这样做，好了，然后一旦那个完成
+I don't know, if I should, no, we won't do any capitalization, let's just do that, okay, and then once that is done
+
+43
+00:03:33,166 --> 00:03:39,675
+我们应该能够进入Hazel并打开我们的premake文件，我将把ImGui添加到其中
+we should be able to go into Hazel and open our premake file, and I'm just going to add ImGui into that
+
+44
+00:03:39,933 --> 00:03:45,475
+所以就像我们所有其他的包含目录一样，我也要为ImGui创建一个
+so just like we have with all of our other include directories, I'm going to make one for ImGui
+
+45
+00:03:46,200 --> 00:03:59,400
+这将是Hazel/vendor/ImGui，我们实际上可能应该看看这个，老实说，这可能是我们需要的
+which will be Hazel/vendor/ImGui, and we actually should probably look at this, yeah that's probably all we need, to be honest
+
+46
+00:04:00,400 --> 00:04:05,400
+然后我们会用到imgui.h，那已经包含了，因为它根本不在包含目录中
+and then we're gonna just do imgui.h, that'll include that, because this is not inside an include directory at all
+
+47
+00:04:05,666 --> 00:04:13,025
+好了，我要复制这个，把它放到包含目录的末尾，也就是ImGui
+so that's fine, I'm gonna grab this and chuck it on the end of include directories, ImGui
+
+48
+00:04:15,600 --> 00:04:25,875
+然后我们还需要链接它，当然，如果我们看一下ImGui的premake文件
+and then also we need to link it, and of course I've got, if we actually look at the ImGui premake file
+
+49
+00:04:27,166 --> 00:04:32,403
+你们可以看到，它和其他库一样，是一个静态库，好了，漂亮
+you can see that, of course we've got it as a static library like everything else, okay, fantastic
+
+50
+00:04:32,500 --> 00:04:39,507
+所以现在如果我们返回，我们应该能够生成我们的项目，完成，重新加载解决方案
+so now if we go back, we should just be able to generate our projects, done, reload the solution
+
+51
+00:04:40,166 --> 00:04:47,275
+当然，我们这里没有ImGui，因为我忘记了一个最重要的部分，那就是像这样包含它
+and of course we don't actually have ImGui in here, because I forgot one of the most important parts, which is to actually include it like this
+
+52
+00:04:49,800 --> 00:04:56,075
+那么现在再次生成我们的项目，好了，一切都完成了，现在我们有了ImGui
+so now generate our projects again, there we go everything is done, we now have ImGui over here
+
+53
+00:04:56,400 --> 00:05:01,925
+让我们试着构建它，好了，所以当然，构建成功了，Hazel应该像它那样引用它
+let's try and build it, okay, so of course that succeeded, and a Hazel should reference it as it does
+
+54
+00:05:02,700 --> 00:05:07,700
+好了，漂亮，一切都完成了，那么现在我们需要做的最重要的事情就是是设置ImGui层
+okay, fantastic, everything is done, so now the biggest thing we need to do is set up the ImGui layer
+
+55
+00:05:08,025 --> 00:05:12,850
+为了实现那个，我们需要创建一个新文件，那么让我们进入Sandbox
+now to do that, we're actually gonna have to make a new file, so let's come into Sandbox
+
+56
+00:05:13,850 --> 00:05:18,566
+哦，抱歉，现在让我们把Sandbox放到Hazel中，然后我们现在得到的是
+oh sorry, now let's Sandbox into Hazel, and then what we've got is at the moment
+
+57
+00:05:18,566 --> 00:05:24,150
+我们在Hazel里面已经有了所有的东西，那很酷，但我想做的是，如果在这儿显示所有文件
+we've kind of got everything inside Hazel, that's cool, but what I want to do is if I show all files here
+
+58
+00:05:26,266 --> 00:05:30,133
+在Hazel里面，我一直在测试是否要这么做，是否
+inside Hazel, I've been testing out whether or not to do this, whether or not
+
+59
+00:05:30,133 --> 00:05:33,933
+我们需要把它放在一个叫做debug的文件夹中，我想是在Hazel开发分支中
+we want to actually put this into a folder called debug, I think in the Hazel development branch
+
+60
+00:05:33,933 --> 00:05:39,669
+我确实把它放到了一个叫debug的文件夹里，因为我总是，我想像是一个debug
+I did actually put it into a folder called debug, because I'm always kind of, I guess like a debug thing
+
+61
+00:05:41,000 --> 00:05:48,399
+现在我要为它创建一个名为ImGui的文件夹，然后创建一个头文件和一个cpp文件
+for now though I am actually going to just make a folder called ImGui for it, and then make a header file and a cpp file
+
+62
+00:05:48,400 --> 00:05:58,300
+叫做ImGuiLayer，现在的问题是，我不认为它只是用来调试的
+I guess called ImGuiLayer, now the thing is I don't really think that it is something that's just gonna be used for debug
+
+63
+00:05:58,566 --> 00:06:04,150
+例如，我的意思是，因为Hazel是一个，它不像一个应用框架
+for example, I mean, since Hazel is quite a, it's not really like an application framework
+
+64
+00:06:04,733 --> 00:06:12,400
+我甚至不知道我们是否会创建自己的ui库，因为那个需要很多工作
+I don't even know if we will end up kind of creating our own ui library, because that's a lot of work
+
+65
+00:06:12,700 --> 00:06:20,550
+如果我们像ImGui那样，你们知道为什么，为什么我们会浪费所有的时间去实现那个
+and if we what ImGui, you know like why why why would we kind of waste all of all of that time kind of trying to do that
+
+66
+00:06:21,333 --> 00:06:24,899
+所以那是我的思路，因为再说一次，如果我们
+so that's kind of my line of thinking, because again, if we were making like
+
+67
+00:06:24,900 --> 00:06:30,400
+我想这是一种专业的游戏引擎，我们可能希望拥有自己的ui
+this was like a professional kind of game engine I guess like we probably would want our own ui thing
+
+68
+00:06:30,400 --> 00:06:35,150
+而是因为我觉得至少现在是这样，除非有人真的想要
+but because like I feel like maybe for now at least unless someone really wants it
+
+69
+00:06:36,400 --> 00:06:40,500
+你们可以很好地配置ImGui来做你们想做的任何事情
+you can probably just configure ImGui pretty well to do pretty much anything you want
+
+70
+00:06:41,100 --> 00:06:50,375
+因为它是一个非常好的小ui库，好了，所以ImGuiLayer非常简单
+because it's quite a nice, it really is quite a nice little ui library, okay, so ImGuiLayer pretty simple
+
+71
+00:06:50,466 --> 00:06:54,900
+我们会有一个构造函数和一个析构函数，然后我们可能会重写一堆东西
+we're gonna have a constructor and a destructor, and then we're gonna probably override a bunch of stuff
+
+72
+00:06:54,900 --> 00:07:01,799
+我们有内层，所以很酷的是我们已经有了，我们可能真正需要的这两个
+that we have inside layer, so the cool thing about this is that we already have, what we really probably need on these two
+
+73
+00:07:02,366 --> 00:07:07,275
+我们已经有了一个事件系统，这真的很有用，因为我当然会用到很多事件
+we already have an event system, which is really useful, because of course I'm going to use a lot of events
+
+74
+00:07:08,333 --> 00:07:17,325
+所以那就是我喜欢做这个的部分原因，让我们包含我们的hzpch.h和ImGuiLayer.h
+so that's part of the reason why I just love doing this, let's include our pch and include ImGuiLayer
+
+75
+00:07:19,066 --> 00:07:25,766
+命名空间Hazel，我们将从所有东西创建方法实现
+namespace Hazel, and we're going to just create method implementations from everything
+
+76
+00:07:25,966 --> 00:07:32,975
+好了，酷，往上滚动，我将调用这里最好的构造函数，带一个名字
+okay, cool, so scrolling up, I'm going to just call the best constructor here with a name
+
+77
+00:07:33,150 --> 00:07:39,475
+我们将使用的名字是ImGuiLayer，所以这或多或少会是一种带有Hazel的ImGuiLayer
+so the name that we'll use is ImGuiLayer, so this is more or less going to be the kind of ImGuiLayer that comes with hazel
+
+78
+00:07:39,800 --> 00:07:44,775
+那么你们可以在任何层上开始渲染ImGui，我不知道我们要怎么设置
+so you can obviously just start rendering ImGui probably on any layer, I don't know how we'll set that up
+
+79
+00:07:44,775 --> 00:07:51,350
+但这是一个特定的层，我们会在这里进行调试，这是我们的调试绘图层
+but this is like a specific layer, where we're going to render kind of debug things, this is like our debug draw layer
+
+80
+00:07:51,350 --> 00:07:56,675
+这个总是会被绘制在我们30个场景的顶部(？？？)
+this will always be drawn kind of a last or rather on top of our 30 scene and all of that
+
+81
+00:07:58,450 --> 00:08:07,350
+那么是了，这将是一个特定的层，我们可能会在其中调用ImGui之类的代码
+so yes, it's going to be a specific layer in which we probably will end up calling ImGui kind of code
+
+82
+00:08:08,000 --> 00:08:11,450
+或者至少可以在上面绘制任何ImGui类型的窗口
+or at least being able to draw any ImGui kind of windows on this
+
+83
+00:08:11,450 --> 00:08:16,575
+所以我们甚至可能最终添加像ImGui绘图或其他图层
+so we might even end up adding like an ImGui draw or whatever to like other layers
+
+84
+00:08:16,700 --> 00:08:19,125
+我不知道该怎么设置，我们可以晚点再谈，好了
+I don't know how we're gonna set that up, we can talk about that later, okay
+
+85
+00:08:20,266 --> 00:08:26,700
+所以我实际上想做的是某些初始化代码，但我认为它可能会依赖于OpenGL
+so what I actually do want to do is certain initialization code, but I think it's going to probably rely on OpenGL
+
+86
+00:08:27,900 --> 00:08:30,933
+所以我要做的是，我想做一些事情
+so what I'm going to do, well there's a few things that I want to do
+
+87
+00:08:30,933 --> 00:08:36,166
+但我想做的第一件事实际上可能是复制OnAttach和OnDetach
+but the first thing I want to do is actually probably end up taking OnAttach OnDetach
+
+88
+00:08:36,166 --> 00:08:45,250
+因为我知道，很明显，当添加一个层时，它肯定已经有渲染器设置了
+because I know that obviously, when a layer is attached, it will already, it definitely should already have the renderer setup
+
+89
+00:08:46,933 --> 00:08:51,650
+那么OnAttach和OnDetach，我们也会为这些创建方法实现
+so OnAttach OnDetach, we'll create method implementations for those as well
+
+90
+00:08:53,725 --> 00:08:55,425
+它最后是否又创建了一个，是的，我创建了
+did it end up creating one more, yeah I did
+
+91
+00:08:55,666 --> 00:09:01,825
+我不知道为什么要这样做，在OnAttach和OnDetach中，我们需要做一些很重要的事情
+I'm not sure why did that,okay, so inside OnAttach OnDetach, we need to do a few really important things
+
+92
+00:09:02,166 --> 00:09:08,566
+所以为了知道我们实际需要做什么，我将进入Hazel/vendor/ImGui
+so to know what we actually need to do, what I'm going to do is go into Hazel/vendor/ImGui
+
+93
+00:09:08,566 --> 00:09:11,762
+然后我们会看一些例子，这里有两个例子是我想重点关注的
+and then we're gonna look at some of the examples, so there's two examples that I want to focus on
+
+94
+00:09:12,666 --> 00:09:20,700
+一个是opengl3的实现，也就是这个，我们会复制那个，并保留它
+one is kind of the opengl3 implementation which is this, so we'll grab that, and we'll keep that around
+
+95
+00:09:20,866 --> 00:09:25,650
+另一个是glfw的实现，那么就是这个
+and then the other thing is the GLFW one, so this one
+
+96
+00:09:25,966 --> 00:09:29,850
+好了，那么那就是我们今天要讲的基础
+okay, so that's kind of going to be the basis for what we're actually going to do today
+
+97
+00:09:30,166 --> 00:09:37,050
+这个opengl3，它实现所有这些gl的东西，我们基本上会完全复制这个
+now this opengl3 thing, which does all of this gl stuff, we're basically going to copy this completely
+
+98
+00:09:37,250 --> 00:09:43,025
+好了，那么我就把它放在Platform里面，在Platform中，创建一个新建项
+okay, so I'm gonna put it into Platform, inside Platform, I'm gonna make a new item
+
+99
+00:09:43,333 --> 00:09:52,817
+抱歉，是一个叫OpenGL的新文件夹，然后我要做的是
+sorry, a new folder called OpenGL, called OpenGL, and then what I'm going to do is
+
+100
+00:09:53,000 --> 00:09:56,675
+实际上，我要直接复制粘贴这些文件
+I'm actually going to end up copying and pasting these files just directly
+
+101
+00:09:57,100 --> 00:10:02,275
+甚至不可能，甚至不打算重新命名它们，只是为了让我们真正强调，它们是暂时的
+not even probably, not even going to rename them, just so that we really do reinforce the fact, that they are temporary
+
+102
+00:10:03,566 --> 00:10:11,950
+我们要把它们放在这里，并把它们包含在我们的项目中，现在我们可能需要改变一些东西
+and we're going to put them in here, and include them in our project, now we probably will have to change a few things
+
+103
+00:10:14,333 --> 00:10:19,125
+但我们会看到如何进行，所以这是我们的直接实现，那么至于这个imgui.h
+but we'll kind of see how we go, so this is like our direct implementation, so imgui.h
+
+104
+00:10:19,600 --> 00:10:26,225
+我的意思是，我觉得那应该没问题，我不确定为什么不行，好了，那么这个东西
+I mean I think that actually should be fine, I'm not sure why that's not, okay, so this this stuff uh
+
+105
+00:10:27,133 --> 00:10:31,425
+我的意思是，要把这个去掉，因为这是我们自己的文件，我们会重命名它，这样我们就没有
+look, I mean, I'm just gonna strip this out, because it's our own file, we will rename this, just so that we have there's no
+
+106
+00:10:31,800 --> 00:10:41,450
+没有任何冲突，那么我们就叫它ImGuiOpenGLRenderer，还有那个也是
+there's no kind of confusion, so ImGuiOpenGLRenderer of what we'll call this, and that as well
+
+107
+00:10:42,600 --> 00:10:53,450
+我们会看到我们在这里做了什么，那么清楚地定义？，那很奇怪，把imgui.h包含在这儿
+and we will see what we do here, so clearly define ???, that's weird, well, include imgui.h in here
+
+108
+00:10:54,600 --> 00:10:58,399
+我不知道为什么我不喜欢，我不喜欢这个，不管如何，反正它对这个不满意
+I'm not sure why I'm not, I don't like that, it's not happy with this anyway
+
+109
+00:10:58,399 --> 00:11:04,965
+然后我们还必须，在我们包含其他东西之前，我们还需要包含pch
+and then we also have to, before we include anything else, we also need to include our pch
+
+110
+00:11:08,733 --> 00:11:13,166
+我们可能会马上重新生成项目，这实际上应该没什么问题
+we'll probably have to regenerate projects as well in a minute, and this actually should be fine
+
+111
+00:11:13,566 --> 00:11:19,275
+我想那可能只是VS的问题，不，它确实没有包含那个
+I think that might just be visual Studio, no, it really can't include it
+
+112
+00:11:20,100 --> 00:11:30,566
+嗯，那很奇怪，因为它应该是一个包含目录，它在Hazel里面，所以那有点奇怪
+huh well that's weird, because it should be an include directory, and it is inside Hazel, so that's a little bit weir
+
+113
+00:11:30,566 --> 00:11:36,275
+让我们快速检查一下包含目录到底是什么，vendor/ImGui/include
+let's just quickly check what the include directories actually are, vendor/ImGui/include
+
+114
+00:11:36,275 --> 00:11:42,300
+那是错误的，因为它只是vendor/ImGui，所以如果回到Hazel，并打开那个premake文件
+ah well that's wrong, because it's just vendor/ImGui, so if we go back to Hazel and grab that premake file
+
+115
+00:11:42,733 --> 00:11:50,125
+我们要确保这里没有像那个的路径，然后我们会再次生成我们的项目，好了，搞定，重载
+we're just gonna make sure that this does not something like that, and then we'll generate our projects again, okay, done, reload
+
+116
+00:11:50,933 --> 00:11:59,550
+好了，酷，那么现在已经完成了，让我们再次尝试构建我们的渲染器，看看得到了什么
+okay, cool, so now that we've done that, let's try and build our our renderer again, and we'll see what we get
+
+117
+00:12:02,600 --> 00:12:03,975
+好了，这儿还有一些错误
+alright, few errors here
+
+118
+00:12:05,400 --> 00:12:10,625
+好了，显然它可以包含这个，因为我们把它改成了ImGuiOpenGLRenderer
+okay, this it can include obviously, because we've changed this to be ImGuiOpenGLRenderer
+
+119
+00:12:12,900 --> 00:12:20,517
+然后它对其他一些东西不爽，因为我们没有包含Glad，所以先包含Glad
+and then it's not happy with a bunch of other things, because of course we're not including Glad, so we'll include Glad
+
+120
+00:12:24,666 --> 00:12:30,600
+好了，成功了，漂亮，那么搞定，现在回到ImGuiLayer这边
+okay, succeeded, fantastic, so that's done, now back in ImGuiLayer land
+
+121
+00:12:32,350 --> 00:12:38,025
+我们可以在OnAttach中做一些我们需要的事情，那么这里我将包含两个文件
+we're going to be able to OnAttach do a bunch of things that we need, so I'm going to include two things into here
+
+122
+00:12:38,400 --> 00:12:46,675
+我将包含ImGuiOpenGLRenderer，它实际上在Hazel/Platform中
+I'm going to include the OpenGLRenderer, which is actually in Hazel/Platform
+
+123
+00:12:48,900 --> 00:12:55,625
+我认为这实际上也包含ImGui本身，但我可能也应该包括imgui.h
+and I think that actually includes ImGui itself as well, but I probably should just include imgui.h as well
+
+124
+00:12:56,325 --> 00:13:04,100
+好了，它对这个不爽，有点奇怪，让我们在Platform中，看起来是Platform/OpenGL
+okay, so it's not happy with this, and that's a bit weird, oh it's not unheated, let's just in Platform,  looks Platform OpenGL
+
+125
+00:13:05,733 --> 00:13:12,625
+好了，酷，那么OnAttach，有一些ImGui的事情我们需要做，比如你们知道的CreateContext
+okay, great, so OnAttach, there's a few ImGui things we have to do, such as you know CreateContext
+
+126
+00:13:13,333 --> 00:13:21,150
+现在这些东西应该写在这里，它们都消失了，那很好，我不知道它们为什么消失了
+now this stuff should be written by the way in here, they're all gone, that's great, I don't know why they disappeared
+
+127
+00:13:22,766 --> 00:13:28,814
+我刚刚点击关闭了标签，所以那挺好的，但如果我们再次进入examples目录，会看到GLFW
+I was just clicking on the minute was closing the tabs, so that's great, but if we go into examples again, and we'll look at GLFW
+
+128
+00:13:33,900 --> 00:13:41,250
+所以我们有了所有这些我们可能关心的回调，以及所有内部代码
+so we have all these callbacks that we probably care about, as well as all the internationalization code 
+
+129
+00:13:41,250 --> 00:13:48,100
+比如CreateContext，我甚至不知道它在哪里，我想它可能在
+such as CreateContext, which I don't even know where that is, I guess that's probably in yeah
+
+130
+00:13:48,100 --> 00:13:59,475
+所以ImGui关于这个的很多实现可能在example_glfw_opengl3中
+so the other thing that ImGui does is a bunch of this stuff is actually probably in, like example_glfw_opengl3
+
+131
+00:13:59,475 --> 00:14:07,175
+在这个main.cpp文件中，那么你们就可以看到它实现了CreateContext以及很多这些功能
+inside this main file, yeah so you can see it does CreateContext and all of this stuff
+
+132
+00:14:07,175 --> 00:14:13,333
+现在我已经知道我在做什么了，因为之前实现过这个，但你们知道，那就是我引用的东西
+now I already know what I'm doing, because I've implemented this before, but just so you know, that's kind of what I'm referencing
+
+133
+00:14:13,333 --> 00:14:17,850
+那么这儿这个main文件，在你们使用到的例子中，也就是这两个示例文件
+so there's the main file, that's inside the example you're using, there's the two example files
+
+134
+00:14:18,066 --> 00:14:26,425
+比如example_glfw.h和example_glfw.cpp，还有OpenGLRenderer之类的实现例子
+which is like example_glfw.h and cpp, and there's also the renderer at the OpenGL kind of implementation example as well
+
+135
+00:14:26,425 --> 00:14:30,566
+所以那就是opengl3，所以那就是我的想法，在此基础上，我们要写所有这些东西
+so opengl3, so that's kind of the idea, and based on that, we're just gonna write all this stuff
+
+136
+00:14:31,900 --> 00:14:41,599
+那么我们会创建上下文，这里我们会使用深色，然后我们需要做的是设置一些标志
+so we're gonna create the context, we're gonna use dark colors here, and then what we need to do is set some flags
+
+137
+00:14:41,600 --> 00:14:54,875
+那么就是ImGuiIO& io = ImGui::GetIO()，我们会设置一些BackendFlags
+so I'll see ImGuiIO equals ImGui::GetIO(), we're gonna send, we're gonna set some BackendFlags
+
+138
+00:14:56,175 --> 00:15:04,175
+这就像是发送的，ImGui设置代码一样，那么就是HasMouseCursors，是了
+this is just like pretty sended, ImGui set up code, so HasMouseCursors, yes
+
+139
+00:15:05,300 --> 00:15:11,133
+最终我们还需要添加一些光标，可能不是今天，因为它就像是hack实现一样
+we have to add a bunch of mouse cursors as well eventually, probably not today, because it's like the hack implementation
+
+140
+00:15:11,733 --> 00:15:19,200
+HasSetMousePos，好了，如果我们想让按键运行，就需要建立一个按键映射
+and HasSetMousePos, okay, and then what we actually need to do, if we want keys to work is set up a key map
+
+141
+00:15:19,733 --> 00:15:29,800
+现在我认为这是在这里的东西，所以我不需要把它写出来，在哪儿来着
+now I think that this is something that is inside here, so that I don't have to write everything out, where is it
+
+142
+00:15:30,300 --> 00:15:37,750
+那是OpenGL实现，我在找GLFW那个，好了，找到了
+all right, that's the OpenGL implementation, I'm looking for the GLFW one, okay, there's that came out
+
+143
+00:15:38,900 --> 00:15:43,425
+我们只是要复制这个，现在这是非常暂时的，我实际上要
+we're just gonna steal this, now this is extremely temporary, and I'm actually gonna
+
+144
+00:15:45,600 --> 00:15:57,025
+temporary最终会用到Hazel按键代码，我们可能会在下期视频中看到Hazel按键代码
+and temporary should eventually use Hazel key codes, and we might actually take a look at Hazel key code stuff in the next video
+
+145
+00:15:58,000 --> 00:16:02,050
+因为那很重要，我需要这样做，就像输入轮询系统
+because that's important, I need to be done, as well as like an input kind of polling system as well
+
+146
+00:16:02,533 --> 00:16:07,269
+因为现在我们有一个事件系统，但如果我想问输入，嘿，这个按键按下了吗
+because right now we have an event system, but if I want to actually ask the input, hey, is this key down
+
+147
+00:16:07,269 --> 00:16:15,200
+我们现在还不能这样做，所以需要去做，好了，那么就是GLFW/glfw3.h，当然也是暂时的
+we can't do that right now, so we need to go to do that, okay, so GLFW/glfw3, of course this is also temporary
+
+148
+00:16:15,200 --> 00:16:19,325
+我们不应该在这里包含glfw3，但就像我说的，这是一期hack视频
+we should not be including glfw3 here, but as I said this is a hack video
+
+149
+00:16:21,275 --> 00:16:27,866
+至于ClipboardText，我想我们现在不需要考虑，然后我们需要做的另一个实际上是
+this stuff ClipboardText, I think we won't worry about for now, and then the other thing we need to do is actually
+
+150
+00:16:27,866 --> 00:16:36,300
+一旦我们完成了那就是初始化这个OpenGL，它在OpenGL中
+once we've done that is initialize this OpenGL thing, which in it for OpenGL
+
+151
+00:16:36,933 --> 00:16:40,275
+我想这里还有一个不同的，就是OpenGL3_Init，我想这是我们想要的
+I think there's a different one there, yeah OpenGL3_Init, now I think that's what we want
+
+152
+00:16:40,900 --> 00:16:48,750
+然后我们想要的版本，我们现在用的可能是410，好了，酷
+and then the version that we want, and that we'll use for now is probably going to be 410, all right, cool
+
+153
+00:16:50,000 --> 00:16:55,200
+所以希望那最终能初始化成正确的gl版本，这是我们想要的
+so hopefully that actually ends up initializing with the correctional gl version, which is what we want
+
+154
+00:16:55,866 --> 00:17:01,750
+我很确定现在应该是这样，就更新而言，我们想要做的实际上就是每一帧
+and I'm pretty sure that should be yet, so as far as updating goes, and what we want to actually do every frame
+
+155
+00:17:02,766 --> 00:17:13,675
+重要的是ImGui::Render，我认为，打开Renderer，那么就是NewFrame和RenderDrawData
+the important one is of course ImGui::Render, as well as I think, show Renderer, so NewFrame and also RenderDrawData
+
+156
+00:17:13,866 --> 00:17:19,050
+所以我们需要调用NewFrame，我想我们首先调用ImGui::NewFrame实现那个
+so we need to do NewFrame, and I think we do that first followed by ImGui::NewFrame
+
+157
+00:17:20,000 --> 00:17:24,275
+然后我们调用Render，然后还需要调用RenderDrawData
+and we do Render, and then also we need to do the RenderDrawData
+
+158
+00:17:24,500 --> 00:17:29,800
+然后从那里，我们会从ImGui获得绘制数据，好了，酷
+and then from there, we'll actually get the draw data from ImGui, okay, cool
+
+159
+00:17:31,466 --> 00:17:38,125
+就是这样，我们要做的是，快速创建这个静态变量(show)，值是true
+that's it, what we will do is, I'll just quickly write this, static true
+
+160
+00:17:39,133 --> 00:17:44,966
+这将决定是否显示演示窗口，也就是ShowDemoWindow
+this will just whether or not to show this demo window, which about ShowDemoWindow
+
+161
+00:17:48,966 --> 00:17:54,925
+所以我们会显示一个演示窗口，它的名字是ImGui演示窗口，它有我们想要的一切
+so we'll show a demo window, which shall be kind of just a, it's the name ImGui demo window, that has everything we might want
+
+162
+00:17:56,333 --> 00:18:04,475
+现在我们还需要设置delta时间，所以可以从GLFW中得到它，我认为GetTime会返回双精度
+now we need to set the delta time as well, so we can get that from the GLFW, I think that returns to double GetTime
+
+163
+00:18:06,533 --> 00:18:12,975
+是的，它会返回一个双精度，然后我们会设置io.Delta时间，那么就是ImGuiIO
+yes, it does return a double, and then we'll set io.Delta time, so ImGuiIO
+
+164
+00:18:17,375 --> 00:18:33,025
+这是什么，就是ImGuiIO& io = ImGui::GetIO()，这个io.DeltaTime =
+what is this, um ImGuiIO& io equals ImGui::GetIO(), and this will be io.DeltaTime equals
+
+165
+00:18:33,500 --> 00:18:43,350
+我们需要记录时间，所以我们会看到m_Time，然后是time-m_Time，否则就是1/60
+we'll have to keep track of our time, so we'll see m_Time time minus m_Time, otherwise we'll do 1/60
+
+166
+00:18:43,650 --> 00:18:54,850
+以防m_Time还没有设置，然后添加属性float m_Time = 0，所以这就是首帧会执行的
+so just in case m_Time is not set yet, and then we'll do float m_Time equals zero, so the first frame it will just do
+
+167
+00:18:56,600 --> 00:19:01,750
+它只是1/60，好了，酷，不管怎样，那只是一个非常基本的实现
+it'll just do one over sixty, okay, cool, anyway, that's just a very basic implementation
+
+168
+00:19:01,750 --> 00:19:04,725
+不管怎样，就像我说的，我们可能会重写这个，也就是m_Time=time
+anyway, as I said, we'll probably rewrite this, we'll set m_Time time
+
+169
+00:19:05,025 --> 00:19:08,300
+好了，所以那应该是我们需要的所有东西
+okay, great, so that should be everything that we need
+
+170
+00:19:08,750 --> 00:19:20,300
+还需要设置DisplaySize吗，现在的Application，我想没有Window，我们需要的是Window
+are we also need to set the DisplaySize, now Application, I think doesn't have a Window, and what we need is Window
+
+171
+00:19:20,300 --> 00:19:27,200
+我认为有GetWidth()和GetHeight()，好了，我们要做的是返回这个Window
+I think has a GetWidth, GetHeight, okay, so what we'll do is we'll return this Window here
+
+172
+00:19:27,466 --> 00:19:38,256
+我们要做的只是创建一个inline Window& GetWindow()，它会像那样返回Window
+so what we'll do is just an inline Window&, GetWindow, which would return window just like that
+
+173
+00:19:39,875 --> 00:19:47,133
+然后在这里，因为我们想设置的主要东西就是DisplaySize
+and then over here, we will, because the primary thing that we want to set is something called DisplaySize
+
+174
+00:19:47,133 --> 00:19:56,166
+它告诉ImGui显示是怎样的，为了实现那个，需要得到我们的Application
+which just tells ImGui how video display is, so to make that happen, we'll need to get our Application
+
+175
+00:19:56,166 --> 00:20:02,525
+我们现在还没有，我想我们有的，好了，那么Application现在不是单例的，那是一个问题
+we don't have that at the moment, I thought we did, okay, so Application is not a singleton at the moment, that's kind of an issue
+
+176
+00:20:03,466 --> 00:20:23,925
+所以我们要做的是需要得到Application，这儿添加一个s_Instance，这应该是私有的
+so what we want to do is basically have Application, I'll add s_Instance here, this should be private
+
+177
+00:20:23,925 --> 00:20:30,549
+这应该是我们有的东西，因为Application，只会有一个Application
+this should be something that we have, because Application, it's only going to be one Application
+
+178
+00:20:32,066 --> 00:20:42,100
+不管在哪儿，不管在代码中什么位置，我们都可能需要访问Application
+and wherever we are, just types out wherever we are in our code base, we will probably want to access the Application
+
+179
+00:20:42,100 --> 00:20:48,999
+因为它有重要的信息，它的作用是，为我们的Application持有一个单例
+because it has important information, so what this will basically do is, hold a singleton to our Application
+
+180
+00:20:51,575 --> 00:20:58,550
+它在我们构造Application时设置，我们应该只有一个，所以甚至可以断言，以确保你们知道
+which gets set when we construct our Application, and we should only have one anyway, so we could even assert to make sure that you know
+
+181
+00:20:59,366 --> 00:21:09,100
+我们只能有一个Application，所以也就是s_Instance需要为空，Application已经存在
+that we only have one Application, so what to see s_Instance needs to be null, Application already exists
+
+182
+00:21:11,625 --> 00:21:18,850
+我还有一个s_Instance，这样无论在代码库中，比如这里，我们可以看到Application::Get()
+I also have a s_Instance to this, so that then wherever we are in our code base, such as here we can just see Application::Get()
+
+183
+00:21:19,166 --> 00:21:29,333
+那会返回我们Application，那么让我们包含Hazel/Application.h吧
+and that will kind of give us our Application, so let's include Hazel/Application
+
+184
+00:21:30,966 --> 00:21:40,550
+就是Application::Get()，Get()需要是静态的，好了，酷，那么现在我们得到了了这个
+Application::Get, Get needs to be static, okay, cool, so now that we have this
+
+185
+00:21:41,200 --> 00:21:49,800
+我们可以在这里放入app.GetWindow().GetWidth()和app.GetWindow().GetHeight()
+we can into here just put app.GetWindow().GetWidth() and app.GetWindow().GetHeight()
+
+186
+00:21:51,100 --> 00:22:00,875
+好了，酷，那我们继续，我想就是这样了，我们当然也要实现事件，但我认为那应该是
+alright, cool, so there we go, I think it's about it, so we have to do events as well of course, but I think that should be
+
+187
+00:22:01,733 --> 00:22:08,425
+那应该差不多了，我们需要让这个运行起来，所以我很想看看它能不能跑起来
+that should be pretty much, all that we need to actually get this running, so I'm interested to see this will work
+
+188
+00:22:08,425 --> 00:22:14,450
+因为这只是一些hack的东西，那么如果我们进入我们的SandboxApp
+because of course, this was a lot of just hacking stuff in, so if we go into our SandboxApp
+
+189
+00:22:14,700 --> 00:22:23,200
+现在，我们只有ExampleLayer被推送进去了，但我要做的是
+at the moment, we only have our ExampleLayer being pushed in, but what I'm gonna do is
+
+190
+00:22:24,225 --> 00:22:37,224
+我要进入Hazel.h，添加Hazel/ImGui/ImGuiLayer.h
+I'm going to into into Hazel.h, I'm just going to add in Hazel/ImGui/ImGuiLayer.h
+
+191
+00:22:39,400 --> 00:22:48,150
+然后在我们的SandboxApp中，我将推送一个覆盖层，也就是我们的ImGuiLayer
+and then in our SandboxApp, I'm going to push an overlay, which is going to be our ImGuiLayer
+
+192
+00:22:53,350 --> 00:23:04,450
+好了，那么那是不存在的，ImGuiLayer，那应该是合法的，哦，是了，它必须在Hazel里面
+okay, so that is for some reason not there, ImGuiLayer, that should be legit, oh well yeah it has to be inside Hazel
+
+193
+00:23:04,900 --> 00:23:11,566
+我以为我们在命名空间里，好了，酷，现在我有点害怕，让我们按f5，看看会发生什么
+I thought we were inside the namespace, okay, cool, so now I'm kind of scared, but let's hit f5 and see what happens
+
+194
+00:23:11,566 --> 00:23:16,850
+我可能会在这里放一个断点，因为我想检查某些东西看它们是否设置正确
+I'm just gonna put a break point maybe here, because I want to check out certain things to see if they were set correctly
+
+195
+00:23:17,500 --> 00:23:24,500
+它没有一个奇怪的。。。有一个链接错误，因为没有ImGui，让我们展示给你们看看
+okay, so it's not having a weird certain, we got a linking error, because we're missing ImGui, let's show you guys
+
+196
+00:23:25,466 --> 00:23:29,625
+因为我们忽略了，似乎我们忽略了构造函数，它没有参数
+because we're missing, it seems we're missing the constructor, that has no parameters
+
+197
+00:23:30,566 --> 00:23:39,450
+那有点奇怪，因为不是那个，看看ImGuiLayer，显然我们忽略了这个，怎么忽略了那个
+that's a bit weird, because is that not it, ImGuiLayer, we're missing this apparently, how does we're missing that
+
+198
+00:23:40,000 --> 00:23:48,900
+我们忘记导出了，那么就是HAZEL_API，所以那很重要的
+oh well I mean we actually forgot to export it, so what is it HAZEL_API, so that's kind of important
+
+199
+00:23:49,366 --> 00:23:54,599
+别忘了，好了，那么我们得到了一个调试错误，abort被调用了，这些都是最好的
+let's not forget that, okay, so we have a debug error, abort has been called these are the best ones
+
+200
+00:23:55,200 --> 00:24:00,675
+所以ImGui不爽，如果我点击重试，ImGui不爽是因为我们没有调用CreateContext之类的
+so ImGui's not happy, if I hit retry, I can see, ImGui's not happy, because we didn't call CreateContext or anything like that
+
+201
+00:24:01,500 --> 00:24:09,500
+我认为那可能是因为，当我们附加层的时候，它们实际上是没用的
+I actually think that maybe, that's because yeah when we attach layers, they don't actually, you know cause
+
+202
+00:24:09,500 --> 00:24:16,625
+那么这儿应该是layer->OnAttach()，PushOverlay中也一样，我们再试一次
+so layer->OnAttach is what should happen here, and in PushOverlay, so yes let's try that again
+
+203
+00:24:19,666 --> 00:24:25,825
+好吧，它又不爽了，这次是无效的DisplaySize值，好了，酷，我有种感觉
+okay, it's not happy again, this time invalid DisplaySize value, okay, cool, so I have a feeling
+
+204
+00:24:26,400 --> 00:24:33,225
+让我们快速看一下这些很酷的东西看看，这是从OnUpdate GetIO哪儿冒出来的，好了，知道了
+let's just look at the cool staff quickly to see, where this is coming from OnUpdate GetIO, ok, alright, okay
+
+205
+00:24:34,100 --> 00:24:40,050
+我想我们之前应该做过那个，所以在开始创建新帧之前，我们需要设置一个大小
+I think that maybe we should have done that before, so before we begin the frame, we actually need to set a size
+
+206
+00:24:40,350 --> 00:24:48,500
+那么我们会像那样实现那个，实际上会先做计时，所以需要把这个移下来
+so we'll do that like that, and actually we'll even do the timing first, so we'll need to move this down
+
+207
+00:24:49,275 --> 00:24:56,850
+好了，那么我们继续，DisplaySize已经被设置成了1280x720，很好，DeltaTime是0.016s
+okay, so there we go, DisplaySize has been set to 1280 by 720, that's great, DeltaTime is 16 miles seconds
+
+208
+00:24:57,566 --> 00:25:01,900
+让我们看看得到了什么，好了，看看，太棒了，这里就是ImGui，我们不能移动任何东西
+let's see what we get, oh okay, look at that, fantastic, so we have ImGui here, we can't move anything
+
+209
+00:25:01,900 --> 00:25:03,750
+我们不能追踪任何东西，因为我们没有事件
+we can't track with anything, because we have no events
+
+210
+00:25:04,225 --> 00:25:07,775
+但这是多么酷啊，我们在窗口有了ImGui渲染
+but how cool is this we have ImGui rendering inside our window
+
+211
+00:25:08,166 --> 00:25:12,650
+那非常棒，好了，所以下一步就是设置所有的事件
+that's pretty awesome, okay, so the next step would be to set up all of the events
+
+212
+00:25:13,375 --> 00:25:18,600
+现在我将把它作为一个练习留给你们，看看你们是否能自己弄明白
+now I'm going to leave this as a bit of an exercise to you guys to see if you guys can figure it out by yourselves
+
+213
+00:25:19,666 --> 00:25:25,640
+我们将在下期视频中做，因为这期视频已经有30分钟了，但我会看到这个
+we're going to do this in the next video, because this video's already like 30min, but I will see this
+
+214
+00:25:26,566 --> 00:25:32,800
+如果只是引用这个GLFW实现，你们可以看到实际发生的是
+if you just reference this implementation, the GLFW has, you can see that what actually happens is
+
+215
+00:25:33,466 --> 00:25:39,133
+如果我们看一些KeyCallback函数，你们就可以看到实际发生了什么，对吧
+if we look at some kind of you know KeyCallback function, you can see what actually happens, right
+
+216
+00:25:39,133 --> 00:25:45,066
+所以我们调用这个回调，也就是MouseButtonCallback，那个KeyCallback在哪儿
+so what we call this previous callback, which is as a MouseButtonCallback, where's that KeyCallback
+
+217
+00:25:45,300 --> 00:25:51,675
+你们可以看到它设置io，也就是ImGuiIO，我们基本上想要设置某些变量
+yeah you can see that it sets io stuff sometimes that ImGuiIO, we basically want to set certain variables
+
+218
+00:25:52,066 --> 00:25:57,700
+所以你们知道的，当我们按下一个按键时，它会将KeysDown[key]设置为true，对吧
+so you know when we press a key, it sets KeysDown with a relevant key to true, right
+
+219
+00:25:58,866 --> 00:26:04,650
+或者对于直接修改它取决于是否被按下，对吧，对于鼠标位置
+or it for modifiers it sets directly whether or not they're pressed, right, for the mouse position
+
+220
+00:26:04,650 --> 00:26:10,875
+例如这儿有个MouseButtonCallback，我相信它会在循环中完成
+for example there's a MouseButtonCallback, which actually this gets done inside a loop I believe
+
+221
+00:26:11,266 --> 00:26:15,925
+那么io.MouseDown会在UpdateMousePosAndButtons中被设置
+yeah so io.MouseDown gets set inside the UpdateMousePosAndButtons
+
+222
+00:26:16,200 --> 00:26:21,550
+所以如果你们引用这个imgui_impl_glfw文件，应该能够设置一切
+so if you refer to this imgui_impl_glfw file, you should be able to get everything set up
+
+223
+00:26:21,775 --> 00:26:29,966
+非常简单，非常简单，对吧，所以那就留给你们当作练习吧，看看能不能实现
+really easy, really easily, right, so that's kind of an exercise for you guys to see if you can do
+
+224
+00:26:29,966 --> 00:26:36,799
+但下周我会向你们展示我是怎么做的，我们会让ImGui完全互动和运行起来
+but otherwise next week of course I will show you guys how I do it, and we'll get ImGui fully kind of interactive and working
+
+225
+00:26:36,800 --> 00:26:42,799
+我们可能还会做光标之类的东西，因为这个文件中有很多东西需要做
+and we'll probably do things like mouse cursors as well, because there's quite a lot of stuff in this file, that needs to be done
+
+226
+00:26:42,800 --> 00:26:48,133
+我绝对不想在这期视频中匆忙完成，希望你们喜欢这期视频，如果喜欢，就为它点赞吧
+and I definitely don't want to rush it in this video, hope you guys enjoyed this video, if you did, hit the like button
+
+227
+00:26:48,133 --> 00:26:51,566
+一如既往地感谢所有支持本系列节目的赞助人
+huge thank you as always to all the patreons that make this series possible
+
+228
+00:26:51,566 --> 00:26:57,266
+如果你们没有在patreon上支持我，一定要去看看，它真的对支持这个系列有帮助
+if you guys aren't supporting me on patreon, and definitely check it out there, it really does help support the series
+
+229
+00:26:57,266 --> 00:27:00,125
+你们现在就可以看到下期视频，因为它已经上线了
+also you'll get to see the next video right now, because it's already up
+
+230
+00:27:01,166 --> 00:27:08,400
+还有所有这些东西所有ImGui的东西，所有的代码都已经在开发分支中写好了
+and also also all of this stuff all the same ImGui stuff, all the code has already been written in the development branch
+
+231
+00:27:08,400 --> 00:27:13,533
+你们也会看到，因为我在那里写了更多Hazel的代码
+that you will get access to as well, because I've got like much more of Hazel actually written there
+
+232
+00:27:13,533 --> 00:27:19,900
+那么如果你们有兴趣提前离开，不想等的话，那就去看看patreon.com/thecherno吧
+so if you're interested in kind of just leaving ahead, and you don't want to wait, then check out, check out patreon.com/thecherno
+
+233
+00:27:20,225 --> 00:27:22,900
+希望你们喜欢这期视频，如果喜欢的话，就为它点赞吧
+hope you guys enjoyed this video, if you did, please hit the like button
+
+234
+00:27:22,900 --> 00:27:27,099
+现在能在屏幕上看到实际的东西是非常令人兴奋的，尽管这有点小技巧
+it's really exciting to see the actual stuff on the screen now, even though this is a bit of a hack
+
+235
+00:27:27,100 --> 00:27:31,900
+我们将来需要重构很多，我认为实际的层基本没问题
+and we'll have to refactor a lot of it in the future, the actual layer stuff I think is mostly okay
+
+236
+00:27:32,300 --> 00:27:34,875
+它就是渲染器，那才是我们需要完成的重要事情
+it's the Renderer, is the really big thing that we'll need to work on
+
+237
+00:27:35,266 --> 00:27:40,099
+一旦Hazel真的有了自己的渲染器，不管怎样，我们下次见，拜
+once Hazel actually does have its own Renderer, anyway, I'll see you guys next time, goodbye
+

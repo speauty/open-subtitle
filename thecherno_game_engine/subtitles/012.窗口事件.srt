@@ -1,0 +1,1055 @@
+﻿1
+00:00:00,166 --> 00:00:03,725
+嗨，大家好，我叫TheCherno，欢迎回到我的游戏引擎系列
+hey, what's up guys, my name is TheCherno, welcome back to my game engine series
+
+2
+00:00:03,933 --> 00:00:09,750
+上次我们讨论了如何创建窗口，我们使用GLFW为我们的游戏引擎创建窗口
+so last time we took a look at creating windows, and we used GLFW to actually create the window for our game engine
+
+3
+00:00:09,750 --> 00:00:13,533
+我们讲了很多抽象的东西，以及如何抽象窗口
+and we talked a lot about abstractions, and how we can actually abstract that window
+
+4
+00:00:13,533 --> 00:00:20,625
+一种逻辑和接口，而不是仅仅寻求一个单一的平台，因为很明显，Hazel将支持多个平台
+kind of logic and api outside of just seeking to a singular platform, because obviously, Hazel's gonna be supporting multiple platforms
+
+5
+00:00:20,966 --> 00:00:24,933
+所以，如果你们还没有看这个视频，一定要去看看，因为这对这个视频至关重要
+so definitely check out that video, if you haven't already, because that's gonna be vital for this video
+
+6
+00:00:25,066 --> 00:00:32,525
+我们会将事件添加到窗口中，那么，窗口就会生成事件
+in which we're going to actually add events to that window, so windows, right, windows generates, they generate events
+
+7
+00:00:32,525 --> 00:00:38,650
+所以在任何时候，我们移动鼠标，按下一个键，关闭窗口，调整窗口大小，点击鼠标按钮
+so anytime, we move the mouse, we press a key, we close the window, we resize the window, we click a mouse button
+
+8
+00:00:38,875 --> 00:00:43,399
+所有那些都产生了一个叫做事件的东西，如果你们还没有看过事件的视频
+all of that generates something called an event, if you guys haven't seen the event video
+
+9
+00:00:43,400 --> 00:00:48,266
+我们实际上实现了事件系统，还有之前计划事件系统的视频，一定要去看看
+where we actually implemented both the event system, but also the video before that where we planned it, definitely check it out
+
+10
+00:00:48,266 --> 00:00:53,250
+事实上，看看整个游戏引擎系列的播放列表，你们要按顺序看所有的视频，这很重要
+in fact, check out the whole game engine series playlist, it's really important that you guys kind of watch all the videos in order
+
+11
+00:00:53,533 --> 00:00:57,933
+因为他们分享了很多关于我们在任何一期中实际做什么的信息
+because they help shared a lot of light as to what we're actually doing in any given episode
+
+12
+00:00:58,675 --> 00:01:05,533
+不管怎样，重点是，在那些视频中，设置了所有我们需要创建一个事件的东西，对吧
+anyway, the point is that, in those videos, we kind of set up everything that we need to both create an event, right
+
+13
+00:01:05,533 --> 00:01:10,845
+并且有某种事件框架，它将事件传递到我们代码库的特定部分
+and have some kind of event framework, which delivers events to specific parts of our code base
+
+14
+00:01:11,700 --> 00:01:14,650
+然后我们还创建了窗口，它能够生成这些事件
+and then we also create the window, which is capable of generating these events
+
+15
+00:01:15,066 --> 00:01:20,000
+所以我们现在要做的就是把这两个系统联系起来，那就是这个视频要讲的内容
+so what we need to do now is kind of link those two systems together, and that's really what this video is going to be about
+
+16
+00:01:20,333 --> 00:01:25,366
+我们需要能够说，嘿，当一个事件在我们的窗口内发生时，对吧
+we need to be able to say that, hey, whenever an event occurs inside our window, right
+
+17
+00:01:25,566 --> 00:01:31,200
+我们需要创建一个事件，然后调度它，然后把它扔到世界上
+we want to kind of create one of our events, and dispatch it, and kind of throw it out into the world
+
+18
+00:01:31,333 --> 00:01:35,429
+然后是我们的引擎或者游戏或应用中的内容
+and then whatever inside our engine or later inside our game or application
+
+19
+00:01:35,700 --> 00:01:41,925
+它实际上需要处理特定类型的事件，这是一个很好的例子，非常简单的例子
+that actually wants to handle a certain type of event can, and a really good example, really simple good example
+
+20
+00:01:41,925 --> 00:01:49,000
+现在我们迫切需要的是关闭按钮，当我们在Hazel中点击关闭按钮时
+right now that we actually desperately kind of need is the close button, so when we hit the close button in Hazel
+
+21
+00:01:49,000 --> 00:01:53,275
+现在在Hazel应用程序中，什么都没有发生，只要我们点击它，什么都没有发生
+right now in a Hazel application, nothing happens, it just we click it and nothing happens
+
+22
+00:01:54,175 --> 00:02:00,999
+我们实际想要的是终止程序，对吧，所以那就是我们今天要实现的
+what we actually want to happen is we want to terminate the program, right, so that's what we're going to kind of implement today
+
+23
+00:02:01,166 --> 00:02:03,775
+以及能够调度所有不同的事件类型
+as well as just being able to dispatch all of the different event types
+
+24
+00:02:03,775 --> 00:02:08,899
+比如KeyPressed, MouseEvents, WindowResizedEvents，所有这些东西
+like KeyPressed, MouseEvents, WindowResizedEvents, all that kind of stuff
+
+25
+00:02:08,900 --> 00:02:12,566
+我们将看看如何实际设置，所以直接上手干吧
+we're going to take a look at how we can actually set that up, so let's just go ahead and do it
+
+26
+00:02:12,566 --> 00:02:16,550
+好了，那么实际上，我们的Application类现在有点空，这里没有太多东西
+okay, so our actual Application class is kind of black right now, not much going on here
+
+27
+00:02:17,366 --> 00:02:22,099
+但我们真正需要做的是能够在Window上设置一个回调函数
+but what we actually need to do is to be able to set a callback function on the Window
+
+28
+00:02:22,100 --> 00:02:26,400
+那么在Window中，我们做的是SetEventCallback，对吧
+so inside Window, what we actually made was something called SetEventCallback, right
+
+29
+00:02:26,700 --> 00:02:28,975
+这当然是来自抽象的Window
+and this is something that comes from the abstract Window of course
+
+30
+00:02:29,275 --> 00:02:31,450
+并且这个EventCallbackFn基本上只是一个函数
+and the EventCallbackFn is basically just a function
+
+31
+00:02:31,450 --> 00:02:38,350
+它返回void，并以Event&作为参数，我们需要能够设置它
+which returns void, and takes in an Event reference as its parameter, we need to be able to set that up 
+
+32
+00:02:38,350 --> 00:02:45,399
+所以当调用事件时，当在这里生成事件时，我们会将它们调度给那个回调函数
+so that when we actually call our events, when we generate events over here, we dispatch them to that callback function
+
+33
+00:02:45,400 --> 00:02:51,266
+所以为了做到这一点，我们只需要SetEventCallback，需要将它绑定到这里的一个函数
+so to do that, we'll just SetEventCallback, and we actually need to bind it to one of the functions in here
+
+34
+00:02:51,266 --> 00:02:54,350
+或者至少这是我想做的，我们可以用lambda或者类似的东西
+or at least that's what I want to do, we could just use a lambda or something like that
+
+35
+00:02:54,350 --> 00:02:58,850
+但我要将它绑定到一个实际的函数，所以这儿有一个函数，叫做OnEvent
+but I'm going to bind it to an actual real function, so we're going to have a function here called OnEvent
+
+36
+00:02:59,166 --> 00:03:08,766
+它只接收一个Event&作为参数，我要复制它，然后在这里实现它
+which takes in just an Event as an argument like that, I'm going to go ahead and copy that, and then implement it over here
+
+37
+00:03:09,533 --> 00:03:19,275
+好了，然后我们可以使用我们创建的EventDispatcher，它就在这儿
+so there we go, and then this we can actually use the EventDispatcher that we created, which is located over here to
+
+38
+00:03:19,600 --> 00:03:25,900
+然后调度适当的事件到我们这里的适当方法或函数
+then kind of dispatch the appropriate event to the appropriate method or function that we actually have here
+
+39
+00:03:26,575 --> 00:03:34,425
+我们等下会看这个，所以我们会为这个特定事件设置事件回调函数
+and we'll take a look at that in a minute, so we'll set the event callback to actually be this specific event
+
+40
+00:03:34,425 --> 00:03:42,050
+我们可以通过使用std::bind来实现，我们将绑定Application::Event
+and the way we can do that just by using std::bind, and we'll bind Application::Event
+
+41
+00:03:42,050 --> 00:03:48,550
+你们可以为此创建一个宏，我通常会这样做，抱歉，OnEvent，那会让事情更简单
+you could create a macro for this, I usually end up doing that, sorry, OnEvent, that ends up making things easier
+
+42
+00:03:49,000 --> 00:03:54,800
+尤其是这些占位符，但现在我觉得这没啥问题
+especially with this whole placeholders thing, but for now I think that's probably fine
+
+43
+00:03:55,066 --> 00:03:59,899
+我会告诉你们我的意思，无论如何，它可能会这样，BIND_EVENT_FN或其他东西
+I'll show you what I mean, anyway, it might as well do it, you know, BIND_EVENT_FN or something
+
+44
+00:04:00,566 --> 00:04:07,100
+就变成了某个东西，就像我们刚才写的一样，只不过我们可以在这里取一个x
+just become something, like something like we just wrote, except we can just take an x here
+
+45
+00:04:07,600 --> 00:04:15,300
+所以这个，这行代码变成BIND_EVENT_FN(OnEvent)，就这样
+and so this, this line of code becomes BIND_EVENT_FN(OnEvent), and that's it
+
+46
+00:04:15,766 --> 00:04:21,166
+显然，这样的东西只适用于这个类，但如果你们愿意的话，可以把这整个都拿出来
+obviously something like this only works in the context of this class, but you could actually take this whole thing out, if you want
+
+47
+00:04:21,800 --> 00:04:27,900
+然后这是Application::OnEvent，这可能更好，这是一些可以考虑的东西
+and then this would just be Application::OnEvent, which might be even nicer, so just something to consider
+
+48
+00:04:27,900 --> 00:04:32,533
+总之，我要回到这个，好了，酷，所以设置了事件回调
+anyway, I'm gonna just go back to this, okay, cool, so we've set up the event callback
+
+49
+00:04:33,200 --> 00:04:42,066
+事件回调会进入我们这里的WindowData结构，所以如果我们调用EventCallback
+the event callback goes into this WindowData struct that we have here, so if we call EventCallback
+
+50
+00:04:42,366 --> 00:04:48,400
+现在我们已经设置好了，它最终会调用这个OnEvent函数
+now that we've kind of set it up, it's actually going to end up calling this OnEvent function for now
+
+51
+00:04:49,200 --> 00:04:50,533
+我们把它打印出来
+let's just go ahead and print it
+
+52
+00:04:50,533 --> 00:05:00,999
+那么就是HZ_CORE_INFO(e)，对吧，然后我希望我们必须提供格式化字符串
+so I'll do HZ_INFO, HZ_CORE_INFO for e, okay, and then I'll rather we have to provide formatting strings
+
+53
+00:05:01,000 --> 00:05:05,566
+我们会这样做，然后打印事件，因为我们在每个事件上实现了一个ToString
+we'll do that, and then so we're just printing the event, and because we have a ToString implemented it on every event
+
+54
+00:05:05,566 --> 00:05:10,750
+它会打印一些细节，比如它是什么类型的事件，以及数据被设置为什么，好了，棒
+it should just print some nice details about what kind of event it is, and what the data is set to, okay, great
+
+55
+00:05:10,750 --> 00:05:21,000
+现在让我们实际设置事件，我会在这里写一个注释，它们基本上是说设置GLFW回调
+so now let's actually set up the events, so I'll write a nice comment here, they're basically just says set GLFW callbacks
+
+56
+00:05:21,525 --> 00:05:24,825
+因为我们要从GLFW中捕获一些回调，我能如何设置它们
+because we're going to grab some callbacks from GLFW, and what can I just set them up
+
+57
+00:05:25,275 --> 00:05:32,300
+那么我们会先做WindowSizeCallback，需要传入m_Window，然后是一个函数
+so we'll do the WindowSizeCallback first, so we need to pass in m_Window and then a function
+
+58
+00:05:32,666 --> 00:05:38,125
+当窗口大小改变时，它会被调用，所以对于这个，我们需要做的就是
+that actually will get called, whenever the window size changes, so for this, all we really need to do is
+
+59
+00:05:38,900 --> 00:05:43,733
+我将使用一个Lambda，创建一个Lambda，它接受一个GLFWwindow*
+I'm just going to use a Lambda, I'm going to create a Lambda, which takes in a GLFWwindow
+
+60
+00:05:43,733 --> 00:05:48,750
+然后我认为最好的方法是去回调函数
+and then I think the best way to really do this is just to go to the callback function
+
+61
+00:05:49,766 --> 00:05:54,000
+看看这个实际的GLFWwindowsizefun，看看它到底是什么，所以你们可以看到
+and just to go through this actual windowsizefun, and see what it actually is, so you can see
+
+62
+00:05:54,900 --> 00:05:59,099
+它是GLFWwindow指针，然后是三个整数，这两个整数分别是width和high
+it's the Window pointer, and then three integers, and these two integers are the width and high
+
+63
+00:05:59,300 --> 00:06:06,550
+所以我们知道这是window，width，high，然后我们可以把实际的实现写在这里
+so we know that it's the window and then the width and then the high, and then we can have the actual implementation written here
+
+64
+00:06:06,900 --> 00:06:14,600
+那么，我们如何在这个Lambda中调用这个Application函数，并创建正确的事件
+so how do we now inside this Lambda end up calling this Application function, and and also creating the right event
+
+65
+00:06:14,600 --> 00:06:21,496
+那是这个函数的缺失，首先，你们可能记得我们说过WindowUserPointer
+that's kind of the the miss of this function, so first of all, you might recall that we said a WindowUserPointer
+
+66
+00:06:21,666 --> 00:06:29,800
+这意味着在这个Window上的GLFWwindow是这样的结构，它是在某处定义的
+what this means is that onto this window kind of GLFWwindow is this kind of struct here, that is defined somewhere
+
+67
+00:06:30,933 --> 00:06:40,266
+它基本上支持我们把任何类型的数据放在这个WindowUserPointer的形式中，对吧
+that has basically like a support for us to put any kind of data we want in the form of this WindowUserPointer, right
+
+68
+00:06:40,266 --> 00:06:46,200
+一个void指针可以指向任何东西，我们说过它是指向这个数据结构的指针
+so just a void pointer can be appointed to anything, we've said it to be a pointer to this data struct that we have here
+
+69
+00:06:46,366 --> 00:06:53,200
+它包含所有这些数据，所以基本上意味着在这个函数中，因为可以访问GLFWwindow
+which contains all this data, so basically what that means is that inside this function, since we have access to GLFWwindow
+
+70
+00:06:53,666 --> 00:07:01,400
+我们可以用GetUserPointer, GetWindowUserPointer从窗口返回一个void指针
+we can just kind of GetUserPointer, GetWindowUserPointer from the window, right, that returns a void pointer
+
+71
+00:07:01,400 --> 00:07:07,125
+那么现在需要强制转换这个为正确的类型，对我们来说是WindowData
+so now we need to cast this to be the correct type, which for us is WindowData
+
+72
+00:07:07,125 --> 00:07:09,800
+因为那是我们设置的UserPointer
+because that's what we've set the UserPointer to be
+
+73
+00:07:10,166 --> 00:07:20,666
+所以我们只需要这样做WindowData& data = WindowData，然后在这里引用它
+so we just need to do WindowData& data equals WindowData like that, and then we're just referencing it here
+
+74
+00:07:20,666 --> 00:07:23,250
+好了，好了，接下来我们要做Hazel相关的了
+okay, there we go, and then we actually need to make the Hazel about
+
+75
+00:07:23,366 --> 00:07:30,533
+那么就是 WindowResizeEvent event()，然后我想我们只需要取它并处理I
+so we're write WindowResizeEvent event, and then I think we just need to take it and deal with an i
+
+76
+00:07:31,766 --> 00:07:37,950
+就这样，现在我们需要包括所有这些事件，Hazel/Core，
+and that's it, now we need to include all of these events, so Hazel/Core, 
+
+77
+00:07:39,625 --> 00:07:43,100
+也就是Hazel/ events /ApplicationEvent
+which is Hazel/Events/ApplicationEvent
+
+78
+00:07:43,100 --> 00:07:55,133
+我们需要所有这些，那么现在就包含这些，MouseEvent.h和ApplicationEvent.h
+well we need all of them, anyway, so reminds will include it now, MouseEvent and Application of that
+
+79
+00:07:55,133 --> 00:08:02,366
+好了，酷，完成了，所以现在我们可以通过data.EventCallback(event)来调度它
+okay, cool, so there we go, so we've made that, now we can dispatch it by just doing data.EventCallback with the event
+
+80
+00:08:03,000 --> 00:08:08,675
+然后我们的data中，有一个最小height值，那是由Window维护的，对吧
+but then we also have inside our data a within height, that is maintained accounted by the window, right
+
+81
+00:08:09,300 --> 00:08:17,800
+所以我们还需要设置它，那么就是，data.Width = width，data.Height = height，酷
+so we also need to set that up, so we'll see data.Width equals width, and data.Height equals height, cool
+
+82
+00:08:17,800 --> 00:08:21,400
+那么我们创建了一个WindowResizeEvent，并调度它，然后完成了所有这些
+so we've created a WindowResizeEvent, we've dispatched it, and then we've done all this
+
+83
+00:08:21,400 --> 00:08:27,450
+我可能会先做这个，这样我们在创建任何事件东西之前
+I might actually do this first, just so that we basically even before we create any kind of event stuff
+
+84
+00:08:27,450 --> 00:08:31,500
+Window已经有了更新后的大小，因为这只是假设
+the window already has the updated size, because just hypothetically speaking
+
+85
+00:08:31,675 --> 00:08:36,866
+如果在这些事件类型的处理函数中，我们决定查询窗口的宽度和高度
+if inside one of these event kind of handling functions, we decide to query the window for its width and height
+
+86
+00:08:36,900 --> 00:08:42,075
+这是错误的，因为它有一个更新，所以这样会更好一点，好了，就是那样
+it would be wrong, because it has an updated yet, so this way it's just a little bit better, okay, and that's it
+
+87
+00:08:42,075 --> 00:08:47,450
+你可以看到我们这里的这种模式在每种事件类型中都是重复的
+and you can see this kind of for the same pattern that we have here is just repeated for every kind of event type
+
+88
+00:08:49,600 --> 00:09:00,450
+它是glfwSetWindowCloseCallback，我觉得这很简单
+so it's glfwSetWindowCloseCallback as well, just becomes I think this is quite simple
+
+89
+00:09:01,666 --> 00:09:11,533
+我想这只是一个GLFWwindow指针，就是那样，如果发生这种情况，我们将复制这一行
+I think this is just a window pointer, and that's it, and then if this happens, we'll copy this line
+
+90
+00:09:12,733 --> 00:09:23,533
+我们需要做的就是创建WindowCloseEvent，然后调度，所以就是data.EventCallback(event)
+and all we need to really do is create that WindowCloseEvent, and then dispatch it, so the data.EventCallback
+
+91
+00:09:23,866 --> 00:09:31,575
+就这样，下一个我可能不需要复制它，下一个要做的是KeyCallback
+and then that's it, so next one I probably don't really need to copy it, next one we'll do is the KeyCallback
+
+92
+00:09:32,266 --> 00:09:41,975
+所以我们将KeyCallback设为window，然后是回调函数，它可能需要复制
+so we'll set the KeyCallback to be window, and then the callback function, which will probably need to copy
+
+93
+00:09:42,650 --> 00:09:48,325
+我们到这里，到上面的KeyFunc，然后我们有window和四个整数
+so again, we'll go into here, we'll go up to the KeyFunc, and then we have window and then four integers
+
+94
+00:09:48,800 --> 00:09:50,925
+key, scancode, action, mods
+so key, scancode, action, mods, 
+
+95
+00:09:51,950 --> 00:10:07,725
+那么就是key, scancode, action, mods，然后我们会抓取这个WindowData
+so key, scancode, action, mods, and then again we'll grab this WindowData
+
+96
+00:10:08,966 --> 00:10:13,599
+现在我们需要做的是，顺便说一下，因为这个KeyCode是特定于GLFW的
+now what we need to do at some point, by the way, is because this KeyCode is kind of GLFW specific
+
+97
+00:10:13,600 --> 00:10:18,533
+我们需要把它转换成Hazel的KeyCode，因为在其他平台上我们不使用GLFW
+we need to convert it into a Hazel key code, because on other platforms where we don't use GLFW
+
+98
+00:10:18,533 --> 00:10:25,133
+不想对那些KeyCode感到厌倦，我们想有自己的KeyCode，所以在某些时候，需要做些转换
+we don't want to be tired to those kind of key codes, we want to have our own, so at some point, we need to do some kind of conversion
+
+99
+00:10:25,366 --> 00:10:29,782
+所以这个比其他的要复杂一些，就是switch(action)
+so this one's going to be a little bit more complicated than the other ones, we basically want to switch on the action
+
+100
+00:10:30,200 --> 00:10:35,128
+因为GLFW为我们提供了许多不同的操作，这便是所谓的GLFW_PRESS
+because GLFW provides us with a bunch of different actions, there's something called Press
+
+101
+00:10:35,600 --> 00:10:38,766
+有一种叫做GLFW_RELEASE，还有一种叫做GLFW_REPEAT
+there's something called Release, and then there's something called Repeat as well
+
+102
+00:10:38,966 --> 00:10:52,775
+那么就是PRESS, RELEASE, REPEAT，在PRESS的分支中，我们可能也会把这个括起来
+so Press, Release, Repeat, in the case of Press, and we'll probably have just around this in brackets as well
+
+103
+00:10:52,775 --> 00:10:58,800
+因为我们会创建一堆同名的变量，所以KeyPressedEvent会在这里创建
+because we'll make a bunch of variables with the same name, so KeyPressedEvent gets created here
+
+104
+00:10:59,050 --> 00:11:03,366
+然后是我们传入的key，以及repeatCount，就是0
+and then the key is what we pass in, as well as the repeatCount of zero
+
+105
+00:11:03,366 --> 00:11:09,566
+那么key是被按下的按键的KeyCode，然后我们会在那里调用EventCallback
+so the key being the KeyCode of the key that was pressed, and then we'll just call the EventCallback there
+
+106
+00:11:13,166 --> 00:11:17,099
+REPEAT将是相同的，除了，GLFW接口实际上没有提供给我们一个repeatCount
+repeat is going to be the same except, GLFW api doesn't actually provide us with a repeatCount
+
+107
+00:11:17,100 --> 00:11:20,966
+尽管Win32API可以做到这一点，所以我们现在把它设为1
+even though the Win32API can do that, so let's just set this to one for now
+
+108
+00:11:20,966 --> 00:11:25,499
+如果我们将来想要它，它是有可能提取的，所以我们要记住这一点
+if we want that in the future, it's possible to extract, so we'll kind of keep that in mind
+
+109
+00:11:28,533 --> 00:11:35,775
+然后RELEASE是KeyReleasedEvent，然后我们也没有那个的repeatCount
+and then RELEASE is just KeyReleasedEvent, and then we also don't have a repeatCount for that
+
+110
+00:11:35,933 --> 00:11:45,166
+好了，继续，那就是我们需要做的，我习惯缩进，这样更清楚一些
+okay, there we go, that is what we need to do, I like to indent this though, just so that it's a bit more clear
+
+111
+00:11:45,166 --> 00:11:52,466
+所以我们会这样做，很好，酷，那就是我们需要为按键做的一切，也就是KeyCallback
+so we'll do that, and there we go, cool, and that's all we need to do for the key, for the key callbacks
+
+112
+00:11:52,466 --> 00:11:59,399
+那么下一个我们要讲的是MouseButtonCallback，这和KeyCallback基本相同，除了鼠标按钮
+so the next one we'll move on to is the MouseButtonCallback, this is basically the same as the KeyCallback, except for mouse buttons
+
+113
+00:12:02,766 --> 00:12:09,511
+我想这个只有三个整数，那么就是button，action，还有mods
+so I think this one, yeah it just has three integers, so the button, the action, and then the mods
+
+114
+00:12:12,066 --> 00:12:31,500
+window, button, action, mods，我们再次抓取这个，你们应该明白我为什么喜欢它了
+so window, button, action, mods, so we grab this again, you guys kind of see how maybe why I like
+
+115
+00:12:32,900 --> 00:12:39,948
+事先就写好了代码，然后给你们看区别，因为我觉得这样浪费的时间少一些
+you actually have the code written beforehand, and then just kind of show you the diff, because I think it's a little bit less time wasty
+
+116
+00:12:40,275 --> 00:12:45,836
+但无论如何，对于这个视频，我想我应该把它打出来，因为它没有那么多代码
+but anyway, for this video, I thought I'd type it out, because it's not that much code
+
+117
+00:12:47,466 --> 00:12:58,199
+因此，也是switch(action)，同样地，PRESS和RELEASE
+so we'll switch on the action, and again mask presses and releases the handle the same way
+
+118
+00:12:58,700 --> 00:13:05,733
+所以我们有Press和Release事件，没有Repeat事件，所以是MouseButtonPressedEvent
+so we have the press event and the release event, we don't have repeat events, so a MouseButtonPressedEvent
+
+119
+00:13:07,866 --> 00:13:10,800
+所以按下的按钮就是我们需要的
+so the button that was pressed is really all we need
+
+120
+00:13:11,566 --> 00:13:32,000
+EventCallback, MouseReleaseEvent，也一样，这显然是在release时，那是鼠标按钮
+and the EventCallback, mouse, MouseReleaseEvent same thing, said this is obviously on release, and that is it for mouse buttons
+
+121
+00:13:34,166 --> 00:13:41,099
+然后我们还有两个，我们有鼠标位置和鼠标滚动，我先做鼠标滚动，设置鼠标滚动
+and then we have two more, we have the mouse position and the mouse scroll as well, I'll do the mouse scroll first, so set mouse scroll
+
+122
+00:13:41,766 --> 00:13:44,399
+它是什么，SetScrollCallback
+what is it, SetScrollCallback
+
+123
+00:13:50,100 --> 00:13:59,066
+我想这里有两个双精度，对，就是这个双精度，也就是滚动轴的x偏移量和y偏移量
+I think this just has two doubles, yep such a double, which is the x offset and the y offset of the scroll
+
+124
+00:14:01,500 --> 00:14:13,125
+那么它是x偏移量，int，抱歉，它是双精度的，然后我们再复制一下这个，哎呀
+so it's x offset, int, sorry, that doubles, okay, and then we grab this again, oops
+
+125
+00:14:22,066 --> 00:14:43,599
+然后我们创建一个MouseScrolledEvent，我们可以传递这两个浮点数，然后调度它
+and then we make a MouseScrolledEvent, we can pass these two floats, and then dispatch it
+
+126
+00:14:46,333 --> 00:14:54,266
+好，最后是我们的，作为一个位置，回调，我要看到
+okay, and then finally we have our, as a position, scroll back scroll back, I was gonna see
+
+127
+00:14:54,933 --> 00:15:02,028
+然后那当然只是鼠标移动的任何东西，我们能得到一个它现在的位置的回调
+and then that of course is just whatever the mouse moves, we can get a callback with the position of where it is now
+
+128
+00:15:02,500 --> 00:15:10,725
+那么这是x位置和y位置，我想它们是双精度的，是的，它们是的
+so this is just x position and y position, and I think they were doubles actually, were they, yeah they were doubles
+
+129
+00:15:10,725 --> 00:15:17,350
+好了，有两个双精度，我们可以，我想可以把它们作为两个浮点数，应该没问题
+okay, so we have two doubles, we can, I think we just have them as either insulfloats, which should be fine
+
+130
+00:15:19,466 --> 00:15:34,450
+因为回调的位置，x位置y位置，再次复制这个，然后这只是一个MouseMovedEvent event
+so because a position for callback, x position y position, grab this again, and then this is just a MouseMovedEvent event
+
+131
+00:15:34,566 --> 00:15:43,100
+我们在这里实际上有两个浮点数，所以将它们转为浮动，就像我们在滚动时做的那样
+what we actually have here, get two floats, so we'll cast them to float as we did with the scrolling
+
+132
+00:15:46,733 --> 00:15:55,565
+然后我们调用这个，就那样，那就是我们实现的所有事件
+and then we'll call, let's call this, and that's it, that's all of our events implemented
+
+133
+00:15:56,100 --> 00:16:00,400
+那么现在我还想添加一个glfwErrorCallback
+so now one more thing that I actually want to add is a glfwErrorCallback 
+
+134
+00:16:01,025 --> 00:16:04,850
+所以我们GLFW实际上做的另一种类型的回调
+so what we the other kind of type of callback that GLFW actually does
+
+135
+00:16:04,850 --> 00:16:08,466
+我想我们会在这里做，因为它被重新纳入GLFW
+and I think we'll do this inside here, as it is renatalized GLFW
+
+136
+00:16:08,466 --> 00:16:14,850
+我们可以设置一个错误回调，我会把它设置成一个实际的函数
+we can actually set an error callback, and I'll set this to be like an actual kind of function
+
+137
+00:16:14,850 --> 00:16:22,000
+所以我们就叫它GLFWErrorCallback，把这个函数写在这里，我现在只是一个sag函数
+so we'll just call it GLFWErrorCallback, and we'll make this function up here, I'll just be a sag function for now
+
+138
+00:16:23,300 --> 00:16:35,133
+但这只是GLFWErrorCallback，错误回调函数接受一个整数，const char
+but this is just gonna be GLFWErrorCallback, I think the error callback function takes in an integer, const char
+
+139
+00:16:35,133 --> 00:16:42,899
+所以这是错误，然后是描述，我们把它放到这里，error，description
+so the error, and then a description, so we'll pop that in here, error, description
+
+140
+00:16:44,800 --> 00:16:52,800
+然后我们现在要做的就是记录它，我们会看到HZ_CORE_ERROR, GLFW Error
+and then all we'll do for now is just log it, so we'll see HZ_CORE_ERROR, GLFW Error
+
+141
+00:16:55,200 --> 00:17:04,366
+然后加上括号，因为这是错误，然后我们会取描述，这就是我们的描述
+and then I think it puts the brackets, because that's the error, and then we'll take the description, so there are our description
+
+142
+00:17:04,533 --> 00:17:08,846
+我们现在也有了一个错误回调，好了，不管怎样，那就搞完了
+okay, so we've now got an error callback as well, okay, anyway, that is done
+
+143
+00:17:09,366 --> 00:17:15,054
+那就是我们在这里需要做的一切，所以现在应该能做的就是运行这个
+that is everything that we need to do here, so now what we should be able to do is just kind of run this
+
+144
+00:17:15,600 --> 00:17:19,950
+我们应该支持应用程序记录每一个事件，那么让我们试一下
+and we should back an application get every single event being logged, so let's go ahead and try that
+
+145
+00:17:20,166 --> 00:17:25,566
+好，那么这儿就是引擎，这是我们的日志，我把日志展示这里
+okay, so here is the engine, and then here we have our log, I'll kind of show the log here
+
+146
+00:17:26,300 --> 00:17:29,333
+你们可以看到，当我们移动鼠标时，我们得到了鼠标的位置
+you can see, that when we move the mouse, we get the position of the mouse
+
+147
+00:17:29,333 --> 00:17:31,766
+当我们点击时，我们得到按钮的Press和Release事件
+when we click, we get button Press and Release event
+
+148
+00:17:31,766 --> 00:17:38,600
+也取决于按下了哪个按钮，如果我输入，我们得到k释放
+and depending on which button is pressed as well, if I type, but we get k release
+
+149
+00:17:38,600 --> 00:17:41,999
+如果我按住它，你们可以看到，重复次数设置为1
+if I hold down the thing way, it says, you can see, the repeat is set to one
+
+150
+00:17:44,666 --> 00:17:50,895
+然后我还可以做什么，滚动，调整窗口大小，你们可以看到，那是如何运行的
+and then what else can I do scroll resize the window, you can see, how that works as well
+
+151
+00:17:51,200 --> 00:17:58,825
+这很好，对于close，我们会得到一个close事件，你们可以看到，窗口关闭了
+it's quite nice, and then for close, we should get a close event, and you can see we do, see the window close
+
+152
+00:17:59,166 --> 00:18:03,666
+好了，酷，现在让我们实现那个CloseEvent，并展示调度器是如何运行的
+okay, cool, so now let's implement that CloseEvent, and also show you guys how the dispatcher works
+
+153
+00:18:04,200 --> 00:18:08,975
+因为我认为有很多关于如何使用EventDispatcher的问题，它非常非常简单
+because I think there were quite a few questions on how to actually use the EventDispatcher, and it's very very easy
+
+154
+00:18:09,766 --> 00:18:13,600
+那么这儿，我们会停止记录所有事件，我们会把它保留在这里
+so over here, we'll stop logging all of our events, actually we'll kind of keep that in there
+
+155
+00:18:13,600 --> 00:18:21,850
+只是为了调试目的，对于这个构建，我想我们使用info来实现，也许可以使用trace
+just for debug purposes, for this build I guess, I think we're doing it yeah as info, maybe let's do it as trace 
+
+156
+00:18:22,500 --> 00:18:31,350
+因为它不是绿色的，然后我们只需要EventDispatcher dispatcher，传入事件
+because no, it's not gree, and then we'll just do EventDispatcher dispatcher, we pass in the event
+
+157
+00:18:31,625 --> 00:18:40,899
+现在我们知道对于一个WindowCloseEvent我们真正想要的是，我们可能会把这个写在这里
+now we know that for a WindowCloseEvent what we actually want is, and we'll kind of probably write this down here
+
+158
+00:18:41,000 --> 00:18:46,466
+我们实际需要的WindowCloseEvent只是一个bool OnWindowClosed
+what we actually want for a WindowCloseEvent is just a bool OnWindowClose
+
+159
+00:18:47,566 --> 00:18:55,366
+然后是WindowCloseEvent，我猜窗口关闭时是什么颜色，WindowCloseEvent, e
+and then WindowCloseEvent, I guess what color on window closed, WindowCloseEvent, e
+
+160
+00:18:55,366 --> 00:18:58,200
+那基本上是某种事件函数的签名，对吧
+that is basically the signature of kind of an event function, right
+
+161
+00:18:58,200 --> 00:19:05,500
+我们会继续实现它，bool Application OnWindowClose
+we'll go ahead and implement it, bool Application OnWindowClose
+
+162
+00:19:05,500 --> 00:19:09,133
+当关闭事件时，我可能会把这个移到Run的下面
+when I close Event, I might actually move this to below Run
+
+163
+00:19:09,600 --> 00:19:13,399
+因为我们可能想要看到比我们想要的更多的运行，然后我们实际上想要看到那个
+because we probably want to see run more than we do want to, then we actually want to see that
+
+164
+00:19:14,100 --> 00:19:20,733
+然后这个会返回true，我想我们已经处理了，但基本上所有运行的设置都是假的
+and then this will return true, I guess that we've been handled, but basically all the set running is false
+
+165
+00:19:20,733 --> 00:19:26,575
+这显然应该在下一点终止这个循环，这个查询，它会看到，它是假的，终止循环
+and that should obviously terminate this loop at the next point, that this queried rather, it will see that, it's false, terminate loop
+
+166
+00:19:26,966 --> 00:19:30,250
+这样我们就没有其他东西来运行应用程序了，它应该会关闭
+and then that way we have nothing else to run an application age, and it should close
+
+167
+00:19:31,066 --> 00:19:36,050
+所以为了调度那个，我们需要做的就是看到一个dispatcher，我们创建了一个调度器
+so to dispatch that, all we need to do is see that a dispatcher, so we've created a Dispatcher 
+
+168
+00:19:36,050 --> 00:19:43,600
+现在我们只看到Dispatcher，如果你们看到WindowCloseEvent，然后调度它到这个函数
+now we just see Dispatcher, if you see a WindowCloseEvent, right, then dispatch it to this function
+
+169
+00:19:43,600 --> 00:19:47,275
+现在我们可以使用之前的BindEvent函数将一个函数绑定到此
+now we can use this BindEvent function we had before to bind a function to this
+
+170
+00:19:47,533 --> 00:19:50,625
+你们可以像我做其他东西一样创建一个Lambda
+you could just create a Lambda like I did with the other stuff
+
+171
+00:19:50,625 --> 00:19:56,825
+那完全没问题，通常你们可能想要一个函数，所以我们用BindEvent函数
+that's totally fine, usually though you probably want to actually have a function, so we'll do BindEvent function
+
+172
+00:19:57,166 --> 00:20:02,066
+然后OnWindowClose，显然我们已经在应用命名空间了
+and then OnWindowClose, and obviously we're already in the inside the application namespace
+
+173
+00:20:02,066 --> 00:20:07,175
+因为它在宏定义中，就是那样，那就是你们要做的，那么这里会发生什么
+because it's in the macro, that's it, that's all you have to do, so what will happen here is that 
+
+174
+00:20:07,175 --> 00:20:13,522
+如果这个事件是一个WindowCloseEvent，它通过检查这里的类型来做到这一点
+if this event that comes through is a WindowCloseEvent, right, and it does that by checking the type over here
+
+175
+00:20:13,800 --> 00:20:20,263
+它检查传入事件的事件类型是否等于你们在这里使用的模板的静态类型，对吧
+it checks to see if the event type of the incoming event is equal to the static type of the template that you used here, right
+
+176
+00:20:20,866 --> 00:20:25,499
+可以通过调用你们的T来做，在这种情况下是WindowCloseEvent GetStaticType
+which you can do by just calling your T, which in this case is WindowCloseEvent GetStaticType
+
+177
+00:20:25,566 --> 00:20:32,683
+因为你们可以看到，很明显WindowCloseEvent实现EVET_CLASS_TYPE
+because you can see that, obviously the WindowCloseEvent implements EVET_CLASS_TYPE
+
+178
+00:20:33,300 --> 00:20:40,300
+它实现了GetStaticType作为WindowClose的类型，对吧，所以如果那是真的
+which implements GetStaticType as the type of WindowClose, right, so if that comes in that
+
+179
+00:20:40,875 --> 00:20:45,435
+然后它会调用这个函数，在这里是这个，并说运行到false
+then it actually will call this function, which in this case is this, and said running to false
+
+180
+00:20:45,600 --> 00:20:52,400
+让我们点击f5，看看会发生什么，我们得到了一堆错误，可能只是因为没有包含东西
+so let's hit f5 and see what happens, okay, so we got a bunch of errors, and probably just because of not including stuff
+
+181
+00:20:52,400 --> 00:20:57,575
+所以我们在这里包含了ApplicationEvent，我可能会把它移到这里
+so we have ApplicationEvent included here, I might move that to here
+
+182
+00:20:57,575 --> 00:20:59,366
+因为它不知道WindowCloseEvent是什么
+because it doesn't know what WindowCloseEvent is
+
+183
+00:20:59,533 --> 00:21:06,333
+按下f5，希望这能行，好了，所有鼠标移动事件都按下了
+let's hit f5, and hopefully this will work, okay, there we go, so we have all the mouse move events are down
+
+184
+00:21:06,866 --> 00:21:13,700
+所有东西都在非绿色的地方跟踪，这很好，如果我点击关闭，应用程序关闭
+everything is kind of tracing in the non green thing, which is good, and now if I hit close, there you go application closes
+
+185
+00:21:14,066 --> 00:21:19,625
+那么那就是我们实现事件的方式，这将是引擎其他部分事件的基础
+so that is how we implement events, and this will be the basis for pretty much the events for the rest of the engine
+
+186
+00:21:19,625 --> 00:21:23,600
+所以一旦我们有了层，一个比应用程序更好的系统
+so once we have layers and more of a better system for that than the Application
+
+187
+00:21:23,600 --> 00:21:26,725
+将负责这些事件的实际调度
+will be in charge of actually dispatching those events further down
+
+188
+00:21:27,000 --> 00:21:32,750
+因为现在的应用程序，一点儿也不知道GLFW或我们的窗口，对吧
+because now the Application while having no knowledge at all of GLFW or of our Window, right
+
+189
+00:21:33,866 --> 00:21:36,206
+我的意思是，Window根本没有意识到Application
+well I mean, Window doesn't have any knowledge of Application
+
+190
+00:21:36,533 --> 00:21:42,425
+我们只是用事件获得一个很好的回调，这很好，很干净，很酷
+we just get a nice little callback with just the event, which is nice and clean, and pretty cool, alright
+
+191
+00:21:42,425 --> 00:21:45,025
+我希望你们喜欢这个视频，如果喜欢的话，就为它点赞吧
+I hope you guys enjoyed this video, if you did, you can hit the like button
+
+192
+00:21:45,150 --> 00:21:47,900
+请在下方留言，说说你们对整个事件系统的看法
+leave any comments below us to what you think of this whole event system
+
+193
+00:21:47,900 --> 00:21:53,150
+因为现在我们已经得出了结论，我想是在实施它，有了计划阶段，有了实施阶段
+because now we've kind of come to the conclusion, I guess of implementing it, we had the planning stage, we had the implementation stage
+
+194
+00:21:53,366 --> 00:21:57,933
+现在我们把它和GLFW连接到我们的Window上
+and now we kind of have connected it to GLFW to our windows to our window
+
+195
+00:21:57,933 --> 00:22:01,925
+我们现在大致了解了Hazel事件的全貌
+and we have kind of the entire picture now of events in Hazel
+
+196
+00:22:01,925 --> 00:22:05,299
+所以让我知道你们认为这教会了你们什么，酷
+so let me know what you think this kind of taught you something, cool
+
+197
+00:22:05,766 --> 00:22:09,645
+我认为这是一个相当好的干净的事件系统，我一直喜欢或类似的东西
+I think that this is quite a nice clean event system, I always loved or anything like this
+
+198
+00:22:10,366 --> 00:22:15,250
+它是其他一切的基础，因为现在如果我们决定，我们不会喜欢3D相机或其他东西
+and really it is the basis for everything else, because now if we decide that, we won't like a 3D camera or whatever
+
+199
+00:22:15,800 --> 00:22:20,150
+在我们的场景中，我们不需要说，哦，我没有这些特定的事件，就像我提到的输入
+in our scene, we won't have to like be like oh, but I don't have these certain events as I mentioned with input 
+
+200
+00:22:20,150 --> 00:22:26,333
+尽管我们仍然需要实现某种轮询系统，我们可以询问事物的当前状态
+though we do still need to implement some kind of polling system, where we can actually ask for the current state of things
+
+201
+00:22:26,333 --> 00:22:32,450
+如果不使用GLFW接口，现在无法做到这一点，所以我们肯定需要开始做这件事
+we can't do that right now without using the GLFW api, so definitely we need to get off to that
+
+202
+00:22:32,733 --> 00:22:36,914
+还有一大堆我现在想做的事情
+and then there's also a huge list of things that I really want to do like right now
+
+203
+00:22:37,266 --> 00:22:39,975
+所以我想下个视频会让你们大吃一惊
+so next video is going to be a bit of a surprise I think
+
+204
+00:22:40,350 --> 00:22:44,066
+如果你们想支持这个系列，可以访问patreon.com/thecherno
+you guys want to support this series, you can go to patreon.com/thecherno
+
+205
+00:22:44,066 --> 00:22:46,975
+非常感谢所有支持这个系列的人
+huge thank you as always to everyone who supports that series
+
+206
+00:22:46,975 --> 00:22:52,130
+当然，我们可以在下方评论中找到下一个视频的链接
+next video for you guys of course is available, as always as there'll be a link in the comments below
+
+207
+00:22:53,350 --> 00:22:58,766
+你们可以访问源代码，这是在这之前，因为我的开发有很多私有分支
+you'll get access to source code, it's way ahead of this, because I develop has a lot of private branch
+
+208
+00:22:58,766 --> 00:23:04,150
+我也用它来规划这些视频，在这个分支中，我尽可能快地开发它
+which I also used to kind of plan these videos, and in that branch, I kind of just develop it as fast as I can
+
+209
+00:23:04,150 --> 00:23:10,533
+所以只要我有空闲时间，我就可以写一些代码，我们就像，你们知道，我们就像我要去那里
+so whenever I have free time, or whatever I can just write some code, and so we've got like you know, we've got like I am going in there
+
+210
+00:23:10,533 --> 00:23:16,475
+我们有OpenGL渲染，我们有它很高级，如果你们感兴趣的话，一定要去看看
+we've got OpenGL rendering, we've got like it's way advanced, so definitely check that out, if you are interested
+
+211
+00:23:16,766 --> 00:23:19,699
+不管怎样，希望你们喜欢这个视频，我们下次再见，再见
+anyway, hope you guys enjoyed this video again, and I'll see you next time, goodbye
+

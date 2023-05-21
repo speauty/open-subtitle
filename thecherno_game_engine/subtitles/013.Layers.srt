@@ -1,0 +1,1305 @@
+﻿1
+00:00:00,133 --> 00:00:03,100
+嘿，你们好，我是TheCherno，欢迎回到我的游戏引擎系列
+hey, what's up guys, my name is TheCherno, welcome back to my game engine series
+
+2
+00:00:03,366 --> 00:00:08,625
+那么上次我们看了Glfw，并将事件从Glfw发送到我们的事件系统中
+so last time we took a look at Glfw, and sending events from Glfw into our event system
+
+3
+00:00:08,625 --> 00:00:11,600
+如果你们还没看过的话，请一定要去看看那期视频哦
+definitely check out that video, if you haven't already
+
+4
+00:00:11,600 --> 00:00:17,025
+并且今天我们要看一个叫做层栈的东西，本质上是层
+and today we're gonna be taking a look at something called a layer stack, and essentially layers
+
+5
+00:00:17,025 --> 00:00:21,333
+在我们的游戏引擎中，它们在游戏引擎中是什么，以及我们将如何使用它们
+and what they are in a game engine in our game engine, and how we're gonna use them
+
+6
+00:00:21,333 --> 00:00:25,775
+我们将采取更实际的方法来学习这个，我将向你们展示我已经写好的一堆代码
+and we're gonna take a more practical approach to this, I'm just gonna show you guys a bunch of code that I've already written
+
+7
+00:00:26,350 --> 00:00:30,800
+那堆代码已经实现了那些东西，以及我们将来可能会有一个理论视频
+that makes all that stuff kind of happen, and we might have a theory video in the future
+
+8
+00:00:30,800 --> 00:00:34,900
+我认为至少现在没有必要，因为这是一个非常简单的概念
+I don't think it's that necessary right now at least, because it's quite a simple concept
+
+9
+00:00:34,900 --> 00:00:39,825
+我想你们一旦看到代码就会明白，那可能是一种更好解释它实际功能的方式
+I think you guys will get it once you see some code, and that might be a better way of explaining what it actually does
+
+10
+00:00:40,250 --> 00:00:44,533
+首先，我想向所有使这一系列成为可能的赞助人表示衷心的感谢
+first of all, I want to give you a huge thank you to all of the patreons that make this series possible
+
+11
+00:00:44,533 --> 00:00:49,400
+如果你们还没有支持这个系列，可以访问patreon.com/thecherno
+if you guys aren't supporting the series, you can do, so by going over the patreon.com/thecherno
+
+12
+00:00:49,400 --> 00:00:55,350
+你们将获得Hazel的更高级版本的代码，所有人都可以使用该版本
+you'll get the code to a much more advanced version of Hazel already available to all of you guys
+
+13
+00:00:55,350 --> 00:01:01,933
+它实现了所有这些东西，比如way，以及所有这些视频都会提前一周发布
+which has all of this stuff like way implemented, as well as all of these videos will kind of come out one week early
+
+14
+00:01:01,933 --> 00:01:04,550
+如果你们也这么认为的话，这也是一个很好的方式来支持这个
+if you guys as well, and it's just a really good way to help support this
+
+15
+00:01:04,550 --> 00:01:09,700
+因为在这之外还有一份全职工作，我很难为这个挤出时间
+because I do have a full time job outside of this, and it's kind of hard for me to allocate time for this
+
+16
+00:01:09,700 --> 00:01:16,300
+但由于社区的支持，我实际上能够在这方面花费更多的时间，否则我会付出更多的努力
+but because of the support from the community, I'm able to actually spend a lot more time on this, and I would have otherwise
+
+17
+00:01:16,300 --> 00:01:19,100
+所以非常感谢你们让这一切成为可能
+so huge thank you to all those people for making this possible
+
+18
+00:01:19,266 --> 00:01:25,366
+好的了，那么层，什么是层，每当我向人们谈论层时
+okay, so layers, what are layers, whenever I, whenever I talk about layers to people
+
+19
+00:01:25,366 --> 00:01:28,675
+我通常会把它们与Photoshop之类的东西进行比较
+I usually end up comparing them to something like Photoshop
+
+20
+00:01:29,075 --> 00:01:33,300
+我认为这不是一个很好的比较，因为很明显
+which isn't like a great comparison, I think, because obviously
+
+21
+00:01:33,566 --> 00:01:38,725
+那不像游戏引擎那样具有交互性，但你们可以把它想象成Photoshop中的一个图层
+that's not as interactive as something like a game engine, but you can think of it as a layer in Photoshop
+
+22
+00:01:38,725 --> 00:01:43,925
+这里基本上有一个有序的层列表或层栈，因为它通常有点固定
+where you basically have an ordered list kind of of layers or layer stack as it's kind of cold usually
+
+23
+00:01:44,866 --> 00:01:50,645
+当你们想在屏幕上画东西的时候，层决定了画东西的顺序
+and whenever you kind of want to draw something on the screen, layers determine what order things are drawn in
+
+24
+00:01:51,200 --> 00:01:54,999
+但问题是它们不仅仅决定事物的顺序
+but the thing is they don't just determine what order things are drawn in
+
+25
+00:01:55,000 --> 00:02:01,375
+而且层不仅仅适用于游戏中的图形，层对于游戏引擎来说
+and also layers aren't just applicable to graphics, layers in a game engine also is
+
+26
+00:02:01,375 --> 00:02:07,150
+它们也主要适用于事件和更新逻辑之类的事情，对吧
+they're also primarily applicable to events and also things like update logic, right
+
+27
+00:02:07,950 --> 00:02:14,366
+所以我们知道，目前我们的游戏在Application类中有一个Run函数
+so we know that at the moment our game in the Application class has a Run function
+
+28
+00:02:14,366 --> 00:02:21,200
+它基本上有一个while循环，不断地重复，直到我们的游戏真正停止
+which basically has a while loop, that keeps kind of iterating over and over and over again, until our game actually stops
+
+29
+00:02:21,200 --> 00:02:25,325
+那叫做我们的游戏循环，对吧，所以这里实际发生的是
+that's called our game loop, right, so what actually will happen here is
+
+30
+00:02:25,600 --> 00:02:30,375
+当前可见或启用的层栈中的每个层，对吧
+every layer that is inside that layer stack, which is currently kind of visible or currently enabled, right
+
+31
+00:02:30,375 --> 00:02:36,200
+就像你们在Photoshop中显示和隐藏图层一样，只需隐藏它们，本质上也是禁用它们
+same way that you can kind of turn layers on and off in Photoshop, and just hide them, essentially disabled them
+
+32
+00:02:36,500 --> 00:02:42,550
+你们也可以在这里做同样的事情，只要一个层被启用，然后当我们通过游戏循环时
+you can do the same thing here as well, whenever a layer kind of is enabled, then as we go through that game loop
+
+33
+00:02:43,650 --> 00:02:52,150
+每一层都将按照其实际出现在该层栈中的顺序进行更新，对吧，通过那种更新循环
+each layer will be updated in the order, that it actually appears in that layer stack as well, right, through that kind of update loop
+
+34
+00:02:52,150 --> 00:02:58,700
+你们可以在该层上进行渲染，显然，由于层栈是有序的，那非常重要
+you can do rendering on that layer, and obviously since the layers stack is ordered, that's very important
+
+35
+00:02:58,700 --> 00:03:03,025
+因为这意味着你们可以将层放在其他层的顶部，这将返回并绘制顺序
+because it means that you can put layers on top of other layers, which will kind of return and draw order
+
+36
+00:03:03,333 --> 00:03:08,550
+它的结尾对于像覆盖层这样的东西也非常有用，事实上，它甚至对覆盖到某一点非常有用
+and it ends also very useful for things like overlays, in fact, it's even very useful for overlays to the point
+
+37
+00:03:08,550 --> 00:03:13,550
+实际上像一个覆盖层系统一样嵌入到层栈中，这使你们就能够推送
+where I actually built in like an overlay system into the layer stack, which enables you to push
+
+38
+00:03:13,550 --> 00:03:20,725
+我猜层是层栈的后半部分，所以基本上我们有，就像我们有一个连续的层列表
+I guess layers to the second half of the layer stack, so basically we have, like we have one one contiguous list of of layers
+
+39
+00:03:21,100 --> 00:03:27,950
+但这类覆盖层始终位于列表的末尾，因此它们最后渲染，这非常重要
+but kind of overlays are always at the end of that list, so that they get rendered last, which is very important
+
+40
+00:03:27,950 --> 00:03:33,999
+因为如果我们决定，我不知道，渲染一个gizmo，或者渲染某种调试图形
+because if we decide that we want to, I don't know, render a gizmo, or render some kind of debug graphics
+
+41
+00:03:34,000 --> 00:03:41,825
+我们希望它始终位于我们渲染的任何东西之上，然后我们需要最后渲染它
+which we want to have always on top of anything that we render then, we need to render it last
+
+42
+00:03:42,025 --> 00:03:46,875
+没有真正的方法，我们需要基本上禁用结束测试，然后让它持续下去
+there's no real way about it, we need to basically disable death testing, and then render that thing last
+
+43
+00:03:47,700 --> 00:03:49,400
+那就是为什么你们要做最重要的事情
+that's how you get something to be on top of everything
+
+44
+00:03:50,250 --> 00:03:54,300
+所以层目前对此很重要，但层的另一个重要方面是事件
+so layers are currently important for that, but the other big thing with layers is events
+
+45
+00:03:55,100 --> 00:03:59,125
+现在这是它的工作方式相反，而我们有一个层列表
+now this is where it works the other way around, whereas we kind of have a list of layers
+
+46
+00:03:59,125 --> 00:04:06,300
+我们按照从零到size-1的顺序来处理它们，基本上按照事件顺序来处理它们
+and we go through them kind of in order from zero to no size minus one, essentially we go through them in order with events
+
+47
+00:04:06,300 --> 00:04:11,733
+我们也可以按照其他方式来搞，对吧，因为如果，你们想一想，如果我去点击我的鼠标
+we kind of go the other way, right, because if you think about it, if I go and click my mouse on something
+
+48
+00:04:12,108 --> 00:04:16,675
+然后，应该接收该事件的第一个层实际上是最后一个渲染层
+then the first layer, that should receive that event is actually the last rendered layer
+
+49
+00:04:16,966 --> 00:04:20,500
+因为如果我们画一个按钮，它会被渲染在其他所有东西之上，直到上次渲染
+because if we draw a button, that is rendered on top of everything else, since rendered last
+
+50
+00:04:21,000 --> 00:04:26,836
+那应该是接收事件的第一个层，然后如果它决定处理事件，它会将其标记为已处理
+that should be the first thing that receives the event, and then if that decides to handle the event, and it marks it as handled
+
+51
+00:04:27,075 --> 00:04:33,350
+然后，它就不需要再沿着层栈向下传递到其他层，例如我们的3D游戏世界
+then it does not need to get propagated further down the layer stack into the other layers, such as our 3D game world
+
+52
+00:04:33,350 --> 00:04:39,875
+因为很明显，如果在屏幕上有一个大按钮，点击它，我们不希望角色也被点中
+because obviously if we have a big button on the screen, and we click it, we don't want our character to shoot his gun as well
+
+53
+00:04:40,100 --> 00:04:45,350
+例如，如果他像第一人称射击一样再次射击，因为那是由在顶部的层处理的
+for example, if he's like a first person shoot again, because that has been handled by the thing, that's on top
+
+54
+00:04:45,350 --> 00:04:50,050
+对吧，所以我们有一种，你们知道的，在列表中向前遍历
+right, so we kind of have this kind of, you know, going kind of forwards through the list 
+
+55
+00:04:50,050 --> 00:04:54,400
+向后遍历列表，向前遍历列表以呈现它，并更新为所有那些内容
+and going backwards through the list, forwards through the list to render it, and to update into all that all that kind of stuff
+
+56
+00:04:54,700 --> 00:05:00,950
+然后我们向后遍历处理事件，向后，我的意思是，我们从最顶层开始
+and then we go backwards in order to kind of handle events, and by backwards, I just mean, we kind of start at the top most layer
+
+57
+00:05:01,225 --> 00:05:05,250
+我们的运行方式是向下的，而不是像渲染那样从下到上
+and we work our way downwards, instead of going from the bottom up, like we would with rendering
+
+58
+00:05:06,100 --> 00:05:12,075
+差不多就是那样，所以总结一下层是什么，层是一个非常抽象的概念
+that's pretty much it, so to sum up what a layer is, a layer is quite an abstract concept
+
+59
+00:05:12,075 --> 00:05:16,325
+这就是它，它就像是你们游戏的一部分
+it's just what it is, it's kind of like it's kind of like a section of your game
+
+60
+00:05:16,325 --> 00:05:22,625
+那就是应用程序的一个部分，用于呈现某些类型的内容并接收事件
+that is kind of a section of your application that renders certain kind of things and also receives events
+
+61
+00:05:23,300 --> 00:05:28,475
+对吧，这听起来很模糊，当我们开始时
+right, that sounds very vague, and when we get into it will definitely
+
+62
+00:05:28,700 --> 00:05:32,800
+这肯定会更有意义，但如果你们实际地考虑一下，可能会更有意义
+it'll probably definitely make more sense, but if you think of it kind of practically, it might make more sense
+
+63
+00:05:32,800 --> 00:05:37,225
+所以，如果你们喜欢3D游戏世界，我们可以说，我们正在制作一个类似3D游戏的东西
+so if you have like a the 3D game world, let's just say, we're making like a 3D game or whatever
+
+64
+00:05:37,400 --> 00:05:42,350
+我们有我们的3D游戏世界，它在一个层上，所有三个渲染都在该层上完成
+we have our 3D game world, that's it's on one layer, all of the three rendering gets done on that layer
+
+65
+00:05:42,350 --> 00:05:46,966
+那有点像我们的游戏层，任何发生的事件都会被发送到该层
+that's kind of like our game layer, any events that happen as well get kind of sent into that layer
+
+66
+00:05:46,966 --> 00:05:50,733
+那几乎就是，这一层就像通往游戏其余部分的路线
+and that is almost, that layer is like the route to the rest of the game
+
+67
+00:05:50,733 --> 00:05:55,650
+如果它能坚持续下去，对吧，就是那样，一切都源于游戏层
+if it holds out thing, right, that's what it is, everything kind of stems from that game layer
+
+68
+00:05:56,225 --> 00:06:02,214
+然后我们可能会有一个调试层或其他类似于游戏世界调试层的东西
+then we might have like a debug layer or something on top of that, as like a game world debug layer
+
+69
+00:06:02,533 --> 00:06:09,750
+这基本上是一些只会在调试层中推到层栈上的东西，这可能会有一些像我不知道的东西
+this is basically something that might only get pushed onto the layer stack in debug bills, and this will have maybe something like I don't know
+
+70
+00:06:10,750 --> 00:06:18,350
+只是一些调试图形，你们知道的，hitbox区域之类的，比如被绘制的立方体或红色
+just some kind of debug graphics some kind of you know, hitbox regions or like things that, like cubes that get drawn or red
+
+71
+00:06:18,350 --> 00:06:23,166
+就像你们知道的，被画上的立方体就像某些角色，因为当它们被子弹击中时
+like you know, cubes that get drawn on like certain characters, because like when they get hit with a bullet
+
+72
+00:06:23,166 --> 00:06:26,958
+或者像任何一种调试图形一样，在我们的3D世界中可以识别，可能就在这一层
+or like any kind of debug graphics, that recognize in our 3D world, might be on that layer
+
+73
+00:06:27,425 --> 00:06:32,550
+然后我们可能会在游戏中有一个UI层，比如2D类型的自动图形投影
+and then we might have like a UI layer in our game, which is such as a 2D kind of autographical projection
+
+74
+00:06:32,550 --> 00:06:37,799
+那也是分层的另一种方式，层之间有某种联系，通常对于该层有一种投影
+that's another way that layers kind of tie, and usually you would have one kind of projection for that layer
+
+75
+00:06:37,800 --> 00:06:41,300
+显然，你们始终可以切换投影，并开始渲染层中的其他内容
+obviously you can always switch projection, and start rendering something else in a layer
+
+76
+00:06:41,300 --> 00:06:47,200
+那也是完全可行的，但另一个更好的方式，可以想象那种划分就是，如果你们只有UI层
+that's also perfectly valid, but another good way to, maybe imagine that division is, if you just had, like the ui layer
+
+77
+00:06:47,200 --> 00:06:51,950
+你们要知道，自动图形投影保存了所有的UI 2D游戏，可以在一个单独的层上
+which you know has autographical projection holds all of the UI 2D game, that could be on a separate layer
+
+78
+00:06:52,166 --> 00:06:56,399
+事实上，那就可能需要在一个单独的层上，因为当你们点击一个按钮
+and then in fact that would probably need to be on a separate layer, because when you click on a button
+
+79
+00:06:56,400 --> 00:07:01,750
+你们希望它不会传递到游戏层，因为点击事件可能会执行其他操作
+you would want it not to propagate down to the game layer, because that click event might do something else
+
+80
+00:07:02,650 --> 00:07:06,975
+你们想从根本上阻止它，然后在那层上面，你们可能有另一个调试图形层
+and you want to essentially block that, and then on top of that, you might have like another debug graphics layer
+
+81
+00:07:06,975 --> 00:07:12,000
+有一种2D图形，可能就像ImGui或类似的东西
+there's kind of for 2D graphics, there might be just like ImGui or something like that
+
+82
+00:07:12,300 --> 00:07:16,200
+或者你们知道的某种菜单或按钮，你们可以单击这些菜单或按钮来触发事件中的设置
+or some kind of you know, menu items or buttons that you can click to trigger set in events
+
+83
+00:07:16,200 --> 00:07:20,875
+那不应该出现在类似调试之类版本中，抱歉，不应该出现在发布版本或分发版本中
+that shouldn't be there in like debug builds or anything like that, sorry in release builds or distribution builds
+
+84
+00:07:21,700 --> 00:07:26,350
+但你们可能希望将其像调试构建或发布构建一样包含在内部发布构建中
+but might you might want to have it in like debug built or release builds kind of in house release builds
+
+85
+00:07:27,066 --> 00:07:31,550
+因此，你们可以触发设置事件，或者你们知道负载设置级别，本质上只是额外的功能
+so that you can kind of trigger setting events, or you know load setting levels, just extra functionality essentially
+
+86
+00:07:32,333 --> 00:07:36,499
+因此那可能是一种查看层的实践方法，它们都是
+so that could be a practical way of kind of looking at layers, all they are
+
+87
+00:07:36,500 --> 00:07:42,700
+我只是有点反对应用程序组，它们接收事件并通常呈现某种图形
+I just kind of against groups of your application, that receive events and usually render some kind of graphics
+
+88
+00:07:43,075 --> 00:07:45,425
+好了，不管怎样，让我们开始实现这个
+okay, anyway, let's just jump in and start implementing this
+
+89
+00:07:45,425 --> 00:07:49,200
+我觉得这儿没有那么多代码，所以我会带你们过一下
+I don't think there's not that much code, so I'll kind of walk you guys through it
+
+90
+00:07:49,575 --> 00:07:55,264
+希望这本身就足够了，我们之后还将创建一个示例，看看如何使用接口
+and hopefully that in itself will kind of be enough, and we'll also create an example later, just to see how to use the api
+
+91
+00:07:55,425 --> 00:08:02,873
+好了，所以我在这里做的是git diff工具进行比较，再次向大家展示我所做的一切
+okay, so what I've done here is I've got git diff tool up with beyond compared, again, just to show you guys everything that I've done
+
+92
+00:08:03,266 --> 00:08:06,151
+但我要做的第一件事是，会给你们看看新加的类
+but the first thing I'll do is, I'll actually show you guys the new classes
+
+93
+00:08:06,366 --> 00:08:12,725
+所以这儿有四个新文件，LayerStack.h和cpp，以及Layer.h和cpp将从层开始
+so there's four new files, LayerStack.h and cpp, and Layer.h and cpp will start with layer
+
+94
+00:08:14,066 --> 00:08:19,899
+这也很简单，我不想让你们把这想象成一件复杂的事情
+this is again really simple, I don't want you to kind of picture this as like some complex thing
+
+95
+00:08:19,900 --> 00:08:26,220
+它可以非常强大地使用，将来可能会添加一些东西，但现在它实际上是一个非常简单的实现
+it can be used very powerfully, and will probably add stuff to it in the future, but for now it's really quite a simple implementation
+
+96
+00:08:26,925 --> 00:08:31,300
+基本上我们现在拥有的是一个层，它可以选择接受一个名称
+basically what we have right now is a layer, which optionally takes in a name
+
+97
+00:08:31,300 --> 00:08:35,100
+如果你们不提供名称，它只调用自己的层，这或多或少是一个调试名称
+if you don't provide a name, it just calls itself layer, this is more or less a debug name
+
+98
+00:08:35,733 --> 00:08:42,366
+层在分发版本中不应该真正有名称，因为你们不应该按名称寻址层
+layers shouldn't really have names in distribution builds, because you shouldn't be addressing layers by names
+
+99
+00:08:42,366 --> 00:08:48,825
+总之，这只是为了调试的目的，你们知道，我的意思是，不要那么说
+anyway, so this is kind of all for debug purposes, you know, I mean, not saying that like it would be that
+
+100
+00:08:49,333 --> 00:08:53,000
+如果你们确实在每个层中存储了一个名称，你们就会知道这对性能有坏处
+you know bad for performance, if you did have a name being stored per layer
+
+101
+00:08:53,766 --> 00:08:59,850
+但这又是一样的，你们可以看到，我没有在发布版本中使用宏来禁用它
+but it's just like again, you can see, I haven't put macros around this to disable it in distribution builds
+
+102
+00:09:00,225 --> 00:09:02,250
+我只是想明确一点，这是一个调试名称
+I'm just kind of making it clear that, it's a debug name
+
+103
+00:09:02,925 --> 00:09:07,333
+所以当你们试图查找层或其他东西时，不要开始使用这些东西
+so that you don't start using this stuff, when trying to find layers or whatever
+
+104
+00:09:07,333 --> 00:09:08,500
+因为你们真的不应该这样做
+because you really shouldn't be doing that
+
+105
+00:09:10,275 --> 00:09:14,750
+所以我们有了OnAttach，OnDetach和OnUpdate，以及OnEvent，所以当一个层绑定时
+we have OnAttach OnDetach OnUpdate and OnEvent, so when a layer is attached
+
+106
+00:09:14,750 --> 00:09:20,084
+基本上，当一个层被推送到层栈上时，作为应用程序的一部分，我们就会固定它
+basically when a layer is pushed onto the layer stack, and part of our application, we attach it
+
+107
+00:09:20,625 --> 00:09:26,100
+当它从那儿被移除时，我们也可以把它分离，那基本上就像OnInit和OnShutdown之类的
+we can detach it as well, when it gets removed there, that's basically like OnInit and OnShutdown type of thing
+
+108
+00:09:26,300 --> 00:09:30,933
+我们还有OnUpdate，当层更新时，Application就会调用它，并且更新应该在每一帧发生
+we have OnUpdate, which gets called by the Application, when the layer is updated, which should happen every frame
+
+109
+00:09:31,100 --> 00:09:35,450
+然后就是OnEvent，即每当一个事件位于中间层时，我们都会在这里接收它
+and then we have OnEvent, which is whenever an event gets centered layer, we receive it here
+
+110
+00:09:35,600 --> 00:09:40,766
+这些都是虚函数，所以当你们创建自己的Layer时，也可以选择可以重写它
+this is all virtual, so you can all kind of override this, when you make your own layer
+
+111
+00:09:40,766 --> 00:09:45,875
+因此，使用它的方法基本上就是继承这个类
+so the way that this is intended to be used is you basically subclass this class
+
+112
+00:09:46,300 --> 00:09:49,875
+然后你们实现你们想要的任何东西，那就是你们的Layer，然后
+and then you implement anything you want, and that's your layer, and then that
+
+113
+00:09:49,875 --> 00:09:53,325
+当你们创建一个类时，就像游戏层之类的类
+when you do create a class, that's like your game layer or something
+
+114
+00:09:53,325 --> 00:09:56,325
+并且你们在类中包含了所有这些内容，可以将其推送到Application中
+and you do have all of this in it, you push it into the Application
+
+115
+00:09:56,625 --> 00:10:01,000
+正如你们马上就会看到的，它会被放入到层栈中
+as you'll see in a minute, and it kind of gets gets put into that layer stack
+
+116
+00:10:01,000 --> 00:10:04,750
+从而更新和接收事件，所有这类事情都会发生
+and thus gets updated and receives events, and all that kind of stuff happens
+
+117
+00:10:05,533 --> 00:10:12,333
+关于层的启用和禁用，我没有特意放在这儿，我们将在以后实现那个
+one thing I haven't put in here yet deliberately is the kind of enabling disabling of layers, we'll do that a little bit further down the road
+
+118
+00:10:12,333 --> 00:10:17,300
+因为我不想把事情搞太复杂了，但基本上你们通常会在layer类本身中
+because I don't want to complicate things too much, but basically you would usually have either in the layer class itself
+
+119
+00:10:17,300 --> 00:10:21,099
+一个表示是否启用层的布尔属性，它允许你们禁用该层
+a boolean which says whether or not it's enabled, and it allows you to disable the layer
+
+120
+00:10:21,100 --> 00:10:25,975
+这意味着它不会被更新，因此它不会渲染，也不会接收事件
+which means that it will not be updated, thus it will not render, and also won't receive events
+
+121
+00:10:26,650 --> 00:10:31,475
+所以它基本上只是从LayerStack中隐藏了它，实际上你们所能拥有的就是
+so it basically just kind of hides it from the from the LayerStack, all you could actually have that
+
+122
+00:10:31,800 --> 00:10:39,150
+如果你们愿意，可以把布尔值存储在LayerStack中，好了，关于这个类的cpp代码非常简单
+that boolean being stored in the LayerStack, as well if you wanted to, okay, the cpp side of this is really simple
+
+123
+00:10:39,150 --> 00:10:42,400
+我们有一个空的析构函数，显然我们需要一个虚拟析构函数
+we have an empty destructor, obviously we need a virtual destructor
+
+124
+00:10:42,400 --> 00:10:47,533
+因为这将是子类化的，然后我们基本上只存储名称
+because this is going to be subclassed, and then we just basically just store the name
+
+125
+00:10:47,533 --> 00:10:52,350
+就是那样，非常简单，现在LayerStack比这要复杂一点
+and that's it, so dead simple, now the LayerStack is a little bit more complicated than that
+
+126
+00:10:52,933 --> 00:10:57,575
+因为LayerStack本质上是Layer向量上的包装器
+because what the LayerStack is is essentially a wrapper over this vector of layers
+
+127
+00:10:58,000 --> 00:11:04,975
+现在我们使用一个向量，因为每一帧都会被迭代，还需要一个反向迭代器
+now we're using a vector, because every frame, this will be iterated over, there will need to be a reverse iterator as well
+
+128
+00:11:05,133 --> 00:11:11,525
+因为我们需要以相反的方式传递事件，但对于更新之类的事情，我们总是需要遍历它
+because we need to propagate events in a reverse fashion, but for things like updates, we always need to iterate through it
+
+129
+00:11:11,525 --> 00:11:17,300
+所以没有什么真正的原因，这应该是这样的，哦，也是为什么它不是一个实际的栈
+so there's no like real reason this should be like oh, and also the reason it's not an actual stack
+
+130
+00:11:17,966 --> 00:11:23,675
+是因为我们实际上最终把东西推到了中间，正如你们在覆盖层中看到的那样
+is because is because we actually end up pushing things into the middle of it, as you can see with overlays
+
+131
+00:11:24,666 --> 00:11:29,825
+但无论如何，我们需要某种连续式存储，我也只是在这里存储原始指针
+but anyway, the idea is that we want some kind of contiguous style storage, I'm also just storing raw pointers here
+
+132
+00:11:30,925 --> 00:11:35,025
+没有理由用共享指针、唯一指针或其他类似的东西来包装它
+no reason to really wrap this up in shared pointers, or unique pointers or anything like that
+
+133
+00:11:35,400 --> 00:11:40,900
+这是一个非常简单的系统，很容易处理
+it's really a dead simple kind of system here that is easy to handle
+
+134
+00:11:41,466 --> 00:11:48,350
+就所有权而言，所有这些层都属于LayerStack，只要你们将其交给LayerStack
+and in terms of ownership and all of that layers are owned by the LayerStack, as soon as you give it to the LayerStack
+
+135
+00:11:48,733 --> 00:11:53,325
+因此，当你们将该点推送到LayerStack中时，你们可以看到这里它将其推送到正确的位置
+so when you push that point or into the LayerStack, you can see here it pushes it into the right place
+
+136
+00:11:54,025 --> 00:12:00,100
+很明显，当LayerStack被销毁时，它就会被删除，现在另一件事是当你们弹出层时
+and then obviously when the LayerStack gets destroyed, it gets deleted, now the other thing is when you pop layers
+
+137
+00:12:01,350 --> 00:12:07,250
+我应该看到这里的所有权有点有趣，因为当我们弹出层时，我们不会丢失它们
+I should see the ownership here is a little bit interesting, because when we pop layers, we don't lose them
+
+138
+00:12:07,250 --> 00:12:12,022
+只有当LayerStack被销毁时，现在问题是，LayerStack由Application所有
+it's only when the LayerStack gets destroyed, now here's the thing, the LayerStack is owned by the Application
+
+139
+00:12:12,325 --> 00:12:16,425
+这意味着，基本上，这种原理是你们可以分配层
+which means that basically the way this works is you can allocate your layer
+
+140
+00:12:16,766 --> 00:12:23,325
+只要你们将其交给LayerStack，并且不将其取出，当应用关闭时，它才会被解除处理
+and as long as you give it to the LayerStack, and don't take it out, it will be deallicated, when the Application shuts down
+
+141
+00:12:23,483 --> 00:12:29,450
+好了，所以层的目的是在给定的时间点上贯穿应用的整个生命周期
+okay, so layers are kind of intended to live throughout the lifetime of your application at this given point in time
+
+142
+00:12:30,025 --> 00:12:37,850
+当然，在将来，如果你们更改级别或执行类似操作，则可能值得重新创建整个LayerStack
+in the future of course, if you change levels or you do something like that, it would it might be worth recreating the entire LayerStack
+
+143
+00:12:37,850 --> 00:12:41,375
+但在这种意义上，你们实际上会重新创建整个LayerStack
+but again in that sensem you would in fact recreate the entire LayerStack
+
+144
+00:12:41,375 --> 00:12:46,950
+这意味着所有层都会通过这个析构函数被删除，好吧，所以所有权有点牵连
+which means all the layers would get deleted via this destructor, okay, so the ownership kind of tied
+
+145
+00:12:47,366 --> 00:12:51,250
+就像在LayerStack存活期间一样，所有内容都绑定到LayerStack
+like during your during the duration of the LayerStack, everything is tied to the LayerStack
+
+146
+00:12:51,250 --> 00:12:56,650
+但是，如果你们临时弹出一个层，可以将其推回，但不会，就像该层不会被删除一样
+however if you pop a layer temporarily, you can push it back in, and you won't, like the layer will not be deleted
+
+147
+00:12:56,933 --> 00:13:03,825
+它将从中移除，将从这个实际向量中移除，但它不会被删除
+it'll just be removed from the, it'll be just removed from this actual vector, but it's not going to get deleted
+
+148
+00:13:03,966 --> 00:13:07,425
+所以有一种所有权语义，若你们真的关心这类东西的话
+so there's a kind of the ownership semantics, if you really care about that kind of stuff
+
+149
+00:13:07,725 --> 00:13:14,700
+不管怎样，推送层，所有这些都很简单，正如我所说，普通层被推到列表的前半部分
+anyway, pushing layers, and all that stuff is really simple, layers get pushed into the first half of the list as I said 
+
+150
+00:13:14,700 --> 00:13:20,650
+然后覆盖层被推到列表的后半部分，基本上就是它的原理，这里有一些代码实现了那个
+and then overlayers get pushed into the second half of the list is basically how it works, and there's some code around here to make that happen
+
+151
+00:13:21,200 --> 00:13:26,533
+那样做的原因是，如果推送了覆盖层，我们总是希望它最后渲染
+the reason is done that ways because over layers, we always want to render last, if we push an overlay
+
+152
+00:13:26,700 --> 00:13:31,900
+在任何时候，我们总是想确保，覆盖层被放在列表尾部，对吧
+just at any point, we always want to ensure that, it suddenly gets put into the very very very end, right
+
+153
+00:13:32,333 --> 00:13:35,650
+但是如果我们推送一个普通层，会被推送到覆盖层之前
+whereas if we push a layer, it gets pushed before the overlays
+
+154
+00:13:36,100 --> 00:13:38,425
+所以它会作为最后的普通层被推送进去
+so it'll get pushed as the last layer
+
+155
+00:13:38,866 --> 00:13:45,025
+但不是这样，它永远不会在覆盖层之前，覆盖层总是在普通层之后
+but not kind of in, it will never be in front of overlays, overlays will always be after layers
+
+156
+00:13:45,025 --> 00:13:49,625
+那就是为什么这里有一些代码来确保它被推送到固定地方
+that's kind of why there's some code here to make sure that it gets pushed into certain places
+
+157
+00:13:49,766 --> 00:13:52,900
+例如你们可以看到，覆盖层被推送到列表尾部
+for example overlays, you can see, get pushed into the very emplace list
+
+158
+00:13:53,366 --> 00:14:02,850
+而其他层被推送到LayerInsert区域，不管删除还是添加一个层，每次都会变化，对吧
+whereas layers get pushed into this kind of LayerInsert area, which also changes every time, we, you know, we remove or add a layer, right
+
+159
+00:14:03,866 --> 00:14:07,258
+这样可以确保层被推到列表的前半部分
+or so that kind of makes sure that layers get pushed into the first half of the list
+
+160
+00:14:07,725 --> 00:14:12,425
+好了，所以基本上就是那样，然后我们实现了begin和end
+okay, so that is basically it, and then we have this implementation of begin and end
+
+161
+00:14:12,425 --> 00:14:16,875
+所以我们可以在基于范围的for循环中使用它，就像我们在Application类中所做的那样
+so that we can use this in a range based for loop, as we'll do in the Application class
+
+162
+00:14:17,100 --> 00:14:19,175
+所以那几乎就是它的全部内容
+so that's pretty much all there is to it
+
+163
+00:14:19,175 --> 00:14:25,111
+再说一遍，这个LayerStack实际上只是这种层的包装
+again, what this LayerStack is, is really just a wrapper around this kind of layers thing
+
+164
+00:14:25,800 --> 00:14:29,425
+我可能会在这个实际集合中用typedef
+I could probably typedef this actual collection or using it
+
+165
+00:14:30,166 --> 00:14:36,325
+这样我们就不必一直在这里编写它，但我想对于迭代器尤其如此
+just so that we wouldn't have to write it all the time here, but especially for the iterator I guess
+
+166
+00:14:36,425 --> 00:14:41,525
+但我在这段视频中说得更清楚了，至少也许在将来，这是我们可以优化的
+but I've made it a little bit more clear in this video at least, maybe in the future, it's something that we can change
+
+167
+00:14:41,933 --> 00:14:46,125
+好了，酷，就是这样，这些是新文件，现在让我们看看已经发生的变更
+okay, cool, that's it, those are the new files, now let's take a look at the changes that have happened
+
+168
+00:14:46,600 --> 00:14:54,599
+所以在Application.h， 除了整理这些外，还有两个新函数，PushLayer和PushOverLayer
+so in Application.h, apart from sorting out these kind of includes about two new functions, PushLayer and PushOverLayer
+
+169
+00:14:54,600 --> 00:14:59,900
+正如你们所看到的，这只是在那一层中，还没有办法弹出它们，这也很好
+which just take in that layer, as you can see, there's no way to pop them yet, which is fine as well
+
+170
+00:14:59,900 --> 00:15:06,220
+这应该是一个简单的第一步实现，然后我们还有一个LayerStack
+this is supposed to be a simple, a simple kind of first step implementation, and then we also have a LayerStack
+
+171
+00:15:06,600 --> 00:15:12,328
+你们可以看到，它只是在栈上创建的，因此某种程度上继承了这个Application类的生存期
+which you can see is just created on the stack here, and thus kind of inherit the lifetime of this Application class
+
+172
+00:15:12,600 --> 00:15:16,933
+好了，那很简单，现在我想这儿才是令人小兴奋的地方
+okay, that's pretty simple, now this is where I guess a little bit more exciting
+
+173
+00:15:16,933 --> 00:15:21,299
+很明显这很简单，我们只是在推送，这只是一个包装
+so obviously this is very simple, we're just pushing, which is this is just a wrapper
+
+174
+00:15:21,300 --> 00:15:25,700
+本质上，我们只是将其作为一个层或覆盖层推送到LayerStack
+essentially we just push it to the LayerStack as a layer or an overlay
+
+175
+00:15:26,500 --> 00:15:29,588
+但接下来还有OnEvent和Run
+but then we have OnEvent and the Run thing
+
+176
+00:15:29,588 --> 00:15:34,666
+正如你们所看到的，Run非常简单，我们只是有点拒绝，只是对LayerStack进行了迭代
+run thing really simple as you can see, we just kind of refuse, we just iterate over all the layers and LayerStack
+
+177
+00:15:34,666 --> 00:15:37,925
+我们可以在这里使用基于范围的for循环，因为我们实现了开始-结束
+we can use that range based for loop here, because we implemented the beginning end
+
+178
+00:15:38,666 --> 00:15:43,925
+它只是触发了OnUpdate，非常简单，从头到尾，明显包含了很多层
+and it just caused OnUpdate, really simple, kind of goes from the beginning to the end, includes over layers obviously
+
+179
+00:15:45,100 --> 00:15:49,125
+那就是它所做的，然后在这里，我们不得不向后遍历，对吧
+and that's just what it does, and then here, we kind of have to go backwards, right
+
+180
+00:15:49,466 --> 00:15:53,325
+因此，我们向后遍历LayerStack，都会调用OnEvent
+so we go backwards through the LayerStack, and we call OnEvent
+
+181
+00:15:53,325 --> 00:15:56,477
+无论何时接收到事件，如果事件被标记为已处理
+whenever an event is received, if the event is marked as handled
+
+182
+00:15:56,866 --> 00:16:02,166
+就会退出循环，这意味着我们不继续，也意味着如果覆盖处理事件
+we break which means we do not continue this, also means that if an overlay handles an event
+
+183
+00:16:02,166 --> 00:16:05,622
+就是那样，对吧，层不会得到它，这是预期的行为
+that's it, right, layers will not get it which is the intended behavior
+
+184
+00:16:06,300 --> 00:16:11,999
+好了，就是那样，好了，那么在Hazel.h，这是一种面向公共客户端的头文件
+okay, that is it, okay, so in Hazel.h, which is our kind of public client facing header file
+
+185
+00:16:12,000 --> 00:16:15,466
+我只添加Layer.h在这里，Layer当然应该包含在Application中
+I'll just add a Layer.h here, layer of course is included by Application
+
+186
+00:16:15,466 --> 00:16:18,600
+所以我真的不需要这样做，因为Layer是包含在内的，所有这些
+so I didn't really need to do that, because Layer is that's included and all of that
+
+187
+00:16:18,900 --> 00:16:21,210
+但我这样做，无论如何，只是为了更清楚一点
+but I did that, anyway, just to kind of be more clear
+
+188
+00:16:21,210 --> 00:16:23,900
+因为Layer肯定是客户端可以访问的
+because Layer is definitely something that should be accessible by the client
+
+189
+00:16:25,166 --> 00:16:29,980
+现在在premake文件中，我实际上要做的是我们以前遇到的这种bug
+now in the premake file, what I actually had to do was this kind of a bug that we had before
+
+190
+00:16:30,733 --> 00:16:37,700
+我基本上将构建选项设置为包括多线程调试dll和多线程dll
+I basically set the build options to include the multi threaded debug dll and the multi threaded dll
+
+191
+00:16:37,700 --> 00:16:42,750
+对吧，因为我们之前有，这是针对运行库的，对于C++来说是运行库
+right, because what we had before, and this is for the runtime library, for the C++ was runtime library
+
+192
+00:16:43,050 --> 00:16:44,800
+我们是针对这个静态链接的
+we were linking statically against this
+
+193
+00:16:44,800 --> 00:16:49,650
+这是一个问题，因为实际上这个Hazel构建了dll
+which is an issue, because since this actually this Hazel thing build the dll
+
+194
+00:16:50,166 --> 00:16:59,400
+我们最终得到了Sandbox和Hazel项目的不同堆
+we ended up with kind of different heaps essentially for both the Sandbox and the Hazel project
+
+195
+00:16:59,400 --> 00:17:03,025
+因为它们都被静态地链接到各自的项目中
+because they were both getting statically linked into those respective projects
+
+196
+00:17:03,025 --> 00:17:07,700
+我们不能那样搞，因为我发现这件事的方式是
+we can't have that, because, and the way that I kind of found out about this was
+
+197
+00:17:08,000 --> 00:17:15,099
+我认为是spdlog，它最终试图释放一些内存，这些内存是由不同的堆分配的，然后崩溃了
+I think spdlog, and it ended up trying to free some memory, that was allocated by different heap, and that crashed
+
+198
+00:17:15,100 --> 00:17:23,050
+好了，所以你们需要确保如果正在构建一个dll，你们会链接到运行时的实际dll版本
+okay, so you need to make sure that if you are building a dll that you'd link against the actual dll version of the runtime
+
+199
+00:17:23,333 --> 00:17:29,500
+我将在VS中向大家展示，它只是在C/C++，代码生成，然后是运行时库
+I'll show you guys in Visual Studio,  it's just under C/C++, code generation, and then the runtime library
+
+200
+00:17:29,500 --> 00:17:34,750
+好了，所以我认为默认情况下，它是添加到多线程调试中的，就像这里一样
+okay, so it, I think by default, it's add to multi threaded multi threaded debug, like it is here
+
+201
+00:17:34,750 --> 00:17:39,175
+它应该是多线程dll，好吧，所以我们需要针对dll版本进行链接
+it should be multi threaded dll, okay, so we need to link against the dll version
+
+202
+00:17:39,475 --> 00:17:42,133
+在premake中，我们应该设置成/MDd，就像那样
+and in premake, if we do /MDd like that
+
+203
+00:17:42,166 --> 00:17:46,966
+我认为这是一种切换，我的意思是，如果你们看看这里，/MTd，是的，那就是一种切换
+which I think is the switch, I mean, if you look over here /MTd, yeah that's kind of the switch
+
+204
+00:17:46,966 --> 00:17:51,666
+好的，你们可以看到，在这里，我已经附加了/MDd，它启用了那个切换
+okay, so you can see that over here, I've kind of done /MDd, which enables that switch
+
+205
+00:17:51,666 --> 00:17:57,330
+是的，有争议的是，这里显示的是多线程调试
+now yes, it is controversial that, it kind of shows up is multi threaded debug here
+
+206
+00:17:57,800 --> 00:18:01,800
+但我想，我不知道，是否有一种实际的方法可以在premake中设置为不是那样
+but I think, I don't know, if there's an actual way to set it in premake to not be that
+
+207
+00:18:01,800 --> 00:18:09,425
+好了，我们只是把它包含进去，然后我不确定它的VS是否有错，这里没有传递
+okay, so we kind of just include that, and then I'm not sure if his visual studio is fault, that is not propagated here 
+
+208
+00:18:09,425 --> 00:18:13,275
+但不管怎样，我不确定这可能是真的，如果你们知道的话
+but anyway, I'm not sure about that actually that might be, if you guys know about this
+
+209
+00:18:13,275 --> 00:18:18,881
+因为很明显这有点烦人，它在这里显示错误，然后被额外的命令行覆盖
+because obviously it's kind of annoying that, it shows up wrong here, and then gets overwritten by the additional command line here
+
+210
+00:18:20,000 --> 00:18:25,500
+也许我做错了什么，但它现在似乎确实链接到了库的正确版本
+maybe I've done something wrong, but it definitely seems to be linking the correct version of the library now
+
+211
+00:18:25,500 --> 00:18:30,366
+所以我们对Sandbox和Hazel项目都做了
+so we just did that to both Sandbox and to the Hazel project
+
+212
+00:18:30,366 --> 00:18:35,950
+确保链接正确运行时库版本的正确运行时版本
+to make sure that we're linking the right runtime version of the right runtime library version
+
+213
+00:18:36,300 --> 00:18:38,846
+因为我们同样需要dll，不需要静态库
+because again we want the dll, we don't want the static library
+
+214
+00:18:39,525 --> 00:18:45,294
+好了，SandboxApp是我创建ExampleLayer的地方，我马上给你们看，然后我想就这样了
+okay, SandboxApp is where I did my ExampleLayer, which I'll show you guys in a minute, and then I think that's it
+
+215
+00:18:45,550 --> 00:18:51,200
+好了，所以根本没有太多的变化，所以如果我们去看看SandboxApp
+okay, so not too many changes at all, so if we go to our applicate our SandboxApp
+
+216
+00:18:52,533 --> 00:18:56,625
+这就是我的ExampleLayer，所以这就是如何创建层的，当然这是在客户端中
+this is my ExampleLayer, so this is how you make a layer, and this is in the client of course
+
+217
+00:18:57,066 --> 00:19:02,100
+所以你们所要做的就是将这个层直接继承Hazel::Layer，如果你们愿意，可以给它起个名字
+so all you have to do is basically subclass this layer right into your own layer, you can give it a name if you want
+
+218
+00:19:03,249 --> 00:19:09,925
+然后我刚刚实现了OnUpdate和OnEvent，好了，两个小函数，在这儿只是记录更新，对吧
+and then I've just implemented OnUpdate and OnEvent, okay, two little functions here, in here I'm just logging update, right
+
+219
+00:19:09,925 --> 00:19:13,566
+因为这应该在每一帧更新，当然还有OneEvent，我只是在记录事件
+because this should get updated every frame, and then of course OnEvent, I'm just logging in the event
+
+220
+00:19:13,566 --> 00:19:19,269
+因为我们还没有对它做任何事情，然后在我的Hazel应用中，也就是Sandbox
+because we're not really doing anything with it yet, and then inside my Hazel application, which is Sandbox
+
+221
+00:19:19,466 --> 00:19:25,133
+我所要做的就是推送那个层，好了，那么把新的ExampleLayer推到那个LayerStack中
+all I have to do is push that layer, okay, so just push that new ExampleLayer into that LayerStack
+
+222
+00:19:25,133 --> 00:19:27,213
+就这样，我可以把它作为一个覆盖层推进去，那也很好
+and that's it, I could push it as an overlay, that would be totally fine as well
+
+223
+00:19:27,533 --> 00:19:32,566
+但我只是把它作为一个层来推，所以如果在我们的这个程序上，有一件事我需要点明
+but I just push it as a layer, and so if we were on this little program of ours, one thing I want to point out quickly
+
+224
+00:19:32,566 --> 00:19:39,550
+我在这里的输出中注意到，让我把这个停靠在这里，所以我们要构建的是
+that I noticed in the output here, let me just dock this over here, so we got to build was that
+
+225
+00:19:39,550 --> 00:19:46,766
+你们可以看到，它实际上使用这个/MDd选项覆盖了/MTd
+you can see that, it's actually overriding that multi threaded debug with with this MDd option
+
+226
+00:19:46,766 --> 00:19:52,000
+这是多线程调试dll，好了，所以它实际上链接了正确的版本
+which is the multi threaded debug dll, okay, so it is in fact obviously linking the right version
+
+227
+00:19:52,000 --> 00:19:56,025
+但不是很好，它必须重写，因为如果设置了它会很好
+but not great, that it's having to override it, because it would be nice, if it was set
+
+228
+00:19:56,025 --> 00:19:59,100
+如果你们能直接做到的话，我就不用打印咯
+and I'm not your own printmakers, if you can do that directly
+
+229
+00:19:59,550 --> 00:20:03,325
+不管怎样，那么这里有这个，我想我会把这个留在这里
+anyway, so here we have this, I'll kind of leave this here I guess 
+
+230
+00:20:03,575 --> 00:20:08,625
+所以你们可以看到，层一直在更新，如果我移动鼠标或键入一些键或其他什么
+so you can see, the layer is being updated all the time, and if I move my mouse or type some keys or whatever
+
+231
+00:20:09,000 --> 00:20:13,950
+它正在接收所有这些事件，如果我暂停一下，你们可以看到，Hazel首先得到了事件
+it's receiving all those events, and if I kind of just pause this, you can see, Hazel's getting the event first
+
+232
+00:20:13,950 --> 00:20:19,918
+然后我们的App实际上正在获取事件，所以这个日志来自ExampleLayer，这个来自Core
+and then our APP is actually getting the event, so this log is coming from our ExampleLayer, this log is coming from Core
+
+233
+00:20:19,918 --> 00:20:26,558
+因为如果你们看一下Application，我们实际上有这个HZ_CORE_TRACE，现在就可以得到
+because if you look at the Application thing, we actually have this HZ_CORE_TRACE, which I can get right up now
+
+234
+00:20:27,866 --> 00:20:33,075
+跟踪实际接收到的所有事件，好了，酷，就是那样
+which traces kind of all the events that are actually received, okay, cool, so that is that
+
+235
+00:20:34,066 --> 00:20:41,975
+我们很快就会有一个更实用的例子，因为我们的下一步实际上是将ImGui添加到Hazel中
+we are going to very soon have a way more practical example of this, because our next step is actually going to be the add ImGui to Hazel
+
+236
+00:20:41,975 --> 00:20:44,375
+这样我们就可以使用一些基本的ui，并且你们知道
+so that we can get some basic ui going, and you know
+
+237
+00:20:44,375 --> 00:20:47,847
+我们就可以开始在实际屏幕上而不是在日志中显示内容
+we can start displaying stuff on the actual screen instead of in logs
+
+238
+00:20:49,100 --> 00:20:54,050
+所以那将是我们的下一步，当然，为此，我们要做的就是创建一个ImGui层
+so that's going to be our next step, and of course for that, what we will do is we'll create an ImGui layer
+
+239
+00:20:54,366 --> 00:21:01,166
+它将处理我们需要传递到ImGui的所有事件，以及处理所有渲染，所以那就是以后要做的
+which will handle all of the events that we need to propagate to ImGui, as well as also handle all of the rendering, so that's kind of the future
+
+240
+00:21:01,166 --> 00:21:06,462
+如果你们想知道它的发展方向，那么很明显，一旦我们开始使用3D渲染器或2D渲染器
+if you want to see where this is headed, and then obviously from there, once we start working on like the 3D renderer or the 2D renderer
+
+241
+00:21:06,733 --> 00:21:11,000
+我们还将为3D世界或2D世界或其他任何东西提供一个层
+we'll have a layer as well for kind of our 3D world or for our 2D world or whatever
+
+242
+00:21:11,300 --> 00:21:13,075
+所以那就是它的发展方向
+so that is kind of where this is heading
+
+243
+00:21:13,075 --> 00:21:16,533
+无论如何，我希望你们喜欢这段视频，如果你们喜欢的话，就为它点赞吧
+anyway, I hope you guys enjoyed this video, if you, hit that like button
+
+244
+00:21:16,533 --> 00:21:24,666
+层是非常重要的，我们将使用它，它们是我们真正像在Hazel中编写的任何代码的基础
+layers are very important, and we're gonna use this, they're kind of the basis for any kind of code that we really write like in Hazel
+
+245
+00:21:24,666 --> 00:21:28,375
+比如，如果你们看看游戏引擎的组成部分，我可能很快会制作一段视频
+like if you look at the building blocks of kind of a game engine, which I might make a video soon about
+
+246
+00:21:28,375 --> 00:21:34,800
+现在我们对Hazel的架构有了更清楚的了解，我们将回顾一下它是如何运行的
+now that we're kind of a little bit more clear on the architecture of Hazel, we're kind of going to review kind of how that works
+
+247
+00:21:34,800 --> 00:21:39,725
+但我们基本上清楚地看到，我们创建了一个Application和Layer，然后就那样
+but we basically clear and see, you know, we create an Application, and we create a Layer, and then that's kind of it
+
+248
+00:21:39,725 --> 00:21:43,350
+Application是一种核心运行时和游戏？，以及所有与之相关的东西
+the application's kind of the core runtime and the game lube and all that stuff about thing
+
+249
+00:21:43,600 --> 00:21:46,625
+然后层实际上是渲染和接收事件的东西
+and then layer is actually the stuff that renders and receive events
+
+250
+00:21:46,625 --> 00:21:49,550
+因此，这是一种我们都能看到的东西
+and thus it's kind of the thing that, we both see
+
+251
+00:21:49,550 --> 00:21:54,799
+用户可以看到渲染的形式，也可以在事件的形式中进行交互
+the user kind of sees in the form of rendering, and also interacts within the form of events
+
+252
+00:21:54,800 --> 00:21:58,125
+所以它是一种真正基于核心引擎的构建模块
+so it's kind of a really based building block of kind of the core engine
+
+253
+00:21:58,750 --> 00:22:00,775
+很明显我们将来会用到很多东西
+and something that obviously we're gonna use a lot in the future
+
+254
+00:22:01,650 --> 00:22:03,875
+如果你们想支持这个系列，可以访问patreon.com/thecherno
+if you want to support the series, patreon.com/thecherno
+
+255
+00:22:03,875 --> 00:22:08,333
+一如既往地非常感谢你们，我没有一直告诉你们，没有你们，就没有这个系列
+huge thank you as always, that I don't really keep telling you guys that, this series wouldn't be here without you guys
+
+256
+00:22:08,333 --> 00:22:17,125
+所以我真的很感激，因为它是社区中一个很好的课程区，并且非常慷慨地帮助支持这个系列
+so I really am thankful, because it's amazing how like a nice course section of the community, and be so generous as to help support this series
+
+257
+00:22:17,125 --> 00:22:22,050
+然后你们其他人就可以免费看了，所以我真的很感谢那些家伙
+and then the rest of you guys kind of get to see it for free, so I really am thankful to those guys
+
+258
+00:22:22,050 --> 00:22:25,933
+那就是为什么他们会得到奖励，比如Hazel背后的所有代码
+and that's why they receive rewards, such as all of the code behind the scenes of Hazel
+
+259
+00:22:25,933 --> 00:22:31,175
+还有我在业余时间写的所有代码，以及提前一周播放的视频
+and all the stuff that I've written in my spare time, as well as videos one week early and play
+
+260
+00:22:31,175 --> 00:22:35,600
+在下期视频中，我们可能会开始实现ImGui的接口，它早就对赞助人开放了
+the next video in which we probably will start implementing, ImGui is already out for patrons
+
+261
+00:22:36,533 --> 00:22:41,600
+所以，是的，希望你们喜欢这期视频，谢谢你们观看，下次见，拜
+so yeah hope you guys enjoyed this video, thank you for watching, and I'll see you next time, goodbye
+
