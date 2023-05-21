@@ -1,0 +1,1140 @@
+﻿1
+00:00:00,150 --> 00:00:03,600
+嘿，大家好，我是TheCherno，欢迎回到我的游戏引擎系列
+hey, what's up guys, my name is TheCherno, welcome back to my game engine series
+
+2
+00:00:03,933 --> 00:00:08,825
+那么上期我们创建了一个ImGuiLayer，如果你们还没有看过的话，一定要去看看那期视频
+so last time we took a little creating the ImGuiLayer, definitely check out that video, if you haven't already
+
+3
+00:00:09,133 --> 00:00:12,125
+在那期视频的最后，我给你们留下了一个小小的挑战
+and at the end of that video, I left you guys with a bit of a challenge
+
+4
+00:00:12,400 --> 00:00:16,700
+也就是尝试并实现了ImGuiLayer的整个事件系统
+which was try and implement the whole event system for the ImGuiLayer
+
+5
+00:00:16,700 --> 00:00:22,100
+因为我们所做的只是一种渲染，只是更新并初始化和设置所有ImGui
+because what we had done was just kind of rendering and just updating and getting all of ImGui initialized and set up
+
+6
+00:00:22,100 --> 00:00:25,333
+我们在屏幕上看到了一些东西，但我们当然无法与之互动
+and we were seeing stuff on the screen, but of course we couldn't interact with that
+
+7
+00:00:25,333 --> 00:00:28,775
+我们不能使用鼠标或键盘之类的东西，而挑战是给你们的
+we couldn't use the mouse or the keyboard or anything like that, and the challenge was for you guys
+
+8
+00:00:28,775 --> 00:00:34,825
+要自己尝试使用Hazel的事件系统实现那个，因为视频提前一周发布给赞助人
+to try and implement that yourself, using Hazel's event system, so because the video is out a week early for patrons
+
+9
+00:00:34,825 --> 00:00:39,750
+我们已经就可能的解决方案进行了一些非常重要的讨论，这很酷
+we've had some pretty crucial discussions about possible solutions to that, which is pretty cool
+
+10
+00:00:40,950 --> 00:00:44,700
+所以首先，如果你们在patreon上还没支持我，一定要看看patreon.com/thecherno
+so first of all, if you're not supporting me on patreon, definitely check that out, patreon.com/thecherno
+
+11
+00:00:44,933 --> 00:00:49,475
+所有的视频都是一个月前一周发布的
+all the videos are released of a, what's going to say on month early a week early
+
+12
+00:00:49,800 --> 00:00:54,350
+你们还可以进入Hazel的一个私有开发分支，就像我在业余时间在搞Hazel一样
+and you also get access to a private development branch of Hazel, which is like me working on Hazel in my spare time
+
+13
+00:00:54,350 --> 00:00:58,850
+那比我们这里实际拥有的要多得多
+that's a lot a lot a lot a lot a lot bigger than what we actually have here
+
+14
+00:00:59,700 --> 00:01:02,550
+总之，我们确实在Discord上的的赞助人频道中讨论过那个
+so anyway, so we did actually discuss that in the patrons channel on Discord 
+
+15
+00:01:03,075 --> 00:01:06,650
+看到你们中的很多人都在尝试挑战，真的很酷
+so that was really cool to see how a lot of you guys actually attempted that challenge
+
+16
+00:01:07,066 --> 00:01:10,800
+最终提出了自己的解决方案和实现
+and ended up coming up with your own kind of solutions and implementations
+
+17
+00:01:11,050 --> 00:01:16,900
+今天我们要看一看我实现这个的基本方法，我可以点明的这些例子
+and today we're just going to take a look at basically the way that I did it, these exercises could I just point out
+
+18
+00:01:17,300 --> 00:01:21,250
+我知道很多人一直要求我做这样的事情，我也一直在尝试做这样的事情
+I know that a lot of people have been asking me to do stuff like that, and I've been trying to do stuff like that
+
+19
+00:01:21,566 --> 00:01:26,450
+因为你们看了之后就开始做自己的事情
+because this kind of interaction between you guys watching it and then going off and doing your own thing
+
+20
+00:01:26,800 --> 00:01:31,122
+很多时候，我只是假设这是存在的，不管怎样，举个例子
+that's something that a lot of the time I just kind of assume exists, anyway, so for example
+
+21
+00:01:31,600 --> 00:01:35,533
+你们知道，你们创建的，你们写下视频中的所有内容，然后自定义它
+you know, you make, you write down everything from this video, but then you customize it
+
+22
+00:01:35,533 --> 00:01:40,025
+因为你们在构建自己的引擎或类似的东西，对吧，或者你们改变它
+because you're making your own engine or something like that, right, or you change it
+
+23
+00:01:40,025 --> 00:01:44,825
+或者你们只是在业余时间继续写，在下期视频中，你们也可以整合我所做的一切
+or you just keep working on it in your spare time, and in the next video comes out, and you integrate whatever I've done as well
+
+24
+00:01:45,166 --> 00:01:50,275
+那那有点像你们正在做的一个不断发展的项目，而不仅仅是每周视频发布的时候
+and that's it's kind of like an ever evolving kind of project that you're working on, not just when the video comes out every week
+
+25
+00:01:50,550 --> 00:01:56,100
+但是整个一周或者任何你们有空闲时间的时候，但是因为很多人都不这样对待它
+but just all throughout the week or wherever you have spare time, but because a lot of people kind of don't treat it like that
+
+26
+00:01:56,766 --> 00:02:01,399
+我认为这是一个好主意，显然提供这样的练习，当你们这样做的时候
+I think it is kind of a good idea, obviously to provide exercises like that, and when you do that when you kind of
+
+27
+00:02:01,400 --> 00:02:07,375
+当我给你们挑战时，我真的希望你们去做，因为首先，我不认为它们太难
+when I give you guys challenges, I really want you to do them, because first of all, I don't think they're too difficult
+
+28
+00:02:07,375 --> 00:02:10,425
+或者我认为它们不一定需要我，只是需要编写代码
+or I don't think they're necessarily need me, it's just code that needs to be written
+
+29
+00:02:10,766 --> 00:02:15,825
+它不像你们知道的那样，像这个主要的新特性那样进行架构，顺便说一句，即使它是
+it's not like you know, architecting like this major new feature, which by the way, even if it was
+
+30
+00:02:15,825 --> 00:02:19,750
+你们还是可以试试看，看看有什么不对的，你们应该这样做
+you could still give that a shot, and see what you come up with nothing wrong with that, you should do that in fact
+
+31
+00:02:20,600 --> 00:02:26,575
+但是你们真正要学习的唯一方法是亲自编写代码，并尝试自己设计和编写代码
+but the only way you're really going to learn is by actually writing code yourself and trying to come up with designs and code yourself
+
+32
+00:02:26,575 --> 00:02:29,975
+因此，练习非常重要，无需进一步的计划
+so exercises super important without further ado
+
+33
+00:02:29,975 --> 00:02:34,125
+让我们看看如何将ImGui与Hazel的事件系统集成
+let's see how we can get ImGui integrated with Hazel's event system
+
+34
+00:02:34,125 --> 00:02:38,866
+这可能是我们第一次正确使用事件调度器，我很期待
+this is probably the first time we're going to use the event dispatcher properly as well, which I'm looking forward to
+
+35
+00:02:38,866 --> 00:02:41,999
+因为人们一直在问这个问题，是的，到最后
+because people have been asking about that, and yeah by the end
+
+36
+00:02:42,000 --> 00:02:45,666
+我的意思是，总之，我们应该能够在ImGui中输入内容
+I mean by the end of today, we should have, we should be able to type stuff into ImGui
+
+37
+00:02:45,666 --> 00:02:50,100
+然后移动窗口，使用鼠标和滚动等等，那么看看我们能做些什么
+and move the window around, and use the mouse and scroll, and all of that kind of stuff, so let's see what we can do
+
+38
+00:02:50,400 --> 00:02:55,975
+好了，那么如果我们像现在这样运行Hazel，看看有什么，基本上就是这些
+okay, so if we just kind of launch Hazel as it is now, just to see what we have, it's basically this
+
+39
+00:02:55,975 --> 00:02:59,575
+我们看到了ImGui演示窗口，但你们可以看到，我们显然无法与之交互
+we see the ImGui demo window, but you can see, we obviously can't interact with it
+
+40
+00:02:59,966 --> 00:03:05,066
+是的，真的很无聊，所以实际上得把这些交互加入其中
+and yeah it's pretty boring, so to actually add that kind of interaction to it
+
+41
+00:03:05,533 --> 00:03:11,200
+我们可以从GLFW实现中复制代码，因为你们可以看到它的作用是
+one thing that we can kind of steal code from is that GLFW implementation, because you can see what this does is
+
+42
+00:03:12,066 --> 00:03:17,299
+你们知道，GLFW会触发某些事件，它们会在这里的某个地方发生
+you know, we have certain events to get triggered from GLFW, and they'll be here somewhere
+
+43
+00:03:17,300 --> 00:03:24,825
+就像你们知道的，有一个向后滚动，一个按键回调，一个滚动回调，一个鼠标按钮回调
+so like you know, there's a scroll back, a key callback, scroll back, a scroll callback, a mouse button callback
+
+44
+00:03:24,825 --> 00:03:31,775
+你们可以看到它的实际功能，实际上设置了g_MouseJustPressed，然后在循环中更新
+and you can see what it actually does, well this one actually sets g_MouseJustPressed and then updates in the update loop
+
+45
+00:03:32,200 --> 00:03:39,550
+但可以看到，对于KeyCallback，如果按下按键，然后ImGui::GetIO()，也就是ImGuiIO，对吧
+but you can see that for the KeyCallback for example, it just if the key is pressed, then ImGui::GetIO(), which is ImGuiIO, right
+
+46
+00:03:39,900 --> 00:03:47,600
+如果io.KeysDown[key] = true，那么那个就是我们要在按键容器中设置的key
+it says io.KeysDown, with the key as the index equals true, and that indexible key is kind of what we set in this key map
+
+47
+00:03:48,700 --> 00:03:55,450
+所以那就是它的原理，考虑到那一点，那就是从imgui_impl_glfw得到灵感的
+so that's kind of how it works, so with that in mind, that's kind of where this is inspired from imgui_impl_glfw
+
+48
+00:03:56,000 --> 00:04:01,766
+那也是ImGui仓库的一部分，我们将基本上实现它，但我们自己可能会更干净一些
+which is part of the ImGui repository, we're going to implement basically that, but ourselves and probably a little bit cleaner
+
+49
+00:04:01,766 --> 00:04:05,300
+我不知道我们是否真的能实现所有的事情，因为它很大，而且很多都不是
+and I don't know, if we'll actually get to do everything, because it's quite large, and a lot of it's not
+
+50
+00:04:05,850 --> 00:04:10,866
+那就是我需要的，就像你们知道的，剪贴板上的文本和类似的小东西，可能以后可以做
+that's how I needed, like you know, clipboard text and stuff like that minor things, that can probably be done later
+
+51
+00:04:10,866 --> 00:04:15,466
+我甚至可以把它作为你们的练习，但主要的是我们今天会搞定
+I might even leave that as an exercise for you guys, but the main stuff is what we're gonna get done today
+
+52
+00:04:15,466 --> 00:04:21,550
+这样我们就可以开始使用ImGui了，好了，那么我想做的第一件事就是看到ImGuiLayer.h
+so that we can actually start using ImGui, okay, so the first thing I wanna do is go to ImGuiLayer.h
+
+53
+00:04:21,550 --> 00:04:24,700
+我们实际上需要实现一系列这样的函数
+and we actually need to implement a bunch of these kind of functions
+
+54
+00:04:24,700 --> 00:04:30,100
+所以我喜欢将私有变量与函数分开，只是为了让它更容易一些
+so I like to separate private variables from functions, just to make it a little bit easier
+
+55
+00:04:30,366 --> 00:04:34,400
+但基本上，我们需要几乎所有的事件
+but basically we're gonna need pretty much every every event we have
+
+56
+00:04:34,400 --> 00:04:38,300
+所以ButtonPress，那么就是OnMouseButtonPressedEvent
+so ButtonPress, so OnMouseButtonPressedEvent
+
+57
+00:04:39,500 --> 00:04:45,225
+就是一个MouseButtonPressedEvent，我们还有OnMouseButtonReleasedEvent
+which is a MouseButtonPressedEvent, we have OnMouseButtonReleasedEvent
+
+58
+00:04:47,400 --> 00:05:00,400
+我们可能还需要包含一些头文件，MouseMove MouseScroll，MouseMoved，scrolled
+and we'll have to probably include a bunch of headers here as well, MouseMove MouseScroll, MouseMoved, scrolled
+
+59
+00:05:02,666 --> 00:05:09,525
+然后我们有，让我们看看按键的按下释放和输入，输入是我们可能需要添加的事件
+and then we have, let's see key press release typed, typed is something we might actually have to add
+
+60
+00:05:10,066 --> 00:05:14,225
+然后是WindowResize，这些都是我能想到的
+and then the WindowResize as well, those are all the ones I can think of
+
+61
+00:05:14,225 --> 00:05:27,425
+那么就是OnWindowResized，至于这个OnKeyTyped，我想我们没有一个KeyTyped
+so OnWindowResized, OnKeyTyped, I don't think we have a KeyTypeed
+
+62
+00:05:27,425 --> 00:05:30,625
+那么我们可能必须实现那个，因为ImGui需要那个
+then we might have to implement that, because ImGui's going to want that
+
+63
+00:05:31,500 --> 00:05:37,625
+所以KeyTypedEvent本质上就是，如果你们点击一个字符代码按键，它就像输入
+and then so KeyTypedEvent is essentially, if you hit a character code key, and it kind of counts as like typing
+
+64
+00:05:37,866 --> 00:05:46,675
+输入实际字符，然后是KeyReleased和KeyPressed
+typing an actual character, KeyReleased, and KeyPressed
+
+65
+00:05:47,600 --> 00:05:58,600
+那么就是MouseButtonPressed，MouseButtonReleased，MouseMoved，MouseScrolled
+okay, so MouseButtonPressed, MouseButtonReleased, MouseMoved, MouseScrolled
+
+66
+00:06:00,000 --> 00:06:08,175
+KeyPressed，KeyReleased，KeyTyped，糟糕，应该是Event
+KeyPressed, KeyReleased, KeyTyped, oops event
+
+67
+00:06:08,766 --> 00:06:18,250
+然后是WindowResizeEvent，好了，我们可以称之为WindowResize，所以必须包含
+and then WindowResizeEvent, okay, so and we might just call that WindowResize, so we'll have to include
+
+68
+00:06:18,766 --> 00:06:31,625
+也就是Hazel/Events/KeyEvent，和MouseEvent，差不多了，好了，很好
+if it's Hazel/Events/KeyEvent, MouseEvent, and yeah it seems to have everything, okay, great
+
+69
+00:06:31,900 --> 00:06:37,766
+那就是我们所有的东西，可以看到，相当多，至于KeyTypedEvent，现在先注释掉
+so that's all of our stuff you can see, this quite a lot, the KeyTypedEvent, I'll comment that out for now
+
+70
+00:06:37,766 --> 00:06:44,300
+我们稍后再讨论，先让它跑起来，让我们点击OK来生成所有这些
+we'll talk about that later, we'll get this working first, let's hit okay to that just to generate all of these
+
+71
+00:06:44,666 --> 00:06:51,825
+这就是乐趣的开始，所以我们需要做的第一件事是，显然这些都应该是bool，所以那很好
+and this is where the fun begins, so the first thing we need to do is to, and obviously this should all be bool, so that's great
+
+72
+00:06:55,666 --> 00:07:04,800
+因此需要做的第一件事就是，如果这样做的话，我们可以在这个范围内用bool来代替void
+so the first thing we need to do, let's just if we just do that we can replace void with bool just in that scope
+
+73
+00:07:05,066 --> 00:07:10,775
+好了，那么我们要做的第一件事实际上是调度所有这些事件
+okay, so the first thing we need to do is actually dispatch all of these kind of events
+
+74
+00:07:10,966 --> 00:07:17,200
+所以我这样做的方式是使用事件来进行特殊处理，所以我的意思是当一个事件进入层时
+so the way that I do that is using our event to special, so what I mean is when an event gets kind of comes into the layer
+
+75
+00:07:17,533 --> 00:07:23,850
+我们需要一种方法来检查事件类型，然后根据事件类型将该事件转发到其中一个函数上
+we need a way to check the event type, and then forward that event onto one of these functions depending on what it is
+
+76
+00:07:23,850 --> 00:07:30,325
+如果是KeyPressEvent，我们想转到KeyPressEvent函数，因此可以使用EventDispatcher
+if it's a KeyPressEvent, we want to go to this KeyPressEvent function, so to do that, we can use the EventDispatcher
+
+77
+00:07:30,666 --> 00:07:37,675
+所以我们基本上是在栈上创建这个dispatcher对象，当然就是dispatcher(event)
+so we basically create this dispatcher object here on the stack, of course dispatcher with the event
+
+78
+00:07:38,200 --> 00:07:46,775
+需要做的就是dispatch.Dispatcher()，然后事件类型，所以第一个是MouseButtonPressEvent
+and then all we need to do is type in Dispatcher dispatch and then the event type, so our first one is the MouseButtonPressEvent
+
+79
+00:07:46,775 --> 00:07:51,025
+所以从字面上看，这个MouseButtonPressEvent就是这样
+so literally this MouseButtonPressEvent, and then that's it
+
+80
+00:07:51,025 --> 00:07:56,128
+所以如果这个事件与这个事件类型匹配，就会发生什么
+and so what will happen is if this event matches this event type
+
+81
+00:07:56,766 --> 00:08:02,000
+这就是dispatch函数检查的内容，然后它将实际调用我们将在此处指定的函数
+which is what the dispatch function checks for, then it will actually call this function that we're about to specify here
+
+82
+00:08:02,466 --> 00:08:07,566
+现在我们使用这个，我们在WindowsWindow中基本上做了同样的事情
+now we use this, we basically kind of do the same thing in our WindowsWindow
+
+83
+00:08:08,100 --> 00:08:13,310
+当我们在这里处理lambders和所有回调时，有点类似，我们可以在这里设置lambda
+when we dealt with lambders over here with all the callbacks, it's kind of similar, we could set a lambda here
+
+84
+00:08:13,566 --> 00:08:17,825
+当然，我们有一个实际的函数，所以要设置它，需要绑定它
+but of course we've got an actual function, so to set it up, we need to bind it
+
+85
+00:08:18,900 --> 00:08:22,866
+因为这个函数当然是ImGuiLayer的成员
+because this function of course is a member of ImGuiLayer
+
+86
+00:08:22,866 --> 00:08:30,925
+那么长话短说，我们需要做一些类似std::bind的事情，你们知道的，这个实际的函数
+so long story short, we need to do something that's like std bind, you know this actual function
+
+87
+00:08:31,066 --> 00:08:38,533
+所以它看起来像&ImGuiLayer::MouseButtonPressedEvent，然后
+so it would look like an ImGuiLayer, and then that, and then
+
+88
+00:08:38,533 --> 00:08:45,375
+我们需要绑定到this，然后就是std::placeholder::_1，就像那样
+we need to bind this, and then you know std::placeholder, one look kind of like that
+
+89
+00:08:46,200 --> 00:08:47,875
+这个应该是OnMouseButtonPressEvent
+and this is OnMouseButtonPressEvent
+
+90
+00:08:49,066 --> 00:08:54,659
+就像这样，我的意思是完全一样，好吧，那就是我们需要做的，现在很明显这看起来很混乱
+and by kind of like that, I mean exactly like that, okay, so that's what we need to do, now obviously this looks very messy
+
+91
+00:08:55,300 --> 00:09:03,220
+所以我想做的是定义一个宏，我会把它和所有其他东西一起放进我们的Core.h文件中
+so what I want to do is actually make a macro out of this, and I'm actually going to put this into our kind of Core header file with all of the other stuff
+
+92
+00:09:03,533 --> 00:09:10,699
+就叫它HZ_BIND_EVENT_FN，我们基本上要把它粘贴在这里
+I'm going to call it HZ_BIND_EVENT_FN, and we're basically gonna paste that in here
+
+93
+00:09:10,700 --> 00:09:18,070
+然后这一块就换成fn，就这样做，就是fn，好了
+and then the only thing I want to really take away is just this x I'll call fn, this so we just do and fn, okay
+
+94
+00:09:18,366 --> 00:09:22,966
+然后我说，但我是说当然是fn的引用，好了
+and then I'm saying, and but I mean anne for sandwich of course is the reference of fn, okay
+
+95
+00:09:22,966 --> 00:09:30,300
+那只需要用一个占位符将其绑定到该函数中，好了，所以现在变成了我们仍然保留这部分
+and that's just gonna bind this with a single placeholder into that function, okay, so this now becomes we still keep this part
+
+96
+00:09:30,800 --> 00:09:38,575
+但这现在变成了那样的HZ_BIND_EVENT_FN，好了，那看起来干净多了
+but this now becomes HZ_BIND_EVENT_FN like that, okay, and that looks a lot clean up
+
+97
+00:09:38,766 --> 00:09:44,799
+现在我们需要做的是基本上做相同的事情，但对于所有其他事件，我可能会快速过一遍
+and now what we need to do is basically do the exact same, but for all of the other events, so I'm just gonna probably fast forward through that
+
+98
+00:09:44,800 --> 00:09:48,400
+因为那可能需要一点时间，好了，所以那就是所有的代码
+because that might take a bit of time, okay, so that's all of the code done here
+
+99
+00:09:48,533 --> 00:09:52,533
+所以现在将发生的是，每当ImGui实际接收到事件时，它都会尝试查看事件的类型
+so now what will happen is whenever ImGui actually receives an event, it'll try to see what type is
+
+100
+00:09:52,533 --> 00:09:55,800
+然后传递到适当的函数，这很好
+and then propagated to the appropriate function, which is great
+
+101
+00:09:55,800 --> 00:10:03,125
+所以现在我们可以开始实现七个事件发生时会发生什么，那么鼠标按钮按下和释放非常简单
+so now we can actually start implementing what happens when seven events happen, so mouse button press release is quite easy
+
+102
+00:10:03,366 --> 00:10:11,950
+我们需要做的就是得到那个ImGuiIO，我想，就是ImGui::GetIO()
+all we need to do is actually get that ImGuiIO, which is I think ImGui::GetIO()
+
+103
+00:10:14,333 --> 00:10:24,525
+然后简单地看一下，MouseDown[e.GetMouseButton()] = true
+and then simply see that, MouseDown with the actual mouse button, it's true
+
+104
+00:10:24,725 --> 00:10:27,425
+好了，然后我们会返回false，这意味着我们处理这个事件
+okay, and then we'll return false, meaning we haven't handled this
+
+105
+00:10:28,700 --> 00:10:31,893
+返回false的原因是我们希望其他层可以处理这个事件
+the reason we return false is because we want other layers to potentially handle this
+
+106
+00:10:32,866 --> 00:10:39,900
+因为你们知道，我们并没有检查鼠标是否被二次点击
+because you know it's not like we've checked to see if the mouse has actually been pressed over a second button
+
+107
+00:10:39,900 --> 00:10:44,625
+因此，我们不想让，你们知道的，比如其他层查找那个事件
+and thus we don't want to you know kind of have other layers seek out that event
+
+108
+00:10:44,625 --> 00:10:51,050
+对吧，现在你们知道了，无论我们在哪里点击，都要等待，不希望这个层消费鼠标事件
+right, now it's just kind of you know wait wherever we click, we don't want this layer to consume every single mouse event ever
+
+109
+00:10:51,966 --> 00:10:56,725
+所以那就是为什么我们返回false，如果我们想，当然可以检测到按钮是否被点击
+so that's why we kind of leave it, it's false for now, if we wanted to we could of course detect whether a button was actually clicked
+
+110
+00:10:56,725 --> 00:11:00,625
+如果点击了一个按钮，那么很明显鼠标就在按钮上方，我们不希望其他层得到那个 
+and if a button was clicked, then obviously the mouse is over the button, and we don't want other layers to get that
+
+111
+00:11:00,625 --> 00:11:02,875
+但那太难了，所以我们现在不打算那么做
+but that's just too hard, so we're not going to do that right now
+
+112
+00:11:03,725 --> 00:11:05,666
+至于MouseButtonReleaseEvent，再说一次，非常简单
+MouseButtonReleaseEvent, again, really easy
+
+113
+00:11:05,666 --> 00:11:10,533
+只需要返回false，每当鼠标移动时，我们都想设置位置，所以那也很容易
+we just set it to false, whenever the mouse moves, we want to set the position, so that's again easy
+
+114
+00:11:10,533 --> 00:11:22,699
+我们只是看看io.MousePos，现在这个是ImVec2，然后就调用e.GetX()，e.GetY()
+we just see io.MousePos, now this is ImVec2, and then we just do e.GetX(), e.GetY()
+
+115
+00:11:24,333 --> 00:11:28,550
+并且就是那样，这个ScrolledEvent，非常简单
+and that is that, ScrolledEvent, really easy as well
+
+116
+00:11:30,525 --> 00:11:37,925
+我们要做的是，我想这是MouseWheel，有两个MouseWheel
+what we have to do is say, I think this is MouseWheel, there's two MouseWheel
+
+117
+00:11:37,925 --> 00:11:44,975
+有垂直的，也有个水平的，我们实际上都支持，所以我们可以同时实现这两个
+there's the vertical and there's the horizontal one, we actually support both, so we might as well implement both
+
+118
+00:11:45,466 --> 00:11:59,055
+那么就是io.MouseWheel += e.GetXOffset()，这个MouseWheelH+=e.GetYOffset()
+so this just this kind of MouseWheel just becomes plus equals e.GetXOffset, and then H is the yOffset
+
+119
+00:12:00,133 --> 00:12:08,000
+当然，我好像搞反了，所以水平方向是X，垂直方向是Y，就是那样，现在已经记住了
+and of course I mean the other around, so horizontal is x and verticals y, and that's that, now already with this in mind
+
+120
+00:12:08,500 --> 00:12:11,100
+应该让所有鼠标事件都跑起来，所以如果我们运行这个
+we should have all the mouse events working, so if we actually run this
+
+121
+00:12:11,200 --> 00:12:14,875
+我们应该能够移动窗口，像展开成员之类的
+we should be able to move our window around and like expand members and stuff
+
+122
+00:12:14,875 --> 00:12:22,675
+好了，这儿有一些错误，那么确定没有找到WindowResizeEvent，显然应该包含那个的
+okay, so we've got some errors here, okay, so identify a WindowResizeEvent is not found, apparently we should include
+
+123
+00:12:23,400 --> 00:12:29,025
+我想可能会包含那个，但显然没有，那么就是ApplicationEvent.h，让我们再试一次
+I thought they might include that, but of course they don't, ApplicationEvent.h, let's try again apparently
+
+124
+00:12:30,900 --> 00:12:36,375
+我们已经生成了另一个构造函数或类似的东西，那可能也是视觉辅助
+we've generated another constructor or something like that, that was probably visual assist as well
+
+125
+00:12:36,375 --> 00:12:43,125
+我们可以去掉它，运行一下，这儿还有一堆没有返回值的函数
+yep we can get rid of that, f5, and we have a bunch of functions here that return no values
+
+126
+00:12:43,333 --> 00:12:50,125
+所以我们将把return false放在所有这些我们还没有实现的函数中，好了，f5运行这个
+so we'll just put return false into all of these functions that we have not yet implemented, ok, f5 force run this
+
+127
+00:12:50,400 --> 00:12:53,300
+好了，酷，所以你们可以看到，现在很明显我可以悬浮在这个上面
+okay, cool, so you can see that now obviously I can hover over this
+
+128
+00:12:53,300 --> 00:12:54,900
+我可以点击，我可以看到一切
+I can click and I can see everything
+
+129
+00:12:54,900 --> 00:12:56,700
+我可以点击并拖动，可以移动所有的东西
+I can click and drag, and I move everything around
+
+130
+00:12:56,975 --> 00:13:00,000
+所以这一切都很好地结合在一起，而且效果也很好
+so this is coming together pretty nicely, and it works pretty well
+
+131
+00:13:00,766 --> 00:13:05,650
+我也可以滚动，所以如果我展开更多，你们可以看到，我也可以在这里使用滚轮滚动
+I like to scroll as well, so if I expand more of these, you can see, I can use a scroll wheel here to scroll as well
+
+132
+00:13:06,000 --> 00:13:08,650
+所以到目前为止，所有这些都非常有效
+so all of that is working so far awesome
+
+133
+00:13:08,950 --> 00:13:12,975
+所以现在我只想实现KeyPressed、keyreased和KeyTyped事件
+so now I just want to implement the KeyPressed, KeyReleased, and the KeyTyped events
+
+134
+00:13:14,766 --> 00:13:17,325
+除了WindowResizeEvent之外，让我们先实现WindowResizeEvent
+as well as the WindowResizeEvent, let's do the WindowResizeEvent first
+
+135
+00:13:17,325 --> 00:13:19,425
+那是我们剩下的唯一一个非关键事件
+that's kind of the only non key event that we have left
+
+136
+00:13:19,525 --> 00:13:35,857
+所以我将io复制到这里，然后将DisplaySize设置为ImVec2(e.GetWidth(), e.GetHeight())
+so I'll copy io over here, and then I'm going to set the DisplaySize to be ImVec2 e.GetWidth, e.GetHeight
+
+137
+00:13:37,766 --> 00:13:41,599
+以及DisplayFramebufferScale
+and the DisplayFramebufferScale
+
+138
+00:13:42,300 --> 00:13:48,850
+所以这是我们暂时不会碰的东西，所以我要确保它被设置为ImVec2(1.0f, 1.0f)
+so this is something that we're not gonna touch for now, so I'm just gonna make sure that it's set to 1, 1
+
+139
+00:13:51,366 --> 00:13:54,850
+我现在要做的是，在这件事上我可能真的不应该做
+and what I'm going to do for now, which again I probably shouldn't really do in this
+
+140
+00:13:54,900 --> 00:13:58,650
+不，我绝对不应该设置视口，因为我们需要设置渲染视口
+well no, I definitely shouldn't do is set the viewport, because we need to set the rendering viewport
+
+141
+00:13:59,166 --> 00:14:04,299
+所以现在，我要再次将其设置为(0, 0, e.GetWidth(), e.GetHeight())
+so for now, again I'm going to set that to 0, 0, GetWidth() and GetHeight()
+
+142
+00:14:04,300 --> 00:14:08,250
+这将确保我们在调整大小后实际渲染到新屏幕区域
+this will just ensure that we actually render to that new screen area after a resize has happened
+
+143
+00:14:08,650 --> 00:14:17,566
+当然我会的，所以这是暂时的，所以我们不应该在这里停止
+and for that of course I will, so this is temporary, so we should not be including the stop this here
+
+144
+00:14:18,300 --> 00:14:23,166
+我要包含Glad，实际上我把它们改成角括号
+I'm going to include Glad, and actually I change these to be angular brackets
+
+145
+00:14:23,166 --> 00:14:28,325
+因为那个文件不在这个模块中，好了，我们继续
+because that file is not located in this module, okay, there we go
+
+146
+00:14:28,550 --> 00:14:31,775
+那么现在我们应该知道WindowResize应该可以运行了
+so now we should you know WindowResize should work
+
+147
+00:14:31,775 --> 00:14:33,675
+那么，让我们编译这个，看看我们得到了什么
+so let's just compile this, and see what we get
+
+148
+00:14:33,850 --> 00:14:39,125
+好了，如果我调整窗口的大小，使其变小或变大
+okay, so if I resize the window and make it like tiny or really big
+
+149
+00:14:39,775 --> 00:14:43,575
+你们应该看到，我可以将它移动到另一个额外的屏幕区域
+you should see that I'm able to move it into that other that extra screen area
+
+150
+00:14:43,575 --> 00:14:48,300
+这很好，好了，很酷，所以调整大小很好，那么KeyPressEvent
+which is good, okay, cool, so resizing is fine, so on KeyPressEvent
+
+151
+00:14:48,600 --> 00:14:56,439
+有点类似于鼠标的东西，在某种意义上，我们只需要使用KeysDown，代替MouseDown
+this is going to be kind of similar to the mouse stuff, in the sense that we just need to do KeysDown instead of MouseDown
+
+152
+00:14:56,933 --> 00:15:04,933
+那么就是KeysDown[e.GetKeyCode()] = true，然后KeyReleased这里也是一样的
+so KeysDown[e.GetKeyCode()] = true, and then the same thing happened to for here released
+
+153
+00:15:04,933 --> 00:15:10,025
+但我们将其设置为false，但不同的是，我们实际上需要设置潜在的修改器关键点
+but we set it to false, but the difference is that we actually need to set potential modifier keys
+
+154
+00:15:10,600 --> 00:15:16,450
+那么比如io.KeyCtrl，我们需要检测被按下
+so io.KeyCtrl for example, we check to see whether or not
+
+155
+00:15:17,900 --> 00:15:21,075
+我们现在必须再次使用GLFW键码，因为那是我们绑定的
+and again we have to use GLFW keycodes for now, because that's what we've bound to
+
+156
+00:15:21,366 --> 00:15:24,750
+但不管控制键是否按下，或者我猜是右控制键
+but whether or not the control is down, or I guess the right control as well
+
+157
+00:15:24,750 --> 00:15:29,466
+所以那就是LEFT_CONTROL，我们将复制它，然后改成RIGHT_CONTROL
+so that's LEFT_CONTROL, we'll copy that and call it RIGHT_CONTROL
+
+158
+00:15:29,566 --> 00:15:40,133
+好了，我们需要对所有修改键执行相同的操作，所以我们还有Shift、Alt和Super
+okay, so that's we need to do the same for all modify keys, so we have also Shift and Alt and Super
+
+159
+00:15:40,133 --> 00:15:48,650
+所以Super是Windows键，取决于所在的平台，可以看到它是MAC上的一个Command键
+so super is the Windows key, kind of you know depends on the platform you're on, you can see it's a command key on MAC
+
+160
+00:15:49,400 --> 00:15:53,325
+那就是为什么它被称为Super，而不像Windows键，因为这当然不仅仅是关于Windows的
+that's why it's called super, and not like Windows key, because of course this isn't just about Windows
+
+161
+00:15:53,750 --> 00:16:06,283
+就是LEFT_SUPER，RIGHT_SUPER，RIGHT_ALT，RIGHT_SHIFT，LEFT_SHIFT，LEFT_ALT
+so LEFT_SUPER, RIGHT_SUPER, RIGHT_ALT, RIGHT_SHIFT, LEFT_SHIFT, LEFT_ALT
+
+162
+00:16:07,100 --> 00:16:11,500
+好了，我们继续，所以每次按下一个键，我们检查是否基本上也按下了一个修改器
+okay, there we go, so every time a key is pressed, we check to see if a modifier is also pressed basically
+
+163
+00:16:11,733 --> 00:16:17,600
+然后还是默认返回false，所以如果我们按<Ctrl-s>，它也会触发我们设置的那个
+and then we said that modified its true fault, so if we had <Ctrl-s>, and it triggers that we also set this as well
+
+164
+00:16:19,200 --> 00:16:24,675
+然后在任何地方检查，如果我们需要的话，基本上是按s键，所以那就是方法，非常简单
+and then that gets checked where whatever you know, s is pressed, if we need to basically, so that's the idea, it's super simple
+
+165
+00:16:25,666 --> 00:16:29,412
+然后我们终于有了KeyTyped，这应该还没有实现，所以我要把它还原
+and then we finally have KeyTyped, which should we have not implemented yet, so I'm gonna bring this back
+
+166
+00:16:30,300 --> 00:16:34,725
+这应该不会太难，所以我们今天就把它塞进去，我不会把它留到下一期
+this shouldn't be too difficult, so we're just gonna jam that in today, I'm not gonna save this for another episode
+
+167
+00:16:35,666 --> 00:16:40,100
+因为我们不得不浪费时间，即使在这里把它分得很细
+because we have to waste that time, even though we are cutting it pretty thin here
+
+168
+00:16:41,200 --> 00:16:43,825
+所以就是ImGuiLayer::OnKeyTypedEvent
+so we have ImGuiLayer OnKeyTyped
+
+169
+00:16:44,000 --> 00:16:50,543
+好了，那么这里的想法就是，我们甚至可以先看看我们想做什么，然后再确定事件类型
+okay, so the idea here, and we might even just look at what we want to do first, and before we make the event type
+
+170
+00:16:50,900 --> 00:16:54,100
+但基本上这是在任何时候，这也在这里
+but basically this is whenever, and this is also in here
+
+171
+00:16:54,100 --> 00:17:01,200
+我相信在某个地方，它在这里，所以它被称为glfwCharCallback
+I believe somewhere, here it is, so it's called it's the glfwCharCallback
+
+172
+00:17:01,200 --> 00:17:06,350
+如果发生这种情况，我们就是AddInputCharacter，然后复制它，粘贴到这里
+so essentially if this happens, we AddInputCharacter, so let's copy that, it's pasted into here
+
+173
+00:17:06,350 --> 00:17:13,475
+顺便说一下，那在imgui_impl_glfw中，所以那就是我们的字符代码，然后加上return false
+that was in imgui_impl_glfw by the way, so this is our character code, and then we'll add return false
+
+174
+00:17:14,525 --> 00:17:22,200
+这基本上是用来在文本框中键入类似的东西，所以要用GLFW设置它，我们必须做一些事情
+and this is used for like typing stuff typing wise into a text box essentially, so to set this up with GLFW, we have to do a few things
+
+175
+00:17:22,200 --> 00:17:28,250
+首先，我将进入KeyEvent并实际创建该事件类型，因此我将复制KeyPressEvent
+first of all, I'm going to go into KeyEvent and actually make that event type, so I'll copy the KeyPressEvent
+
+176
+00:17:28,250 --> 00:17:34,698
+我想这应该很简单，我会把它粘贴到这里，然后我会把它重命名为KeyTypedEvent
+I guess this should be quite simple there, and I'll paste it over here, and I'll just rename it to be a KeyTypedEvent
+
+177
+00:17:35,166 --> 00:17:44,650
+不会有任何重复计数或类似的事情，会有一个KeyCode，去掉它，将其改为KeyTypedEvent
+there's not gonna be any repeat count or anything like that, there will be a KeyCode, get rid of this, change this to KeyTypedEvent
+
+178
+00:17:44,925 --> 00:17:53,825
+然后我们就不需要这些东西了，这就成了我们需要添加的KeyTyped
+and then we don't need any of this stuff, this becomes KeyTyped which we need to also add
+
+179
+00:17:54,275 --> 00:18:02,975
+当然是KeyTyped，差不多就这样，没有重复计数，好了，所以事件类类型是KeyTyped
+and this is of course KeyTyped, okay, and that is pretty much it, so no repeat count, okay, so event class type KeyTyped
+
+180
+00:18:02,975 --> 00:18:13,647
+我们当然需要在这里添加KeyTyped作为一个事件，所以这里变成了KeyTyped
+we of course need, to add KeyTyped as an event here, so this becomes KeyTyped over here, key pressed, released, typed, great
+
+181
+00:18:14,225 --> 00:18:19,400
+现在我们当然需要实现它，所以在WindowsWindow中，当我们执行KeyCallback时
+and now of course we need to implement it, so in WindowsWindow, when we do our KeyCallback
+
+182
+00:18:20,066 --> 00:18:27,200
+所以KeyCallback，我还要设置glfwSetCharCallback
+so that KeyCallback, I'm also going to set glfwSetCharCallback
+
+183
+00:18:27,675 --> 00:18:31,750
+至于这个CharCallback，如果我们看charFn，char函数
+ and the CharCallback, if we look at the charFn, the char function
+
+184
+00:18:32,050 --> 00:18:37,225
+这很简单，只需要一个unsigned int，所以我们不需要这些，这很简单
+it's really easy, it's just got an unsigned int, so we don't need any of this, it's pretty simple
+
+185
+00:18:37,225 --> 00:18:45,825
+这就是我们实际使用的unicode字符，所以就是character，然后得到WindowData
+that's the kind of the unicode character that we actually press, so recall character, and then we just get the WindowData
+
+186
+00:18:46,100 --> 00:18:57,650
+我们可以这样做，也就是KeyTypedEvent，character，也许我会叫它keycode
+and we can just do something like this, which is the KeyTypedEvent, character maybe I'll call a keycode just to be
+
+187
+00:18:59,166 --> 00:19:02,700
+只是为了让code在任何地方都是一样的，然后我们只需编写code就可以了
+just so that it's code the same everywhere, and then we just code that and that should be it
+
+188
+00:19:03,075 --> 00:19:10,175
+所以我现在看一下命名空间，现在如果我们回到ImGuiLayer，我们要确保
+so I'll just look space yet, now that now if we go back to, now ImGuiLayer, we're going to make sure that we
+
+189
+00:19:10,666 --> 00:19:16,400
+好了，那么就是KeyTypedEvent，很好，如果我们回到这里
+okay, so KeyTypedEvent, great, we'll say if we go back to here
+
+190
+00:19:16,400 --> 00:19:26,000
+我想它只是一个int，所以int keycode = e.GetKeyCode()
+I think it's just it's an int, so int keycode equals e.GetKeyCode()
+
+191
+00:19:27,766 --> 00:19:34,066
+然后这就是要检查的keycode，然后这加上keycode，不管怎么说，这是一个unsigned short
+and then this is what we're checking the keycode, okay, and then we add the keycode here, it's cars into an unsigned short anyway
+
+192
+00:19:34,066 --> 00:19:37,450
+所以很明显，这是一个int，对于一个unsigned int根本没有问题
+so obviously this being an int and on an unsigned int is no problem at all
+
+193
+00:19:37,450 --> 00:19:39,226
+我们不应该有那么大的按键代码
+we should not have key codes that large
+
+194
+00:19:40,000 --> 00:19:44,575
+好了，酷，就那样，我们需要确保我们真的调度了那个循环，因为我们会先把那个注释掉
+okay, cool, so that's it, we need to make sure we're actually dispatching that loop, because we do comment that out
+
+195
+00:19:45,266 --> 00:19:50,200
+你们可以看到它运行得很好，f5，现在应该能够在文本框中输入内容，所以测试一下
+you can see that works perfectly, f5, and we should be able to type stuff into text boxes now, so let's test that out
+
+196
+00:19:50,466 --> 00:19:55,333
+好了，那么让我们把它移回到这里，当你们关闭时，ImGui当然会保存以前的窗口位置
+okay, so let's move this back here, ImGui of course saves the previous window position when you close
+
+197
+00:19:56,333 --> 00:20:03,312
+所以现在我想，如果我们深入到示例和控制台之类的东西，log可能会是一个更好的地方
+so now I think if we go into examples and console or something like that, log might be a better one actually
+
+198
+00:20:05,000 --> 00:20:08,550
+然后我们可以过滤，你们可以看到我实际上可以输入像hello之类的
+then we can filter, and you can see I can actually type in like hello or whatever
+
+199
+00:20:08,900 --> 00:20:16,933
+15.9，因为我看到了这15.9的时间，我甚至可以做control + shift，你们知道的，就像整排一样
+15.9, cause I saw time this 15.9, I can even do like control shifts, you know left just like the whole row
+
+200
+00:20:16,933 --> 00:20:21,066
+如果我有多个词或其他什么，你们可以看到，那是预期控制的
+if I have multiple words or whatever, you can see that, that works is expected control
+
+201
+00:20:21,075 --> 00:20:26,999
+它还寻找我想要的东西，所以这真的很有用，当然shift复制和粘贴不起作用
+also it seeks what I want, so that's like really useful, of course shift copy and paste don't work
+
+202
+00:20:27,000 --> 00:20:30,525
+因为我们还没有设置，所以我希望你们现在可以去尝试一下
+because we haven't set that up, that's something that I want you guys to try out right now
+
+203
+00:20:32,133 --> 00:20:37,900
+但是你们可以看到，我们这里有一个很好的ImGui实现，现在使用的是Hazel的事件系统
+but yeah you can see that we've got a pretty working implementation of ImGui here, now using Hazel's event system
+
+204
+00:20:37,900 --> 00:20:42,325
+实际上，我们所做的唯一提交就是这个glViewport
+and really the only kind of thing that we've committed is this glViewport thing
+
+205
+00:20:42,575 --> 00:20:46,566
+否则，在这个事件系统中，其他一切都非常好，那几乎是最终的代码
+otherwise everything else is really good in all of this event system, that's pretty much final code
+
+206
+00:20:46,566 --> 00:20:50,675
+那就是它的原理，很明显，按键代码只需要替换为HazelKey代码就可以了
+that's how it's going to work, and obviously, the key codes just need to be replaced with HazelKey codes
+
+207
+00:20:50,675 --> 00:20:56,166
+但除此之外，你们可以看到使用Hazel的事件系统设置这些是多么的容易
+but otherwise, you can see how easy it is to set up something like this using Hazel's event system
+
+208
+00:20:56,166 --> 00:21:00,707
+我们有所有这类的层和事件系统，所有的基础组件都在实际运行
+l we have all of this kind of layer and event system stuff all that infrastructure actually up and running
+
+209
+00:21:00,925 --> 00:21:04,166
+好了，那么我希望你们喜欢这期视频，如果喜欢的话，就为它点赞吧
+okay, so I hope you guys enjoyed this video, if you did, and hit the like button
+
+210
+00:21:04,166 --> 00:21:07,425
+你们也可以通过访问patreon.com/thecherno来支持这个系列
+you can also help support this series by going to patreon.com/thecherno
+
+211
+00:21:07,425 --> 00:21:12,533
+非常感谢所有赞助人让系列成为可能，因为如果没有你们，就不会有这个系列
+huge thank you to all the patreons that make a series possible, because it wouldn't be here without you guys
+
+212
+00:21:12,533 --> 00:21:17,966
+你们会得到支持，实际上你们会在一周前得到视频，所以下期视频现在就已经出来了
+you'll get for supporting, you'll actually get videos a week earlier, so the next one will already be out right now
+
+213
+00:21:17,966 --> 00:21:24,166
+如果你们在YouTube上公开观看这段视频，还有我迄今为止写的所有这些代码
+if you're watching this publicly on YouTube, and then also all this kind of code that I've written so far
+
+214
+00:21:24,166 --> 00:21:27,300
+我想我知道该写什么是因为我以前已经写过了
+and kind of I guess how I know what to write is because I've already written it before
+
+215
+00:21:27,666 --> 00:21:31,775
+实际上，它是由赞助人决定的，就像所有那种Hazel的版本
+and it's actually up for patrons, like all of that kind of the version of Hazel
+
+216
+00:21:32,066 --> 00:21:37,250
+那比实际做的要完整得多，写得也要多，更令人兴奋的事情也可以提供给赞助人
+that is much more complete and much more written than actually doing, much more exciting things, is also available to patrons as well
+
+217
+00:21:37,675 --> 00:21:45,450
+所以再次，非常感谢，下次，我想我们要做的可能是，我的意思是我真的不喜欢这些
+so again, huge thank you, next time, I think what we're going to do is probably, I mean I really don't like these
+
+218
+00:21:46,000 --> 00:21:50,600
+我们这里有这样的按键代码，因为我们使用的是GLFW按键代码，那肯定需要修复
+these kind of key codes that we have here, cause we're using GLFW key codes, that definitely needs to be fixed
+
+219
+00:21:50,700 --> 00:21:57,875
+所以我们可能会输入鼠标代码，这可能有点无聊，但它仍然是值得的，除此之外，我认为
+so we might do key in mouse codes, that probably might be a little bit boring, but it's still worth it, and along with that, I think
+
+220
+00:21:58,266 --> 00:22:05,166
+我们可能会转向我还想进行输入轮询的方向，现在我们可以在输入发生时获取事件
+we'll probably move on to a direction where I wanted to also do input polling, which is right now we kind of get events for when an input happens
+
+221
+00:22:05,166 --> 00:22:09,400
+所以当按下一个按键时，我们会得到一个事件，但没有办法请求Hazel，嘿
+so when a key is pressed, we get an event, but there's no way for us to actually ask Hazel, hey
+
+222
+00:22:09,533 --> 00:22:16,150
+你们知道的，现在控制键是不是按下了，鼠标键是不是按下了，鼠标左键是不是按下了
+you know, is the control key down at the moment, is the mouse button, is the left mouse button, is it pressed right now
+
+223
+00:22:16,566 --> 00:22:21,525
+我们没有办法实现那样的事情，那对未来的某些事情肯定是有用和至关重要的
+there's no way for us to do anything like that, and that's definitely going to be useful and vital for certain things in the future 
+
+224
+00:22:21,525 --> 00:22:26,725
+因为如果我们从技术上来说有一个事件系统，是的，一切皆有可能
+because if we kind of just have an event system technically, yes, anything as possible
+
+225
+00:22:27,000 --> 00:22:36,025
+但这意味着客户必须自己订阅，确保它们保持所有这些按键和鼠标按钮的状态
+but it means the client has to order like by themselves, make sure that they kind of keep the state of all of these keys and mouse buttons
+
+226
+00:22:36,025 --> 00:22:39,800
+虽然我们希望Hazel在内部做到这一点，因此接口很好且简单
+whereas we want Hazel to do that internally, so that the api is nice and simple
+
+227
+00:22:39,800 --> 00:22:41,625
+但我们可以向它查询一些东西，然后我们就会得到它
+we can just ask it for something, and we'll get it
+
+228
+00:22:42,366 --> 00:22:45,100
+希望你们喜欢这期视频，下次见，拜
+hope you guys enjoyed this video, I will see you next time, goodbye
+

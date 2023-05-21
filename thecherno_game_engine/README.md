@@ -33,3 +33,13 @@
 14. ##### 现代OpenGL和Glad  [字幕](./subtitles/014.现代OpenGL和Glad.srt)  [合成视频](https://www.bilibili.com/video/BV1xr4y1j7bX?share_source=copy_web)  [源视频](https://www.youtube.com/watch?v=meARMOmTLgE&list=PLlrATfBNZ98dC-V-N3m0Go4deliWHPFwT&index=14)
 
 15. ##### 引入ImGui  [字幕](./subtitles/015.引入ImGui.srt)  [合成视频](https://www.bilibili.com/video/BV1DS4y1t7W5?share_source=copy_web)  [源视频](https://www.youtube.com/watch?v=meARMOmTLgE&list=PLlrATfBNZ98dC-V-N3m0Go4deliWHPFwT&index=15)
+
+16. ##### ImGui事件  [字幕](./subtitles/016.ImGui事件.srt)  [合成视频](https://www.bilibili.com/video/BV1id4y1P7hX?share_source=copy_web)  [源视频](https://www.youtube.com/watch?v=meARMOmTLgE&list=PLlrATfBNZ98dC-V-N3m0Go4deliWHPFwT&index=16)
+
+17. ##### Hazel的GitHub仓库  [字幕](./subtitles/017.Hazel的GitHub仓库.srt)  [合成视频](https://www.bilibili.com/video/BV1A14y147nh?share_source=copy_web)  [源视频](https://www.youtube.com/watch?v=meARMOmTLgE&list=PLlrATfBNZ98dC-V-N3m0Go4deliWHPFwT&index=17)
+
+18. ##### PR  [字幕](./subtitles/018.PR.srt)  [合成视频](https://www.bilibili.com/video/BV1wK411f7QF?share_source=copy_web)  [源视频](https://www.youtube.com/watch?v=meARMOmTLgE&list=PLlrATfBNZ98dC-V-N3m0Go4deliWHPFwT&index=18)
+
+19. ##### 输入轮询  [字幕](./subtitles/019.输入轮询.srt)  [合成视频](https://www.bilibili.com/video/BV16B4y1n74T?share_source=copy_web)  [源视频](https://www.youtube.com/watch?v=meARMOmTLgE&list=PLlrATfBNZ98dC-V-N3m0Go4deliWHPFwT&index=19)
+
+20. ##### 按键和鼠标代码  [字幕](./subtitles/020.按键和鼠标代码.srt)  [合成视频](https://www.bilibili.com/video/BV1og411a7go?share_source=copy_web)  [源视频](https://www.youtube.com/watch?v=meARMOmTLgE&list=PLlrATfBNZ98dC-V-N3m0Go4deliWHPFwT&index=20)

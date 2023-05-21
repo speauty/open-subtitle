@@ -1,0 +1,995 @@
+﻿1
+00:00:00,166 --> 00:00:03,699
+嘿，你们好，我是TheCherno，欢迎回到我的游戏引擎系列教程
+hey, look guys my name is TheCherno, welcome back to my game engine series
+
+2
+00:00:03,700 --> 00:00:09,599
+那么上期看了Github和Hazel，以及它们的工作流，如果你们还没看过，一定要去看看那期
+so last time we took a look at github and Hazel and how all of that kind of work, definitely check out that video, if you haven't already
+
+3
+00:00:09,600 --> 00:00:14,725
+因为实际上我们今天会继续看Github，并且也会了解一下合并请求
+because today we're actually going to be continuing on with the whole github thing and taking a look at pull requests
+
+4
+00:00:14,866 --> 00:00:17,800
+当然除了看看它们，今天也会整合其中一些和并请求
+and apart from just taking a look at them and integrating some of them today
+
+5
+00:00:18,101 --> 00:00:22,200
+我们还将讨论将来如何通过进行合并请求协作
+we're also going to discuss how in the future you should collaborate via pull requests
+
+6
+00:00:22,200 --> 00:00:28,525
+所以我认为这对每个人来说都是一个非常有用的主题，在Hazel项目之外，也会非常有用
+so I think this is like a really useful topic for everyone, it's also gonna be very useful outside of Hazel
+
+7
+00:00:28,766 --> 00:00:33,425
+因为如果你们在使用Github，如果你在与一群人一起工作，并且在使用git
+because if you're working with github, if you're working with kind of teams of people and you're using git
+
+8
+00:00:34,333 --> 00:00:39,333
+并且邀请您真正使用合并请求的版本控制系统并不重要
+and invite it doesn't really matter what version control system you're really using pulled requests
+
+9
+00:00:39,333 --> 00:00:46,150
+就是能够，你们知道，作为一个团队创建代码，然后将其合并在一起，就所有那些东西
+and just that whole notion of being able to kind of, you know, create code as a team and then merge it together and all of that
+
+10
+00:00:46,425 --> 00:00:50,875
+你们知道，切入到自己的功能分支或错误修复分支或诸如此类的任何东西
+and you know break off into your own feature branches or bugfix branches or anything like anything like that
+
+11
+00:00:51,050 --> 00:00:57,966
+一般来说，对于软件工程来说非常重要，我倾向于制作大量关于实际编写代码的技术视频
+really vital for soft engineering in general, I tend to make a lot of videos on the technicalities of actually writing code
+
+12
+00:00:57,966 --> 00:01:03,975
+但后来我意识到很多人问我，如果在一个团队中，这是如何工作的，如果我在一个团队中
+but then I realize that a lot of people ask me, well how does this work if I'm in a team, right, if I'm in a team of people
+
+13
+00:01:04,300 --> 00:01:10,375
+我们在研究同个东西，这是如何工作的，因为所有的视频，我是唯一真正在研究它们的人
+and we're all working on the same thing, how does this work, because all of my videos, I'm kind of the only one really working on them
+
+14
+00:01:11,300 --> 00:01:17,299
+正因为如此，就没有搞那些，而且因为我在教你们一些具体的东西，不会花太多时间在那儿
+um and so because of that I don't, and and because I'm teaching you guys like a specific thing, I'm not spending too much time being like
+
+15
+00:01:17,300 --> 00:01:20,528
+如果这是在团队环境中，而不是我们应该做这个或那个
+well if this was more in a team environment than we should do this or that
+
+16
+00:01:20,800 --> 00:01:23,350
+所以今天我想花点时间谈谈那个
+so I want to spend a little bit of time kind of talking about that today as well
+
+17
+00:01:23,950 --> 00:01:28,125
+但希望我们可以对这些合并请求进行排序，这儿有7个打开的合并请求
+but hopefully we can just kind of sort through these pull requests,  we have seven open pull requests
+
+18
+00:01:28,250 --> 00:01:34,333
+emmm，不要忘记Hazel的仓库链接在每个视频的描述中都有
+um other right now, don't forget that the repository for Hazel is in the description of every video
+
+19
+00:01:34,333 --> 00:01:39,075
+如果你们有想改的代码，或注意到我犯了个错误，并且想修复它，那么一定要去看看那个
+definitely check that out, if you have code that you want to change, or if you notice that I make a mistake and you want to fix it
+
+20
+00:01:39,250 --> 00:01:45,175
+或者你们想继续添加一些有用的内容，然后一定要去打开一个合并请求或问题哦
+or you want to go ahead and just add something that you think is useful, then definitely open a pull request or an issue
+
+21
+00:01:45,766 --> 00:01:49,099
+因为至少我们会讨论这个，社区也会和你们讨论这个
+because at the very least, we'll discuss this, and the community will discuss this with you
+
+22
+00:01:49,100 --> 00:01:55,499
+这样，在工作流过程中，你们就可以掌握所有信息
+and then that way you can kind of get to grips with just you know the whole stuff when during workflow
+
+23
+00:01:55,500 --> 00:01:59,895
+以及如何共同构建这个项目，所以我对那些感到很是兴奋，让我们看看这些合并请求吧
+and how we can build this project together, so I'm really excited for all of that, let's take a look at pull requests
+
+24
+00:02:00,266 --> 00:02:04,650
+那么我们有7个合并请求，这就是Hazel仓库，当然这是它的样子
+so we have seven pull requests, this is the Hazel repository, of course this is what it looks like
+
+25
+00:02:06,575 --> 00:02:09,770
+应该有README的，我很快会添加一个
+README wise, I'm going to add a README very very soon
+
+26
+00:02:10,066 --> 00:02:15,402
+这将有关于如何打开合并请求的信息，因为那些才是你们真正想要的东西
+and this will have information on how to open pull requests, because those are those are really things that you want to have
+
+27
+00:02:16,666 --> 00:02:23,450
+为什么我们有两个分支，这是什么，所以我第一次注意到这个，老实说，我不知道那是什么
+why do we have two branches, what's this, so first time I'm noticing this, to be honest, I have no idea what that is
+
+28
+00:02:24,466 --> 00:02:34,133
+无论如何，不是12月份，所以我们这里有一个README文件，将包含如何建造Hazel
+not the December anyway whatever, so we have we had this README file here, which will contain information on things like how to build Hazel
+
+29
+00:02:34,133 --> 00:02:39,875
+以及如何提交合并请求以及如何提交问题和有关一般协作的信息
+and how to submit pull requests and how to submit issues and just information about general collaboration
+
+30
+00:02:40,200 --> 00:02:44,675
+所以那通常是Github中放置此类信息的地方，我还没有这样做，但后面会做的
+so that is usually a place in github where you would put such information, I haven't done that yet, but I will
+
+31
+00:02:45,425 --> 00:02:53,750
+但现在你们可以看到，我们有6个问题和一堆请求，其中一些你们可以看到非常频繁地出现
+but for now you can see that we have six issues and a bunch of pull requests, and some of these you can see just coming in pretty frequently
+
+32
+00:02:53,750 --> 00:03:00,866
+通常我会线下看这些内容，因为很明显，我们每周都会收到越来越多的
+and usually I will kind of read these offline, because obviously you know every week we get more and more of these
+
+33
+00:03:00,866 --> 00:03:06,175
+我不能每周都做一期，至少现在不行，我只是把每件事都做完了
+and I can't make an episode every week, at least not at this point, where I kind of just go through everything
+
+34
+00:03:06,900 --> 00:03:11,566
+如果这是你们想在某个时候看到的，我现在告诉你们，这不会每周都发生
+if that's something that you guys want to see at some point, I'm telling you right now, it's not gonna happen every week
+
+35
+00:03:11,566 --> 00:03:17,666
+但也许每个月，或者每两周，或者诸如此类的，如果你们想让我拍一段我喜欢的视频，好吧
+but maybe every month or every two weeks or something like that, if you guys just want me to make a video where I'm like okay
+
+36
+00:03:17,666 --> 00:03:22,575
+让我们过滤掉所有这些问题和合并请求，然后我就可以做那些了
+let's just filter through all of these issues and pull requests, then I can probably do that
+
+37
+00:03:23,800 --> 00:03:31,825
+但一般来说，当在火车上或其他时候，一有空余时间，我会在手机上看这个，并且回复
+but in general I just you know, when I'm just on the train or something, and I have a spare moment I'll look at this on my phone and just reply
+
+38
+00:03:31,825 --> 00:03:36,875
+你们知道的，这是一种继续讨论的方式，所以那就是我现在处理这件事的方式
+and just you know kind of kind of keep that discussion going, so that's how I kind of handle this stuff right now
+
+39
+00:03:37,200 --> 00:03:40,933
+因为很明显我没有时间坐在电脑前做这些事情
+because obviously I don't really have the time to sit down at a computer and do all this stuff
+
+40
+00:03:40,933 --> 00:03:47,775
+因为我的生活很忙碌，所以至于合并请求，这就是我们今天看到的，所以让我们从头开始
+because my life is just hectic anyway, so pull requests, this is what we're looking at today, so let's start from the beginning
+
+41
+00:03:48,133 --> 00:03:54,733
+实际上我们已经关闭了6个，我相信，我甚至喜欢这一个，使用唯一指针而不是原始指针
+we've actually got six of them closed already I believe, I like even for this one, using unique pointers instead of raw pointers
+
+42
+00:03:54,900 --> 00:04:04,325
+是的，就像你们看到的，我对此做出了回应，不管怎样，我很久以前就做出了回应
+yeah like you can see that I responded to this, two thumbs down, anyway I responded to this quite a while ago actually
+
+43
+00:04:04,950 --> 00:04:12,075
+我甚至举了一些例子，你们知道，也给出了些理由解释为什么我决定以那种方式去做
+and I even gave some examples, and I you know gave some reasoning as to why I decided to do what I did a certain way
+
+44
+00:04:12,600 --> 00:04:20,266
+所以你们知道，就好比合并请求，实际上似乎没有任何作用，我也不知道为什么没有变化
+so you know you know, this is like a pull request, that actually doesn't even seem to do any, ok, so does I don't know why the falls change is zero
+
+45
+00:04:20,266 --> 00:04:26,000
+但也许那个项目早已经关闭了，不重要了，关键是，这是一种独立的合并请求，对吧
+but maybe that project and closed already, doesn't matter, the point is, this is kind of the sperate pull request, right
+
+46
+00:04:26,000 --> 00:04:34,266
+就像你们知道的那样，做了这个，很明显会创建个问题，并询问这样做是否合理
+like you know, you know done this, and that obviously could have opened an issue instead, and asked if this was reasonable to do
+
+47
+00:04:34,266 --> 00:04:41,100
+或者如果那是我们的方向，但这也很好，我不介意做这样的事情，然后你们可以看到
+or if that's the direction we're going in, but this is also fine, I don't mind doing something like this, and then you can see that
+
+48
+00:04:42,000 --> 00:04:49,575
+人们直接加入我们的讨论，然后如果我，你们知道的，我不喜欢什么，或者我想进一步讨论
+people just jump in and we have a discussion going, and then if I you know don't like something, or if I want to discuss it further
+
+49
+00:04:49,933 --> 00:04:56,625
+然后我告诉你们怎么做，我的意思是我甚至喜欢把cn.cppreference和里面的东西联系起来
+then I will kind of you know do this, and I mean I even like linked the cppreference and stuff inside in cases
+
+50
+00:04:56,966 --> 00:05:02,600
+所以这是一个很好的，对每个人来说都是一个很好的，有点像我们的课程
+so it's kind of a good, it's kind of a good, kind of like us lesson for everyone
+
+51
+00:05:02,600 --> 00:05:06,766
+呃，实际上不太像课程，就像我不想以正确的方式
+uh not not actually like lesson, like I'm not trying to be like my ways the correct way
+
+52
+00:05:06,766 --> 00:05:11,325
+这或多或少比人们可能没有想到的一些方面
+it's more or less than in terms of like some uh aspects of this that people might not have thought about
+
+53
+00:05:11,600 --> 00:05:15,266
+这是一种终身教育，就像跳进这个讨论并参与进来一样
+it's educational forever on the kind of just jump into this discussion and participate
+
+54
+00:05:15,266 --> 00:05:19,933
+所以我喜欢它，当人们经常这样做的时候，你们可以看到这一个里有六个不同的按钮
+so I like it, when people do that a lot you can see six different people buttons fed in this one specifically
+
+55
+00:05:19,933 --> 00:05:26,125
+嗯，然后我甚至没有关闭合并请求，所以我不是像按钮一样完成，就是关闭了
+um and then I didn't even close you know the pull request, so it's not like I'm just like button done, that's it closed
+
+56
+00:05:26,566 --> 00:05:32,125
+不，原来的创建者曾经关闭了合并请求，我想他们满意了，没关系
+no the original poster close the pull request once, I guess they were satisfied that, that's fine
+
+57
+00:05:32,533 --> 00:05:40,325
+所以，这对那些真正想学习如何加入团队并编写引擎的人来说真的很好
+so again this is really good for those of you for those of you who actually want to learn how to be on a team and write an engine 
+
+58
+00:05:40,325 --> 00:05:44,050
+所有这些，而不仅仅是观看视频和复制代码，并尝试自己做所有事情
+and all of that instead of just watching the videos and copying down the code, and trying to do everything yourself
+
+59
+00:05:44,566 --> 00:05:52,625
+认真地说，真的很酷，很可靠，它会给你们更多的团队经验
+jump into this, seriously, it's really cool, it's solid, it's gonna give you much more of a team kind of experience
+
+60
+00:05:53,075 --> 00:05:57,399
+是的，我的意思是我来这里只是为了帮助你们
+and yeah I mean I'm here to just help you guys out
+
+61
+00:05:57,400 --> 00:06:02,650
+你们会遇到很多这样的情况，嘿，Cherno，你完全错了
+and again there's gonna be so many cases of you guys being like, hey cherno, you're completely wrong in this
+
+62
+00:06:02,800 --> 00:06:07,066
+这是正确的方式，或者这是更好的方式，我会像哦，伙计，谢谢你们给我指出来
+this is the right way to do it, or this is a better way to do it, and I'll be like oh man, like thank you so much for showing me
+
+63
+00:06:07,066 --> 00:06:11,133
+我不会像哦，你们怎么敢的，像这个软件工程社区最糟糕的事情一样
+I'm not gonna be like oh how dare you, like the worst thing about this software engineering community
+
+64
+00:06:11,133 --> 00:06:19,600
+这是一种编程社区，很多时候人们都很喜欢优越感，只是拒绝听取其他人的意见
+this is kind of programming community, a lot of the time does the people just get very very like superior, and just refuse to listen to everyone else
+
+65
+00:06:19,600 --> 00:06:24,550
+而且认为每个人都在他们之下，我绝对不是那种人，老实说，我讨厌那些人
+and think everyone's beneath them, I'm definitely not one of those people, I hate those people to be honest
+
+66
+00:06:24,900 --> 00:06:28,933
+我希望他们会更好，但关键是这就像是一个安全的空间
+and I wish that they would be better, but the point is this is like a safe space
+
+67
+00:06:29,000 --> 00:06:36,125
+我的意思是，我会在整个系列中学到很多东西，所以你们让我们在友好环境中一起构建这个
+like I mean I'm gonna learn a lot throughout this series, so you guys let's build this thing together in a nice friendly environment
+
+68
+00:06:37,350 --> 00:06:46,825
+是的，好吧，不管怎样，这只是我们可以做的一个例子，一般来说，合并请求是如何完成的
+yeah okay, so anyway, that was just kind of an example of what we can kind of do, so or like how pull requests in general are done
+
+69
+00:06:47,066 --> 00:06:49,675
+所以不管怎样，我会看到我对这个项目的支持，这个项目很大
+so anyway, I'd see my support of the project, this one's huge
+
+70
+00:06:49,950 --> 00:06:54,975
+不知道我今天是否会倾向于这个项目，因为它有17名参与者
+I don't know if I'll tend to this one today, because it's got 7 17 participants
+
+71
+00:06:56,750 --> 00:07:06,525
+我想我确实在某个时候回答过这个，即使是Gaztin，我Discord的管理者，也回答了这个
+and I did I think I think I did reply to this at some point, well even Gaztin who's an administrator on my discord replied to this
+
+72
+00:07:07,066 --> 00:07:12,550
+说我用premake代替CMake，这有点多余，还有很多其他的东西
+and said that I'm using premake instead of CMake, and it's kind of redundant, and there's a lot of other stuff here
+
+73
+00:07:13,200 --> 00:07:22,866
+但是你们可以看到这个已经关闭了，所以是的，四天前的事，你们知道的，就是premake
+but you can see this has been closed yet, so yeah and this stuff from like even four days ago, and you know he's premake blah blah
+
+74
+00:07:23,966 --> 00:07:29,066
+所以，是的，我对此不确定，我可能会暂时保持开放，这也是第一个问题
+so yeah I'm not sure about this,  I might I'll keep that open for now, and it was the very first issue as well
+
+75
+00:07:29,066 --> 00:07:34,566
+这是第一个合并请求，很有趣，所以我们来看看
+which is the very first support request, which is interesting, so yeah we'll take a look at that
+
+76
+00:07:34,566 --> 00:07:40,266
+好的，添加对该项目的linux支持，这很有雄心，我想我不确定这是否是最新的
+okay, add linux support of the project, that's quite ambitious, I guess I'm not sure how up to date this is
+
+77
+00:07:40,333 --> 00:07:43,400
+你们可以看到它有冲突，这意味着它不是最新的
+you can see it's got conflicts, which means it's not up to date
+
+78
+00:07:44,733 --> 00:07:49,400
+但是，添加对linux的支持，使文件更改全局艺术修复编译时代
+but so add a support for linux, premake file change global art fix the compile era
+
+79
+00:07:52,500 --> 00:08:01,600
+是的，我的意思是，很明显，我很高兴像ben这样我不知道为什么是一样的，因为平台
+yeah I mean like I'm obviously, I'm happy for like this to ben I'm not sure why it's the same, because the platforms over
+
+80
+00:08:02,200 --> 00:08:05,250
+是的，就像确定的那样，好了，当然
+yeah so like certain, okay, sure
+
+81
+00:08:09,100 --> 00:08:22,666
+你能更新这个分支并确保它准备好合并了吗，我很乐意将它合并到主分支
+can you please update this branch and make sure it's ready to merge, I'd be keen to merge this in
+
+82
+00:08:23,733 --> 00:08:32,575
+我甚至会加上一张笑脸，这是非常有点笑脸，是的，我不想完全不高兴
+and I'll even add a smiley face, that's very is there a slightly smiley face, yes I don't want to be like full unhappy yet
+
+83
+00:08:33,133 --> 00:08:42,950
+但我会说，好了，像你们知道，让我们这样做，好了，用premake属性替换编译器标志
+but I'll just yeah, okay, done, say so like this is you know, let's do this, okay, I replace compiler flags with premake properties
+
+84
+00:08:43,200 --> 00:08:48,125
+所以我必须在premake中用运行库的属性，所以我想我相信已经这样做了
+so I have to premake file with properties for the runtime library, yes, so I think I've already done that I believe
+
+85
+00:08:49,133 --> 00:08:56,189
+因为我认为这里的情况是，当我们使用MDd和所有这些东西时，现在确信已经做了
+so because I think what the thing here was that yeah back, when we used mdd and all of that stuff, I believe that right now
+
+86
+00:08:56,966 --> 00:09:06,400
+如果我们查看premake文件，我相信我们不会再这样做了，对吧，是的，我们用了runtime
+if we look at the premake file, I believe we're not doing that anymore, right, yes we're doing runtime
+
+87
+00:09:06,400 --> 00:09:11,766
+我们没有像你们知道的MTd那样做，顺便说一句，我之所以要检查，不是因为
+and we're not doing like you know MTd or anything like that, the reason I had to check, by the way, is not because
+
+88
+00:09:11,766 --> 00:09:16,200
+我太笨了，我记不起我们做了什么，做了什么，只是有时候
+I'm that stupid that I can't remember what we did and what we did, and it's just sometimes like
+
+89
+00:09:16,200 --> 00:09:22,966
+我的意思是我有一个Hazel开发分支，开放给赞助人的，在那里我做了很多这类来的
+I mean I have a Hazel development branch, that's excessible to patrons, where I do a lot of this kind of development stuff
+
+90
+00:09:22,966 --> 00:09:28,900
+有时我不记得我为开发分支做了什么，所有我在直播视频中做过的
+and sometimes I don't remember what I've done kind of for that development branch, all of the stuff that I've actually done live in a video
+
+91
+00:09:28,900 --> 00:09:43,666
+所以那就是为什么有时候我只需要再检查一遍，好吧，不管怎样，最近已经做了，不行
+so that's why sometimes I just need to double check, okay, anyway, so this this has been done recently not enough
+
+92
+00:09:44,133 --> 00:10:03,225
+过时了，谢谢你的建议，好吧，酷，我们开始吧，启动项目，现在我想这是我想做的
+I'll just say obsolete, thanks for the suggestion, okay, cool, so there we go, start project, now I think this is something that I want to do
+
+93
+00:10:03,766 --> 00:10:10,553
+premake在哪里，因为我们没有启动项目，我知道有一个premake标志，就是startproject
+where's that premake park, because we don't have a start project, I know that there's a premake flag for that, it's called startproject
+
+94
+00:10:10,766 --> 00:10:19,800
+所以startproject看起来真的很好，不错，不可能做出通用的不，不，我真的没有找到那个
+so that looks really good at a start project, let's thumbs that up, it's not possible to make a universal no not really, I don't really find that
+
+95
+00:10:19,800 --> 00:10:24,500
+我看不太清楚，这很好，看看这个，看看这个讨论
+I don't see that exactly, this is good see, look at this look at this discussion
+
+96
+00:10:24,766 --> 00:10:32,525
+人们正在就如何使这一行代码变得更好进行讨论，好像这太棒了，太棒了
+people are having a nice discussion about maybe making this one line of code better, like that's fantastic, so really good
+
+97
+00:10:32,525 --> 00:10:35,325
+显然，在这种情况下，我们不需要这样做，而且甚至不能这样做
+obviously in this case we don't need to do that, and we can't even do that
+
+98
+00:10:35,325 --> 00:10:39,450
+因为不管怎样，很清楚的一点是，只需要从项目中创建Sandbox
+because yeah it's pretty clear anyway to just make Sandbox out of project
+
+99
+00:10:39,450 --> 00:10:42,625
+我很高兴，我现在就要把这个合并进来，所以我合并合并请求
+I'm happy with that, I'm going to merge this in right now, so I merge pulled requests
+
+100
+00:10:46,000 --> 00:10:52,300
+我不喜欢这个合并的标题，不是吗，我肯定我很喜欢那个更多一点 
+yeah I don't like the this is the title of the of the merge, isn't it, I'm sure I like this that much
+
+101
+00:10:52,300 --> 00:10:58,333
+但是，我想Github只是喜欢这样做，所以我们将其合并，好了，现在合并了
+but yeah I guess github just likes doing that way, so we'll just merge that in, okay, that's now merged
+
+102
+00:10:58,333 --> 00:11:03,966
+如果转到Github中的代码，可以看到我的最新提交是22秒前的合并请求
+if you go to the code in github, you can see that my latest commit was merged pull request 22 seconds ago
+
+103
+00:11:03,966 --> 00:11:09,399
+如果我们也从这里开始，你们可以看到，这是一个提交，所以现在这个人也贡献了Hazel
+if we look at the commence here as well, you can see that, there's that commit, so now this person is also contributed to Hazel
+
+104
+00:11:09,399 --> 00:11:20,475
+这真的很酷，而且我们也得到了，已经完成了这个，所以现在可以标记验证，好了
+which is really cool, and also we get the you know we get this code done, so I can now kind of pull that verified, okay
+
+105
+00:11:20,475 --> 00:11:24,766
+不管怎样，我甚至不知道这意味着什么，但不管怎样，显然可以把这些拉到本地仓库中
+whatever I don't know what that even means, but anyway I can now obviously pull the changes into my local depository
+
+106
+00:11:24,766 --> 00:11:29,725
+我会把它放在那里，所以我甚至可以告诉你们怎么做，以防你们不知道
+and I will have that there, so I might even show you guys how to do that, so just in case you're unaware
+
+107
+00:11:30,133 --> 00:11:36,125
+所以我现在要做的就是拉取，我不知道我有没有什么东西，我可能会检出一些东西
+so all I need to do now is just pull, I don't know if I've got any kind of stuff, I probably do have checkout stuff
+
+108
+00:11:36,125 --> 00:11:49,741
+我不知道为什么这么做，啊，这只是我做的，没有提交这个，哦，我一定没有提交这个
+I don't know why I do actually, ah this is just did, I not commit this, maybe I didn't commit this, oh I must not have committed this
+
+109
+00:11:50,100 --> 00:11:58,199
+哦，那太棒了，好吧，有时候我也忘了提交，真需要在屏幕上贴便条，这样就可以提交了
+oh that's fantastic, okay, sometimes I forget to commit code as well, I really need to put a post note on my monitor, so that I can commit stuff
+
+110
+00:11:58,200 --> 00:12:11,700
+但我们现在就把这些提交了，那么需要什么，我想就那样，对了，剩下什么，我不需要了
+but let's just commit that stuff now, so what do we need that, and that I think that's it, right, what else is left, I don't need that
+
+111
+00:12:11,700 --> 00:12:25,625
+好了，我的意思是，我们实际上也可以这样做，所以我们要做什么，我们在Core.h中添加
+okay, well I mean we might as well commit this actually, so what do we do, we added what was that in Core.h we had 
+
+112
+00:12:26,400 --> 00:12:47,375
+因此，如果开启了调试，并且实际上第一件事，那就是对静态库所做的事情
+so if if debugs on and am I actually the first thing on my right for the message is what we did regarding the static library 
+
+113
+00:12:47,375 --> 00:13:03,536
+因此，我们已经链接动态库，我希望提交消息非常准确，所以你们可以现场看到
+so we now link the dynamic library instead of well, I like to get my commit message is pretty accurate, so you'll see this live
+
+114
+00:13:05,700 --> 00:13:25,075
+它就是其中的运行库，是的，就是MDd，现在动态链接运行库，并定义那个
+it's just called the runtime libraries in it, yeah Multi-thread dll, now linking runtime library dynamically, and define that
+
+115
+00:13:25,366 --> 00:13:35,800
+好吧，git push，虽然也需要拉取，我希望我先拉，没关系，已经提交了，这应该比较轻松
+okay, git push, while we also need to pull, I wish I pulled first, it doesn't matter, we've committed it, this should be an easy match
+
+116
+00:13:36,566 --> 00:13:45,500
+然后也可以推送，所以要把它完成，很酷，你们看到我在这里直播做一些事情，这很酷
+and then we can also push, so I'm just gonna get that done, it's like cool, you guys are seeing me do some stuff alive here, which is pretty cool
+
+117
+00:13:47,700 --> 00:13:57,950
+不管怎样，现在完成了，如果我们刷新仓库，应该看到这个，它可能必须合并，我做了一点
+anyway, now that's done, if we were freshmester pository, we should see this, and it probably had to merge, yeah I did a little
+
+118
+00:13:58,266 --> 00:14:04,100
+我做了一个小小的合并，因为在我做最新的合并之前，我和它进行了提交，所以有点有趣
+I did a little merge, because I and it up committing before I pulled the latest merge that we did, so that was a little bit fun there
+
+119
+00:14:04,100 --> 00:14:09,025
+但不管怎样，已经完成了，很酷，显然已经结束了，下一个依赖项位于解决方案文件夹中
+but anyway, that's done now, cool, that's closed obviously, next one dependencies in a solution folder
+
+120
+00:14:09,200 --> 00:14:12,975
+我将所有依赖项组合在一个解决方案文件夹中，以减少混乱，太棒了
+I grouped all the dependencies together in a solution folder for less cluttering, that's awesome
+
+121
+00:14:12,975 --> 00:14:19,225
+其实我很长时间都在想如何做到这一点，我想你们只是把它分成一组，是了，我真的很喜欢
+I was actually wondering for a long time how to do that, I guess you just put it into a group, yeah I really like that
+
+122
+00:14:19,800 --> 00:14:26,900
+我肯定会更频繁地使用组，但总的来说这很好，所以这只是在文件末尾添加新行，没关系
+I'll definitely be using groups more often, but in general this is good, so this is just adding a new line at the end of the file, that's fine
+
+123
+00:14:28,266 --> 00:14:48,066
+很好，我喜欢，所以我要合并，嗯，不，我不能，好了，酷
+yeah that's pretty good, I like that, so I'm gonna merge that, um no, I can't, okay, cool
+
+124
+00:14:49,325 --> 00:14:59,566
+我不能，因为刚刚更新了premake，好吧，修复首次构建失败，现在先检查目录是否存在
+I can't because I just updated the premake file myself,okay, fixed build failing first time, um now first check folder exist
+
+125
+00:14:59,566 --> 00:15:07,625
+看起来是不是很复杂，好吧，酷，实际上如果不存在的话，是个好主意，我想还有一个
+doesn't this look very fold, okay, cool, actually if not exist, yeah that's good, that's a good idea, there was also another one I think
+
+126
+00:15:07,625 --> 00:15:11,769
+这与此相关，我不确定哪一个更好，但这是修改了Hazel项目的后置构建命令
+which was related to that, I'm not sure which one's better, but it's postbuild command for Hazel project modified
+
+127
+00:15:12,166 --> 00:15:16,133
+这显示xcopy将知道参数是一个目录，并且在一个文件上
+this one show the xcopy will know that the argument to is a fold, and on a file
+
+128
+00:15:16,133 --> 00:15:31,205
+所以我不确定，但这是被引用的，所以不确定，比如为什么这个会引用这个，到底什么意思
+so I'm not sure, but this it was referenced, so I'm not sure why, like why was this ref like he referenced this, right, so what does that mean exactly
+
+129
+00:15:33,400 --> 00:15:42,875
+哦，那是另一个，抱歉，那是9号，这是21号，好了，有几个，意思是这也是处理这个的
+oh that's a different one, sorry, that's No.9, this is 21, okay, so there's been a few, mean, this what does this do this
+
+130
+00:15:42,875 --> 00:15:50,000
+这只是把它分开，所以这不是一个参数，这是真的，但我不确定这样是否能解决它
+this just splits it up, so that this is instead of one argument, it's true, but I'm not sure if that like does that fix it
+
+131
+00:15:50,966 --> 00:15:58,625
+好了，让我们快速打开目录，这样我们就有了，这样就可以删除bin了
+okay, let's quickly reopen this, so we have, so the idea is we can delete bin
+
+132
+00:15:59,150 --> 00:16:05,333
+如果我们尝试构建Sandbox，第一次就会失败，因为文件夹还不存在
+and then if we try and build Sandbox, it will fail the first time, because the folder doesn't exist yet
+
+133
+00:16:05,333 --> 00:16:09,925
+所以，让我们看看我们现在是否真的可以解决这个问题，因为真的很烦人，我同意
+so let's see if we can actually fix this right now, because yeah that's really annoying I agree
+
+134
+00:16:11,966 --> 00:16:19,650
+好了，就是这样，这失败了，我讨厌所有这些，所有这些警告
+okay, so there it is, it's failed over here, I hate all of this, all of these warnings
+
+135
+00:16:19,650 --> 00:16:24,625
+真的需要屏蔽它们或类似的东西，因为我认为很好
+really need to suppress them or something like that, because I think that think that they're fine
+
+136
+00:16:24,625 --> 00:16:33,750
+我想他们只需要感到惊讶，但不管怎样，那么错误在哪里，就在那里，所以命令失败了
+I think that they just need to be surprised, but anyway, okay, so where's the error, there it is, so command blah blah, failed
+
+137
+00:16:34,166 --> 00:16:50,100
+让我们试试，试着做这个，那么复制这个，然后到premake文件，就是这儿，粘贴这个
+so let's try, let's try do this instead, so I'm just going to copy this, and then go to the premake file, there it is, paste this instead
+
+138
+00:16:52,400 --> 00:16:56,699
+然后我们需要，需要做什么，我们需要回到这里，离开bin
+and then we need to, what do we need to do, we need to go back here, we need to leave bin
+
+139
+00:16:57,300 --> 00:17:03,199
+我们需要重新启生成项目，可以把startproject放在workspace中
+we need to regenerate the projects,  I'm able to set startproject should be in one space
+
+140
+00:17:03,200 --> 00:17:13,950
+哦，好吧，也许我不应该合并，然后就是startproject Sandbox，为什么会失败
+oh okay, well maybe I shouldn't have merged, then startproject Sandbox, why was that a failure
+
+141
+00:17:14,500 --> 00:17:21,975
+好了，让我想到了另一点，很明显理想情况下，在实际合并之前，应该先测试合并请求
+okay, this brings me to another point obviously ideally, you should definitely test the pull request before you actually merge them in
+
+142
+00:17:23,000 --> 00:17:25,625
+我有一种感觉，因为这是自动合并的
+I have a feeling that because this was automatically merged it
+
+143
+00:17:25,625 --> 00:17:35,700
+所以它是在Hazel项目Sandbox之前完成的，有趣，我不确定之后是否需要完成，但不确定
+so it was done before Hazel stop project Sandbox, that's interesting, I'm not sure maybe needs to be done after, but I'm not sure
+
+144
+00:17:35,700 --> 00:17:38,800
+我的意思是，很明显就像我想象的那个人测试过它
+I mean,obviously like I imagined that this guy tested it
+
+145
+00:17:40,500 --> 00:17:48,366
+但我们可以，再运行一遍，无法设置startproject
+but we can, let's just run that again, unable to set startproject
+
+146
+00:17:48,366 --> 00:17:54,100
+project应该在？中，所以它在project范围内，这可能是因为我们包含了这些内容
+and project scope should be in work, okay, so it's in a project scope, that's probably because we've included this stuff
+
+147
+00:17:54,133 --> 00:17:59,625
+好了，很酷，所以这需要在workspace内完成，所以也许我会在这里完成
+okay, cool, so this needs to be done in the workspace scope, so maybe I'll do it up here
+
+148
+00:18:00,933 --> 00:18:06,650
+让我们再试一次，好的，我们开始了，把它移到那里，那很有意义
+so let's try this again, okay, there we go, so we'll move it there, that makes sense
+
+149
+00:18:06,800 --> 00:18:09,766
+因为你们可以立即在架构中看到启动项目，所以一切都很好
+because you immediately see the start of project in the architecture, everything's fine
+
+150
+00:18:10,366 --> 00:18:13,399
+好了，好了，现在我们已经完成了，我们要确保这儿没有bin目录
+okay, cool, so now that we've done that, we'll make sure that the case there's no bin fold
+
+151
+00:18:13,400 --> 00:18:19,875
+让我们尝试构建Sandbox，看看它是否再次失败，不确定它是否会失败，不，真没失败
+let's try and build Sandbox, and let's see if it fails again, I'm not sure if it will, no, it didn't really
+
+152
+00:18:21,133 --> 00:18:27,150
+在那里构建得非常快，让我们删除这个，然后再试一次，好吧，我不相信
+that built very quickly there, let's delete this, and let's try again, all right, I don't buy it
+
+153
+00:18:27,600 --> 00:18:34,400
+开始了，成功了，好了，很酷，所以拆分文件才是真正的解决方案，我更喜欢它的原因
+okay, there we go, that succeeded, okay, cool, so splitting out the file was really the solution, the reason I like that better
+
+154
+00:18:34,800 --> 00:18:42,299
+好吧，那太棒了，所以我喜欢这个比另一个好得多，因为那个需要更多的代码，对吧
+so, okay, that's brilliant, so the reason I like this a lot better than the other one like because this this is more code, right
+
+155
+00:18:42,333 --> 00:18:52,999
+所以这必须做更多它必须做的，如果不存在的，但是这就像是一对额外的字符
+so this has to do more it has to do,  and if not exist, blah blah blah, but this is like, it's this, it's literally just like a couple extra characters
+
+156
+00:18:53,000 --> 00:19:00,950
+只需将路径拆分为文件夹，将实际的拆分为目录和文件，真的很好，因为它有一个长路径
+just splitting up the path into the folder, and the actual like into the directory and the file, which is really good is it having like one big path
+
+157
+00:19:01,400 --> 00:19:06,725
+所以我真的很高兴，我觉得这样好多了，事实上我甚至都不知道
+so I'm really happy with that, I think that's a lot better, actually I don't even know it like
+
+158
+00:19:07,066 --> 00:19:14,566
+所以那是第一个参数，然后我们有很多复制的途径，我猜是从，然后Sandbox，我不知道
+so that's the first argument, then we have the a lot of pathway we're copying from, I guess from, and then wearing two Sandbox, I don't know
+
+159
+00:19:14,566 --> 00:19:17,133
+总之，重点是把它分成两个参数
+anyway well, the point is splitting it often to into two arguments
+
+160
+00:19:17,133 --> 00:19:31,166
+那似乎解决了问题，我真的很喜欢这个解决方案，所以我要，我要做我经常做的了
+that seems to fix it, I really like this fix, so I'm going to, I'm going to do my classic
+
+161
+00:19:31,166 --> 00:19:36,425
+请更新它，这样我就可以合并它了，因为我可以自己提交，但我想给这个家伙一点信任
+please update it, so I can merge it, because I could commit it myself, but I kind of want to give this guy credit for doing it
+
+162
+00:19:39,500 --> 00:19:44,500
+因为那是一个困扰我很久的问题，所以我们会给他一个机会来解决它
+because yeah this was an issue that's been bothering me for ages, so we'll give him a chance to fix it
+
+163
+00:19:44,500 --> 00:19:57,125
+我们会给他几天的时间来更新，然后我想做的一件事就是这个，可以看到
+we'll give him like a couple days to update it, and then also one thing I want to do is this, I will see that
+
+164
+00:19:59,400 --> 00:20:07,799
+好了，酷，所以这就是第九号方案
+so blah blah, okay, cool, so this is the one that solution plantation version No.9
+
+165
+00:20:10,066 --> 00:20:34,200
+我如何引用另一个问题，啊，我们开始吧，好了，我有正确的链接
+how do I reference another issue, ah here we go, okay, I have that links properly
+
+166
+00:20:34,766 --> 00:20:39,700
+它应该，我不知道，如果它想在那里有一个空格，但不管怎样，好吧，酷，关闭它，出来吧
+it should, I don't know, if it wants a space there, but whatever, okay, cool, so close and come out
+
+167
+00:20:41,866 --> 00:20:49,266
+很明显，我引用了这个，好吧，酷，好了，一切都完成了，我真的很高兴我们做到了
+and then that's obviously I reference this, and okay, cool, so there we go, that's everything done, I'm really glad we did that
+
+168
+00:20:49,266 --> 00:20:56,150
+因为我们修复了启动项目，修复了文件夹复制的问题，还做了什么，我想就是那些
+because we fixed up the starter project, we fixed that folder thing copying um, and what else do we do, I think that was about it
+
+169
+00:20:56,150 --> 00:21:01,666
+但不管怎样，我带你们看了整个工作流，所以现在我们有了解决所有问题的权限
+but anyway, I kind of took you guys through the whole workflow, so now that we have we permission to address everything
+
+170
+00:21:01,666 --> 00:21:05,600
+这是一个正在进行的讨论，我想我最终会关闭它，因为CMake我不认为
+this is kind of an ongoing discussion that I think I'll close eventually, because CMake I don't think
+
+171
+00:21:05,600 --> 00:21:10,075
+我仍然不确定CMake支持是否应该成为Hazel的一个需要，仅仅因为premake存在
+I'm still not sure if CMake support should ever be a thing in Hazel, just because premake exists
+
+172
+00:21:10,366 --> 00:21:13,199
+还有premake，我想无论如何都可以生成CMakefiles
+and also premake, I think can generate CMakefiles, anyway
+
+173
+00:21:13,200 --> 00:21:17,250
+所以和premake相比，不管怎样，它比我的观点要好的多，
+so and premake, it just 1000 times better than see making my opinion, anyway, 
+
+174
+00:21:17,925 --> 00:21:20,933
+至于这个Linux支持，我很乐意确保它能正常运行
+linux support, again, I'd be happy to kind of make sure that works
+
+175
+00:21:20,933 --> 00:21:26,399
+但我可能想先在Linux虚拟机或其他上测试它，然后再测试我们已经解决的其他问题
+but I wanted to probably test that on a Linux VM or something first, and then everything else we've addressed
+
+176
+00:21:26,400 --> 00:21:31,799
+所以那就是所有的合并请求，希望这种在打开合并请求时有意义
+so that's all the pull requests, hope that kind of makes sense as far as opening pull requires
+
+177
+00:21:31,800 --> 00:21:38,784
+真的很简单，所要做的就是拷贝Hazel，对吧，这样就可以把它拷贝到自己的账号
+really easy all you have to do is kind of fork Hazel, right, so you can fork it into your own kind of into your own account
+
+178
+00:21:39,100 --> 00:21:47,575
+完成后，你们可以在分支中或仅在仓库主分支中（仓库副本）做想做的
+and then once you've done that, you can do what you want in a branch or just in your master in kind of your copy of the repository
+
+179
+00:21:47,933 --> 00:21:51,700
+一旦你们完成了，就可以去合并请求，新的合并请求
+and then once you've done that, you can just go to pull request, new pull request
+
+180
+00:21:52,466 --> 00:22:00,000
+然后可以将副本合并到我的副本中，对吧，就是那样，这将展示所有的差异，一切都有
+and then you can merge you know your copy into my copy, right, and that's it, and this will show you all the difference, and everything will be
+
+181
+00:22:01,166 --> 00:22:08,800
+你们知道，买一辆cherno车，会觉得很顺利，不管怎样，没关系，你们不会明白那个笑话的
+you know, bought a cherno as one might see really smooth is the idea, anyway, it doesn't matter, you guys won't get that joke
+
+182
+00:22:09,100 --> 00:22:18,133
+但关键是你们可以创建一种合并，就可以看到它是如何运行的，一旦我更新了README
+but the point is you can kind of create that merge that in, and you can see that's kind of how it works, I will once I do update that README file
+
+183
+00:22:18,133 --> 00:22:23,450
+我会有一种更好的格式，让你们知道应该如何组织你们的信息
+I will have more or less like a better kind of like a format for like how you should structure your messages
+
+184
+00:22:23,450 --> 00:22:27,722
+你们应该在这里提供什么信息，因为现在就像你们知道的一样
+and what information you should provide here, because right now it's kind of just like you know right whatever
+
+185
+00:22:27,966 --> 00:22:32,800
+但我希望将来能更有条理，是的，就是那样，希望有意义
+but I would like that to be more structured in the future, yeah, that's about it, hope that made sense
+
+186
+00:22:33,066 --> 00:22:37,725
+好了，那就是Github中的合并请求，可以看到这有多大的帮助，以及现在可以做什么
+alright, so that is pull requests in Github, you can see how helpful that is, and how we can kind of just for now
+
+187
+00:22:37,725 --> 00:22:42,025
+这真的像是小改动小修复，因为一开始就没有太多的事情要做
+it's really like small changes small fixes, because there isn't too much to Hazel to begin with
+
+188
+00:22:42,300 --> 00:22:49,333
+但一旦我们了大量的代码，仓库非常庞大，这儿就会有很多东西
+but once we have you know massive, massive like amount of code, and our code base is just huge, there'll be so many things here
+
+189
+00:22:49,333 --> 00:22:54,499
+在那儿，人们可以改进、修复并实施，因此构建请求显然是在以后要做的
+and there that people can improve and fix, and implement as well, so build requests obviously going into the future
+
+190
+00:22:54,500 --> 00:22:57,999
+如果我们能像现在这样开始加速，那就太好了
+if we can kind of start ramping that up like as it is right now, that's perfect
+
+191
+00:22:58,000 --> 00:23:00,672
+我们可以构建它，确保人们对此感到满意
+we can establish it, we can make sure that people are comfortable with that
+
+192
+00:23:00,933 --> 00:23:04,666
+因为在将来，那将非常重要，希望你们喜欢这期视频
+because in the future, that's gonna be really important, hope you guys enjoyed this video
+
+193
+00:23:04,666 --> 00:23:09,533
+如果你们还没有为它点赞的话，还可以通过访问patreon.com/thecherno帮助支持该系列
+if you didn't hit that like button, you can also help support the series by going over to patreon.com/thecherno
+
+194
+00:23:09,533 --> 00:23:16,050
+非常感谢所有使本系列成为可能的小伙伴，如果你们支持的话，就会提前一周收到视频
+huge thank you as always to all the patreons that make this series possible, if you guys support there, you'll get videos a week early
+
+195
+00:23:16,666 --> 00:23:22,050
+以及访问Hazel私有开发库，在那里你们可以看到我写的所有代码
+as well as access to that private Hazel development repository, where you can see like all the code that I've done
+
+196
+00:23:22,766 --> 00:23:30,325
+这远远领先于这个仓库，所以那真的很酷，非常感谢你们帮助支持这个系列
+which is far more ahead of this kind of repository, so that's really cool, and a little kind of thank you for helping to support this series um
+
+197
+00:23:31,600 --> 00:23:35,399
+下次我想我们可能会继续开发Hazel
+next time I think we're gonna probably move on with actual Hazel development
+
+198
+00:23:35,400 --> 00:23:39,300
+这段时间我想做的就是输入和按键编码之类的东西
+one thing that I wanted to do for a while is like input and keycodes and stuff like that
+
+199
+00:23:39,550 --> 00:23:45,200
+所以我们可以做那个，是的，我们可能会搞那个，我想是的，直到下次，再见
+so we can kind of do that, yeah, we'll probably end up doing that I think so until next time, goodbye
+

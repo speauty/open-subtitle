@@ -1,0 +1,1160 @@
+﻿1
+00:00:00,133 --> 00:00:03,150
+嘿，你们好，我是TheCherno，欢迎回到我的游戏引擎系列教程
+hey, what's up guys, my name is TheCherno, welcome back to my game engine series
+
+2
+00:00:03,466 --> 00:00:08,125
+那么上次我们看了一下输入管理器，构建了一个输入轮询系统
+so last time we took a look at the input manager, and we've made an input polling system
+
+3
+00:00:08,125 --> 00:00:13,125
+如果你们还没有看过的话，一定要去看一下那期视频哦，因为今天我们要继续做那个
+definitely take a look at that video, if you haven't already, and today we're gonna kind of continue on with that
+
+4
+00:00:13,125 --> 00:00:19,701
+做一些我想做一段时间的事情，那就是创建我们自己的Hazel按键代码和鼠标按键代码
+and do something that I wanted to do for a while, and that is to actually create our own kind of Hazel keycodes and mouse button codes
+
+5
+00:00:19,701 --> 00:00:25,189
+对吧，所以这可能是一个你们很多人都没有意识到的问题
+right, so this might be a problem that a lot of you don't realize we actually have
+
+6
+00:00:25,933 --> 00:00:32,800
+但实际上，我们现在所依赖的是GLFW接口的按键代码定义
+but essentially what we're relying on right now is the GLFW api for the definitions of keycodes
+
+7
+00:00:33,675 --> 00:00:39,775
+现在那是一个问题的原因是，首先，它将我们与GLFW紧密绑在一起
+now the reason that that's a problem is because first of all, it ties us very heavily to GLFW
+
+8
+00:00:40,266 --> 00:00:45,100
+其次，那就意味着GLFW必须由实际的客户端知道，而不仅仅是引擎知道
+second of all, it means the GLFW has to be known by the actual client, not just the engine
+
+9
+00:00:45,366 --> 00:00:50,975
+所以我的意思就是，让我们想想，你们在游戏或应用中使用了Hazel
+so what I mean by that is, let's just see, you're inside your game or your application that uses Hazel
+
+10
+00:00:51,250 --> 00:00:56,750
+对吧，所以你们不会，你们知道实际上这不是Hazel库，这是你们的实际应用客户端
+right, so you don't, you know this isn't actually the Hazel library, this is your actual application your client
+
+11
+00:00:57,400 --> 00:01:05,875
+然后你们想看看空格键是否被按下，好吧，要实现那个，目前要做的基本上就是按键代码
+and then you want to check to see if the space button is pressed, right, well to do that, at the moment what you have to do is basically right code
+
+12
+00:01:05,875 --> 00:01:13,775
+那就像是 Input::IsKeyPressed(GLFW_KEY_SPACE)之类的，对吧，类似的，我们不想那样做
+that's like Input IsKeyPressed GLFW_KEY_SPACE or something, right, something like that, we don't want to do that
+
+13
+00:01:13,775 --> 00:01:18,700
+因为这意味着你们实际上必须在应用中包含GLFW，我们不想要那个
+because that means that you actually have to have to include GLFW into your application, we don't want that
+
+14
+00:01:18,700 --> 00:01:27,000
+现在应用中唯一应该包含的东西就是Hazel，你们知道的，还有其他你们需要使用的东西
+with the only thing you should be including in your application really is Hazel now, you know there are other things that you will use
+
+15
+00:01:27,000 --> 00:01:34,100
+例如你们知道的，在某种意义上必须包含spdlog，因为只有宏可以扩展到spdlog之类的
+for example you know, spdlog has to be included in some sense, because we just have macros which expand to kind of spdlog things
+
+16
+00:01:34,900 --> 00:01:42,750
+然后你们实际上需要包含的另一个是，是什么呢，ImGui，对吧
+then the other thing that you actually need to have included would be like what was the other thing ImGui, right
+
+17
+00:01:42,750 --> 00:01:46,100
+因此，ImGui也是你们可以编写的客户端站点
+so ImGui is something that you would write kind of client site as well
+
+18
+00:01:46,100 --> 00:01:50,825
+但是对于像GLFW这样的东西，你们知道的，我们不想与之有任何关系
+but with things like GLFW, you know, we don't we don't want to have any kind of relation to that
+
+19
+00:01:51,133 --> 00:01:55,100
+那也是一个问题的原因是，你们知道的，ImGui，那将在所有平台上被使用
+the reason that that's a problem as well is that, you know, ImGui, that's gonna be used on all platforms
+
+20
+00:01:55,100 --> 00:01:59,375
+至于spdlog，它将在所有平台上使用，GLFW虽然可能不总是
+spdlog, it's gonna be used on all platforms, GLFW though might not always
+
+21
+00:01:59,575 --> 00:02:01,199
+毕竟我们可能不会一直使用GLFW
+we might not always use GLFW
+
+22
+00:02:01,866 --> 00:02:06,950
+所以目前，我们在Windows Mac和Linux上使用它，基本上那就是现在的计划
+so at the moment, we're using it for Windows Mac and Linux essentially, right, that's kind of the plan
+
+23
+00:02:07,333 --> 00:02:15,225
+但在将来，比如在Windows上，你们可能会想使用Win32API，然后至于Mac和Linux
+but in the future, you know it might, you might want to use the Win32API and then like on Windows, and then Mac Linux
+
+24
+00:02:15,225 --> 00:02:19,733
+也许我们会坚持使用适用于Mac和Linux的GLFW，所以那立即就会产生一个问题
+maybe we'll just stick with GLFW for Mac and Linux, so immediately that creates a problem
+
+25
+00:02:19,733 --> 00:02:24,075
+因为一切都绑死了GLFW，但在Windows上，我们甚至不需要GLFW，那就是一个问题
+because everything's tired of GLFW, we don't even need GLFW on Windows, that's an issue
+
+26
+00:02:24,650 --> 00:02:32,550
+现在另一个大问题就是GLFW按键代码实际上与某些其他按键代码不同
+now the other big thing though is that GLFW keycodes are actually different than certain other keycodes
+
+27
+00:02:32,966 --> 00:02:41,225
+例如Win32API将按键代码定义为与GLFW不同的实际常数，写入不同的整数值
+for example the Win32API defines the keycodes as actual different constants, write different integers, different values than GLFW does
+
+28
+00:02:42,400 --> 00:02:47,733
+所以那是一个问题，因为你们知道的，如果我们使用GLFW，切换到Win32API
+so that's a problem, because you know, if we if we're a land GLFW, and we switch to Win32API
+
+29
+00:02:47,733 --> 00:02:51,825
+我们不能一直使用那些常量，我们需要某种转换
+we can't keep using those same constants, we need some kind of either some kind of conversion
+
+30
+00:02:52,100 --> 00:02:57,400
+类似于策略或某种查找表来在两者之间进行转换
+like strategy or like some kind of lookup table to kind of translate between the two
+
+31
+00:02:57,400 --> 00:03:01,900
+或者我们需要更改Windows上的原始按键代码，就像创建了一个完整的掩码
+or maybe we need to change the original keycodes on Windows, it's like a whole kind of mask that gets created
+
+32
+00:03:02,466 --> 00:03:07,050
+所以那就是我们在这一期需要讨论的，我们今天实际上不需要做太多的工作
+so that's kind of what we're going to address in this episode, we don't actually have to do much work today 
+
+33
+00:03:07,050 --> 00:03:14,933
+因为我们有点依赖GLFW，但我只想摆脱GLFW依赖我们的按键代码
+because we are kind of tied to GLFW top, but all I want to do is just get rid of that GLFW dependency our keycodes
+
+34
+00:03:14,933 --> 00:03:19,225
+然后基本上建立一个非常简单的系统，并向大家展示一下代码
+and then essentially set up a very simple system, and also show you guys around the code a little bit
+
+35
+00:03:19,775 --> 00:03:24,966
+至于你们实际需要做什么，以及为什么这是一个问题，所有这些，那么直接看代码吧
+as to what you will actually have to do, and why this is a problem and all of that, so let's just jump into the code
+
+36
+00:03:24,966 --> 00:03:30,125
+我想我现在就不多说了，让我们进入代码，来看看情况
+I think I'm gonna just stop talking for now, let's jump into the code, and we'll take a look at the situation
+
+37
+00:03:30,125 --> 00:03:34,375
+我们能做些什么，好吧，那么现在重申一下这个问题
+and what we can actually do about it, okay, so to reiterate the problem right now
+
+38
+00:03:35,400 --> 00:03:41,975
+而在上期中，当我们创建这个Input类时，我们做了所有那些，并在应用中测试了它，很好
+rather the previous episode, when we made this Input class, and we did all of that, we tested it out in application, which was great
+
+39
+00:03:41,975 --> 00:03:48,200
+对吧，所以运行了应用，我们得到了鼠标位置和所有的东西，那很好，鼠标位置很简单
+right, so we had application run, we did in for get mouse position, we got all of our stuff, that's great, mouse position is an easy one
+
+40
+00:03:48,648 --> 00:03:56,675
+现在，如果我们真的执行了一些像Input::IsKeyPressed这样的代码，需要提供一个按键代码
+now if we actually do something like Input IsKeyPressed, we need to provide a keycode
+
+41
+00:03:57,066 --> 00:04:03,267
+现在我们进入了Application.cpp，在Hazel里面，我不认为需要在这里包含GLFW
+now we are inside Application.cpp, which is inside Hazel, I don't think we actually include GLFW here
+
+42
+00:04:03,866 --> 00:04:09,750
+但现在，我们实际上需要做的是像GLFW_KEY_TAB这样的事情，对吧
+but at the at the minute well, what we would actually have to do is something like GLFW_KEY_TAB, right
+
+43
+00:04:10,266 --> 00:04:15,575
+那是个问题，因为我们必须包含GLFW才能做到那个，现在这个问题更糟了
+that's a problem, because we have to include GLFW to do that, now this problem is even worse
+
+44
+00:04:15,575 --> 00:04:21,911
+如果你们拿着这个并且决定，实际上我想在SandboxApp中这样做，这不在Hazel项目中
+if you take this, and you decide, actually I want to do this in our actual SandboxApp, this is not in the Hazel project
+
+45
+00:04:22,100 --> 00:04:29,800
+这是在Sandbox项目中，对吧，它在一个完全不同的地方，我们绝对不想在这里包含GLFW
+this is inside the Sandbox project, right, it's in a completely different place, we definitely don't want to include GLFW here
+
+46
+00:04:29,800 --> 00:04:35,466
+这是我们的客户端，对吧，但是如果我想做这样的事情或者在OnUpdate中呢
+this is our client, right, so and yet if I want to do something like this or maybe in the OnUpdate
+
+47
+00:04:35,466 --> 00:04:41,978
+我只是想看看这个是否按下了，对吧，那么让我们执行一些像那样的代码，如果按下了
+I just want to see if this is pressed, right, so let's just do some code like that, if that's pressed
+
+48
+00:04:42,466 --> 00:04:50,300
+然后你们知道我们会执行HZ_INFO("Tab key is pressed")，对吧，那就是我们今天的目标
+then you know we'll do something like HZ_INFO("Tab key is pressed"), right, that's our goal kind of for today
+
+49
+00:04:50,300 --> 00:04:55,084
+我们想做这样的事情，但不包含GLFW，我们怎么做呢
+we want to be able to do something like this, but without including GLFW, how do we do that
+
+50
+00:04:56,066 --> 00:05:00,650
+让我来确认一下我们在Hazel，我想我们可能需要更新Hazel.h包含
+let me just make sure that we're in Hazel, and I think we'll probably have to update Hazel.h to include
+
+51
+00:05:00,650 --> 00:05:06,300
+总是忘记做这个，我只是在我们一起的时候可能会做，不想坐在那把整个都写完
+I'll always like forget to do this, I'll probably just do this as we go along, I don't want to sit there and write this whole thing out
+
+52
+00:05:07,200 --> 00:05:14,966
+但你们知道，我们会大致按字母顺序排列，这儿就有了Input，然后现在可以看到
+but you know, we'll kind of have this in roughly alphabetical order, we'll have input here and then you can see now
+
+53
+00:05:15,066 --> 00:05:19,425
+这就是问题所在，所以我们要做的是做一些类似HZ_KEY_TAB的事情，对吧
+this is the problem, so what we want to do instead is to do something like HZ_KEY_TAB, right
+
+54
+00:05:19,766 --> 00:05:25,425
+因此我们现在有点依赖于Hazel按键代码，而不是实际的GLFW按键代码，太棒了
+so we're kind of depending on Hazel keycodes now instead of actually the GLFW ones, which is fantastic
+
+55
+00:05:25,625 --> 00:05:32,900
+因为那再次意味着我们消除了对GLFW的依赖，但也确保无论我们最终使用什么库
+because again, that means that we're eliminating that dependency to GLFW, but also making sure that no matter what library we end up using
+
+56
+00:05:32,900 --> 00:05:38,100
+在后端，总是有一组按键代码可以访问，就是那样
+in the back end will always have one kind of set of keycodes, that can be accessible, and that's it
+
+57
+00:05:38,575 --> 00:05:44,375
+那么为了进一步说明这个问题，如果我们真的转到glfw3.h，也就是这个头文件
+so to kind of further illustrate this problem a little bit, if we actually go to glfw3.h, which is the header file
+
+58
+00:05:44,700 --> 00:05:52,650
+我们看一下GLFW_KEY_TAB，你们知道它在这里，我们这里有一堆常量，一堆定义
+and we look at GLFW_KEY_TAB, you know here it is, we have a bunch of constance here, a bunch of defines
+
+59
+00:05:52,966 --> 00:06:02,600
+被定义为258，很好，对吧，不管怎样，如果看看微软定义的虚拟按键代码，问题就在这里
+this is defined to be 258, that's great, right, 258, whatever, here's the issue, if we look at the virtual keycodes defined by microsoft
+
+60
+00:06:02,600 --> 00:06:11,225
+好吧，那么在Win32API中，看这里的这个Tab被定义为9，9，好了，这是一个意外
+right, so this is in the Win32API, look at this tab over here is defined to be 9, 9, okay, it's an accidentational
+
+61
+00:06:11,225 --> 00:06:17,400
+但9.0也是一样的，258和9，很明显是不同的数字
+but it's the same in decimal 9, 258 and 9, clearly, they're different numbers
+
+62
+00:06:17,700 --> 00:06:24,725
+对吧，所以我们实际上不能，它们彼此不兼容，所以我们需要做的就是选择一个约定
+right, so we can't actually, they're not compatible with each other, so what we need to essentially do is choose one convention
+
+63
+00:06:24,725 --> 00:06:30,800
+我们要么这样做，显然我们也可以定义自己的按键代码，但事实并非如此
+we either do like this, we could obviously invent our own Keycodes as well, but that's not really that
+
+64
+00:06:30,800 --> 00:06:39,250
+这样做没有任何好处，我们要么像微软那样选择，要么选择GLFW，然后坚持那样做
+there's no benefit of doing that, we either pick like Microsoft's ones, we pick GLFW ones, and we kind of just stick with that
+
+65
+00:06:39,600 --> 00:06:43,700
+如果我们在另一个平台上，我们可以在必要时进行某种转换
+and then if we're on a different platform, we could do some kind of conversion where necessary
+
+66
+00:06:43,700 --> 00:06:46,823
+如果我们真的想，可以在编译时进行，也可以在运行时进行
+either a compile time if we really wanted to, or even at runtime
+
+67
+00:06:46,823 --> 00:06:47,975
+所以我会向你们展示它是如何运行的
+so I'll show you how that works
+
+68
+00:06:49,133 --> 00:06:54,175
+所以我们要做的第一件事就是参考这个，好吧，我真的不在乎那个未知按键
+so the first thing we're gonna do is actually steal this, okay, I don't really care about the unknown key
+
+69
+00:06:54,175 --> 00:07:00,800
+但是所有这些可打印的键，我们从这里开始，我只是要复制并粘贴整个块，好了
+but all of these printable keys, where we kind of begin here, I'm just gonna copy and paste this entire block, okay
+
+70
+00:07:01,966 --> 00:07:13,500
+我要在这里创建一个文件KeyCodes.h，好了，我要把这些都复制在这里
+and I'm going to make a file just in here called KeyCodes.h, alright, and I'm just gonna paste all of this in here
+
+71
+00:07:14,133 --> 00:07:19,650
+现在对于GLFW，我要点击<Ctrl-h>，我不知道，如果你们能看到，你们就能看到这个
+now GLFW I'm going to hit <Ctrl-h>, and I don't know, if you'll get, you guys will be able to see this
+
+72
+00:07:20,150 --> 00:07:28,800
+也许如果我把它拖到这边，你们肯定就会看到，我最终会用HZ_替换GLFW_
+maybe if I drag it over here, you'll definitely see it, I'm just gonna finally replace GLFW like that underscore with HZ_ 
+
+73
+00:07:28,800 --> 00:07:32,825
+<alt+a>将在当前文档的任何地方替换它，现在继续
+an alt a will replace it everywhere in this current document, and there we go
+
+74
+00:07:32,825 --> 00:07:36,393
+所以现在我们实际上在这里参考了GLFW按键代码
+so now we've effectively stolen GLFW keycodes here
+
+75
+00:07:36,875 --> 00:07:43,325
+现在我们可能想重新定义某些东西，比如你们知道的，它们就像一个有趣的倍数
+um now again we might want to redefine certain things, so for example you know, they they've like an interesting multiple
+
+76
+00:07:43,325 --> 00:07:49,950
+可能你们不喜欢像这样的按键代码，一个叫做super，这实际上指的是Windows键
+like maybe you're not happy with like some keycodes like this, one's called super, this actually refers to the Windows key
+
+77
+00:07:50,200 --> 00:07:54,375
+或者是你们在Mac上使用的命令键，我不知道，有些人不喜欢super这个名字
+or if you're on Mac the command key, I don't know, some people don't like the name super
+
+78
+00:07:54,375 --> 00:07:59,666
+他们觉得这很奇怪，可能会把它重命名为Windows键，显然我只是想把它保留Super
+they think it's weird, they might rename it to Windows key, obviously I'm just gonna keep it a super
+
+79
+00:07:59,666 --> 00:08:04,875
+因为我们只支持Windows模型，所以我们不想绑定任务东西，比如说Windows键等等
+because we do support model just Windows, and so we don't want to tie anything to like the Windows key whatever
+
+80
+00:08:05,475 --> 00:08:15,175
+我们有了键盘，无论如何，这对我来说很好，我显然要添加评论，来自glfw3.h，好了
+we have the keypad stuff, anyway this looks pretty good to me, I'm obviously going to add a comment from glfw3.h, okay
+
+81
+00:08:15,450 --> 00:08:20,000
+只是为了让我们知道，如果想更新或引用这个，或者以某种方式它已经改变了
+just so that we know, if we want to update this, or if we want to refer to this, or somehow this has changed
+
+82
+00:08:20,866 --> 00:08:29,166
+但那是它的基本要点，对吧，我还将添加一个新项，也就是MouseButtonCodes.h
+but that's the basic gist of it, right, I'm also going to add a new item, a header file here called MouseButtonCodes
+
+83
+00:08:29,968 --> 00:08:38,325
+然后这个也是一样的操作，我们将转到glfw3.h，找到GLFW_MOUSE_BUTTON
+and then this will be and then this will be kind of the same, we'll go to glfw3, GLFW_MOUSE_BUTTON
+
+84
+00:08:39,093 --> 00:08:45,950
+然后我们会复制所有这些，还有一堆mod，我们可能会担心
+and then we'll just grab all of these, and there's a bunch of mods as well, which we could worry about
+
+85
+00:08:46,500 --> 00:08:53,225
+它们只是由实际的glfw函数设置的特定位，因此修改了标志，我们暂时不需要麻烦
+they're just certain bits that are set therefore modified flags by the actual glfw functions, we're not gonna bother for now
+
+86
+00:08:53,466 --> 00:08:59,950
+如果我们将来确实需要它们，我们将使用它们，然后在这里我可以完全替换为HZ
+if we do need them in the future, we will use them, and then over here I can just completely replace this to be HZ
+
+87
+00:09:00,400 --> 00:09:08,325
+然后这里也是一样，好了，我会再次添加我的小评论，来自glfw3.h， 好了，好了
+and then same with here, okay, and again I'll add my little comment, from glfw3.h, and there we go, okay cool
+
+88
+00:09:08,475 --> 00:09:12,933
+所以我们有了MouseButtonCodes.h和KeyCodes.h，这些头文件也很小
+so we have our MouseButtonCodes and we have our KeyCodes, these header files are really light as well
+
+89
+00:09:12,933 --> 00:09:18,050
+很明显，它们只是定义，这很好，这里没有函数，没有符号，只是定义
+obviously they're just defines, which is really nice, no functions here, no symbols really just defines
+
+90
+00:09:18,533 --> 00:09:24,625
+所以那很好，我们几乎拥有了所需的一切，现在我要做的是
+so that is quite good, and we have pretty much everything we need, now here's the thing, and what I'll do
+
+91
+00:09:24,625 --> 00:09:36,809
+很明显我会去找Hazel头文件，包含Hazel/MouseButtonCodes.h和Hazel/KeyCodes.h，好了
+obviously is I'll go to that Hazel head of file of mine, and I'll include, you know, Hazel/MouseButtonCodes, Hazel/KeyCodes, okay
+
+92
+00:09:37,200 --> 00:09:45,200
+可能只是把Input.h放在它自己的小部分，好吧，酷，好了，我们得到了 所有的东西
+might just put Input into its own little section here like that, okay, cool, so there we go, we've got all of that stuff
+
+93
+00:09:45,200 --> 00:09:49,425
+现在，如果我们转到SandboxApp，显然这是可行的，猜猜如果我们真的测试这个
+now if we go to SandboxApp, obviously this works, and guess what if we actually test this
+
+94
+00:09:49,425 --> 00:09:52,433
+它会运行的，对吧，所以如果我进入Application
+it will work, right, so if I go into head into Application
+
+95
+00:09:52,600 --> 00:09:59,725
+我只是想把我们上次讨论过的东西去掉，我现在也不是特别想记录每个事件
+I'm just going to get rid of this stuff that we talked about last time, I also don't really particularly want to log every event right now
+
+96
+00:09:59,725 --> 00:10:04,637
+所以我会把它注释掉，希望我们只剩下这个，让我们看看这是什么样子
+so I'll just comment that out, hopefully I think we'll only have this left, so let's just see what this looks like
+
+97
+00:10:04,775 --> 00:10:10,700
+好了，这是我们的应用，这是我们的日志，所以我们仍在执行ExampleLayer::Update
+okay, so here's our application, this is our log, so we're still doing ExampleLayer::Update
+
+98
+00:10:11,100 --> 00:10:17,340
+但是如果我按tab键，你们可以看到，tab键按下，我可能会去掉那个
+but if I hit the tab key, you can see, says tab keys press, I might just um get rid of that
+
+99
+00:10:17,866 --> 00:10:23,266
+也许只要改成这个TRACE，使它不是绿色的，好吧，那么现在我们有了这个，如果按tab键
+and maybe just make this trace, so that it's not green, okay, so we have this now, and if I hit the tab key
+
+100
+00:10:23,266 --> 00:10:29,066
+你们可以看到，它说tab键被按下了，好了，我按住它，好了，现在可以了，一切都好了
+you can see, it says tab key is pressed, okay, I'm holding it down, so there we go, that now works, and everything's fine
+
+101
+00:10:29,066 --> 00:10:34,425
+我们刚刚参考了GLFW按键代码，一切都很好，现在我们来谈谈转换
+we've just kind of stolen GLFW keycodes, and everything's fine, now let's talk about conversions
+
+102
+00:10:34,425 --> 00:10:38,350
+在可能有必要的地方，在不必要的地方，以及我的意思
+and where that might be necessary, where it won't be necessary, and what I even mean by that
+
+103
+00:10:38,475 --> 00:10:47,750
+因此我们试图解决的问题是，如果从GLFW切换到Win32，这些可能会有所不同，对吧
+so again the problem here that we're trying to solve is potentially if we switch from GLFW to Win32, these will be different, right
+
+104
+00:10:48,166 --> 00:10:52,650
+我的意思是，现在如果你们看看发生了什么，我们执行IsKeyPressed，对吧
+what I mean by that is at the moment, if you take a look at what's happening, we do IsKeyPressed, right
+
+105
+00:10:52,933 --> 00:10:57,675
+我们转到它的Windows实现，然后查看glfwGetKey
+we go to the Windows implementation of that, and then we look up to the glfwGetKey
+
+106
+00:10:57,675 --> 00:11:04,350
+但是如果正在执行函数的Win32API版本，对吧，就需要提供Win32API按键代码，对吧
+but what if we're doing the Win32API version of this function, right, we need to provide a Win32API keycode, right
+
+107
+00:11:04,800 --> 00:11:09,475
+因此，这里是你们的选择，以及基本上可以做的事情
+so here are your options, and what you could essentially do
+
+108
+00:11:10,075 --> 00:11:15,726
+你们可以做的第一件事可能是在运行时成本方面最有效的
+the first thing you could do is probably the most efficient in terms of runtime cost
+
+109
+00:11:16,625 --> 00:11:23,266
+也就是说，请稍候，如果我们在某个平台上
+and that is to basically say that well, hang on a minute, if we are on a certain platform
+
+110
+00:11:23,266 --> 00:11:27,850
+当我们在某个平台上为某个目标编译Hazel及其应用时
+and when we compile Hazel and its application on a certain platform, for a certain target
+
+111
+00:11:28,325 --> 00:11:35,600
+我们知道窗口库的实际情况，对吧，我们知道是否使用GLFW
+we know what the actual like windowing library or whatever will be, right, we know if we're using GLFW
+
+112
+00:11:36,000 --> 00:11:38,625
+我们知道如果我们使用的是Win32API，我们就知道我们在做什么
+we know if we're using Win32API, we know what we're doing
+
+113
+00:11:39,000 --> 00:11:47,850
+因此我们所能做的只是基于正在编译的平台，将这些代码适配给定平台的正确代码
+so what we could do is just based on the platform that we're compiling for change these code to be the correct ones for that given platform
+
+114
+00:11:48,400 --> 00:11:53,125
+所以换言之，如果我们真的按照我想的那样
+so in other words, if we did go with the kind of scenario that I came up with
+
+115
+00:11:53,125 --> 00:11:58,800
+我们在Mac和Linux上使用GLFW的Hazel，在Windows上使用Win32API的Hazel
+where we have Hazel on Mac and Linux using GLFW, and Hazel on Windows using Win32API
+
+116
+00:11:59,025 --> 00:12:01,166
+当我们编译时，你们知道我们可以像
+then when we compile you know we could have like a
+
+117
+00:12:01,166 --> 00:12:05,525
+你们知道如果定义了HZ_PLATFORN_WINDOWS，就有WINDOWS按键代码
+you know ifdef HZ_PLATFORN_WINDOWS, we have Windows keycodes
+
+118
+00:12:05,766 --> 00:12:12,075
+否则如果是HZ_PLATFORM_MACOS或HZ_PLATFORM_LINUX，我们有GLFW按键代码
+otherwise if it's HZ_PLATFORM_MACOS or HZ_PLATFORM_LINUX, we have GLFW keycodes
+
+119
+00:12:12,950 --> 00:12:14,900
+那意味着我们执行的任何运行时检查
+what that means is that any runtime checks we do
+
+120
+00:12:15,166 --> 00:12:18,950
+根据我们编译的平台，这个常量实际上是不同的，对吧
+this constant is actually different based on the platform we've compiled for, right
+
+121
+00:12:19,900 --> 00:12:27,425
+所以，如果是Windows，这将被定义为9，如果这是因为9是我们这里的一个，对吧
+so again, if it's Windows, this would be defined to be nine, if it's because nine is the one that we have here, right
+
+122
+00:12:27,800 --> 00:12:36,499
+而Mac和Linux这应该是258，那很好，你们可以这样做，那样做没有什么错
+whereas Mac and Linux this would be 258, now that's great, you could do it that way, there's nothing wrong with doing it that way
+
+123
+00:12:36,500 --> 00:12:43,825
+我想，那是你们的选择之一，那就是我所做的，我丢失了我的，丢失了WindowsInput
+I think, that's one of your options, and that's kind of the what did I I lost my, I heard it lost my WindowsInput
+
+124
+00:12:44,866 --> 00:12:48,275
+那是一个选择，不错，唯一的问题是
+that's one of the options, it's not bad the only problem with that
+
+125
+00:12:48,275 --> 00:12:53,575
+我能真正看到的是，如果你们决定以某种方式对数据进行序列化或存储
+that I can really see is that if you decide to somehow sterilize that data or store it
+
+126
+00:12:54,475 --> 00:13:02,500
+它不会真的与你们知道的其他类型的按键代码兼容我猜是值
+it wouldn't really be compatible with you know with the other kind of keycode I guess values
+
+127
+00:13:03,366 --> 00:13:07,300
+比如说，我有一个游戏的安全文件，我已经重新映射了
+so for example, let's just say that I have a safe file for my game, I've remapped
+
+128
+00:13:07,300 --> 00:13:11,100
+你们知道玩家将某些键码重新映射为其他键码，对吧
+you know of what the player remapped certain keycodes to be other keycodes, right
+
+129
+00:13:11,100 --> 00:13:16,825
+因为通常你们在游戏中，你们可以改变控制，使之成为你们想要的任何东西
+because usually you kind of in games, you're able to change your controls to be whatever they whatever you want them to be
+
+130
+00:13:17,525 --> 00:13:24,057
+然后我将tab键序列化为数字9，那就与258不兼容
+and then I've just serialized, you know, the tab key as like the number nine, that's not going to be compatible with two fifty eight
+
+131
+00:13:24,466 --> 00:13:29,133
+对吧，这就是现在通过GLFW的情况，按键代码会有所不同
+right, which is what it is right now through GLFW, there's keycodes are going to be different
+
+132
+00:13:29,133 --> 00:13:38,600
+所以再次假设，复制并粘贴我的按键代码，比如C文件，或者更少，比如我的输入和偏好
+so again hypothetically speaking, I copy and paste my keycode like C file or whatever less you say like my input like preferences
+
+133
+00:13:38,900 --> 00:13:45,166
+我把文件从我的Windows电脑复制粘贴到我的Mac电脑上，Hazel，那样做行不通，对吧
+I copy and paste that file from my Windows computer to my Mac computer, and ron Hazel on that, that's not gonna work, right
+
+134
+00:13:45,166 --> 00:13:51,200
+它不会知道tab键是什么，因为你们已经将它作为一个数字进行了解析，而那正是它所期望的
+it's not gonna know what the tab key is, because you've sterilized it as a number, and that's what it expects it to be
+
+135
+00:13:51,776 --> 00:13:55,666
+现在你们可以通过解析一个字符串来解决这个问题，上面写着tab或类似的东西
+now you could solve this by just sterilizing a string, which says tab or something like that
+
+136
+00:13:55,666 --> 00:14:00,700
+然后，当我想让它去解码时，它可以查找实际值，然后你们可以设置在那里
+and then when I want it de sterilizes it, it could look up the actual value, and then you'd be kind of set there
+
+137
+00:14:01,276 --> 00:14:04,750
+但是那也是你们必须要做的，因为如果你们在运行时
+but again, that's something that you just have to do, because if you kind of at runtime
+
+138
+00:14:04,750 --> 00:14:10,400
+如果你们已将按键硬编码为类似GLFW或Windows的特定代码
+if you've hard coded your keys to be a certain code that is like either the GLFW one or the Windows one
+
+139
+00:14:10,566 --> 00:14:14,225
+你们没有一直坚持那么做，那是很不利的
+you have to kind of stick without the whole way through, and that's kind of the downside of that
+
+140
+00:14:14,566 --> 00:14:18,320
+你们可以做的另一件事是有一个函数，这也是很常见的
+the other thing you could do is have a function, and this is quite common as well
+
+141
+00:14:18,600 --> 00:14:23,575
+要有一个在按键代码之间进行必要转换的函数，对吧，本质上就是一个查找表
+to have a function that actually converts between the keycodes as necessary, right, just a look up table essentially
+
+142
+00:14:23,933 --> 00:14:30,750
+例如，HZ_KEY_4是确定的值，但当你们在WindowsWindow中与GLFW交互时
+so for example, HZ_KEY_4 is that value sure, but when you interact with GLFW for example in WindowsWindow
+
+143
+00:14:31,333 --> 00:14:39,175
+当我们在按键回调时，对吧，必须用这个key执行KeyPressedEvent，你们要做一个转换
+when we actually do you know the key callback, right, and we have to do a KeyPressedEvent with this k, you do a conversion
+
+144
+00:14:39,333 --> 00:14:48,175
+所以可以实现些类似GLFWKeyToHZKey小函数，可能只是个映射的查找表或类似的函数
+so you do something like a GLFWKeyToHZKey, right, little function, which might just be a look up table into a map or something like that
+
+145
+00:14:48,533 --> 00:14:54,625
+它只是将这个GLFW键码转换为正确的Hazel键码，那就是传递给该事件的按键代码，对吧
+which just converts this GLFW keycode into the correct Hazel keycode, and that's the one that you pass into that event, right
+
+146
+00:14:55,866 --> 00:15:01,225
+很明显，那是针对事件的，然后是针对轮询的，就是这样，当你们在这里得到键码时
+and then that's obviously for events, and then for polling, which is this thing, when you get the keycode here
+
+147
+00:15:01,225 --> 00:15:06,825
+在将其传递到这里之前，只需执行HZKeyCodeToGLFWKeyCode，对吧
+before you pass it into here, you just do HZKeyCodeToGLFWKeyCode, right
+
+148
+00:15:07,425 --> 00:15:09,537
+然后在这儿进行转换，就是那样
+and then you do that conversion here, and that's it
+
+149
+00:15:10,050 --> 00:15:13,266
+那意味着每次你们执行KeyPress之类的事件
+now that does mean that every time you do a KeyPress or anything like that
+
+150
+00:15:13,266 --> 00:15:20,050
+根据我的经验，你们确实需要查找一个字典，在我的经验中，那很好，就像我不喜欢
+you do have to do a look up into a map, in my experience, that's fine, like I don't like
+
+151
+00:15:20,050 --> 00:15:28,150
+我从来没有在我的开发生涯中看到过游戏引擎的瓶颈，哦，这是因为我在查找键码，对吧
+I've never ever in the history of my life seeing like a bottleneck of a game engine, oh it's because I'm doing look ups for keycodes, right
+
+152
+00:15:28,566 --> 00:15:33,966
+我想很多人都喜欢做很多优化，那完全没有必要
+a lot of people I think like to um do a lot of optimizations, that's completely unnecessary
+
+153
+00:15:33,966 --> 00:15:38,675
+在某些领域，他们认为可以节省一些处理器周期，而在其他领域
+in certain areas where they think that they can save like a few CPU cycles, whereas in other areas
+
+154
+00:15:38,675 --> 00:15:43,500
+在不进行优化更重要更具破坏性的地方，他们似乎忽视了那一点
+where it's much more important and much more kind of damaging to not do optimization, they seem to overlook that
+
+155
+00:15:43,500 --> 00:15:50,150
+因为它太复杂了，或者人们没有那样想，所以我认为那是一种优化
+because it's just too complicated, or people don't think about it in that sense, so I think that's an optimization that
+
+156
+00:15:50,400 --> 00:15:55,300
+就像我认为使用正确的按键代码进行编译的性能差异，首先是
+like I think the performance difference between just compiling with the correct keycode is in the first place
+
+157
+00:15:55,625 --> 00:16:02,300
+相对于有一个查找表，你们每次按下按键都需要查找，那可以忽略不计，对吧
+versus having a look up table, that you need to look up every time, you press a key, that's negligible, right
+
+158
+00:16:02,700 --> 00:16:08,200
+就我而言，没有什么不同，所以基于那两种方法，我一点也不担心
+there's no difference there as far as I'm concerned, so I wouldn't worry about that at all, based on those two methods
+
+159
+00:16:08,200 --> 00:16:15,425
+我想我可能会做的是始终将Hazel按键代码作为常量，那在运行时总是如此
+I think what I probably would do is is still always have Hazel keycodes as a constant, that is always the case at runtime
+
+160
+00:16:15,425 --> 00:16:19,700
+然后当你们与不同的库交互时，需要不同的按键代码
+and then when you interact with different libraries, which require different keycodes
+
+161
+00:16:20,075 --> 00:16:27,492
+此时你们可以实际执行现在需要执行的操作，我的意思是转换为正确的实际按键代码
+that's when you can actually do what you need to do now, and by that, I just mean converted into the right actual key code
+
+162
+00:16:27,933 --> 00:16:34,350
+现在我要说的是，我们知道这些是GLFW按键代码，对吧
+now one thing I will say though is that, we know that these are GLFW keycodes, right
+
+163
+00:16:34,600 --> 00:16:41,125
+所以你们知道的函数，如果在WindowsWindow中，在glfwSetKeyCallback，就需要执行这个
+so the function that you know, if we're in WindowsWindow, and we're in glfwSetKeyCallback, and we need to do this
+
+164
+00:16:41,333 --> 00:16:46,200
+实际上我们知道不需要转换，因为我们使用的是正确的按键代码
+we actually know that no conversion is necessary, because we're using the right ones
+
+165
+00:16:46,575 --> 00:16:51,750
+因此你们只需要在与GLFW以外的库交互时进行这个转换
+so you would only need to do this conversion for when you interact with libraries other than GLFW
+
+166
+00:16:52,050 --> 00:16:57,366
+再说一次，如果我们只是为所有这些值编了随机按键代码或类似的东西
+and again, if we had just made up random keycodes or something like that for all these values
+
+167
+00:16:57,366 --> 00:17:02,000
+然后我们每次都需要做一个转换，现在这些不是完全随机的，就像这样
+then we would need to do a conversion every time, now these aren't completely random, like these
+
+168
+00:17:02,000 --> 00:17:07,325
+比如A就是65，与按键代码对齐的，对吧，所以那很有用
+like a being 65 that lines up with as keycodes, right, so that's quite useful
+
+169
+00:17:09,550 --> 00:17:14,999
+因为你们基本上可以捕获到这个HZ_KEY_F，然后把它转换成一个字符
+because you can basically grab this HZ_KEY_F, and just convert it into a char
+
+170
+00:17:15,000 --> 00:17:20,200
+然后你们就可以通过打印HZ_KEY_F，将这个字符打印到控制台上，对吧
+and then suddenly you can actually print that character to the console by just printing HZ_KEY_F, right
+
+171
+00:17:20,566 --> 00:17:25,800
+所以我的意思是，你们知道，好吧，好吧，我们有这个关于事件的事情，对吧
+so what I mean by that is, you know, okay, well, we have this on event thing, right
+
+172
+00:17:27,300 --> 00:17:31,999
+所以让我们做一个，你们知道的，而不是跟踪这个或任何我要说的
+so let's just get a, you know, instead of tracing this or whatever I'll say
+
+173
+00:17:32,366 --> 00:17:43,225
+如果EventType是一个KeyPressedEvent，我希望它能实际显示我想要的KeyPressedEvent
+if the EventType is a KeyEvent, the KeyPressedEvent, I wish that it would actually show me what I wanted KeyPressedEvent
+
+174
+00:17:44,333 --> 00:17:56,225
+然后我们可以得到按键事件，这是一个KeyPressedEvent，我们将把它转换为正确的类型
+then we can get the key events, it's a KeyPressedEvent, and we'll just cast this into the right type
+
+175
+00:18:02,766 --> 00:18:11,073
+好了，然后我们只调用e.GetKeyCode，实际上能做的就是记录它，所以会用HZ_TRACE
+all right, and then we'll just do e.getKeyCode, what I can actually do is log that, so we'll say HZ_TRACE
+
+176
+00:18:14,500 --> 00:18:21,400
+我会把这个放在这里，但我要做的是我会把它转换成一个字符
+and I'll put this in here, except what I'll do is I'll actually cast it to a char
+
+177
+00:18:21,650 --> 00:18:24,400
+好吧，如果我尝试记录像这样的内容
+okay, so if I try and log something like this
+
+178
+00:18:24,600 --> 00:18:29,600
+你们会看到，对于那些愚蠢的值，比如Ctrl、Shift或其他可能愚蠢的按键
+you'll see that for values, that are like stupid like control or shift or whatever might be stupid 
+
+179
+00:18:29,600 --> 00:18:37,850
+但是如果我们真的按下，你们知道的，A，S，D，如果我输入PUBLIC，我要写的
+but if we actually press, you know a, you know sd, you know, if I type in the word public, public static I was going to write
+
+180
+00:18:38,566 --> 00:18:44,925
+但是可以看到，如果我输入这个单词，就可以通过把它转换成一个字符来看到字母是什么
+but you can see, if I type that word in like you can actually see what the letters are by just casting this to a char
+
+181
+00:18:44,925 --> 00:18:50,733
+因为我们使用的按键代码实际上与按键代码一致，所以它们不是完全随机的
+because the keycode that we're using actually lines up with as keycodes, so they're not completely random
+
+182
+00:18:50,733 --> 00:18:54,499
+那就是为什么做你们自己的随机数会很奇怪，但很明显，像tab这样的按键
+and that's why making your own random ones will be weird, but obviously with things like tab
+
+183
+00:18:54,500 --> 00:19:00,775
+我想他们不知道为什么选择了它们，比如为什么tab是258
+and I think that they are not sure why they chose them to be what they are, like for example why tab is 258
+
+184
+00:19:00,966 --> 00:19:04,866
+我不知道那背后的故事，但你们知道有些比如说字母
+I don't know the backstory behind that, but you know certain ones like letters
+
+185
+00:19:04,866 --> 00:19:10,933
+你们真的想输出一个字符，只是因为你们有这些好处，不管怎样，那就是它的要点
+you do want to actually want out with a characters, just because you have kind of those benefits there, anyway, that's kind of the gist of it
+
+186
+00:19:10,933 --> 00:19:13,733
+我的意思是这里没有什么值得太担心的
+I mean there's nothing really here to be too concerned about
+
+187
+00:19:13,733 --> 00:19:17,625
+我将把这段代码留在这里，并将其提交到本期视频的仓库中
+I'll leave this code in here, and I'll commit it into the repository for this video
+
+188
+00:19:17,625 --> 00:19:25,993
+但是你们可以看到，现在我们有能力通过它进行轮询，也有能力实际执行事件
+but yeah, you can see that now we have the ability to do polling via that, and we also have the ability to actually do events 
+
+189
+00:19:25,993 --> 00:19:34,297
+比如这种事件，我猜是KeyEvents，然后可以，有正确的按键代码，实际上可以打印控制台
+kind of stuff events, I guess KeyEvents, and then we can, we have the correct keycodes, that we can actually just print the console
+
+190
+00:19:34,533 --> 00:19:39,650
+现在我们有了这样的东西，这是一件大事，很明显，你们现在可以做比较了
+and now we have like this is the big thing, obviously with this as well you could do comparisons now
+
+191
+00:19:39,650 --> 00:19:47,875
+所以如果e.GetKeyCode() == tab，那么你们也可以让按键按下
+so if e.GetKeyCode() is equal to tab, then you could also do to have kids press for example
+
+192
+00:19:48,266 --> 00:19:54,003
+然后那将代替轮询它，并在每次处理它时检查它，当它实际被按下时
+and then that would be instead of kind of polling it, and checking it every time you can just handle it, when it actually gets pressed
+
+193
+00:19:54,166 --> 00:20:08,975
+但关键是我们现在可以做这个比较，所以我在这里做事件，轮询，实际上也可以看到区别
+but the point is we can now do this comparison, so I'll do event here, poll, okay, and we can actually see the difference here as well
+
+194
+00:20:10,100 --> 00:20:14,166
+但是你们现在可以做这两件事了，那在之前没有GLFW的情况下是不可能的
+but you can now kind of do both of these things, that weren't possible before without including GLFW
+
+195
+00:20:14,366 --> 00:20:19,799
+好了，我们继续，显然tab的ASCII字符不在那里，但我们有轮询，我们有事件
+so there we go, we have, obviously the ASCII character for tab is not there, but we have the poll and we have the event
+
+196
+00:20:19,800 --> 00:20:25,800
+好了，所以那很酷，但我们现在可以与某些按键代码进行这种比较
+okay, so that's pretty cool, but yeah we have the ability now to do these kind of comparisons with certain keycodes
+
+197
+00:20:25,800 --> 00:20:30,150
+并询问按下了什么键，但实际上根本没有包含GLFW
+and as well as ask what key is pressed, without actually including GLFW at all
+
+198
+00:20:30,150 --> 00:20:35,400
+所以我认为那很酷，那对于我们何时真正需要使用这些功能来说也非常重要
+so I think that's pretty cool, and that's again gonna be really important for when we actually need to use these features
+
+199
+00:20:35,500 --> 00:20:38,425
+好吧，那么我希望你们喜欢这段视频，如果你们喜欢的话，就为它点赞吧
+alright, so I hope you guys enjoyed this video, if you did, and hit that like button
+
+200
+00:20:38,666 --> 00:20:45,300
+你们正在通过访问patreon.com/thecherno来支持该系列，非常感谢你们一如既往地支持我
+you're supporting the series by going over to patreon.com/thecherno, huge thank you as always to all the lovely patreons there for supporting
+
+201
+00:20:45,300 --> 00:20:49,925
+你们将提前一周获得视频，并可以访问Hazel开发分支的源代码
+you'll get videos a week early, as well as access to the Hazel development branch source code
+
+202
+00:20:50,300 --> 00:20:54,700
+这实际上是非常令人兴奋的，因为我刚刚开始使用渲染器，并且喜欢渲染命令提示
+which is actually getting quite exciting now, because I've just started on the renderer and like the render command cues
+
+203
+00:20:54,875 --> 00:20:59,466
+那将是各种各样的，它是多线程的，所有的，所以那里的东西都在准备中
+and like that's gonna be all kind of it's multi threaded and everything,  so it's things are heating up there
+
+204
+00:20:59,466 --> 00:21:04,100
+我迫不及待地想在视频中真正开始这方面的工作，但我们还有很长的路要走
+I can't wait to actually start working on this stuff in the videos, but we do still have quite a long way to go
+
+205
+00:21:04,100 --> 00:21:09,400
+直到我们开始喜欢开发分支上令人兴奋的东西，所以如果你们想偷看一下，一定要看看
+until we get up to like the exciting stuff that is on that development branch, so if you want a sneak peek, definitely check that out
+
+206
+00:21:09,848 --> 00:21:14,133
+现在，就我们接下来要做的事情而言，我们有很多选择，很多有趣的选择
+now in terms of what we're doing next, we have a lot of options, a lot of juicy options
+
+207
+00:21:14,133 --> 00:21:19,599
+因为我们现在的情况是，我们有一些事件输入应用层堆栈
+because we're at the point now where we have kind of events input application layer stackvthat kind of stuff done
+
+208
+00:21:20,466 --> 00:21:25,333
+有一些基本特性是你们真正需要构建它的，还有日志记录和ImGui
+there is the kind of the base features that you really need to build it build up, as well as logging and ImGui as well
+
+209
+00:21:25,333 --> 00:21:31,875
+我真的很喜欢，有一些ImGui的事情，我最终想做，Hazel开发分支目前有
+I really like to have, there are some ImGui things that I want to do eventually, the Hazel development branch at the moment has
+
+210
+00:21:32,150 --> 00:21:34,950
+ImGui的一个版本，它支持两种停靠方式
+a version of ImGui, which supports both docking
+
+211
+00:21:35,250 --> 00:21:37,822
+因此你们实际上可以像在visual studio中一样停靠东西
+so you can actually dock things kind of like you can in visual studio
+
+212
+00:21:38,566 --> 00:21:44,166
+也可以将窗口拖到窗口外，以便将窗口放置在窗口外
+as well as drag windows outside of your window, so you can place windows outside of the window
+
+213
+00:21:44,166 --> 00:21:50,733
+这一切只是在感觉背后创造了一扇新的窗口，真的很酷，我想最终将其融入Hazel中
+it all just kind of create a new window behind the sense, it's really cool, I want to integrate that into Hazel eventually
+
+214
+00:21:50,733 --> 00:21:54,450
+下一期我可能不会这样做，因为感觉就像我们在循环和迭代
+I might not do that next episode, because it feels like we're kind of going around in circles and iterating
+
+215
+00:21:54,450 --> 00:21:59,900
+我知道你们很高兴看到一些新特性，而不是推出新的功能
+so much on what we've got instead of introducing new features, I know you guys are excited to see some of those new fishers
+
+216
+00:22:00,066 --> 00:22:03,788
+那么你们为什么不留言告诉我下期你们实际上想看到什么
+so why don't you leave a comment below as to what you actually want to see next in Hazel
+
+217
+00:22:04,166 --> 00:22:12,100
+现在我想我要做的是，我们有一些选择，所以我们可以继续搞后端
+at the moment I think what I'm going to do, like we have a few options, so we could just like go continue going the kind of back end like
+
+218
+00:22:12,100 --> 00:22:18,950
+让我们在后台构建我们需要的东西，而不在屏幕上实际看到那种路线
+let's just build stuff up that we need in the background without actually seeing stuff on the screen kind of that route
+
+219
+00:22:19,266 --> 00:22:23,475
+实际上要进行序列化，因为那需要在某个时候进行
+and actually do sterization, because that needs to be done at some point
+
+220
+00:22:23,950 --> 00:22:29,300
+但我们可能想做的一个更令人兴奋的话题是渲染，对吧，还有图形之类的东西
+but a much more exciting topic which we might want to do is rendering, right, and graphics and that kind of stuff
+
+221
+00:22:30,500 --> 00:22:33,466
+但我们也可以做很多事情
+but there's also like, there's so much stuff we can do
+
+222
+00:22:33,466 --> 00:22:38,525
+我们可以使用脚本语言，看看那些，我甚至不知道我想用什么脚本
+we can go scripting languages, and kind of take a look at those, I don't actually even know what I want to use
+
+223
+00:22:38,525 --> 00:22:44,166
+可能很低，也可能是Python之类的，也还没确定，我们实际上可以做很多事情
+might be low or might be Python, might be something like that, not sure, there's so much stuff that we can actually do
+
+224
+00:22:44,166 --> 00:22:50,500
+我们可以开始设计3D模型格式的工具，比如level editor和ImGui，我们可以做很多事情
+we can start designing tools like a 3D model format like a level editor and ImGui, there's so much stuff that we can do
+
+225
+00:22:50,500 --> 00:22:54,475
+那么就在下面评论区留言告诉我，你们想看什么，或者你们认为比较令人激动的东西
+so just leave a comment below as to what you want to see, and what you think sounds exciting
+
+226
+00:22:54,859 --> 00:22:59,950
+我想创建渲染器的很多原因可能是因为它看起来很好，然后Hazel看起来也不错
+a lot of the reasons why I want to make a renderer is probably because it will look nice, and then Hazel will look nice
+
+227
+00:22:59,950 --> 00:23:05,300
+然后缩略图会看起来很好，然后无论如何，它会很好，因为你们有一些东西要显示
+and then the thumbnails will look nice, and then anyway, it would kind of just be good, because you have kind of something to show
+
+228
+00:23:05,300 --> 00:23:10,800
+因为不幸的是，当人们看到一个游戏引擎时，他们看到的只是表面上的样子
+because unfortunately, when people look at a game engine, they see kind of superficially like what's there like
+
+229
+00:23:11,248 --> 00:23:15,900
+好了，这就是它看起来的样子，因此我知道它有多好是基于它看起来的样子
+okay, this is what it looks like, therefore I know how good it is based on what it looks like
+
+230
+00:23:16,604 --> 00:23:23,933
+显然那很垃圾，但那就是人们的工作方式，所以可能想走那种路线
+obviously that's rubbish, but that's kind of how people work, so kind of maybe want to go that that kind of route
+
+231
+00:23:23,933 --> 00:23:28,466
+但如果你们有什么建议，我基本上只需要做你们想做的
+but if you guys have any suggestions, I just want to kind of basically do what you guys want to
+
+232
+00:23:28,466 --> 00:23:32,375
+我想给你们看你们想看的东西，所以在下面留下评论，下期见，拜
+I want to give you guys what you want to see, so leave a comment below, and I'll see you next time, goodbye
+
