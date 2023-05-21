@@ -1,0 +1,1790 @@
+﻿1
+00:00:00,050 --> 00:00:03,225
+嘿，你们好，我是TheCherno，欢迎回到我的游戏引擎
+hey, what's up guys, my name is TheCherno, welcome back to my game engine of the series 
+
+2
+00:00:03,225 --> 00:00:08,353
+那么上次我们讲了日志，还添加了一个名为spdlog或splog的日志库
+so last time we talked about logging, and we actually added a logging library called spdlog  or splog
+
+3
+00:00:08,600 --> 00:00:12,184
+那期的视频链接就在那儿，在你们看这期视频之前，一定要看那个视频
+video to that is link up there, make sure you watch that before you watch this video
+
+4
+00:00:12,450 --> 00:00:15,960
+今天我们终于将使用一个构建系统
+today we're gonna be finally using a build system of sorts
+
+5
+00:00:15,960 --> 00:00:23,500
+那么基本上我们会使用一些项目生成库或程序，它会为我们生成项目
+so basically we're going to be using some kind of project generation library I guess or program, that just generates projects for us
+
+6
+00:00:23,875 --> 00:00:29,500
+这是我们还没有做的事情，这儿有一些讨论，我可能会使用CMake或类似的东西
+this is something that we haven't done as of yet, there's been kind of discussion, I'm using maybe CMake or something like that 
+
+7
+00:00:30,275 --> 00:00:36,000
+因为有个生成项目这样的问题，今天我们会讨论一下这个问题到底是什么
+because we've kind of have this problem of we generate projects, and we're gonna talk a little bit about what that problem actually is today
+
+8
+00:00:36,200 --> 00:00:46,175
+我们也会解决这个问题，那么首先，项目生成，比如为什么需要它，为什么不能用VS
+as well as we're gonna solve that problem as well, so first of all, project generation like why do we need that, why can't we just, you know, use Visual Studio
+
+9
+00:00:46,175 --> 00:00:51,900
+创建我们的项目，一切都没问题，那么我们可以，并且那就是我们到目前为止一直在做的
+make our projects, and everything's gonna be fine, so we can and that's what we kind of have been doing up until now
+
+10
+00:00:51,900 --> 00:00:55,850
+但当我们要处理不同的平台时，最大的问题就来了
+but the the big issue kind of creeps up, when we have to deal with different platforms
+
+11
+00:00:56,700 --> 00:01:02,525
+所以我的意思是，现在我们的构建工具集是Windows上的VS
+so what I mean by that is, right now our build kind of toolset is visual studio on Windows 
+
+12
+00:01:02,525 --> 00:01:07,619
+并且就是这样，我们唯一需要处理的项目文件是VS，对吧，我们有解决方案文件
+and that's it, so the only kind of project files, we have to deal with is Visual Studio, right, we have solution files
+
+13
+00:01:07,619 --> 00:01:11,225
+我们导出文件的地方，其他C++项目文件的地方
+where we export files, which others C++ project files
+
+14
+00:01:11,500 --> 00:01:16,962
+所有这些东西都是Windows，我想是Hazel引擎的Windows环境
+all that stuff is kind of Windows, I guess the Windows environment for the Hazel engine
+
+15
+00:01:17,075 --> 00:01:25,875
+对吧，但一旦我们开始添加其他平台，比如Mac或Linux，甚至是Android或IOS，对吧
+right, but as soon as we start to kind of add other platforms, like for example Mac or Linux, or even like Android or IOS, right
+
+16
+00:01:26,175 --> 00:01:29,850
+我们需要为我们的引擎生成项目文件
+we need to actually generate project files for our engine
+
+17
+00:01:30,100 --> 00:01:35,675
+这些文件可以与工具集一起使用，它们会为我们编译那些应用
+that can be used with a toolset, that will compile those applications for us, all right
+
+18
+00:01:35,675 --> 00:01:40,675
+那么我的意思就是，我们需要生成一个XCode项目文件
+so what I mean by that is like we literally need to generate for example an XCode project file
+
+19
+00:01:41,200 --> 00:01:44,350
+这样就可以为IOS构建这个项目，那只是一个例子
+so that we can build this for IOS, that's a one example
+
+20
+00:01:44,350 --> 00:01:48,425
+对吧，我的意思是，你们知道的，我们不需要使用扩展Mac来为Mac构建
+right, I mean, you know, we don't have to use external Mac to build for Mac
+
+21
+00:01:48,425 --> 00:01:51,050
+但假设我们这么做了，对吧
+but supposedly like let's just say that we do, right 
+
+22
+00:01:51,225 --> 00:01:55,000
+那么我们就可以生成XCode项目文件，这样就可以在Mac上构建这个Hazal引擎
+so we generate XCode project file, so that we can build this Hazal engine on Mac
+
+23
+00:01:55,325 --> 00:01:56,350
+那么Linux呢，对吧
+what about Linux, right
+
+24
+00:01:56,350 --> 00:02:01,800
+我们可能想为特定的IDE生成某种项目文件，或者只是Makefile或类似的东西
+we might want to generate some kind of project files for specific IDE, or just Makefiles or something like that 
+
+25
+00:02:01,800 --> 00:02:10,775
+但关键是我们这个Hazel项目，对吧，但我们定义这个项目的方式，现在只是通过VS实现的
+but the idea is we have our Hazel project, right, but the way that we've defined what that project is, right, now is just through visual studio 
+
+26
+00:02:11,100 --> 00:02:16,525
+我们刚刚说，好了，这些是所有的文件？这个项目，这些是我需要的所有定义
+we've just said okay, these are all of the files the this project, these are all the defines I'm going to need
+
+27
+00:02:16,525 --> 00:02:20,375
+例如HZ_PLATFORM_WINDOWS，如果我们在Windows上，对吧
+for example, HZ_PLATFORM_WINDOWS, if we're on Windows, right, 
+
+28
+00:02:20,625 --> 00:02:25,925
+我已经定义了我的项目实际上是什么，对吧，但我是在VS中完成的
+I've defined what my project actually is, right, but I've done that in Visual Studio
+
+29
+00:02:26,300 --> 00:02:32,050
+并且我们需要做的不是在VS中那样做，而是定义我们的项目到底是什么
+and what we need to do is instead of do that in Visual Studio, we kind of define what our project actually is
+
+30
+00:02:32,050 --> 00:02:41,925
+Hazel引擎实际上是某种其他格式，然后可以用来构建特定于平台的项目文件
+what the Hazel engine actually is in some kind of other format, that can then be used to construct platform specific project files
+
+31
+00:02:42,275 --> 00:02:50,700
+或者甚至是工具链工具集特定于一个项目文件，对吧，所以我们要用的是premake
+or rather maybe even tool chain tool set specific a project files, okay, so what we're going to be using for that is something called premake 
+
+32
+00:02:51,100 --> 00:02:55,350
+我将在这个视频的描述中放一个链接，告诉你们它到底是什么以及github仓库
+I'll have a link in the description of this video to what that actually is and the github repository
+
+33
+00:02:55,350 --> 00:02:56,209
+这样你们就能去了解它
+so that you can read about it
+
+34
+00:02:56,450 --> 00:03:01,549
+他们的维基对于了解premake实际上是什么，它能为你们做什么，都是非常棒的
+the wiki they have is fantastic for learning kind of about what premake actually is, what it can do for you
+
+35
+00:03:01,925 --> 00:03:07,975
+我不想用CMake，因为我个人不喜欢CMake，觉得它很复杂，我觉得它有点
+I didn't want to use CMake, because I don't personally like CMake, I think it's very complicated, I think it's very kind of its
+
+36
+00:03:08,400 --> 00:03:14,600
+它在很多事情上只是一种格式，它只是，它只是不必要的复杂
+it uses like it's only kind of format for a lot of things, and it's just, it's just unnecessarily complicated
+
+37
+00:03:14,600 --> 00:03:18,500
+很难处理，而premake是用Lua编写的
+hard to deal with, whereas premake is written in Lua 
+
+38
+00:03:18,500 --> 00:03:25,430
+或者当写premake文件时，你们用Lua写，它真的很容易使用，那儿没有太多东西
+or like when you write premake files, you write them in Lua, and it's just really easy to use, there's not much to it
+
+39
+00:03:25,430 --> 00:03:34,750
+我的意思是，我们要为整个Hazel引擎写一个完整的premake文件，现在它会非常简单
+I mean, we're gonna write a complete premake kind of file I guess for the entire Hazel engine right now, it's gonna be really simple
+
+40
+00:03:34,750 --> 00:03:41,400
+对于初学者来说很容易理解，它很强大，可以生成我们需要的所有项目文件，好了
+it's it's easy to understand for people who are new to this, and it's very powerful, and can generate project files for everything that we need, okay 
+
+41
+00:03:41,600 --> 00:03:45,175
+所以它就是关键，一旦我们以预先设定的格式来定义
+so it's the idea, and then once we kind of define in kind of premake format
+
+42
+00:03:45,175 --> 00:03:49,500
+一旦我们以任意的格式来定义，就算是定义了Hazel实际是什么
+once we define that in that arbitrary format, we kind of define what Hazel actually is 
+
+43
+00:03:49,500 --> 00:03:55,130
+那么例如，这些是简单的，这些是我们需要包含的C++文件，这些是我们需要包含的头文件
+so for example, these are the simple, these are the C++ files we need to include, these are the header files we need to include
+
+44
+00:03:55,130 --> 00:04:01,250
+这些是包含目录，这些是我们要链接的库，你们知道的，这些是我们要使用的定义
+these are the include directories,  these are the libraries we want to link, you know, these these are the defines that we want to use
+
+45
+00:04:01,250 --> 00:04:04,275
+这些是我们想要设置的不同平台的配置，对吧
+these are the different platforms of configurations we want to set up, right
+
+46
+00:04:04,475 --> 00:04:07,925
+一旦我们在Lua中定义了这些，我们就可以运行premake了
+once we define that in Lua, we can then just run premake 
+
+47
+00:04:07,925 --> 00:04:15,125
+它会为我们生成VS项目文件，或XCode项目文件，或Makefile文件等等，对吧
+and it will generate Visual Studio project files for us, or XCode project files for us, or Makefiles for us or whatever, right 
+
+48
+00:04:15,425 --> 00:04:22,400
+所以那就是为什么我们想要使用这种项目生成器而不是手动处理一切
+so that's kind of the idea of why we want to use this kind of project generator rather than just deal with everything manually
+
+49
+00:04:22,575 --> 00:04:28,550
+因为你们也可以想象，我们可以手动维护一切，可以每次都制作与VS相关的专业配置文件
+because as you can also imagine, we could maintain everything manually, we could make expert profiles Visual Studio pertinent files every time 
+
+50
+00:04:28,550 --> 00:04:31,525
+我们添加了一个新文件，我们将它添加到Mac和Windows中
+we add a new file, we add it to both Mac and Windows
+
+51
+00:04:31,525 --> 00:04:34,597
+但必须手动完成所有这些，并且那是很痛苦的
+but we will have to do that all kind of manually, and that's just a pain 
+
+52
+00:04:34,875 --> 00:04:40,275
+这样就简单太多了，我们甚至可以创建一个bat文件，这就像
+this is much much easier, and we'll even make like a bat file, which will just be like a
+
+53
+00:04:40,675 --> 00:04:42,175
+我的意思是，在不同的平台上，那是不同的
+I mean, on different platforms, that would be different 
+
+54
+00:04:42,175 --> 00:04:44,750
+但因为我们现在用的是Windows，它将是一个bat文件
+but since we're sticking with Windows for now, it'll be a bat file
+
+55
+00:04:44,750 --> 00:04:47,425
+我们可以双击它，它就会为我们生成一切
+that we can just double click, and it will just generate everything for us
+
+56
+00:04:47,425 --> 00:04:53,525
+我不知道，可能需要100毫秒来完成一个列表，所以这将非常棒，就不用我多说了吧
+in like I don't know, probably take like 100 milliseconds a list, so it's gonna be fantastic, so without further ado
+
+57
+00:04:53,750 --> 00:04:59,450
+让我们直接用premake来设置Hazel，那么我想做的第一件事可能就是运行这个
+let's just jump in and set up Hazel with premake, okay, so the first thing, I want to do is actually just kind of run this maybe
+
+58
+00:04:59,450 --> 00:05:05,500
+看看我们实际得到了什么，这样我们就有了一个可以继续工作的结果
+and just see what we actually get, just so that we have like a result that can kind of work towards
+
+59
+00:05:06,300 --> 00:05:08,825
+那么我将等待这个编译和运行
+so I'll just wait for this to compile and run
+
+60
+00:05:09,400 --> 00:05:13,440
+继续，那么我们看到Initialized Log，只打印了Hello，然后还有一个不受控制的死循环
+and there we go, so we see that we Initialized Log, and we just print Hello, and then we have a wild for true loop
+
+61
+00:05:13,440 --> 00:05:17,925
+好了，棒，所以就是现在Hazel引擎的作用，现在我们来看看premake
+okay, great, so that's kind of what the Hazel engine is at this moment, so now let's take a look at premake 
+
+62
+00:05:18,375 --> 00:05:24,100
+那么我将在下面描述中放这个的链接，但premake基本上可以在github上免费获得
+so I'll have a link to this in the description below, but premake is essentially available free on github
+
+63
+00:05:24,100 --> 00:05:29,350
+如果你们看一下它实际附带的许可证，基本上说它对几乎所有东西都是免费的
+if you look at the license that it actually comes with it, basically just says that is free for pretty much everything
+
+64
+00:05:29,550 --> 00:05:36,400
+只要这个版权声明被保留，所以我们就必须下载这个许可证文本文件并使用它
+just as long as this copyright notice especially retained, so we'll have to actually kind of download this license text file and use it
+
+65
+00:05:36,950 --> 00:05:41,375
+那么我肯定会把它保存在某个地方，但然而，我们可以直接进入release，
+so I will definitely save that somewhere, but otherwise, we can just go to releases, 
+
+66
+00:05:41,725 --> 00:05:45,875
+然后premake 5.0-alpha 13，这是我们在这里要用到的
+and then premake 5.0-alpha 13 is we're going to use as at this point 
+
+67
+00:05:46,125 --> 00:05:49,875
+我怀疑当premake发布新版本时，我们会简单地获取它
+I suspect that as premake comes out with new releases, we will simply grab that
+
+68
+00:05:50,250 --> 00:05:52,875
+我们肯定会使用premake5而不是premake4
+ we'll definitely be using premake5 and not premake4
+
+69
+00:05:53,825 --> 00:05:58,900
+尽管这是个alpha版本，它仍然很稳定，在我的经验中，它很好
+even though this is kind of still an alpha, it's still quite stable, and it's been fine in my experience 
+
+70
+00:05:59,275 --> 00:06:08,000
+它有很多我想要使用的功能，那么这是Windows压缩文件，我要下载它，这应该很好很简单
+and it has a lot of features that I actually want to use, so there's the Windows zip file, I'm just going to download that, and that should be nice and simple
+
+71
+00:06:08,000 --> 00:06:15,175
+我想它只会有一个exe文件，就是那样，那么如果我复制这个exe文件，进入Hazal目录
+I think that will only have an exe file, and that's it, so if I copy that exe file, I'm going to go into my Hazal directory 
+
+72
+00:06:15,350 --> 00:06:20,400
+我要创建一个新文件夹vendor，这个vendor文件夹不同于Hazel中的vendor文件夹
+I'm gonna make a new folder called vendor, so this vendor folder is different than the vendor we have in Hazel
+
+73
+00:06:20,400 --> 00:06:23,175
+因为这个vendor文件夹适用于所有东西
+because this vendor folder kind of applies to everything
+
+74
+00:06:23,475 --> 00:06:27,275
+而这个vendor文件夹和Hazel只是Hazel需要的东西，那不是在根目录
+whereas this vendor folder and Hazel is just kind of stuff that Hazel needs, that isn't house 
+
+75
+00:06:27,600 --> 00:06:34,375
+这是整个解决方案需要的东西，而不是？，在vendor内部，我将创建一个名为bin的目录
+this is stuff that the entire solution kind of needs, that isn't house, and inside vendor, I'll make a directory called bin
+
+76
+00:06:34,375 --> 00:06:42,229
+然后粘贴premake.exe，我甚至可以创建一个文件夹叫premake之类的
+and I'll paste in premake.exe, I could even kind of make maybe I'll make a folder called premake or something like that
+
+77
+00:06:42,575 --> 00:06:49,800
+把premake5放到这里，因为我还需要保留这个许可文件，点击raw，右键保存为
+put premake5 in there, because I also have to retain this license file, so if I just hit raw, I'm gonna right-click save as
+
+78
+00:06:50,225 --> 00:06:57,725
+然后保存这个许可，我将文本文件保存在这里，现在我在我们要提交的实际仓库中
+and then save that license I'll text file in here, okay, so now I am of course in in in our actual repository which we will commit
+
+79
+00:06:58,000 --> 00:07:02,550
+我们有premake.exe和许可证文件，好了，棒，那么继续，现在premake在这里
+we have premake.exe as well as that license file, okay, great, so there we go, premake is now in here
+
+80
+00:07:02,550 --> 00:07:05,775
+我们只需要一个二进制文件，不需要自己编译或者做任何类似的事情
+all we need is a binary, we don't need to compile it ourselves or do anything like that
+
+81
+00:07:06,100 --> 00:07:07,575
+那就是我们真正需要做的
+that's really all that we need to do
+
+82
+00:07:07,575 --> 00:07:14,100
+现在我们只需要创建一个文件，告诉premake，整个Hazel项目是什么，这样它就可以
+now we just need to create a file that basically just tells premake, what this whole Hazel project is, so that it can
+
+83
+00:07:14,425 --> 00:07:21,100
+所以premak可以生成你们知道的解决方案文件，Sandbox.vcxproj和Hazel.vcxxproj文件
+so the premak can then generate, you know, the solution files the Sandbox.vcxproj file, this Hazel.vcxproj file
+
+84
+00:07:21,375 --> 00:07:24,100
+我们的项目实际上意味着它将能够生成任何东西
+anything that our project actually means it will be able to generate
+
+85
+00:07:25,025 --> 00:07:29,075
+所以作为一个指导，如何做到这一点，再次强调，这不是一个premake的教程
+so as for a guide to how to do that, again, this is not intended to be a premake tutorial
+
+86
+00:07:29,325 --> 00:07:38,050
+但在维基里面，在premake库中，他们有一个很棒的维基，你们可以看到里面有很多东西
+but inside the wiki here, so in premake repository, they have a fantastic wiki, which you can see has like just a bunch of stuff
+
+87
+00:07:38,350 --> 00:07:43,925
+包括对你们的第一个脚本的这种很棒的指导，这样它们实际上就像这里的C文件一样编写
+including this  kind of great guide to your first script, so they actually write like a c file here
+
+88
+00:07:43,925 --> 00:07:48,380
+只是一个简单的C程序，就输出hello world，然后是一个premake的脚本
+just a C program, that just out hello world, and then a premake script
+
+89
+00:07:49,225 --> 00:07:52,475
+就像他们所说的，也就是premake.lua，你们可以看到文件的名字
+as they call it, which is just premake.lua, you can see the name of the file
+
+90
+00:07:52,775 --> 00:07:57,620
+它基本上只是说如何准确地定义这么简单的东西
+it basically just says how exactly to define something as simple as that 
+
+91
+00:07:57,620 --> 00:08:01,700
+你们可以看到它做了个工作空间，也就是VS的解决方案
+you can see what this does is workspace, just basically means solution for visual studio
+
+92
+00:08:02,000 --> 00:08:05,650
+所以我们创建了一个叫做HelloWorld的解决方案，有两个版本，调试和发布
+so we're creating a solution called HelloWorld with two configurations debug release 
+
+93
+00:08:06,375 --> 00:08:11,900
+然后我们创建一个实际的项目，在这个例子中，就像一个C  C#或C++作为项目
+then we're creating an actual project, this will be like a C C# C++ as project in this case
+
+94
+00:08:12,275 --> 00:08:15,850
+HelloWorld是一个控制台应用程序，这意味着它是一个可执行程序
+called HelloWorld which will be a console app, which means it's an executable 
+
+95
+00:08:17,150 --> 00:08:19,675
+这儿有一个targetdir，文件将被构建到该目录
+there's a targetdir, which is where the files will be built to
+
+96
+00:08:19,950 --> 00:08:22,100
+项目中应该包含的那些文件
+which files should be included in the project
+
+97
+00:08:22,100 --> 00:08:30,500
+所以基本上就是所有子目录中递归的头文件或C文件
+so basically anything in kind of child directories recursively that have header files or c files 
+
+98
+00:08:30,725 --> 00:08:37,000
+然后我们可以将特定的设置应用到特定的过滤器上，那么只用于调试配置
+and then we can apply certain settings to specific filters, so for just the debug configuration
+
+99
+00:08:37,175 --> 00:08:40,825
+例如，我们要应用调试，调试标志就会启用
+we're going to apply debug for example, and debug symbols will be turned on
+
+100
+00:08:41,150 --> 00:08:46,150
+但对于发布版本，我们会定义NDEBUG并开启优化
+but for release, we'll have NDEBUG defined and optimization turned on 
+
+101
+00:08:46,575 --> 00:08:51,475
+所以那只是关于premake原理一个非常基本的例子，我再次建议你们阅读这个
+so that's kind of just a really basic example of how premake work, again I suggest you read this
+
+102
+00:08:51,700 --> 00:08:55,275
+也许在未来，我将提出一个更详细的premake教程
+maybe in the future, I'll come up with a more detailed premake tutorial 
+
+103
+00:08:55,275 --> 00:08:58,975
+但在这种情况下，这或多或少只是在Hazel中使用premake
+but of course in this case, this is more or less just using premake in Hazel 
+
+104
+00:08:58,975 --> 00:09:03,170
+并且那就是我们现在想要实现的，那么回到Hazel目录
+and that's what we want to achieve right now, so popping over to our Hazel directory 
+
+105
+00:09:03,170 --> 00:09:06,050
+右键点击新项，然后创建一个新的文本文档
+I'm going to right click hit new, and then create a new text document 
+
+106
+00:09:06,375 --> 00:09:09,800
+也就是premake5.lua
+which is going to be called premake5.lua
+
+107
+00:09:09,800 --> 00:09:13,950
+好了，你们可以看到，这和他们在这里做的格式是一样的，对吧
+okay, which is as you can see the same format that they've kind of done here, right
+
+108
+00:09:14,200 --> 00:09:18,600
+并且然后我不会复制很多，我想我要自己打出来
+and then I'm not really gonna copy a lot of this, I think I'm just going to type it up myself 
+
+109
+00:09:18,975 --> 00:09:23,975
+但基本上我们要做的就是，把这个premake5文件拖到VS中
+but we're basically just going to make, I'll drag this premake5 file into visual studio
+
+110
+00:09:23,975 --> 00:09:30,430
+我们只需要做我们的premake.lua，那么这里是工作区，就叫Hazel
+and we're basically just gonna make our premake.lua here, so workspace of course, I'm gonna call Hazel
+
+111
+00:09:31,075 --> 00:09:35,875
+好了，所以这个Hazel工作区也就是这个解决方案，你们可以看到，它叫做Hazel
+okay, so this Hazel workspace is kind of this solution, you can see, it's called Hazel
+
+112
+00:09:35,875 --> 00:09:43,600
+它就是这样的，它的体系结构是x64，对吧
+that's what it's going to be, the architecture for this is going to be x64, okay
+
+113
+00:09:44,525 --> 00:09:46,730
+我似乎在这儿遇到了麻烦
+I seem to be struggling with courts here
+
+114
+00:09:47,300 --> 00:09:51,175
+基本上，架构就是我们真正想要处理的平台
+basically the architecture is just the platform that we actually want to deal with
+
+115
+00:09:51,175 --> 00:09:55,010
+在这种情况下，我们已经决定了，不想处理32位的
+which in this case we have decided, we don't want to deal with 32-bit
+
+116
+00:09:55,010 --> 00:09:59,180
+现在就是x64，并且就是那样，对于这个的配置，你们可以看到
+right now just x64, and that's it, and then for the configurations of this, you can see
+
+117
+00:09:59,180 --> 00:10:01,875
+我们有调试和发布，这是默认的
+that we've kind of got debug and release, which is the default for now 
+
+118
+00:10:01,875 --> 00:10:06,650
+但实际上我要加上第三个，这样我们就有了配置
+but I am actually going to add a third one, so we'll have our configurations 
+
+119
+00:10:06,650 --> 00:10:12,250
+我们会有Debug，当然那只是我们习惯的调试配置
+we're gonna have Debug, which of course is just the debug configuration that we are used to
+
+120
+00:10:12,250 --> 00:10:17,175
+以及Release，然后我还会添加Dist，那么以后我们可能会讲到这三个
+the Release one, and then I'm also going to add something called Dist,  so we might talk about these three in the future
+
+121
+00:10:17,175 --> 00:10:23,720
+你们会看到它们的原理，也许在这里也一样，但Debug基本上就是完全调试代码
+you'll kind of see how they work, maybe in here as well, but Debug is basically just full-on just debug code
+
+122
+00:10:23,720 --> 00:10:30,830
+我们用来开发的所有东西都会启用，在Release配置时就不太必要了，Release模式
+everything enabled that we kind of used to develop, in Release is kind of not necessarily, the Release mode 
+
+123
+00:10:30,830 --> 00:10:34,150
+我们订购了它，发布了它，我们把它发送给人们
+that we kind of order it, the release build that, we actually send out to people 
+
+124
+00:10:34,425 --> 00:10:39,350
+但这只是一种调试，但去掉了很多调试信息后，启用了优化
+but it's just kind of debug, but with a lot of debug information stripped, optimizations turned on
+
+125
+00:10:39,500 --> 00:10:43,000
+但其他功能，比如日志记录，仍然是启用的
+but other things such as logging for example still actually enabled
+
+126
+00:10:43,400 --> 00:10:47,700
+所以这就像是一个更快的调试版本，它做的也更少
+so it's like a faster version of debug essentially, that will also do less
+
+127
+00:10:48,075 --> 00:10:51,320
+然后发行版实际上是一切，去除了一切
+and then distribution is actually everything, kind of stripped everything
+
+128
+00:10:51,320 --> 00:10:55,025
+只是完整的发行版构建，完全没有日志记录或任何东西之类的
+just out complete distribution build with absolutely no logging or anything like that
+
+129
+00:10:55,700 --> 00:11:00,200
+那就是关键点，我们当然会在这个系列的未来看到它是如何运行的
+that's kind of the idea, and we'll of course see how this works in the future of this series 
+
+130
+00:11:00,500 --> 00:11:07,350
+并且之后，我想创建一个名为Hazel的项目，这个项目是相应的
+and then after that, I actually want to create a project called Hazel, so this project is kind of corresponding
+
+131
+00:11:07,350 --> 00:11:11,750
+因为它被称为一个项目，在工作空间上，它有点像Hazel项目
+because it's called a project, and on a workspace, it's kind of corresponding to this Hazel project
+
+132
+00:11:11,750 --> 00:11:15,950
+那么基本上就是我们放到属性里的东西，比如你们知道的
+so basically stuff that we've put in here into properties, such as you know
+
+133
+00:11:15,950 --> 00:11:25,775
+预处理器，比如你们看到的HZ_PLATFORM_WINDOWS, HZ_BUILD_DLL, _WINDLL
+our preprocessor, stuff which you can see is a HZ_PLATFORM_WINDOWS, HZ_BUILD_DLL, _WINDLL, you know 
+
+134
+00:11:25,775 --> 00:11:30,975
+现在就拷贝这些，但你们知道，像这样的东西以及它包含的所有文件
+copy these right now, but you know, stuff like that as well as all the files it includes
+
+135
+00:11:31,450 --> 00:11:35,750
+那就是我们想要放到这里的，因为这是我们的项目
+that's kind of what we actually want to put into here, because this is our project
+
+136
+00:11:36,925 --> 00:11:40,850
+所以我首先要做的是，指定这个的location
+so what I'll do is first of all, specify the location of this
+
+137
+00:11:41,200 --> 00:11:47,025
+所以我们希望我们的premake文件在Hazel根目录中
+so we want it to kind of our premake file is inside our Hazel root directory 
+
+138
+00:11:47,025 --> 00:11:51,929
+但你们看到的，Hazel项目在Hazel文件夹中，那么为了指定那个
+but you can see, the Hazel project is inside a Hazel folder, so to kind of specify that
+
+139
+00:11:51,929 --> 00:11:56,275
+我将输入Hazel，那将确保所有东西都相对于这个路径
+I'm going to type in location Hazel, and that'll make sure that everything will be relative to this path 
+
+140
+00:11:56,475 --> 00:12:01,025
+比如我们生成的所有项目文件都会被放到那个路径中
+as well as everything that we like the project files we generate will actually be placed into that path
+
+141
+00:12:01,250 --> 00:12:04,550
+你们可以看到，我们当然希望这些vcxproj文件在Hazel中
+you can see we of course want these vcxproj files to be inside Hazel
+
+142
+00:12:04,700 --> 00:12:06,625
+而不是在我们的解决方案文件中
+and not alongside our solution file 
+
+143
+00:12:06,750 --> 00:12:11,500
+现在我需要设置它的类型，它基本上是一个可执行的应用程序
+now I need to set the kind that it is, so basically is it like an application executable
+
+144
+00:12:11,650 --> 00:12:16,300
+它只是动态库中的静态库，因为它是动态库
+is it just a static libraries at a dynamic library, because it's a dynamic library
+
+145
+00:12:16,300 --> 00:12:22,275
+你们会看到它是一个SharedLib，因为这是指定它的正确方式，它是一个dll文件
+you would see that it's a SharedLib, because that's the correct way to specify that, it's a dll file
+
+146
+00:12:22,600 --> 00:12:26,675
+在premake中，共享库与动态库相同，然后是语言
+inside premake, shared libraries the same as a dynamic library, and then the language
+
+147
+00:12:26,675 --> 00:12:33,750
+我们要指定的是C++，好了，酷，那么现在我们指定了一个目标目录
+we're gonna specify is C++, okay, cool, so now we specified like a target directory essentially 
+
+148
+00:12:34,050 --> 00:12:37,975
+那么这将输出到哪里，你们可以看到，我们想要bin
+so where is this going to be output to, you can see, we kind of wanted to be bin
+
+149
+00:12:37,975 --> 00:12:41,450
+然后是debug x64，然后是项目名等等
+then debug x64 and then the project name and all of that
+
+150
+00:12:41,700 --> 00:12:45,300
+那么那就是我们在这里设置的，所以它就是bin
+so that's basically what we're setting up here, so it's going to bin
+
+151
+00:12:45,950 --> 00:12:50,050
+然后我要做的是因为我们要重复使用很多次
+and then what I'm actually gonna do is because we'll have to reuse as a bunch of time
+
+152
+00:12:50,050 --> 00:12:55,750
+我要在这里创建一个变量叫做outputdir，对吧
+I'm actually gonna create a variable here called outputdir, right 
+
+153
+00:12:56,000 --> 00:13:03,300
+它基本上会使用一些premake的标志，我不知道是否有好的页面
+which will basically use a bunch of kind of tokens that premake supplies us with, I don't know if there's a good page
+
+154
+00:13:03,300 --> 00:13:07,950
+当然有一个关于标志的好页面，它基本上只指定了一堆宏
+well there definitely is a good page on tokens, which basically just specifies a bunch of macros
+
+155
+00:13:07,950 --> 00:13:14,150
+那么也就是说，你们可以使用，那么比如cfg.longname，file.name
+so to speak, that you can actually use, so stuff like the cfg.longname, the file.name
+
+156
+00:13:14,150 --> 00:13:19,825
+[target].relpath，wrk.location，所有这些都可以作为宏使用
+the [target].relpath, the wrk.location, all that stuff you can kind of use as macros
+
+157
+00:13:19,825 --> 00:13:24,375
+这和我们在VS中使用的方法是一样的
+the same way that we kind of have done inside Visual Studio where we've actually used 
+
+158
+00:13:24,375 --> 00:13:28,829
+比如你们知道的，$(SolutionDir)或$(Platform)或$(Configuration)之类的东西，对吧
+you know, the $(SolutionDir) or the $(Platform) or the $(Configuration) that kind of stuff, right
+
+159
+00:13:29,675 --> 00:13:34,625
+所以我要做的是基于这些东西构造我的另一个目录
+so what I'm going to do is just kind of construct my other directory based off of those things
+
+160
+00:13:34,625 --> 00:13:39,233
+所以我们在这里要使用的第一个是%\{cfg.buildcfg\}
+so the first one that we're going to use here is going to be doing the %\{cfg.buildcfg\}
+
+161
+00:13:40,950 --> 00:13:49,850
+那么这将是我们是Debug或者Release，然后我想先包含系统，对吧，就是%\{cfg.system\}
+so this will basically be whether our is Debug or Release, then I want to include the system, right, %\{cfg.system\}
+
+162
+00:13:51,025 --> 00:13:53,975
+设置系统的结构，然后我还会有架构
+and then I'm going to also have the architecture
+
+163
+00:13:53,975 --> 00:13:56,639
+这和我们之前做的有点不同
+this is a little bit different than what we actually had
+
+164
+00:13:57,175 --> 00:14:02,175
+因为系统会看它是Windows还是Mac之类的
+because the system is going to basically see whether or not it's Windows or Mac or something like that
+
+165
+00:14:02,175 --> 00:14:07,050
+对吧，因为如果我们只调试x64，那可能是在Mac上，对吧
+right, because if we just have kind of debug x64 we'll, that could be on Mac, right
+
+166
+00:14:07,350 --> 00:14:12,950
+并且因为我们想让它成为通用的，跨平台的
+and since we're kind of trying to make this be universal, like basically be cross-platform
+
+167
+00:14:13,225 --> 00:14:17,025
+我想我们实际上需要多种系统支持
+we actually need to have  multiple kind of system support I guess
+
+168
+00:14:18,175 --> 00:14:22,225
+这样我们就能区分像这样的东西，那么就是%\{cfg.architecture\}，好了
+so that we actually differentiate between stuff like that, so %\{cfg.architecture\}, okay
+
+169
+00:14:22,450 --> 00:14:27,975
+那将生成调试Windows x64之类的东西，这是我们需要的，现在我们将获取它
+and that will generate something like debug Windows x64, which is what we need and now we'll take that
+
+170
+00:14:27,975 --> 00:14:32,110
+然后像这样把它加到这里，然后继续
+and we'll append it to this like that, and then we'll also continue here
+
+171
+00:14:32,110 --> 00:14:41,975
+因为我们现在需要实际的项目名，那么就是/%\{proj.name\}，好了，并且就是那样
+because we now need the actual project name, so slash and then %\{proj.name\}, okay, and that is it
+
+172
+00:14:42,150 --> 00:14:47,000
+那么我们会把一切都放到bin，然后是Debug Windows x64，然后是Hazel
+so we're putting everything in bin,  and then like Debug Windows x64 and then Hazel 
+
+173
+00:14:47,150 --> 00:14:52,800
+那将是我们二进制文件的输出目录，现在我们需要做同样的事情
+that will be the kind of output directory for our binaries, and now we need to do the same thing
+
+174
+00:14:52,800 --> 00:14:56,700
+但就像我们对bin-int做的一样，这是我们的中间目录
+but as we did for bin-int, which is our kind of intermediates 
+
+175
+00:14:57,025 --> 00:15:01,675
+所以我们指定它的方式基本上是写objdir，对吧
+so the way that we specify that is basically by just writing obj directory, right 
+
+176
+00:15:01,950 --> 00:15:08,100
+并且那就是bin-int，我想有人问为什么我称这个文件夹为bin-int
+and that we have bin-int, I think someone asked why I call this folder bin-int
+
+177
+00:15:08,100 --> 00:15:14,875
+而不是像obj那样的对象，我做得很好原因之一是这里很好地分组在一起
+and not something like obj like object, I did that well one of the reasons was that the nicely grouped up here 
+
+178
+00:15:14,875 --> 00:15:17,790
+很好，我想删除这些东西，就在这里，bin bin-int
+so fine, I want to delete these or whatever they just right there bin bin-int
+
+179
+00:15:17,790 --> 00:15:22,625
+就是那样，如果我有obj排序在下面的某个地方，在这个例子中是Hazel
+that's it, if I had obj will be sorted somewhere below, you know, Hazel in this case 
+
+180
+00:15:23,325 --> 00:15:26,850
+并且它会更少一点组合在一起，更少一点简洁
+and it'll just be a little bit less kind of grouped together, and a little bit less clean
+
+181
+00:15:26,850 --> 00:15:30,300
+所以那就是我喜欢这样做的原因，好了，并且现在我们就可以定义文件了
+so that's why I prefer to do it this way, okay, and now we can define the files 
+
+182
+00:15:30,300 --> 00:15:33,500
+我们想要包含在这里，那么就是files
+that we actually want to include inside here, so I'll see files 
+
+183
+00:15:33,975 --> 00:15:36,471
+并且然后基本上我们会有我们想要的文件列表
+and then we'll basically just have a list of files that we want 
+
+184
+00:15:36,775 --> 00:15:42,325
+当然，所有东西都在项目名中，对吧
+now everything of course is kind of inside the project name, right
+
+185
+00:15:42,325 --> 00:15:47,075
+所以项目的名字是Hazel再好不过了，正好就在这里
+so the perfect the project name is Hazel, which happens to be the location here
+
+186
+00:15:47,800 --> 00:15:55,980
+所以我会看到这些文件在%\{proj.name\}中，然后就是/src
+so what I'll do is I'll see these files are kind of inside project name, and then /src 
+
+187
+00:15:55,980 --> 00:16:00,250
+然后我们补充一个**，意思是递归搜索文件夹
+and then we'll do a double star, which basically means recursively search the folders
+
+188
+00:16:00,250 --> 00:16:05,350
+从这个文件夹下载到子文件夹上，.h文件，对吧
+from that folder kind of downloads right over the child folders .h, right
+
+189
+00:16:06,150 --> 00:16:12,225
+那么就是.h文件和.cpp文件，如果我们有比如.hpp文件或.c文件之类的呢
+so .h files and .cpp files, now if we have like hpp files or .c files
+
+190
+00:16:12,225 --> 00:16:15,600
+可能也会包含这些，但因为我们现在没有这些
+that's something that we also might include, but since we don't have any of that right now
+
+191
+00:16:15,900 --> 00:16:20,400
+我不用担心那个，基本上就是每个.h文件和每个.cpp文件
+I'm not going to worry about that, just basically every .h file and every .cpp file 
+
+192
+00:16:20,400 --> 00:16:28,850
+它在src目录中，应该被包含，在这里，好了，并且现在我还要写includedirs
+that is inside the src directory, should be included, inside here, okay, and now I'll also do the include directories
+
+193
+00:16:28,850 --> 00:16:36,475
+所以我想我们最终使用的包含目录，其实就是spdlog，对吧
+so I think the include directories that we actually ended up using, we're really just spdlog, right 
+
+194
+00:16:37,225 --> 00:16:44,550
+那么这就是我现在要做的，这只是一种，我想我们有一个特定的例子
+so that's what I'll do for now, this will simply just kind of be, I think we had a specific one though
+
+195
+00:16:44,550 --> 00:16:50,175
+让我们复制它，那么就是Hazel/vendor，至于Hazel，我们可以保留，然后是spdlog
+let's just copy it, so Hazel vendor, Hazel, we can keep, and then just vendor spdlog
+
+196
+00:16:50,175 --> 00:16:58,925
+总结一下，好了，我看到这里，我们将复制%\{proj.name\}/
+I'll conclude, okay, sure, so I will see over here, we'll grab a %\{proj.name\}/
+
+197
+00:16:59,950 --> 00:17:09,550
+我猜是%\{proj.name\}，没有src，就是%\{proj.name\}/vendor/spdlog/include，应该是正确的
+I guess %\{proj.name\}, no src, so %\{proj.name\}/vendor/spdlog/include, that should be correct
+
+198
+00:17:09,550 --> 00:17:15,825
+因为我们应该在Hazel vendor中，然后spdlog/include，好了，棒，酷
+because we should be in Hazel vendor, Hazel vendor, and then spdlog include, okay, great, cool
+
+199
+00:17:17,100 --> 00:17:20,275
+那么我们继续，就是那样，includedirs暂时就是这样了
+so there we go, that's that, we'll be out front of solve includes directory for now
+
+200
+00:17:20,500 --> 00:17:23,730
+但如果我们决定加入其他东西，很明显，随着我们的发展
+but if we decide to include other things, obviously as we, as we go along 
+
+201
+00:17:23,730 --> 00:17:28,200
+我们把它加到这个列表中，好了，现在我们可以讨论常量定义了
+we will just add it to this list, okay, so now we can talk about const defines
+
+202
+00:17:28,200 --> 00:17:33,250
+这些显然是Windows特有的定义，所以现在是引入过滤器的好时机
+now these are obviously Windows specific defines, so this is a good time to actually introduce filters 
+
+203
+00:17:33,725 --> 00:17:37,925
+所以我们可以使用过滤器来查看我们有某些项目类型的配置
+so we can use filters to see that we have certain project kind of configurations 
+
+204
+00:17:38,525 --> 00:17:42,675
+或者我们只想应用于特定平台的其他特定类型的程序属性
+or other certain kind of program properties that we only want to apply to like a certain platform
+
+205
+00:17:42,675 --> 00:17:47,425
+例如，那么在这个例子中，我们来看看，如果系统是Windows
+for example, so in this case, we'll see, if the system is of Windows
+
+206
+00:17:47,425 --> 00:17:52,575
+其他所有东西过滤器标签下面的所有东西，都不重要
+then kind of everything else everything underneath this filter tabs, don't actually matter
+
+207
+00:17:52,575 --> 00:17:56,300
+顺便说一下，缩进一点都不重要，我只是在这里用它，这样更容易读一些
+by the way, indentation doesn't matter at all, I'm just using it here, so that it's more readable 
+
+208
+00:17:56,550 --> 00:18:01,825
+但基本上是这个过滤器下面的任何东西，直到我们到达另一个过滤器或其他项目
+but basically anything underneath this filter, until we either reach another filter or another project 
+
+209
+00:18:01,825 --> 00:18:10,975
+或者只适用于Windows，那么对于Windows，我们会设置我们的cppdialect成C++17
+or something only applies to Windows, so for Windows we'll set our cppdialect to C++17
+
+210
+00:18:10,975 --> 00:18:16,575
+我只设置Windows的原因是，在其他编译中
+the reason I'm setting this just for Windows by the way is because in other for other compiles 
+
+211
+00:18:16,575 --> 00:18:19,925
+我们可能需要一个特定的编译标志
+we actually might need to have like a specific compile flag 
+
+212
+00:18:20,175 --> 00:18:23,130
+而不是随意设置这种cppdialect
+rather than just being able to arbitrarily set this cppdialect
+
+213
+00:18:23,200 --> 00:18:31,600
+因为premake编译器不支持这一点，所以staticruntime将设置为启用
+because that's not kind of supported by premake compilers, the staticruntime will set turn on
+
+214
+00:18:31,600 --> 00:18:38,350
+与连接运行时库有关的，我们显然想要静态地连接它们
+which kind of has to do with linking the runtime libraries, we want to obviously link them statically in this case 
+
+215
+00:18:38,900 --> 00:18:43,188
+然后我要做的是创建一个叫做systemversion的东西
+and then what I'll do is actually create something called systemversion here now
+
+216
+00:18:43,725 --> 00:18:48,225
+现在我要做的就是复制上面这个版本
+what I want to do for this is I'm just going to copy the version that we have up here
+
+217
+00:18:48,225 --> 00:18:51,425
+Windows SDK版本，粘贴到这里
+the Windows SDK version, and just paste it in here
+
+218
+00:18:51,425 --> 00:18:55,110
+我们需要这样做的原因是如果你们根本不指定这个
+the reason that we need to do this is because if you don't specify this at all
+
+219
+00:18:55,450 --> 00:19:01,525
+那么premake就会生成Windows 8.1, Windows SDK版本，对吧
+then premake will actually generate a Windows 8.1, Windows SDK version, right
+
+220
+00:19:01,525 --> 00:19:06,350
+不是每个人都安装了，比如，我的笔记本电脑上没有安装这个
+which not everyone has installed, for example, I didn't actually have this installed on my laptop 
+
+221
+00:19:06,350 --> 00:19:11,750
+所以我必须手动重新定位解决方案，这很烦人，所以我们就这样做，我们可能
+and so I had to manually retarget the solution, that's annoying, so we'll just go with this, we might 
+
+222
+00:19:12,120 --> 00:19:17,500
+如果有办法把它变成10，用x表示latest，我会这么做，但我不认为有办法
+if there was a way to just change to like 10.x low just to use latest, I would do that, but I don't think there's a way
+
+223
+00:19:17,500 --> 00:19:23,360
+所以如果现在我们要让它保持在我电脑上安装的版本，就像这样
+so if now we're just gonna leave it on just the version that I happen to have installed on my computer just like that
+
+224
+00:19:24,150 --> 00:19:28,350
+最后我们来讨论一下定义，那么这是我们的三个定义
+and now finally we can talk about the defines, so these are our three defines
+
+225
+00:19:28,350 --> 00:19:34,300
+复制粘贴到这里，HZ_PLATFORM_WINDOWS，HZ_BUILD_DLL
+let's copy them paste them into here, HZ_PLATFORM_WINDOWS, HZ_BUILD_DLL
+
+226
+00:19:34,300 --> 00:19:39,300
+并且还有_WINDLL，我们可能不会用到
+and the kind of _WINDLL as well, which we probably aren't using anywhere 
+
+227
+00:19:39,300 --> 00:19:45,025
+我可以说我们可能不需要它，事实上，我现在可能会承认，那只是一些东西
+I was go as far to say we probably don't need it, in fact, I might admit it for now, that's just something 
+
+228
+00:19:45,025 --> 00:19:49,550
+它是由VS自动生成的，当我们实际创建一个新的dll项目时
+that was automatically generated by Visual Studio, when we actually created a new kind of dll project
+
+229
+00:19:49,550 --> 00:19:53,275
+我认为即使我认为我们确实创建了一个空项目，但我不确定
+I think even though I think we did create an empty project, not sure of it 
+
+230
+00:19:53,275 --> 00:19:58,940
+但无论如何，当dll是在任何地方使用，我只是快速检查整个解决方案
+but anyway yeah, when dll is that used anywhere, I just quickly check the entire solution
+
+231
+00:19:59,775 --> 00:20:04,850
+它不是，所以我现在就省略它，我们看看这会不会破坏什么
+it's not, so I'm going to omit it for now, and we'll see if that breaks anything
+
+232
+00:20:05,875 --> 00:20:15,850
+好了，最后，我还想为Windows创建一个post构建步骤到Hazel
+okay, and then finally what I want to do for Windows as well is kind of create a post build step to Hazel 
+
+233
+00:20:15,850 --> 00:20:21,690
+这实际上把dll放到了我们想要的位置，因为你们可以看到，每次我们构建这个
+that actually puts the dll where we want it to be, because you can see that, every time we kind of built this 
+
+234
+00:20:21,690 --> 00:20:26,040
+我们必须手动将dll文件从Hazel复制到Sandbox中，我真的不想这样做
+we had to manually copy the dll file from Hazel into Sandbox, I don't really want to do that
+
+235
+00:20:26,350 --> 00:20:31,625
+所以我要添加一个postbuildcommands，它能做到这一点，这是最安全的地方
+so I'm just gonna add a postbuildcommands, that actually does that so the safest place to add
+
+236
+00:20:31,625 --> 00:20:35,550
+它实际上对我们实际的Hazel项目有一个postbuildcommand指令操作
+it actually has a postbuildcommand to our actual Hazel project
+
+237
+00:20:37,425 --> 00:20:40,625
+COPY实际上是premake提供的一个指令
+COPY is a command that actually comes with premake
+
+238
+00:20:41,050 --> 00:20:47,350
+他们确实有一些指令，我不知道，postbuildcommand实际上是，我想会的
+they've got a few, I don't know, postbuildcommand will actually be yeah, I guess it will 
+
+239
+00:20:48,325 --> 00:20:51,375
+你们可以看到wiki实际上有一个COPY的例子
+you can see that the wiki actually has an example of COPY stuff
+
+240
+00:20:52,650 --> 00:20:56,162
+所以那是我们最好的做法，那么我们输入COPY
+so that's best what we're going to do, so we're going to type and COPY
+
+241
+00:20:58,500 --> 00:21:05,700
+然后我们会从配置中复制构建目标相对路径
+and then we'll we'll copy from the configuration build target relative path
+
+242
+00:21:06,150 --> 00:21:13,150
+先到…/bin，那么就是我们向上一个目录到bin文件夹
+which is that into ../bin, so we're going up a directory into the bin folder
+
+243
+00:21:14,650 --> 00:21:21,075
+然后是输出目录变量，然后是/Sandbox，好了
+and then into the output directory variable, and then into /Sandbox, okay
+
+244
+00:21:21,275 --> 00:21:26,050
+所以基本上，在Hazel中，它会去到bin目录
+so basically what this is going to do is just in Hazel, it's going to go to the bin directory 
+
+245
+00:21:26,050 --> 00:21:33,925
+然后将Hazel/Hazel.dll复制到Sandbox到Sandbox目录中，这样我们就有了，好了
+and copy Hazel/Hazel.dll into Sandbox into the Sandbox directory, so that we have alongside there, okay
+
+246
+00:21:34,600 --> 00:21:41,375
+接下来我要去创建一个过滤器，这是我们的configurations:Debug过滤器
+next I'm going to go and create a filter, there's going to be our configurations Debug filter
+
+247
+00:21:41,375 --> 00:21:45,925
+好了，那么这个过滤器只适用于我们的调试配置
+okay, so this filter will kind of only apply to our debug configuration
+
+248
+00:21:46,375 --> 00:21:51,000
+所以我想做的是为Debug配置定义HZ_DEBUG
+so what I want to do is define for the debug configuration HZ_DEBUG
+
+249
+00:21:51,000 --> 00:21:57,550
+好了，我们还会有调试符号打开，复制这个
+okay, and also we're gonna have debug symbols and on, I'll copy this 
+
+250
+00:21:57,550 --> 00:22:04,200
+我们会再粘贴两次，对于Release，我当然会用HZ_RELEASE
+and we'll kind of paste it two more times, for Release, I'm going to use HZ_RELEASE of course 
+
+251
+00:22:05,650 --> 00:22:14,000
+优化会打开，优化打开，然后这个就是Dist配置
+optimization will be turned on, so optimize on, and then this one will be our Dist configuration
+
+252
+00:22:14,675 --> 00:22:21,050
+将会定义HZ_DIST，然后对它进行优化
+which will have HZ_DIST defined and then optimization on it as well
+
+253
+00:22:21,050 --> 00:22:25,600
+那么那就是现在要做的，保持这个简单，现在快速注释
+so that's all will do for now to keep this nice and simple, now quick note
+
+254
+00:22:26,125 --> 00:22:28,025
+当你们像这样使用不同的过滤器时
+when you use a different filter like this 
+
+255
+00:22:28,025 --> 00:22:34,225
+它实际上是完全的，只是这个，这并不是，这个只是Windows和调试，它只是调试
+it actually is completely, it's only today, it's only this, this isn't, now Windows and debug, it's just debug 
+
+256
+00:22:34,525 --> 00:22:38,950
+如果你们想要同时执行这两种操作，那么必须同时指定这两种筛选器选项
+if you want to do both, then you have to specify both of the kind of filter options 
+
+257
+00:22:38,950 --> 00:22:41,120
+那么举个例子，我们在这里也要做
+so for example, what we'll do here as well
+
+258
+00:22:41,950 --> 00:22:48,200
+设置为使用MT，这儿就是库，我们看到这里就是个过滤器
+set it to kind of use multi-threaded, library here, we'll just see filters
+
+259
+00:22:48,200 --> 00:22:54,850
+你们可以看到，我是如何被填充的，抱歉，是过滤器，但我实际上在这里用了个大括号
+you can see, how I've been filled, ah sorry, filter, but I've actually opened up a Kelly bracket here 
+
+260
+00:22:54,850 --> 00:23:00,725
+因为我在这里指定了多个选项，所以基本上为Windows和Release
+because I'm specifying multiple options here, so have serve basically for Windows and Release
+
+261
+00:23:01,675 --> 00:23:11,600
+举个例子，实际上我们会设置，你们知道的，就是buildoptions /MT
+as an example, we're actually going to set, you know, buildoptions /MT for example
+
+262
+00:23:11,925 --> 00:23:20,030
+这基本上等价于到这里，进入命令行，输入MT，哦，应该是/MT
+which is basically the equivalent of just going over here, into command line, and doing a MT, oops,  /MT
+
+263
+00:23:20,750 --> 00:23:26,190
+在这种情况下，它只是告诉我们使用多线程运行时库
+which in this case, it just tells us to use the multi-threaded runtime library
+
+264
+00:23:26,190 --> 00:23:28,950
+就像这里看到的，但我们现在不考虑这个
+as seen here okay, but we won't worry about this for now
+
+265
+00:23:29,450 --> 00:23:32,490
+这只是一个我们将来可能会回到的例子
+this that's just an example that we might come back to in the future
+
+266
+00:23:32,490 --> 00:23:37,925
+好的，很好，不管怎样，就是这样，所以这就是我们整个Hazel的结构
+okay, cool, anyway, that's it, so that is our entire Hazel kind of configuration right here
+
+267
+00:23:38,775 --> 00:23:43,125
+我认为这很简单，希望它很容易理解
+I think that's pretty simple, hopefully it's fairly easy to understand
+
+268
+00:23:43,725 --> 00:23:49,475
+我想我已经解释得相当全面了，我不认为还有什么我真正要说的，除了
+I think I explained it fairly comprehensively, I didn't think there's much else like I really say apart from
+
+269
+00:23:49,475 --> 00:23:54,150
+如果你们完全不懂，那就去看看premake和wiki
+if you don't understand any of it or some of it, then just referred to premake and the wiki
+
+270
+00:23:54,575 --> 00:23:57,500
+也许你们可以通过建立自己的C++项目来练习
+and maybe just practice by creating your own C++ project 
+
+271
+00:23:57,500 --> 00:24:00,125
+然后使用premake制作，尝试从那里快速生成
+and then using premake try and generate fast from there
+
+272
+00:24:00,250 --> 00:24:03,450
+好了，酷，无论如何，我们现在需要创建一个Sandbox项目
+okay, cool, so anyway, we now need to create a Sandbox project
+
+273
+00:24:05,250 --> 00:24:09,902
+它将是我们的Sandbox项目，location将是Sandbox
+it's gonna be our Sandbox project, the location is going to be Sandbox
+
+274
+00:24:11,625 --> 00:24:19,530
+类型将是控制台，而不是一个共享库，语言仍将是c++
+the kind is going to be console at this time, instead of a shared library, language will still be C++ 
+
+275
+00:24:19,530 --> 00:24:21,825
+我们复制一些这样的东西
+let's just copy a bunch of these things really
+
+276
+00:24:21,825 --> 00:24:25,225
+顺便说一下，我想我能做的就是复制大部分内容
+what I could do by the way is just copy like most of this I think 
+
+277
+00:24:26,050 --> 00:24:29,370
+因为这很简单，所以我复制所有这些
+because it's gonna be fairly simple, so I'll copy all of this
+
+278
+00:24:29,775 --> 00:24:39,725
+那么在Sandbox中，我们有一个控制台应用，语言是c++，目标目录也是一样的
+so inside Sandbox, we have a console app, language will be C++, and target directory will be the same 
+
+279
+00:24:39,725 --> 00:24:42,475
+因为我们用过类似这样的项目名和宏
+because we've used kind of project name and macros like that 
+
+280
+00:24:42,475 --> 00:24:47,200
+我们可以直接复制粘贴它，当它需要更改时，至于文件
+we can literally just copy and paste it, when it needs changing, files will have
+
+281
+00:24:47,200 --> 00:24:51,250
+那是完全相同的，包含目录会有一点不同
+that'll be exactly the same, include directories will be a little bit different
+
+282
+00:24:51,250 --> 00:24:55,625
+所以我们仍然需要spdlog包含在这里
+so we do still need that kind of spdlog include here 
+
+283
+00:24:56,200 --> 00:25:04,500
+而我们实际可以用的，或者说我想用的
+but what we actually can use, or rather what I will want to use
+
+284
+00:25:04,500 --> 00:25:11,875
+因为这里我们只包含了Hazel.h，通过编译器编译器包含路径
+because I think we just include Hazel.h here, kind of by a compiler a compiler include path 
+
+285
+00:25:11,875 --> 00:25:17,000
+因为你们可以看到Hazel的src指向这里，所以我可以做什么
+because we actually have you can see Hazel src pointing here, so what I can do
+
+286
+00:25:17,675 --> 00:25:24,050
+我需要做的是在过滤器system:windows下，在这里添加Hazel/src作为包含路径
+what I'll need to do is also add Hazel src as an include path here, under filter system:windows
+
+287
+00:25:24,050 --> 00:25:27,450
+这基本上是一样的，当然我们需要构建dll的东西
+this will basically be the same, of course we need to build  dll thing
+
+288
+00:25:28,000 --> 00:25:30,175
+这个HZ_PLATFORM_WINDOWS依然需要被定义在这儿
+the HZ_PLATFORM_WINDOWS should still be defined 
+
+289
+00:25:30,175 --> 00:25:36,575
+我们也不需要这个postbuildcommands了，至于配置Debug，Release和Dist
+we don't need this postbuildcommands either, configuration Debug Release and Dist
+
+290
+00:25:36,675 --> 00:25:41,070
+这是完全一样的，所以这里我们需要定义一个东西
+kind of remains exactly the same though, so one thing that we need to define here
+
+291
+00:25:41,070 --> 00:25:48,125
+我们在Hazel中没有做的，是实际的链接，所以Sandbox需要在Hazel中链接
+that we didn't do of course inside Hazel, is the actual link, so Sandbox need to needs to link in Hazel 
+
+292
+00:25:48,125 --> 00:25:52,400
+并且我们只需要输入links，然后就是项目名称
+and all we just do for that is to type in links, and then the name of the project
+
+293
+00:25:52,400 --> 00:25:58,125
+所以这里是Hazel，并且就是那样，所以你们可以看到premake很容易使用
+so Hazel, and that is it, so you can see that premake is quite easy and nice to use 
+
+294
+00:25:58,450 --> 00:26:07,200
+我们真的没有什么可以把它复杂化的，一点也没有，好了，就那样，搞定
+and we really don't have anything to complicate it, I don't think here at all, okay, that's it, we're done
+
+295
+00:26:07,450 --> 00:26:11,925
+那么接下来我要做几件事，首先，在Hazel目录中
+so now what I'm going to do is a few things, first of all, in our Hazel directory
+
+296
+00:26:11,925 --> 00:26:17,400
+实际上就是删除bin和bin-int，好了，因为那是编译的结果
+I'm actually going to delete bin and bin-int, okay, because that stuff that is a result of compilation 
+
+297
+00:26:17,400 --> 00:26:19,600
+那么，很明显，我们可以很容易地重新生成
+so obviously, we should be able to regenerate that easily 
+
+298
+00:26:20,525 --> 00:26:25,075
+我还可以删除Hazel.sln文件，以及这些vcxproj文件等等
+I could also delete the Hazel.sln file and also the project files and all that stuff
+
+299
+00:26:25,075 --> 00:26:29,450
+我就不麻烦了，因为premake会帮我们重新生成
+I'm not gonna bother, because premake will kind of regenerate that for us
+
+300
+00:26:30,450 --> 00:26:35,175
+所以现在我需要做的就是对这个脚本文件调用premake
+so now all I really need to do is actually call premake with this script file
+
+301
+00:26:35,175 --> 00:26:39,900
+希望一切都能正常运行，所以我在这个目录中打开一个命令提示符，然后输入
+and hopefully everything will work, so I'll open a command prompt in this directory, I'll type in
+
+302
+00:26:40,400 --> 00:26:49,075
+我想应该是vendor/bin/premake，然后是premake5.exe，然后是我要强制生成的项目文件
+I think vendor/bin/premake and premake5.exe, and then the project files that I want to generate force 
+
+303
+00:26:49,075 --> 00:26:54,840
+那么，换句话说，我想生成VS2017，但是要生成项目文件，所以输入vs2017
+so in other words, I want to generate Visual Studio 2017 but project files, so type in vs 2017
+
+304
+00:26:55,200 --> 00:27:00,575
+点enter，看看会发生什么，好了，所以我们尝试连接一个表值
+I'll hit enter, and we'll see what happens, okay, so we attempted to concatenate a table value
+
+305
+00:27:01,020 --> 00:27:05,775
+就是fname，很好，可能只是语法错误之类的
+fname, that's great, I probably just have like a syntax error or something like that
+
+306
+00:27:05,775 --> 00:27:11,750
+那么我将快速浏览一下这个，所以目前发现的一个问题是
+so I'll look through this quickly, so one problem that is spotted so far is
+
+307
+00:27:11,750 --> 00:27:18,550
+include实际上应该是includedirs，那么让我们重新运行它，看看会发生什么
+I include to actually be includedirs, simply does, so let's rerun that, and see what happens
+
+308
+00:27:19,050 --> 00:27:22,750
+那么这就对了，所以很不幸，有时你们不能得到最好的错误消息
+and there you go, so unfortunately, sometimes you don't get the best error messages
+
+309
+00:27:23,600 --> 00:27:28,550
+但检查一下似乎就解决了这个问题，很好，我大概是84毫秒
+but checking over that seems to fix that, okay, great, so I'm like 84 milliseconds
+
+310
+00:27:28,550 --> 00:27:34,575
+已经重新生成了我们所有的解决方案，非常漂亮和快速，所以我们现在得到的是
+we've regenerated all of our solutions, it's really nice and fast, and so what we have over here now is
+
+311
+00:27:34,575 --> 00:27:38,200
+这是一种全新的Hazel解决方案文件，为了进一步证明这一点
+brand new kind of Hazel solution file, so to kind of further prove this point
+
+312
+00:27:38,200 --> 00:27:44,025
+我想我要做的是，就是删除所有这些包括这里的用户类内容
+I guess what I'll do is, I'll delete all of this including the user kind of stuff that we have here 
+
+313
+00:27:44,125 --> 00:27:49,470
+所以我们会删除所有这些，然后再次运行这个premake
+so we'll delete all of this, and then we'll just run this kind of premake thing again
+
+314
+00:27:49,470 --> 00:27:53,250
+现在我不用每次都这样，我们会在命令提示符处
+now instead of me having to every time, we're gonna come at a command prompt 
+
+315
+00:27:53,250 --> 00:27:57,575
+在这里输入这些东西，我要做的是创建一个bat文件
+and just type this stuff in here, what I'm actually going to do is make a bat file
+
+316
+00:27:57,900 --> 00:28:02,275
+所以我将创建一个新的文本文档，也就是GenerateProjects.bat
+so I'll make a new text document, it's just going to be called GenerateProjects.bat
+
+317
+00:28:03,225 --> 00:28:09,900
+我在这里打开它，输入all destroyed，对吧，让我们把它关闭
+I'll open this over here, I'll type in all destroyed, hasn't it, let's just close this
+
+318
+00:28:10,350 --> 00:28:18,125
+不，我不想保存更改，让我们回去打开它，我要键入call
+no, I don't want to save changes, let's go back and open this, I'm just going to type in call
+
+319
+00:28:18,125 --> 00:28:25,450
+并且然后这个，那么也就是call那个，然后可能就是PAUSE
+and then this, so call that, and then probably just PAUSE
+
+320
+00:28:25,650 --> 00:28:28,320
+这样它就不会立即关闭窗口，好了，那么现在那个就搞定了
+so that it doesn't close the window immediately, okay, so now that I've done that
+
+321
+00:28:28,320 --> 00:28:32,892
+我应该可以双击GenerateProjects.bat，你们可以看到它为我们生成了一切
+I can I should just be able to double click GenerateProjects, you can see it generates everything for us
+
+322
+00:28:33,100 --> 00:28:36,500
+这儿有一个新的解决方案文件，我将把它拖到到VS中打开
+there's that new solution file, I'm just going to drag that into Visual Studio here
+
+323
+00:28:36,500 --> 00:28:40,440
+打开解决方案，这里是里面的Hazel
+to open the solution, and here we have inner Hazel with everything 
+
+324
+00:28:40,440 --> 00:28:47,375
+那么你们甚至可以看到为我们生成的正确的过滤器，你们知道的，如果我们进入属性
+so you can see even generated generated the right kind of filters for us, and you know if we go into properties 
+
+325
+00:28:47,375 --> 00:28:51,900
+例如，我们应该在这里看到正确类型的输出目录
+for example, we should see the correct kind of output directory here
+
+326
+00:28:52,150 --> 00:28:57,925
+如你们所知，像我们添加的这些东西，比如我们的包含目录
+as well  as you know like this kind of stuff that we've um added, like our include directories 
+
+327
+00:28:57,925 --> 00:29:02,050
+我们的定义都在那里，你们也可以正确地看到Sandbox引用Hazel
+and our defines are all there, and also you can see Sandbox references Hazel correctly
+
+328
+00:29:02,050 --> 00:29:08,025
+这看起来不错，所以我将在这里设置Sandbox作为一个启动项目，并按f5
+which looks good, so I will set Sandbox here as a starter project and hit f5 
+
+329
+00:29:08,025 --> 00:29:13,625
+希望一切都没问题，首先，这里的复制步骤失败了
+and then hopefully everything will work fine, now the first time, it seems that this kind of copy step fails 
+
+330
+00:29:13,625 --> 00:29:20,100
+因为这个目录实际上还不存在，所以我们再点f5，它应该能运行
+because the directory doesn't actually exist yet, so we'll just hit f5 again, and it should work
+
+331
+00:29:20,300 --> 00:29:23,575
+你们可以看到复制可能工作，但现在我们不能打开spdlog
+you can see the copying probably work, now but now we can't open spdlog
+
+332
+00:29:23,575 --> 00:29:27,525
+因为不存在这样的文件，我相信那是来自SandboxApp
+because no such file exists, I believe that's coming from SandboxApp
+
+333
+00:29:28,725 --> 00:29:33,525
+那么这可能是因为我们弄乱了包含路径包含目录
+so it's probably because we messed up an include path include directory 
+
+334
+00:29:33,525 --> 00:29:38,190
+这是我们实际的Sandbox项目，那么让我们看看这里，它是%\{prj.name\}/vendor
+this specific to our actual Sandbox project, so let's take a look here, it's a prj.name vendor
+
+335
+00:29:38,190 --> 00:29:44,900
+是的，这行不通，因为这是在Hazel下，那么Hazel/vendor/spdlog/include应该不错
+yes, that's not gonna work, because this is actually under Hazel, so Hazel/vendor/spdlog/include should be good 
+
+336
+00:29:45,400 --> 00:29:48,275
+所以现在让我们重新生成我们的项目，删除这个文件
+so now let's regenerate our projects, we'll just delete this file
+
+337
+00:29:48,275 --> 00:29:53,900
+好了，重新载入，f5，并且你们可以看到，它运行起来了
+done, reload, f5, and you can see that, that worked 
+
+338
+00:29:54,000 --> 00:30:00,525
+好了，都完成了，显然dll复制是工作的，所以如果我们进入bin/Debug
+there we are, all done, and obviously the dll copying is working, so if we go to bin/Debug 
+
+339
+00:30:00,775 --> 00:30:06,350
+然后你们知道Sandbox，我们可以看到dll文件被放在exe文件旁边
+and then you know Sandbox, we can see that dll file gets placed alongside our exe file
+
+340
+00:30:06,625 --> 00:30:12,200
+所有的东西看起来都很正常，所以你们现在应该可以运行这个文件了
+and that everything just generally seems to work pretty, well so you should now be able to just run that file
+
+341
+00:30:12,700 --> 00:30:17,960
+我会运行这个premake脚本，让它生成Makefile或XCode项目文件
+I'll kind of run this premake script, and actually have this generate Makefiles or XCode project files
+
+342
+00:30:17,960 --> 00:30:23,025
+一切都应该很好，所以就是这样，那就是对premake的基本介绍
+everything should be great, so that's it, that's a basic kind of introduction to premake
+
+343
+00:30:23,025 --> 00:30:27,380
+我们已经为Hazel和Sandbox做了很多工作，基本上是为我们整个Hazel项目
+and we've set up pretty much to work for Hazel and for Sandbox, and basically for our entire Hazel project
+
+344
+00:30:27,725 --> 00:30:31,100
+那么我希望你们喜欢这期视频，如果喜欢的话，就为它点赞吧
+so I hope you guys enjoyed that, if you did, hit the like button below 
+
+345
+00:30:31,100 --> 00:30:35,925
+这将会被使用，在这个系列的课程中会用到premake脚本
+and now this will be used will kind of work on this, premake script throughout the course of this series 
+
+346
+00:30:35,925 --> 00:30:38,600
+因为它将是我们主要的项目项目生成器
+because it's going to be our main kind of project project generator
+
+347
+00:30:39,200 --> 00:30:42,350
+并且我认为有一个访问的方式来生成实际的CMake文件
+and I think there is visiting a way for it to generate actual CMake files
+
+348
+00:30:42,350 --> 00:30:45,400
+如果我们真的需要，所以这是一个很好的系统
+if we really need that, so it's just a really good system 
+
+349
+00:30:45,400 --> 00:30:48,750
+它非常简单易用，这也是我选择这个的原因之一
+that's really straightforward easy to use, and that's one of the reasons that I've kind of chosen this 
+
+350
+00:30:49,875 --> 00:30:53,475
+我想对所有让这个系列成为可能的赞助人表示衷心的感谢
+I want to give a huge thank you to all the patrons that make this series possible
+
+351
+00:30:53,650 --> 00:30:56,525
+你们可以访问patreon.com/thecherno来帮助支持本系列
+you can help support this series by going patreon.com/thecherno
+
+352
+00:30:56,525 --> 00:31:02,875
+你们将提前一周获得视频，以及访问这个引擎的私人开发分支
+you'll get videos of one week early as well as access to like a private development branch of this engine in 
+
+353
+00:31:02,875 --> 00:31:07,150
+比如你们知道的，就像我已经有了一个窗口并运行了一个事件系统
+which like I've already got, like you know, a window up and running an event system up and running
+
+354
+00:31:07,150 --> 00:31:12,250
+就像所有这些东西一样，我基本上以最快的速度运行，我正在私下开发Hazel引擎
+like all that stuff basically as fast as I can, I'm developing the Hazel engine kind of privately
+
+355
+00:31:12,250 --> 00:31:16,575
+这样我就知道怎么做这些视频了，所有的页面都想支持70
+just so that I know what to making these videos, and all of the kind of page wants to support at a 70 
+
+356
+00:31:16,575 --> 00:31:21,425
+实际上我可以接触到它，作为回报，它也帮助我制作了这些视频，真的很酷
+I actually get access to that and in return, also it helped me make these videos, which is really cool 
+
+357
+00:31:21,925 --> 00:31:26,390
+希望大家喜欢这个视频，下次我们将继续我们的Hazel引擎
+hope you guys enjoy this video, next time we're gonna continue on with our Hazel engine
+
+358
+00:31:26,390 --> 00:31:30,870
+我甚至不知道我下次有什么计划，躁起来吧，再见，拜
+I don't even know what I've got planned for next time, get excited, I'll see you, then goodbye
+

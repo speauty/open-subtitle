@@ -1,0 +1,2100 @@
+﻿1
+00:00:00,030 --> 00:00:04,100
+嗨，大家好，我是TheCherno，欢迎回到我的游戏引擎系列
+Hey, what's up guys, my name is TheCherno, welcome back to my game engine series 
+
+2
+00:00:04,275 --> 00:00:10,675
+上次我们为Hazel设计了一个事件系统，如果你们还没看过那个视频，一定要去看看
+so last time we planned an event system for Hazel, if you haven't seen that video, make sure that you check it out
+
+3
+00:00:10,725 --> 00:00:15,600
+我知道那是一个计划视频，你们可能会觉得它有点无聊，当然让我们直接写些代码吧
+I know it's planning video, I know you might think that it's kind of boring, and it's let's just write some code, sure 
+
+4
+00:00:15,600 --> 00:00:21,025
+但了解我们为什么要做出这种实际上正在做出的架构决策，这一点非常重要
+but it's really important to understand why we're making these kind of architectural decisions that we actually are making 
+
+5
+00:00:21,250 --> 00:00:25,525
+因为我们不理解那点，那么你们就无法学习如何开发游戏引擎
+because we don't understand that, then well you're not gonna be able to learn how to actually write a game engine 
+
+6
+00:00:25,525 --> 00:00:28,500
+那就是这期的全部内容，所以你们一定要去看看那期视频
+which is what the series is all about, so definitely make sure you check that out
+
+7
+00:00:28,925 --> 00:00:33,475
+第二件事就是我想感谢所有让这个系列成为可能的赞助人
+the second thing is I want to you just give a huge thank you to all the patrons that make this series possible 
+
+8
+00:00:33,475 --> 00:00:37,175
+如果你们还没有支持这个系列的话，可以访问patreon.com/thecherno
+if you guys aren't supporting the series, you can go to patreon.com/thecherno
+
+9
+00:00:37,400 --> 00:00:44,600
+你们将提前一周收到视频，并尽可能快地访问我写的Hazel引擎源码
+you'll get episodes like a week early, as well as access to the source code of the Hazel engine as fast as I can write it
+
+10
+00:00:44,700 --> 00:00:48,325
+所以我的意思是，我的意思是，我们已经有了一个窗口，比如在屏幕上显示颜色
+so I mean I mean we've already got like a window and like colors on the screen 
+
+11
+00:00:48,325 --> 00:00:52,800
+并且所有那些东西在开发分支中都能正常运行
+and all that stuff already working correctly kind of in that development branch
+
+12
+00:00:53,150 --> 00:00:56,250
+所以如果你们想继续，或者看看这是怎么回事
+so if you want to kind of just go ahead, or see where this is heading
+
+13
+00:00:56,250 --> 00:00:59,275
+或者比如你们知道的，去实践一下实际的代码
+or just you know get some gear hands on actual code
+
+14
+00:00:59,700 --> 00:01:03,650
+那比我们在这些视频中实际做的要深入得多
+that is way more kind of further along than what we're actually doing in these videos
+
+15
+00:01:04,350 --> 00:01:10,475
+那绝对是做这件事最好的方法，所以说到这里，因为我们正在变成大型系统
+that's definitely best plays to do that, so speaking of which because we're kind of getting into large systems
+
+16
+00:01:10,475 --> 00:01:13,550
+我想我应该稍微改变一下这个系列的形式
+I thought that I would kind of change the format of this series a little bit 
+
+17
+00:01:13,800 --> 00:01:19,325
+并且这是我们第一次看到这个，这个正在发生的变化
+and this is kind of the first episode in which we kind of see this this, this change that is happening 
+
+18
+00:01:19,325 --> 00:01:23,050
+所以在以前的视频中，我会在你们面前写代码
+so in previous episodes what I would do is I'd kind of just write code in front of you 
+
+19
+00:01:23,050 --> 00:01:26,925
+在某种程度上，我仍然会这样做，但这部分实际上会改变一下
+and I and I still will do that to an extent, but that part is actually going to change
+
+20
+00:01:27,075 --> 00:01:31,700
+因为这个事件系统有相当数量的代码，并且这些视频
+because this event system is a considerable amount of code, and these videos
+
+21
+00:01:31,700 --> 00:01:35,175
+我原本想保持在10到15或20分钟的时间
+which I originally wanted to keep between kind of ten to fifteen to twenty minutes
+
+22
+00:01:35,500 --> 00:01:39,700
+结果现在变成了，大概是20到30分钟，我的意思是，有些视频甚至是30多分钟
+are kind of becoming twenty to thirty minutes, and I mean, even thirty plus some episodes
+
+23
+00:01:40,075 --> 00:01:45,200
+这些的内容就有比较多，而我想让这个系列更容易理解，更容易消化
+which is a little bit too much, I want this series to be a little bit more accessible, a little bit more consumable
+
+24
+00:01:45,975 --> 00:01:50,475
+并且我想更多的是关于实际的决定
+and I guess more, so about the actual decisions
+
+25
+00:01:50,475 --> 00:01:55,450
+以及代码的原理，而实际上不是在你们面前写代码
+and how the code works, rather than actually physically writing out the code in front of you
+
+26
+00:01:56,125 --> 00:02:01,590
+现在我可能会做一个关于我为什么做这个决定的视频，可以在另一个视频中讨论它
+now I might I might make a video on why I made this decision, and we can talk about it maybe in another video 
+
+27
+00:02:01,590 --> 00:02:05,475
+我并不希望我们在这个事件视频中讨论所有那些东西
+I don't want to really just we were in this event video by talking about all that kind of stuff 
+
+28
+00:02:05,475 --> 00:02:10,225
+但现在要改变的是，我所做的可能就是
+but what's going to change now, and probably going forward is that instead what I've done is
+
+29
+00:02:10,225 --> 00:02:13,500
+我从我已经写好的私有开发分支代码中提取代码
+I've taken code from that private development branch code that I've already written
+
+30
+00:02:13,500 --> 00:02:17,475
+已经测试过的，可能已经用了一段时间的代码
+code that I've already tested, code that I've been probably using for a while at this point 
+
+31
+00:02:17,575 --> 00:02:24,100
+并且把它合并到Hazel公共库中，然后我要有效地做的是
+and I've kind of merged it into this Hazel public repository, and then what I'm going to effectively do is
+
+32
+00:02:24,100 --> 00:02:31,000
+当然要解释一下它的原理，并且也要回顾一下上一期前后的差异
+explain how all of it works of course, and also kind of go through the diff of before and after the last episode
+
+33
+00:02:31,375 --> 00:02:36,975
+因为这个被推送到github，如果你们想的话，也可以去看看这个差异
+now because this is pushed to github, you can actually look at the differential, if you want to
+
+34
+00:02:36,975 --> 00:02:41,775
+一旦这个视频公开，但即使在这个视频中，我也会详细介绍每一个变化
+once this video goes public, but even in the video, I'll kind of go through each change 
+
+35
+00:02:41,975 --> 00:02:45,750
+并解释实际发生的情况，不仅解释我为什么这么做，还要解释它的原理
+and explain what's actually happened, and not just kind of why I've done this, but also how it works
+
+36
+00:02:46,075 --> 00:02:49,600
+所以我认为最终，我的意思是，就学习而言，这应该是完全一样的
+so I think that ultimately, I mean, in terms of learning it should be exactly the same
+
+37
+00:02:49,825 --> 00:02:55,950
+这只会节省我很多打字的时间，这些东西不一定需要在你们面前敲出来
+it's just gonna save a lot of me typing out stuff, that doesn't necessarily need to be typed out in front of you
+
+38
+00:02:56,525 --> 00:03:01,880
+我甚至不能谈论一些原因，比如使用一些不同的东西的原因
+and I can't even talk about some of the reasons, why like some of the different different things that 
+
+39
+00:03:01,880 --> 00:03:05,450
+我在写这段代码的时候也考虑过，因为这段代码都是我写的
+I thought about while writing this code as well, because this code is all 100 Center in by me
+
+40
+00:03:05,725 --> 00:03:09,400
+所以我当然知道为什么我决定做某些事情而不是其他事情
+so of course I know exactly why I've decided to do certain things and not other things
+
+41
+00:03:09,400 --> 00:03:12,750
+不管怎样，言归正传，让我们来看看这个事件系统
+anyway, without further ado, let's just jump in and take a look at this event system
+
+42
+00:03:12,750 --> 00:03:17,900
+虽然我也有一些关于premake视频的修改，我相信在这里也会涉及到
+although also I have a few amendments from the premake video, I believe that will also cover here 
+
+43
+00:03:17,900 --> 00:03:22,750
+但希望这种新形式也能给你们带来乐趣
+but hopefully this new format is also kind of entertaining for you guys to watch as well
+
+44
+00:03:22,750 --> 00:03:26,600
+我认为它实际上可能更容易观看，因为它不只是等待你们写代码
+I think it actually might be easier to watch, because instead of just waiting for you to write a code
+
+45
+00:03:26,750 --> 00:03:33,050
+这一期更多的时间是花在我实际解释代码上，和讨论实际的代码，而不是实际谈论
+it's more more of the episode is spent on me actually explaining the code, and talking about the actual code rather than physically talking about
+
+46
+00:03:33,050 --> 00:03:37,850
+所以不管怎样，让我们来看看吧，那么这儿是Event.h文件
+so anyway, let's just jump in and take a look so here is the Event ummm file
+
+47
+00:03:37,850 --> 00:03:42,700
+我会过一遍我实际添加的内容，以便大家可以看到，基本上我所做的是改变
+I'll kind of go through what I've actually added, so that you guys can see, essentially what I've done is 
+
+48
+00:03:42,700 --> 00:03:48,350
+我在Hazel目录中创建了名为Events的文件夹，其中有四个文件
+I've created this folder called Events inside the Hazel directory, and there's four files in here
+
+49
+00:03:48,350 --> 00:03:53,250
+这儿是Event.h头文件，它是整个事件系统的主文件
+there's the Event.h header file, which is kind of the main file for this whole event system
+
+50
+00:03:53,250 --> 00:03:56,908
+然后我们有不同类型的事件，分成各自的文件
+and then we've got different types of events, kind of split up into their own files 
+
+51
+00:03:57,325 --> 00:04:00,560
+那么我们先来看看这些是如何运行的，然后我们来看看
+so we'll kind of go through how these work first, and then we'll take a look at 
+
+52
+00:04:00,560 --> 00:04:04,550
+这是一个创建事件的例子，看看接口是什么样子的
+an example of actually creating an event, just to see what the api kind of looks like
+
+53
+00:04:04,550 --> 00:04:09,150
+我们可以用它来做什么呢，好了，那么我想让我们从顶部开始
+and what we can actually do with it, okay, so let's start with the with the top I guess
+
+54
+00:04:09,150 --> 00:04:12,250
+此文件是全新的，因此无需像差异或任何东西一样显示
+this file is completely new, so there's no need to show like a diff or anything
+
+55
+00:04:12,250 --> 00:04:17,325
+因为它是100%新的，所以我想说的第一件事就是包含
+because it's 100% new, so the first thing I want to kind of talk of these includes
+
+56
+00:04:17,325 --> 00:04:22,225
+因为我不喜欢把这些东西包含在这样的文件中
+because these are something that I really don't like including into files like this 
+
+57
+00:04:22,225 --> 00:04:26,225
+因为string和functional都是C++标准库的东西
+because string and also functional are just kind of C++ standard library stuff  
+
+58
+00:04:26,450 --> 00:04:31,030
+这首先应该在预编译头文件中，但甚至在那之上
+that first of all should really probably be in a pre-compiled header, but even above that
+
+59
+00:04:31,030 --> 00:04:37,075
+它们应该包含在Core.h中，所以我们需要很快地做的一件事
+they should just be kind of included maybe in Core, so one thing that we need to get to doing very very quickly
+
+60
+00:04:37,275 --> 00:04:43,675
+因为这个引擎越往下发展，越难集成到预编译头文件
+because it's just gonna be the further along this engine gets the harder is committing it to integrate later is precompiled headers
+
+61
+00:04:43,675 --> 00:04:48,107
+所以我们可能会在下一期或者在不久的将来看一看，好了
+so we might take a look at that maybe in the next episode or sometime soon in the future, okay
+
+62
+00:04:48,250 --> 00:04:52,625
+所以我在这里写了一个很好的注释，只是为了解释事件系统目前是如何运行的
+so I've written a nice little comment here, just to explain how the event system currently works
+
+63
+00:04:52,975 --> 00:04:57,490
+基本上这只是说，它是阻塞事件，对吧，这意味着这是设计的方式
+and basically this just says, that it's blocking, right, which means that the way that this is designed
+
+64
+00:04:57,490 --> 00:05:00,925
+现在它没有被缓冲，事件没有被延迟
+right, now is that it's not buffered, it's not kind of events aren't deferred 
+
+65
+00:05:01,200 --> 00:05:05,140
+只要它们真的发生，只要鼠标被点击，就是那样
+as soon as they actually happen like, as soon as the mouse is clicked, that's it
+
+66
+00:05:05,140 --> 00:05:09,250
+整个应用会停止，然后处理那个事件，这不像是那种
+the whole application basically stops, and then processes that event, it's not kind of just like 
+
+67
+00:05:09,250 --> 00:05:13,250
+让我们从事件中获取信息，将其推送到某个队列或某个缓冲区
+let's get the information from the event, push it into some kind of queue or some kind of buffer
+
+68
+00:05:13,450 --> 00:05:16,650
+它们就会延迟，直到我们真正过到这个事件
+and they kind of defer until until we actually go through the event
+
+69
+00:05:17,125 --> 00:05:24,100
+你们知道的，传递之类的，甚至通过某种事件总线之类的方式传递，不
+you know, pass or whatever, and all kind of even propagate it through like some kind of event bus or something, no 
+
+70
+00:05:24,100 --> 00:05:28,800
+它会立即发生，所以这只是一个简短的注释，解释这个设计目前是如何运行的
+it just happens immediately, so this is just a little comment explaining that how the design currently works
+
+71
+00:05:28,800 --> 00:05:32,970
+也许在未来，我们可以将它们缓冲到某种事件总线中，好了，酷
+and maybe in the future, we can buffer them into some kind of event bus, okay, cool
+
+72
+00:05:33,650 --> 00:05:37,125
+所以这是一切的核心，那么我们有这个Event类
+so this is kind of the heart of everything, so we have this Event class
+
+73
+00:05:38,050 --> 00:05:43,425
+但我们也有一个enum，它基本上是一个EventType类，用来描述事件类型，对吧
+but we also have an enum, which basically an EventType class, which describes the event type, right
+
+74
+00:05:43,925 --> 00:05:47,450
+所以我们有不同的事件类型，我把它们分成了不同的行
+so we have different kind of event types, I've kind of split them up into separate lines
+
+75
+00:05:47,700 --> 00:05:50,950
+有些我们可能不会用到，但我们可以探索一下，比如这些
+some of them we might not even use, we can explore using them, for example these ones
+
+76
+00:05:50,950 --> 00:05:56,475
+我不是百分之百地确定我真的想用，但是其他的都没问题
+I'm not a hundred percent convinced that I actually want to use, but everything else is totally fine
+
+77
+00:05:56,475 --> 00:06:00,825
+并且你们也可以看到，因为这段代码是我已经写好的代码
+and you can also see that, because this code is is code that I've already written 
+
+78
+00:06:01,125 --> 00:06:03,575
+因为它是在Hazel开发分支中编写的
+and because it's kind of written in the Hazel development branch
+
+79
+00:06:03,575 --> 00:06:07,000
+事实上，比如，我就完全忘记了写MouseScrolling
+I'm able to actually, like I totally forgot about MouseScrollingfor example
+
+80
+00:06:07,000 --> 00:06:11,025
+如果我做了这个视频，就可能会忘记这个，稍后必须添加它
+and if I made this video, I might have just forgotten about that, that I had to add it later
+
+81
+00:06:11,025 --> 00:06:14,600
+而是因为我已经使用这个代码一段时间了
+but because I've kind of gone through, and been using this code for a while
+
+82
+00:06:14,600 --> 00:06:18,575
+它有点成熟了，我想我可以在这里合并代码
+it's kind of matured, I guess to the point where the code that I can merge in here
+
+83
+00:06:18,575 --> 00:06:25,100
+给你们看实际上是最后版本，我的意思是，很明显将来会根据需要进行调整
+and show you guys is actually somewhat, you know, final, I mean, obviously will tweak it in the future as need be
+
+84
+00:06:25,100 --> 00:06:28,700
+但这比我只是写我脑子里想到的东西更成熟一些
+but it's a little bit more mature than me just kind of writing what's off the top of my head
+
+85
+00:06:28,700 --> 00:06:34,950
+或者在一些松散的设计上，就像你们知道的，像这些代码的实际使用
+or bed on some loose design that hasn't been through, like you know, actually usage like this code has 
+
+86
+00:06:34,950 --> 00:06:38,625
+因为我在Hazel开发分支中使用了很多这段代码
+because I've been using this code quite a bit in that Hazel development branch
+
+87
+00:06:39,137 --> 00:06:43,150
+总之，我们有不同的事件类型，我们有所有的窗口事件
+anyway, so we have different kinds of event types, we've got all the window events 
+
+88
+00:06:43,150 --> 00:06:47,825
+现在这些实际的事件在它们相关的文件中实现
+now these actual events are implemented in their relevant kind of files 
+
+89
+00:06:47,825 --> 00:06:52,325
+那么ApplicationEvent会涵盖所有这些按键事件，包括KeyPressed和KeyReleased
+so ApplicationEvent kind of covers all of these key events, covers KeyPressed and released
+
+90
+00:06:52,325 --> 00:06:56,875
+然后MouseEvent会包含所有这些事件，那么让我们看看ApplicationEvent
+and then MouseEvent cover all this stuff, so let look at ApplicationEvent for example
+
+91
+00:06:57,000 --> 00:07:00,400
+你们可以看到，我们有WindowResizeEvent，我没有考虑，对吧
+you can see, we have that like WindowResizeEvent, I don't think about, yeah, okay
+
+92
+00:07:00,400 --> 00:07:04,175
+AppRender，AppUpdate，AppTick以及WindowClose等等
+AppRender, AppUpdate, AppTick, WindowClose and all that stuff
+
+93
+00:07:04,175 --> 00:07:09,375
+它都是在这里实现的，我们待会再看，那么这个enum基本上就像
+it's all kind of implemented here, and we'll take a look at that later, so this enum basically is just like
+
+94
+00:07:09,375 --> 00:07:13,125
+嘿，知道吗，我们每个事件都有一个代码，你们可以看到
+hey, you know, what is we have a code assigned to each event, you can see 
+
+95
+00:07:13,125 --> 00:07:18,650
+它就是一个数字，None是0，而其他的就是从1到14
+it's like a number essentially from like you know None is 0, but from 1 to like 14
+
+96
+00:07:19,375 --> 00:07:24,075
+这基本上只是说，这就是我的类型，也将意味着在未来
+and this basically just says, this is what type I am, and will mean that in the future
+
+97
+00:07:24,075 --> 00:07:27,525
+因为我们需要能够分辨事件的类型
+because we need to be able to kind of tell which type an event is 
+
+98
+00:07:28,125 --> 00:07:30,880
+并且你们知道的，我们并不想使用dynamic_cast之类的东西
+and you know, we don't really, don't want to use something like dynamic_cast
+
+99
+00:07:30,880 --> 00:07:33,275
+或运行时类型信息
+or runtime type information for something as trivial as this 
+
+100
+00:07:33,675 --> 00:07:37,525
+用一个整型id来关联所有东西会更简单，然后我们就可以处理它了
+it's easier just to have an int id kind of associated with everything, and then we can deal with it
+
+101
+00:07:38,000 --> 00:07:45,325
+好了，那么这些事件分类，我们有这些的原因是我们可能想要过滤某些事件
+okay, so event categories, the reason we have these is because we basically may want to filter certain events 
+
+102
+00:07:45,575 --> 00:07:50,850
+那么换句话说，我从我的Application接收所有事件到某种事件分类
+so in other words, I am receiving all events from my Application into some kind of an Event class
+
+103
+00:07:51,175 --> 00:07:56,025
+但我只关心键盘事件，对吧，这是一个很简单的场景
+but I only care about the keyboard events, right, or free, like here's a really simple scenario 
+
+104
+00:07:56,025 --> 00:08:02,020
+我想记录每个键盘事件或者每个鼠标事件，让我们看看鼠标事件吧
+I would like to log every keyboard event now or every mouse event, let's see mouse event
+
+105
+00:08:02,020 --> 00:08:04,950
+因为有更多的鼠标事件，对吧，所以我真的要去看看
+because there's more of them, right, so do I really have to go and check to see 
+
+106
+00:08:04,950 --> 00:08:08,925
+如果EventType是Pressed或Released或Moved或Scrolled，那就有点烦人了
+if the EventType is Pressed or Released or Moved or Scrolled, that's a little bit annoying
+
+107
+00:08:09,250 --> 00:08:13,600
+相反，我能做的是，我能说，嘿，你知道的，给我所有的鼠标事件
+so instead, what I can do is, I can just say, hey, you know, what just give me all of the mouse events 
+
+108
+00:08:13,925 --> 00:08:18,325
+因为我们有一些事件分类枚举，我们能够这样做
+and because we have kind of this some event category enum, we're able to do that 
+
+109
+00:08:18,325 --> 00:08:23,700
+因为这有点像，我想这几乎是一种特质，适用于特定的事件类型
+because it's kind of like a, it's almost like a um a trait I guess, that's applied to certain event types
+
+110
+00:08:24,150 --> 00:08:30,575
+所以我们可以看到它们是什么，这实际上是一个位字段
+so that we can actually see what they are, now this is a bit a bit field essentially
+
+111
+00:08:30,950 --> 00:08:38,125
+如果我们来到这儿，因为在Core.h定义它的，这就是全部代码了，对吧
+if we just go to this, because I've just kind of defined it in the Core.h file, this is all it is, right
+
+112
+00:08:38,125 --> 00:08:41,375
+#define BIT(x) (1<<x)
+define BIT(x) as just one shifted by x places
+
+113
+00:08:42,150 --> 00:08:46,425
+这只是说如果执行BIT(1)，你们会在位置上有一个比特
+this just says that if you do a BIT(1) for example, you'll have essentially just a bit at position
+
+114
+00:08:46,425 --> 00:08:50,675
+你们知道的，10是位置0，等等
+you know 1 0 would be position 0 and so on and so forth 
+
+115
+00:08:50,950 --> 00:08:57,975
+这样我们就能得到一些位字段，对吧，我们特别想让它不局限于0 1 2 3 4是因为
+so that we can actually end up with a bit of field, right, and the reason we want that specifically in not just 0 1 2 3 4 is because
+
+116
+00:08:57,975 --> 00:09:02,625
+我们可以将一个事件分成多个分类，比如，你们知道的
+we have the ability for an event to go into multiple categories, so for example you know
+
+117
+00:09:02,625 --> 00:09:04,975
+键盘、鼠标和鼠标按钮事件都是输入事件
+keyboard mouse and mouse button events are all input events
+
+118
+00:09:05,200 --> 00:09:09,825
+鼠标按钮事件是鼠标事件，对吧，键盘事件是键盘和输入事件
+a mouse button event is a mouse event, right, a keyboard event is a keyboard and an input event
+
+119
+00:09:10,225 --> 00:09:13,825
+所以我们想要将多个分类应用到单个事件类型
+so we have kind of we want to apply multiple categories to a single event type
+
+120
+00:09:14,925 --> 00:09:18,800
+所以我们需要创建一个位字段，这样我们就会设置多个位
+so we need to create a bit field, so that we're gonna have multiple bits set
+
+121
+00:09:18,800 --> 00:09:23,475
+然后我们可以简单地取它们掩码，看看什么样的分类和事件
+and then we can simply just mask them out, and see what what kind of category and event 
+
+122
+00:09:23,475 --> 00:09:29,300
+或者一个事件实际上属于什么分类，在考虑这些宏的时候，我们会讲到它们
+or what categories an event actually belongs to, during worried about these macros for a second, we'll get to them
+
+123
+00:09:29,650 --> 00:09:37,625
+让我们看一下这个实际的Event类，好了，那么首先，我想暂停一下
+let's just take a look at this actual Event class, okay, so first of all, I just want to give a quick pause
+
+124
+00:09:38,075 --> 00:09:41,675
+你们看这有多棒，这是我第一次用这种形式制作视频
+you see how how nice this is, like it is my first time doing a video in this format
+
+125
+00:09:41,875 --> 00:09:45,450
+但想象一下，如果我要写出所有这些代码，这个视频，可能会有一个小时那么长
+but imagine if I had to write out all this code, this video, would be like an hour long
+
+126
+00:09:45,750 --> 00:09:49,300
+所以我认为这实际上是更好的，我甚至可能没有提到我做的很多事情
+so I think that this is actually a lot better, and I might not even have mentioned a lot of the stuff I did
+
+127
+00:09:49,300 --> 00:09:55,910
+因为我的时间太紧了，所以我想做一个简短的评论
+just because I would be you know stretched for time, so um yeah, I just wanted to make a quick comment that
+
+128
+00:09:55,910 --> 00:10:00,775
+实际上，我很喜欢这样，好了，不管怎样，那么我们有了这个Event类
+I'm actually enjoying this, okay, anyway, so we have this Event class 
+
+129
+00:10:01,800 --> 00:10:06,700
+后面也会讲到EventDispatcher，但本质上这是事件的基类
+which will talk about the EventDispatcher later as well, but essentially this is a base class for events
+
+130
+00:10:07,950 --> 00:10:10,400
+另一个就是这个实际上存储的是布尔值m_Handle
+the other thing this actually stores is the handle the boolean
+
+131
+00:10:11,350 --> 00:10:14,300
+因为我们需要能够看到一个事件是否被处理了
+because we need to be able to see if an event has been handled or not
+
+132
+00:10:14,550 --> 00:10:22,025
+这样做的原因很大程度上是因为，当我们开始调度事件去处理不同的层时
+the reason we have that is because further down the line, when we actually start to dispatch events to do various layers
+
+133
+00:10:22,025 --> 00:10:29,900
+例如，我们通常会说，我不想让这个事件被进一步传递
+for example, it's pretty common for us to decide to say that, I don't want this to be propagated any further
+
+134
+00:10:30,275 --> 00:10:34,625
+那么比如鼠标点击事件，如果屏幕上有一个按钮，我们点击了鼠标
+so a mouse click event for example, if we have a button on our screen, and we've clicked the mouse
+
+135
+00:10:34,625 --> 00:10:40,650
+鼠标落在按钮的范围内，然后就是那样，事件就被处理了
+and the the mouse has fallen within the bounds of the button, then that's it, that event has kind of been handled
+
+136
+00:10:40,650 --> 00:10:44,240
+我们希望它使用该事件，以便它下面的层
+we want it to consume that event, so that the layer underneath it
+
+137
+00:10:44,240 --> 00:10:47,275
+也许我们的游戏世界实际上并没有收到点击事件
+which might be our game world doesn't actually receive a click event
+
+138
+00:10:47,525 --> 00:10:52,900
+因为按钮已经处理过了，所以这里需要这个
+because of course, it's already been handled by the button, so that's why we need this here
+
+139
+00:10:52,900 --> 00:10:55,925
+当然在以后，当我们真正解决这个问题的时候
+and of course in the future, when we actually get around this
+
+140
+00:10:55,925 --> 00:11:01,650
+你们会看到实际使用中的例子，至于这个IsInCategory，是一种非常简单的工具函数
+you'll see real examples of this in use, IsInCategory, is a very simple kind of utility function
+
+141
+00:11:01,925 --> 00:11:09,850
+基本上就是问，嘿，你知道这个，你知道这个事件是这样的吗
+which basically just asks, hey, you know is this, you know is this kind of, is this event for example
+
+142
+00:11:09,850 --> 00:11:13,125
+你知道一个MouseEvent或在给定分类中的吗
+you know a MouseEvent or whatever is it in the given category
+
+143
+00:11:13,125 --> 00:11:15,825
+我们可以用这个快速过滤掉某些事件
+and we can just use this quickly to filter out certain events
+
+144
+00:11:15,825 --> 00:11:21,850
+它所做的只是对实际分类做按位与运算，看看它是否真的属于那个分类
+and all it does is just an and with the actual category to see, if it actually belongs to that category or not
+
+145
+00:11:22,825 --> 00:11:26,725
+当然，如果它返回0，这意味着它根本不在分类中
+of course this will, if this returns zero, it means that it's not in the category at all
+
+146
+00:11:27,150 --> 00:11:30,450
+如果它返回的值不是0，它就会被捕获，它就会为真
+if it returns anything other than zero, it will be caught, it'll be true
+
+147
+00:11:30,700 --> 00:11:34,700
+对，这意味着，它至少属于这个分类，也可能属于其他分类
+right, which means that, it is at least in that category, might be in other categories as well
+
+148
+00:11:34,700 --> 00:11:39,000
+但至少在这个分类中，然后我们有很多虚函数，其中一些还是纯虚函数
+but it's at least in this one, then we have a bunch of virtual functions, some of them being pure virtual
+
+149
+00:11:39,000 --> 00:11:43,900
+这意味着它们必须被实现，例如GetEventType, GetName, GetCategoryFlags
+which means they must be implemented, so such as GetEventType, GetName, GetCategoryFlags 
+
+150
+00:11:44,300 --> 00:11:50,100
+现在我还没有决定，我真的希望CategoryFlags是一个调试或任何东西
+now I haven't decided whether or not, I actually want CategoryFlags to be a debug or anything
+
+151
+00:11:50,350 --> 00:11:56,075
+或者任何名字，它可能不是最大的开销
+name definitely probably like will be, it's probably not the biggest overhead to have 
+
+152
+00:11:56,075 --> 00:12:00,725
+但我们仍然因为它只是一个const char*，所以就是一个指向常量的指针
+but still we because it's just a const char pointer, so it'll be like a pointer to constant
+
+153
+00:12:01,750 --> 00:12:07,610
+你们知道的，一种只读内存，不管怎样，但是，现在值得考虑一下
+you know, kind of read-only memory, anyway, but mmm something to think about at the moment
+
+154
+00:12:07,610 --> 00:12:13,910
+我让它在所有配置中都是启用的，但这应该只用于调试
+I've left it obviously enabled for all configurations, but it's this should really only be is for debugging 
+
+155
+00:12:13,910 --> 00:12:19,925
+我不期望有必要去检索一个事件名称
+I don't I don't expect ever being having the necessity to actually retrieve an event name
+
+156
+00:12:21,700 --> 00:12:26,325
+所以是的，但无论如何，纯虚函数，意味着，每个事件都必须实现ToString
+so yes, but anyway, that pure virtual, which means, every event has to implement them ToString
+
+157
+00:12:26,325 --> 00:12:31,175
+默认只返回事件的名称，如果你们有更多细节想要打印的话
+by default just returns the name of the event, obviously if you have more details that you want to be able to print
+
+158
+00:12:31,175 --> 00:12:37,075
+比如你们知道的屏幕，让我们去一个随机事件，一个WindowResizeEvent，可能想打印
+such as you know monitor, let's go to a random event, a WindowResizeEvent, you might want to print
+
+159
+00:12:37,350 --> 00:12:42,250
+你们知道的，宽度和高度，就像我在这里做的，然后就可以重写ToString
+you know, width and height, like I've done here, then you can override that ToString function 
+
+160
+00:12:42,250 --> 00:12:46,250
+然后说，好了，这是一个WindowResizeEvent，并且我要把这个信息包含在它里面
+and actually say, that okay, this is a WindowResizeEvent, and I'm including this information with it
+
+161
+00:12:46,450 --> 00:12:52,425
+好了，因为我有点，你们知道，ToString绝对只是一个调试的东西
+okay, because I've kind of, you know, this the ToString is definitely a debugging only thing
+
+162
+00:12:52,425 --> 00:12:56,950
+我并没有真正注意到性能或类似的事情
+I haven't been really kind of attentive to performance or anything like that
+
+163
+00:12:56,950 --> 00:13:00,325
+我只是在这里使用stringstream，并不是说stringstream的性能很差
+I'm just using stringstream here, not that the stringstream is terrible for performance 
+
+164
+00:13:00,625 --> 00:13:06,000
+但很明显，它有能力分配内存，但同样，我们不关心这里的性能
+but obviously it has the ability to allocate memory, but again, we don't care about performance here at all 
+
+165
+00:13:06,625 --> 00:13:11,700
+因为这些都是调试，打印事件信息
+because all this is is a debug, kind of a print the event information
+
+166
+00:13:11,700 --> 00:13:15,125
+因为我不确定我的事件是否正常运行，对吧
+because I'm not sure my events are working correctly or whatever, right
+
+167
+00:13:15,450 --> 00:13:21,200
+不应该被实际的游戏使用，运行时只用于调试，好了，酷
+should never be used by actual game, runtime for anything other than debugging, okay, cool
+
+168
+00:13:22,200 --> 00:13:26,450
+继续，是的，所以这些默认必须实现，你们知道
+moving on, yeah so these have to be implemented this by default, you know it
+
+169
+00:13:26,775 --> 00:13:30,850
+Event类为你们提供了一个默认的ToString，它只是Event的名称
+the Event class provides you with just a default kind of ToString, which is just the name of the Event 
+
+170
+00:13:31,250 --> 00:13:36,800
+但你们当然有能力重写它，就那样，那就是整个Event类
+but of course you have the ability to override that, that's it, that's the whole Event class 
+
+171
+00:13:36,800 --> 00:13:42,800
+那么在进入Dispatcher之前，让我们看看Event是什么样子的
+so before we get into the Dispatcher, let's just actually look at what an Event might look like
+
+172
+00:13:42,800 --> 00:13:47,650
+所以我想我可能，嗯，也许KeyEvent会是比较值得关注的东西
+so I think I might um maybe like a KeyEvent would be something better to look at 
+
+173
+00:13:48,050 --> 00:13:53,425
+所以KeyEvent非常简单，很明显，当我们在键盘上按键时，KeyEvents就会运行
+so a KeyEvent is very simple, obviously KeyEvents work, when we kind of press things on our keyboard
+
+174
+00:13:53,425 --> 00:13:57,275
+如果我按下键盘上的一个按键，那就是KeyPressEvent
+so if I press a key on my keyboard, that's a KeyPressEvent
+
+175
+00:13:57,275 --> 00:14:00,200
+当我从键盘上释放按键时，那是一个KeyReleasedEvent
+when I release the key from my keyboard, that's a KeyReleasedEvent 
+
+176
+00:14:00,525 --> 00:14:04,875
+现在这些这些KeyEvents有一些共同之处，对吧
+now these these KeyEvents have certain things in common, right
+
+177
+00:14:04,875 --> 00:14:10,650
+也就是被按下或释放的按键代码，对吧，不管它是按下还是释放
+namely the key code of what has been pressed or released, right, whether it's press or released 
+
+178
+00:14:11,500 --> 00:14:15,675
+那应该是它自己的事件类型，但这些事件之间的按键代码是通用的
+that's should be its own event type, but the key code is common between those events
+
+179
+00:14:16,000 --> 00:14:20,225
+这就是为什么我做了一个基类KeyEvent，它包含按键代码
+which is why I've made a base class called KeyEvent, which contains the key code
+
+180
+00:14:20,800 --> 00:14:26,975
+现在按键释放可能不需要其他任何东西，除了它是一个KeyReleasedEvent
+now key released probably shouldn't need anything else, apart from just the fact that it's a KeyReleasedEvent
+
+181
+00:14:26,975 --> 00:14:31,000
+因此按键已经释放，但按键按下时也应该有是否
+therefore the key has been released, but a key pressed should also have whether or not
+
+182
+00:14:31,000 --> 00:14:34,825
+本次按键是一个RepeatedEvent，这意味着
+the key is a RepeatedEvent, what that means is that
+
+183
+00:14:34,825 --> 00:14:40,000
+当我按下一个按键时，通常会发生什么取决于操作系统和驱动程序等等
+when I press a key, what happens usually depending on the operating system and the drivers and all that
+
+184
+00:14:40,000 --> 00:14:46,975
+但通常当我按下一个按键时，它会发送给操作系统，发送一个KeyPressedEvent，对吧
+but usually when I press a key, it sends the operating system, sends a KeyPressedEvent, right
+
+185
+00:14:46,975 --> 00:14:53,820
+然后等待一会儿，然后它发送一堆按键重复事件，你们可以看到这一点
+and then waits like a little bit, and then it sends a bunch of key repeat events, you can see this in action
+
+186
+00:14:53,820 --> 00:14:58,000
+如果我点击某个地方，然后按a键，你们就会看到
+if I just kind of click somewhere, and I press the a key, you'll see that there's going
+
+187
+00:14:58,000 --> 00:15:01,125
+我会在这里按住a键，坚持一会儿，你们就会看到
+and I'm gonna press, and hold the a key in a minute here, you'll see, there's like
+
+188
+00:15:01,125 --> 00:15:04,980
+它会添加字母a会立即出现，然后会有停顿
+it'll add the letter a will appear immediately, then there'll be a pause 
+
+189
+00:15:04,980 --> 00:15:13,000
+然后它会打印出一堆，对吧，那么，是的，再打印一次a，然后剩下的就在那儿，对吧
+and then it will print a bunch of them, right, so, yeah, again a, and then they're, there the rest, right
+
+190
+00:15:13,400 --> 00:15:18,175
+所以第一个是KeyPressedEvent，然后其他的基本上是KeyRepeatEvent
+so the first one is a KeyPressedEvent, and then there's other ones are essentially KeyRepeatEvents
+
+191
+00:15:18,975 --> 00:15:22,350
+所以我们也希望能够接受那点
+so we want to be able to kind of also take that
+
+192
+00:15:22,350 --> 00:15:26,150
+所以那就是KeyPressedEvent和KeyReleasedEvent除了名称之外的不同
+so that's how a PressEvent might be different from a ReleasedEvent other than the name
+
+193
+00:15:27,050 --> 00:15:33,275
+但因为它们有相同的按键代码，我在这里实际上做的是，创建了这种KeyEvent基类
+but because they have that key code in common, what I've actually done here is, I've created this kind of KeyEvent base class
+
+194
+00:15:33,275 --> 00:15:38,825
+正如你们看到的，它只包含一个按键代码，就那样，还有一个受保护的构造函数
+as you can see, which just contains a key code, that's it, it's also got a protected constructor
+
+195
+00:15:38,825 --> 00:15:44,725
+因为没有别的东西可以构造它，然后它把它放在一起，用于按键代码
+because nothing else can construct it, and then it's got it just together for that key code
+
+196
+00:15:44,725 --> 00:15:49,000
+显然，我们不需要设置按键代码，因为当事件被构造时，那就会被设置
+obviously we don't need to set the key code, because that happens, when the event gets constructed
+
+197
+00:15:49,000 --> 00:15:53,300
+但我们确实想要得到它，然后我们有一个宏来实现这个类分类判断
+but we do want to get it, and then we have a macro which implements this class category thing
+
+198
+00:15:53,790 --> 00:15:57,960
+我们待会再讲宏，因为还有更多，好了，那么这儿还有个KeyPressedEvent
+we will talk about the macros in a minute, because there's more, okay, so a KeyPressedEvent
+
+199
+00:15:57,960 --> 00:16:03,400
+所以这是一个抽象事件，你们不应该能够创建一个KeyEvent，不能
+so essentially this is kind of like an abstract event, you shouldn't really be able to make a KeyEvent, you really can't
+
+200
+00:16:03,400 --> 00:16:05,450
+我是说，它有一个受保护的构造函数
+I mean, it's got a protected constructor
+
+201
+00:16:05,700 --> 00:16:10,725
+所以你们不能在任何东西中创建这个类，除了它的派生类
+so you won't be able to make this class in anything other than a class that derives from it 
+
+202
+00:16:11,100 --> 00:16:14,475
+所以KeyPressedEvent是一个实际的事件，对吧
+so KeyPressedEvent is an actual event, right
+
+203
+00:16:14,475 --> 00:16:18,350
+我们将在引擎中看到它基本上有一个keycode和一个repeatCount
+that we'll see in our engine it's basically got a keycode, and a repeatCount 
+
+204
+00:16:18,675 --> 00:16:22,850
+所以我还没有决定，我们是否需要记录统计次数
+so I haven't really decided whether or not, we want to keep track of the amount of times
+
+205
+00:16:22,850 --> 00:16:27,450
+就是一个按键是否重复触发，通常就像这样，就像一个布尔值
+that a key has been repeated, usually like essentially like this could act like a boolean
+
+206
+00:16:27,450 --> 00:16:32,675
+所以你们知道，意思就是，如果这个是0，那么它就不是，它就不是一个重复事件
+so you know, I mean, if this is zero, then it has not been, it's not a repeat event 
+
+207
+00:16:32,675 --> 00:16:37,080
+这是我第一次按下按键，但之后就像
+it's the first time that keys been pressed, but then the kind of remaining like 
+
+208
+00:16:37,080 --> 00:16:40,099
+如果不是0，也就是1
+if it's anything other than when other than the zero, which might be one 
+
+209
+00:16:40,400 --> 00:16:44,450
+如果它被重复了20次，如果它被重复了20次，或者它可能只是1次
+if it's been repeated all like twenty, if it's been repeated twenty times, or it could just be one
+
+210
+00:16:44,450 --> 00:16:47,800
+即使它已经重复了20次，这取决于我们如何实现它
+even if it has been repeated twenty times depending on how we implement it
+
+211
+00:16:48,125 --> 00:16:54,525
+那意味着它是一个重复事件，所以那就是，比如整个KeyRepeatEvent的东西非常非常有用
+that just means, it's a repeat event, so that's really, like this whole KeyRepeatEvent stuff is really really useful
+
+212
+00:16:54,525 --> 00:16:57,550
+因为如果，你们知道的，如果你们在游戏中制作菜单之类的东西
+because if, you know, if you're making something like a menu in game
+
+213
+00:16:57,825 --> 00:17:02,250
+那么你们的菜单里有四个选项，举个例子，不支持鼠标操作
+so you have like four options in your menu, and the mouse isn't in use for example
+
+214
+00:17:02,425 --> 00:17:07,800
+你们只能用方向键进入菜单，很明显，你们知道
+you just want to use the arrow keys to go down the menu, obviously like you know
+
+215
+00:17:07,800 --> 00:17:11,350
+举个例子，你们可能想，可能需要
+for as an example, you might want to only, you might want to
+
+216
+00:17:11,350 --> 00:17:15,500
+强制用户多次按方向键来完成某项任务
+force the user to actually press the arrow key multiple times to go through something
+
+217
+00:17:15,500 --> 00:17:20,300
+而不是按下按键并保持，按传统来说，如果你们只是处理一个KeyPressedEvent
+instead of being able to press and hold it, traditionally, if you just handle a PressedEvent
+
+218
+00:17:20,300 --> 00:17:24,950
+并且你们可以看到，直到它被释放，循环遍历菜单选项，它会非常快地循环下去
+and you see that, until it's released go cycle through the menu options, that'll keep looping really quickly
+
+219
+00:17:24,950 --> 00:17:30,175
+即使用户快速按下按键，它可能仍然会发送两个事件，这很糟糕
+and even if the user presses the key quickly, it might actually still send two events, that's bad 
+
+220
+00:17:31,275 --> 00:17:36,600
+因为设置的方式是，正如你们之前看到的，我输入一个A按键，它就可以发送事件
+because the way that this is set up is, as you saw, with me typing A key it will kind of just send the event
+
+221
+00:17:36,600 --> 00:17:41,775
+稍等一下，然后就发送一堆重复事件，因为这是大多数OS的处理方式，这个你们可以
+wait a bit, and then send a bunch of repeat events, because that's how most of operate system's handle, this you could just 
+
+222
+00:17:42,075 --> 00:17:44,125
+你们甚至不需要担心菜单的重复计数
+you don't, you don't even need to worry about repeat count for menus 
+
+223
+00:17:44,125 --> 00:17:48,400
+因为你们可以看到，你们知道，很明显有差距，所以你们就可以
+because you could just see that, you know, obviously there's that gap, so you can just kind of 
+
+224
+00:17:50,300 --> 00:17:56,625
+你们可以自然地等待，直到它给用户足够的时间来释放它
+you can just kind of wait naturally, until it kind of that will give the user man enough time to release it 
+
+225
+00:17:56,625 --> 00:18:00,375
+如果他们不想浏览多个菜单选项，那么基本上你们可以看到
+if they don't want to go through multiple menu options, and then essentially you could just see that
+
+226
+00:18:00,825 --> 00:18:09,025
+我会让它自然运行，也就是说，你们使用？，它会下降，等待一段时间，然后一直下降
+I'll just let it naturally work, which means that, you use the president downer, it goes down, waits a bit, and there goes boom boom boom, all the way down
+
+227
+00:18:09,025 --> 00:18:12,650
+可能是循环或者别的，不管怎样，那只是一个用例场景
+and maybe loops or whatever, so that's just a use case scenario, anyway
+
+228
+00:18:14,175 --> 00:18:18,425
+那就是重复的想法，我们在这里实现了一个ToString函数
+um that's kind of the idea with repeats, we've implemented a ToString function here
+
+229
+00:18:18,425 --> 00:18:25,775
+它重写了我们的ToString，并且基本上看到了那一点，它将只打印已按下的队列
+which overrides our ToString, and just essentially sees that, this will just print which queue has been pressed
+
+230
+00:18:25,775 --> 00:18:31,450
+还有重复次数，然后我们有这个EVENT_CLASS_TYPE宏，它实现了我们所有的功能
+and also the amount of times, and then we have this EVENT_CLASS_TYPE macro, which implements all of our functions 
+
+231
+00:18:31,725 --> 00:18:35,750
+那么让我们讨论这些宏，现在有了EVENT_CLASS_CATEGORY和EVENT_CLASS_TYPE
+so let's talk about these macros, now we have EVENT_CLASS_CATEGORY and EVENT_CLASS_TYPE
+
+232
+00:18:36,175 --> 00:18:41,125
+它们存在的原因是我们需要实现这三个纯虚函数
+the reason these exist is because we need these three things implemented
+
+233
+00:18:41,725 --> 00:18:50,800
+现在事件类型名称和分类标志是如此微不足道，我的意思是，我们真的不需要它们
+now event type name and category flags are so trivial, that I mean, we don't really need them
+
+234
+00:18:50,800 --> 00:18:56,125
+分类标志显然需要指定分类，但命名事件类型
+now category flags obviously does need the category to be specified, but name an event type 
+
+235
+00:18:56,125 --> 00:19:00,975
+我的意思是，名称是事件类型，输入这些很痛苦
+I mean the name is the event type, and it's just a pain to kind of type all this 
+
+236
+00:19:01,225 --> 00:19:04,830
+那么我们不需要输入所有这些代码，我将展示给你们
+so instead of us having to type essentially all of this code, I would I'll show you
+
+237
+00:19:04,830 --> 00:19:08,400
+忘记了一个KeyEvent，你们知道如果我想用这个东西
+what it wouldn't look like forgot a KeyEvent, you know if I wanted to employ this stuff
+
+238
+00:19:08,875 --> 00:19:15,725
+我得说，我的意思是，看看这些东西，我们还需要一个静态类型
+I'd have to basically say, I mean, look at all this stuff, we also need a static type
+
+239
+00:19:15,725 --> 00:19:19,100
+我们马上就会讲到，但基本上我想说的是
+which we'll talk about in a minute, but basically what I would need to say is that
+
+240
+00:19:19,100 --> 00:19:22,025
+我需要一个静态函数，它返回这个事件的类型
+I would need a static function, which returns the type of this event 
+
+241
+00:19:22,300 --> 00:19:26,275
+这是一个KeyPressedEvent，如果我们去到Event类
+now this is a KeyPressedEvent, which if we go to our Event class 
+
+242
+00:19:26,275 --> 00:19:32,650
+它是这个KeyPressed事件，也就是EventType::KeyPressed
+it's this KeyPressed event, which would just be EventType KeyPressed
+
+243
+00:19:32,975 --> 00:19:38,940
+我需要一个虚函数，它返回这种静态类型，我们一会儿就会知道为什么需要它
+I need to have a virtual function, which returns this static type, and we'll see, why we need that in a minute
+
+244
+00:19:39,325 --> 00:19:43,800
+然后我就不需要这个名字了，也可能是类似的名字
+um and then I wouldn't need this name, which again would probably be something like that
+
+245
+00:19:44,700 --> 00:19:48,225
+因此，不用在每个实现中复制和粘贴此代码
+so instead of copying and pasting this code in every single implemention
+
+246
+00:19:48,425 --> 00:19:50,725
+我刚刚实现了一个可以使用的宏
+I've just implemented a macro that I can use
+
+247
+00:19:51,025 --> 00:19:54,100
+就是这个EVENT_CLASS_TYPE，然后是KeyPressed，也就是这个类型
+which just says EVENT_CLASS_TYPE, and then KeyPressed, which is this type 
+
+248
+00:19:54,100 --> 00:19:59,750
+就这样，然后显然它会做的是，填空，将它字符串化为名字
+and that's it, and then obviously what it will do is, fill in the blanks it, will stringify it for the name
+
+249
+00:20:00,325 --> 00:20:07,829
+我的意思是，就是这样，所以说，这些静态类型的想法是什么，为什么我们需要它们
+and I mean, that's about it, so that being said, what is the idea with these static types, why do we need them well
+
+250
+00:20:08,300 --> 00:20:12,775
+我们希望能够在运行时检查，这个KeyPressedEvent是什么类型，对吧
+we want to be able to at runtime check to see, which type this KeyPressedEvent is, right
+
+251
+00:20:13,025 --> 00:20:19,925
+所以显然，我们需要一个函数，返回它是什么类型的事件，现在这个不一定是成员函数
+so obviously we need a function, that returns which event type it is, now this does not have to be a member function
+
+252
+00:20:20,175 --> 00:20:24,875
+它可以只是一个静态函数，因为如果我们看到KeyPressedEvent类型之类的
+it can just be a static function, because if we see KeyPressedEvent type or whatever
+
+253
+00:20:25,700 --> 00:20:29,825
+我们不需要一个KeyPressedEvent类的实例来实际查看它是什么类型
+we don't need to have an instance of the KeyPressedEvent class to actually see what type it is
+
+254
+00:20:29,825 --> 00:20:36,450
+很明显，KeyPressedEvent总是一个KeyPressed事件，不管实例是什么
+obviously KeyPressedEvent is always going to be a KeyPressed event, no matter what the instance is 
+
+255
+00:20:36,950 --> 00:20:41,250
+现在，我们之所以需要一个非基于实例的，是因为它是一个虚拟的，对吧
+now the reason we need a non instance based one is specifically a virtual one, right
+
+256
+00:20:41,250 --> 00:20:47,700
+这个重写了一个虚函数，我们之所以需要它，是因为如果我们只有一个事件基类，对吧
+this overrides a virtual function, the reason we need that is because if, we just have an event base class, right 
+
+257
+00:20:47,700 --> 00:20:50,575
+如果我们把它看成这是一个多态问题
+if we're just treating it kind of this is like a polymorphic kind of thing
+
+258
+00:20:50,825 --> 00:20:55,875
+我们只是，只是有一个指向Event的引用或指针，我们希望能够看到
+we're just we just have a reference or a pointer to an Event, we want to be able to see 
+
+259
+00:20:55,875 --> 00:21:01,475
+它实际是什么类型，你们知道的，我们可以执行Event->GetEventType
+what type it actually is, so we can do Event, you know, GetEventType
+
+260
+00:21:01,475 --> 00:21:09,125
+它会返回它实际是什么类型的事件，它的一个实现场景是实际的EventDispatcher
+and it will return which event type it actually is, one implementation scenario for this is the actual EventDispatcher
+
+261
+00:21:09,375 --> 00:21:11,825
+你们可以在Dispatch函数中看到它的作用
+you can see what it does here in the Dispatch function
+
+262
+00:21:12,100 --> 00:21:20,050
+它检查当前尝试调度的事件类型是否与此模板参数匹配
+is it checks to see which event type the current event that we're trying to dispatch is whether or not it matches this template argument
+
+263
+00:21:20,375 --> 00:21:21,850
+因为这是一个静态函数
+and because this is a static function 
+
+264
+00:21:21,850 --> 00:21:27,300
+我们可以只使用T::GetStaticType，现在这儿没有类型安全来确保它是事件
+we can just do T::GetStaticType, now there's no type safety here to make sure it's an event for example 
+
+265
+00:21:27,925 --> 00:21:33,100
+但它已经有了，但你们可以看到，显然因为它只是一次编译
+but it can already have, but that aside you can see that, obviously uh because it's just one compile
+
+266
+00:21:33,100 --> 00:21:39,000
+如果这是一个事件之类的，它会得到静态类型，你们可以在这里看到
+if this is an event or anything, that has get static type, but anyway, you can see here
+
+267
+00:21:39,000 --> 00:21:46,075
+我们可以在Event引用和模板参数之间进行比较，事件引用可以是任何事件，和模板参数
+we're able to do this comparison between an Event reference, which is just which could be any event, and this template argument 
+
+268
+00:21:46,075 --> 00:21:54,475
+然后，如果在这种情况下的话，那么这个调度器将它调度到适当的事件，或者适当的函数
+and then if so example in this case, this dispatchable dispatch it to the appropriate event, or to the appropriate function essentially
+
+269
+00:21:54,675 --> 00:21:58,350
+稍后我们会更详细地讨论这个EventDispatcher
+and we'll talk about the EventDispatcher in more detail a little bit later
+
+270
+00:21:59,175 --> 00:22:00,625
+但不管怎样，那就是我们需要这两个的原因
+but anyway, that's why we need these two
+
+271
+00:22:01,100 --> 00:22:04,825
+然后就是GetName，你们知道的，返回名称，通常是为了调试
+and then the GetName, you know, just returns the name for usually for debugging purposes 
+
+272
+00:22:05,150 --> 00:22:09,860
+所以这三个都很容易通过这个宏实现，EventClassCategory也是如此
+so all these three are easily implemented with this one macro, same with the EventClassCategory
+
+273
+00:22:09,860 --> 00:22:17,301
+而不是我们需要，你们知道的，就是virtual int GetCategoryFlags() const override之类的
+instead of us kind of having to, you know, type out, you know, virtual int GetCategoryFlags() const override whatever
+
+274
+00:22:18,050 --> 00:22:22,425
+可以很容易看到EVENT_CLASS_CATEGORY，就这两个，好了，我已经把它们放在一起了
+we can easily just see EVENT_CLASS_CATEGORY, these two, okay, I've ordered them together 
+
+275
+00:22:22,425 --> 00:22:28,200
+因为键盘事件也是一个重要的事件，好了，我在基类中实现了这个
+because of course a keyboard event is also an important event, okay, and I've implemented this in the base class
+
+276
+00:22:28,200 --> 00:22:31,600
+不管怎样，因为KeyPressed和KeyReleased事件都是这两个
+because a KeyPressed and Released event are both of these, anyway
+
+277
+00:22:31,600 --> 00:22:36,450
+所以我不需要在它们自己的类中实现它们，好了
+so I don't need to implement them in their own kind of classes, okay
+
+278
+00:22:36,775 --> 00:22:41,300
+那是KeyPressedEvent, KeyReleaseEvent是相同的，除了？，没有repeatCount
+that's the KeyPressedEvent, KeyReleaseEvent is identical except Issa's and does not have that repeatCount 
+
+279
+00:22:42,025 --> 00:22:47,450
+显然它只有一个KeyReleasedEvent，类型是KeyReleased而不是KeyPressed，好了
+and obviously it's just got a KeyReleasedEvent, and the type is KeyReleased instead of KeyPressed, okay
+
+280
+00:22:47,725 --> 00:22:53,780
+那就是KeyEvent，现在鼠标事件(MouseEvent)完全一样，我的意思是
+that is that is the KeyEvent, now mouse events exactly the same, I mean
+
+281
+00:22:53,780 --> 00:22:58,925
+你们可能已经知道，如何写这些MouseMovedEvent，好了
+you guys probably already understand, how to write these a MouseMovedEvent, okay
+
+282
+00:22:58,925 --> 00:23:04,310
+一个事件，它有x和y，也就是鼠标当前的位置
+is an event, it's got x and y, which is the location of the mouse as it currently stands
+
+283
+00:23:04,575 --> 00:23:09,380
+我们有获取器，有ToString，它打印MouseMovedEvent和坐标
+we've got getters for that, we've got a ToString, which prints MouseMovedEvent along with the coordinates
+
+284
+00:23:09,550 --> 00:23:13,625
+然后我们会实现这两个东西，它们实现MouseMoved类类型
+and then we will we've implemented these two things, which implement the MouseMoved class type 
+
+285
+00:23:13,625 --> 00:23:20,725
+它给了我们所有的类型信息，然后还有EVENT_CLASS_CATEGORY，告诉我们分类
+which gives us all of our type information, and then also the EVENT_CLASS_CATEGORY, which tells us which category thing
+
+286
+00:23:20,725 --> 00:23:26,175
+就这样，然后我们就把所有的东西都存储起来了，你们可以快速记下Hazel引擎
+and that's it, and then we're storing everything, you quick note for the Hazel kind of engine
+
+287
+00:23:26,175 --> 00:23:32,075
+我采用的编码风格是先公开的东西，然后私有的东西
+the coding style that I've kind of adopted is public stuff first, and then private stuff
+
+288
+00:23:32,525 --> 00:23:38,175
+原因是当你们看一个类，你们知道的，让我们看看，在用Hazel引擎运行一个游戏
+the reason is when you kind of look at a class, and you know you, let's just see, you're running a game with the Hazel engine
+
+289
+00:23:38,450 --> 00:23:41,505
+并且想很快看到，你们能用这个接口做什么
+and you want to quickly see, what you can actually do with the api
+
+290
+00:23:42,150 --> 00:23:45,665
+显然你们不关心私有的实现细节，对吧
+obviously you don't care about the implementation details which are private, right
+
+291
+00:23:46,325 --> 00:23:49,300
+你们首先想看到的是实际可以使用的，对吧
+what you want to see first is what you can actually use, right 
+
+292
+00:23:50,025 --> 00:23:54,200
+所以这就是为什么对我来说更有意义的是，所有公共的东西都先写
+so that's why it makes more sense to me to just say, all the public stuff gets written first
+
+293
+00:23:54,625 --> 00:24:00,200
+然后私有的东西只有我们作为开发者才感兴趣
+and then the private kind of stuff that is only in that is only kind of interesting to us as developers 
+
+294
+00:24:00,200 --> 00:24:05,825
+当人们开发Hazel引擎的时候，你们知道，这有点，我们还是不谈这个了
+as days people developing the Hazel engine, you know, that's kind of, let's just not talk about that
+
+295
+00:24:05,825 --> 00:24:10,275
+因为如果我们使用Hazel引擎，我们想看看我们能使用什么
+because if we're actually using the Hazel engine, we want to actually see what we can use 
+
+296
+00:24:10,275 --> 00:24:16,960
+而不是实现细节，这我们不关心，好了，MouseScrolledEvent完全一样的，对吧
+and not implementation details, which we don't care about, okay, ScroledlEvent exactly the same, right
+
+297
+00:24:16,960 --> 00:24:22,575
+我们有偏移量，也就是我们滚动了x和y
+we have our offset, which is essentially where we've kind of scrolled both x and y
+
+298
+00:24:22,575 --> 00:24:25,225
+因为我们可以在一些鼠标上进行水平滚动
+because there is horizontal scrolling that we can do on some mice
+
+299
+00:24:26,350 --> 00:24:34,500
+然后这个显然打印了所有信息也实现了所有类型的东西
+and then this obviously prints all of the information implements all the type stuff as well
+
+300
+00:24:34,500 --> 00:24:40,250
+事件，你们知道的，这是一个实际的基类，然后我们有ButtonPressed和ButtonReleased
+but an event again, you know, this is an actual base class, and then we have ButtonPressed, ButtonReleased
+
+301
+00:24:41,400 --> 00:24:45,850
+我们的按钮被存储在这里，这是受保护的，所以我们不能创建这个事件
+we have our button being stored here, this is protected, so that we can't create this event
+
+302
+00:24:46,425 --> 00:24:50,525
+只有MouseButtonPressedEvent和MouseButtonReleasedEvent能创建那个
+only the MouseButtonPressedEvent and ReleasedEvent can create that
+
+303
+00:24:50,925 --> 00:24:54,175
+然后我们会像往常一样实现其他所有东西
+and then we have everything else implemented kind of as usual 
+
+304
+00:24:54,175 --> 00:24:59,175
+你们知道了吧，ApplicationEvent有WindowResizeEvent和WindowCloseEvent
+you get the drift, ApplicationEvent has things like WindowResize, WindowCloseEvent
+
+305
+00:24:59,425 --> 00:25:04,875
+WindowCloseEvent很简单，什么都没有，它在EventCategoryApplication中
+WindowCloseEvent is really simple, has absolutely nothing, it's in the Application EventCategory
+
+306
+00:25:06,500 --> 00:25:12,975
+它实际上只是，嘿，我是一个WindowCloseEvent，根本不需要任何数据
+and all it really is is just, hey, I'm a WindowCloseEvent, it doesn't need any data at all
+
+307
+00:25:13,950 --> 00:25:20,740
+WindowResizeEvent有我们被调整到的宽度和高度，然后我们还有这四个事件
+ResizeEvent has the width and height that we've been resized to, and then we have also these four events
+
+308
+00:25:21,150 --> 00:25:26,825
+我不确定，如果我要使用，但我们有TickEvent，UpdateEvent和RenderEvent
+which I'm not sure, if I'm going to use yet, but we have TickEvent, UpdateEvent and RenderEvent
+
+309
+00:25:27,350 --> 00:25:35,450
+这是如果我们想要，更新渲染和时钟函数以事件的形式传播，这是可行的
+this is if we would like our kind of, you know, update render and tick functions to actually be propagated as events, which is doable
+
+310
+00:25:35,450 --> 00:25:42,625
+但是，如果我们试图像学究一样，正确地使用事件系统
+but again, if we were trying to be really like pedantic about our correct kind of event system usage
+
+311
+00:25:42,625 --> 00:25:49,300
+那么也许一切都应该是一个事件，因此你们知道，因此我们应该把它作为一个事件来实现
+then maybe everything should be an event, and thus you know, thus we should have this implemented as an event
+
+312
+00:25:49,300 --> 00:25:54,625
+但因为它们是某种，你们知道的，所以是实际应用程序的固有特性
+but because they're kind of, you know, so, so intrinsic to an actual application
+
+313
+00:25:55,200 --> 00:26:01,400
+我觉得这应该是硬编码的，就像你们知道的，这三个
+I feel that maybe this should just be hard coded, that's just like you know these three are like you know
+
+314
+00:26:01,850 --> 00:26:06,975
+实际的非模块化事件，它们总是存在的，你们可以选择实现它们，也可以不必实现它们
+actual non-modular events, they're always present, and you can choose to implement them or you don't have to 
+
+315
+00:26:06,975 --> 00:26:11,075
+但它们已经为你们准备好了，你们不需要首先把它们当作事件来接收
+but they're kind of already there for you, you don't need to first receive them as an event
+
+316
+00:26:11,075 --> 00:26:16,000
+然后把它们分配给一个已经调用过的函数，我倾向于这样做
+and then dispatch them to a function there already called, and I'm I'm leaning towards doing it that way
+
+317
+00:26:16,275 --> 00:26:21,517
+但以防万一，我们确实有这三个事件，好了，就这样
+but just in case, we do have these three events over here, okay, so that is that
+
+318
+00:26:23,050 --> 00:26:30,975
+实际上，那就是我添加的4个文件，用于整个事件系统，它们是Dispatcher
+that's what I've actually added these kind of four four files, which are for your full event system, are the dispatcher
+
+319
+00:26:30,975 --> 00:26:38,100
+我们快速讲一下，那么Dispatcher是一种基于事件类型调度事件的方法
+let's quickly talk about that, so the Dispatcher is a is a way for us to actually dispatch events based on their type
+
+320
+00:26:38,500 --> 00:26:41,750
+很容易，所以如果我们接收到一个事件
+really easily, okay, so if we're, if we receive an event 
+
+321
+00:26:42,100 --> 00:26:48,350
+我们知道，我们自己的事件函数被调用，将作为Event引用接收它，这意味着
+and we you know, our own event function gets called, we will we will be receiving it as an event reference, which means that 
+
+322
+00:26:48,350 --> 00:26:54,225
+它可以是任何类型的事件，我们不知道它是什么，所以我们可以写
+it could be any type of event, we have no idea what it is, so what we can do is we can actually write
+
+323
+00:26:54,625 --> 00:26:59,966
+我们可以用刚刚接收到的事件创建该类的一个实例
+we can create an instance of this class with the event that we've just received 
+
+324
+00:27:00,500 --> 00:27:06,475
+然后我们可以用不同的事件函数多次调用这个Dispatch函数
+and then we can call this Dispatch function a bunch of times with with a different event function
+
+325
+00:27:06,475 --> 00:27:11,625
+这个事件函数就像你们看到的，它是一个std::function，对吧
+and this event function is as you can see, it's an it's a std::function, all right 
+
+326
+00:27:11,625 --> 00:27:16,575
+它返回布尔，并接受T&，所以T在这种情况下可以是任何事件类型
+which returns bool, and takes in T reference, so T in this case could be any event type 
+
+327
+00:27:16,575 --> 00:27:21,175
+像WindowResizeEvent一样，我们可以在WindowResizeEvent中看到bool Dispatch()
+like WindowResizeEvent, so we could see bool Dispatch in a WindowResizeEvent
+
+328
+00:27:21,830 --> 00:27:28,525
+然后我们可以在引擎的某个地方实现一个函数，通常在同一个类中
+and then we could implement a function somewhere in our engine, usually in the same class
+
+329
+00:27:28,700 --> 00:27:34,125
+你们实际上处理的是这个事件，但本质上是一个函数，接收
+as you've actually are handling is this event in, but essentially a function that takes in 
+
+330
+00:27:34,125 --> 00:27:40,850
+你们知道，一个WindowResizeEvent，然后返回一个布尔值，然后使用基本上通过
+you know, a WindowResizeEvent, and then returns a boolean, and then uses basically passes through 
+
+331
+00:27:41,125 --> 00:27:52,225
+如果你们要调度的事件本质上与这个函数的类型匹配，那么它就会运行那个函数
+and if the event that you're trying to dispatch matches the type of this function essentially, then it will actually run that function
+
+332
+00:27:52,475 --> 00:28:00,475
+它会用那个事件调用那个函数，否则，它就不会，就是这样，它很容易使用
+it'll call that function with that event, otherwise, it just won't, right, that's really it, it's really easy to use
+
+333
+00:28:01,300 --> 00:28:08,425
+将来我们可能会看到它的实际作用，当我们开始从Window类接收事件时
+we'll see it in action probably in the future, when we actually start, you know, receiving events from like the Window class or whatever 
+
+334
+00:28:09,225 --> 00:28:14,650
+但这是一种很简单的方法让我们不必说
+but that's kind of just a really easy way for us to actually be able to not have to say 
+
+335
+00:28:15,150 --> 00:28:21,125
+你们知道，如果事件类型为KeyEvent，则手动开启事件功能，就是KeyPressed
+you know, manually now on event function if the event type is KeyEvent, called the KeyPressed
+
+336
+00:28:21,400 --> 00:28:28,100
+你们知道的，在KeyPressed函数中，也可以将其转换为KeyPressedEvent
+you know, on KeyPressed function with the in your, and also cast this to it, you know, to the to a KeyPressedEvent
+
+337
+00:28:28,100 --> 00:28:31,325
+因为它目前只是一个普通的基础事件，这个可以自动处理那个
+because it's currently just a normal base event, this kind of automates that
+
+338
+00:28:31,325 --> 00:28:36,725
+它使我们的客户端代码看起来非常简单，最后，我们有一个小小的输出流操作符
+it makes our code in the client side look really simple, and then finally, we have a little output stream operator
+
+339
+00:28:37,075 --> 00:28:41,175
+这是为我们的日志库而存在的，所以我们可以很容易地在事件上调用ToString
+this exists for our logging library, so that we can easily just call ToString on the event
+
+340
+00:28:41,520 --> 00:28:47,875
+我们就能很容易地记录事件，等下我们就会看到，好了，那是我添加的所有新文件
+and we'll be able to log events really easily as we'll see in a minute, okay, that's all of the new files that I've added
+
+341
+00:28:48,250 --> 00:28:52,450
+我将带你们看一看我修改过的现有文件的区别
+I'm going to take you through the diff of the kind of existing files that I've modified
+
+342
+00:28:52,450 --> 00:28:58,150
+我已经建立了一个非常非常简单的监控系统的例子，请随意盘它，并做出你们自己的例子
+I've set up a very very simple example of a surveillance system, feel free to just play around with it, and make your own examples 
+
+343
+00:28:58,150 --> 00:29:01,980
+或者只是玩玩，玩玩，这样你们就能更好地理解它是如何运行的
+or just you know, play, just play around with it, so that you can understand, how it works a little bit better
+
+344
+00:29:02,150 --> 00:29:07,000
+显然，当我们添加一个Window类时，我们开始接收这些真实的事件
+obviously as we add like a Window class, and we actually start receiving these real events
+
+345
+00:29:07,000 --> 00:29:12,950
+实际输入事件会大量使用这个系统，但现在，它只是供我们使用的
+like real input events will be heavily using this system, but for now, it's kind of just there for us to use 
+
+346
+00:29:13,450 --> 00:29:17,400
+所以让我们看看所有的差异吧，我在这里用的是Beyond Compare
+so yeah let's just take a look at all the diffs, so I'm using Beyond Compare here
+
+347
+00:29:18,750 --> 00:29:22,675
+我刚运行了git difftool，我设置了 Beyond Compare作为我的difftool
+I've really just run git difftool,  and I've set up the  Beyond Compare as my devtool 
+
+348
+00:29:23,100 --> 00:29:28,000
+我已经做了一个完整的目录差异，所以这就是所有改变的东西，那么让我们看一下
+I've done a full directory diff, so this is everything that's changed, so let's take a look 
+
+349
+00:29:28,150 --> 00:29:35,700
+所以如果你们认为我在premake文件中做的一些事情来自上一期，你们可能已经意识到
+so if you think a few things that I did in the premake file is from last episode, you might you might have realized
+
+350
+00:29:35,700 --> 00:29:40,025
+我加了一点备注，这不是在上一期，这是在premake的那期
+add a little I added a little note, this wasn't in the last episode, this was in the premake episode
+
+351
+00:29:41,150 --> 00:29:44,375
+但我加了一点说明，对于这个，我们不需要硬编码
+but I added a little note saying that, we don't actually have to hardcode this
+
+352
+00:29:44,875 --> 00:29:47,375
+现在在premake中，有一个systemversion:latest
+there is a systemversion:latest, now in premake
+
+353
+00:29:47,375 --> 00:29:49,575
+我们可以直接使用，我们只需使用最新的系统版本
+that we can just use, and our just use the latest system version 
+
+354
+00:29:49,575 --> 00:29:54,950
+所以那就是我们想要的，所以我对Sandbox和Hazel项目都做了更改
+so that's what we want, so I've changed that for both the Sandbox and the Hazel projects
+
+355
+00:29:55,325 --> 00:30:00,850
+然后我添加到了Hazel的includedirs，还添加了src目录
+and then I've also added into it the includedirs for Hazel, I've also added the src directory
+
+356
+00:30:00,950 --> 00:30:03,575
+这只是为了让我们可以，你们知道，做这样的事情
+this is just so that we can, you know, do stuff like
+
+357
+00:30:03,575 --> 00:30:08,750
+因为你们知道，这个Event在Events文件夹中，就是Event.h文件
+because you know, this Event is inside the Events folder, this Event.h file
+
+358
+00:30:08,750 --> 00:30:12,150
+但我不想回到上一级目录，然后进入Core之类的
+but I don't really want to go back a directory and go into Core or whatever
+
+359
+00:30:12,375 --> 00:30:14,825
+我希望能够从src目录开始
+I want to be able to just start from the src directory
+
+360
+00:30:14,825 --> 00:30:19,650
+我的部分总是与包含Hazel的src目录相关
+and always do my parts kind of relative to that src directory which contains Hazel
+
+361
+00:30:19,650 --> 00:30:22,950
+所以如果我们看一下这里的所有文件，你们可以看到，我们有一个src目录
+so if we look at what all files here, you can see, we have a src directory 
+
+362
+00:30:22,950 --> 00:30:27,850
+事实上，我在这里添加了这个src目录，这意味着一切都可以与此相关
+and the fact that I've added this src directory here means that everything is about everything can be relative to this
+
+363
+00:30:27,850 --> 00:30:31,325
+这意味着我可以写Hazel/Core.h，就像那样，真的很干净
+which means I can just write Hazel/Core like that, and it's really clean
+
+364
+00:30:31,475 --> 00:30:34,000
+也就是说，如果把这个文件移动到其他文件夹
+and also means that, if this file moves into a different folder 
+
+365
+00:30:34,000 --> 00:30:38,975
+我不需要重做所有的路径，因为所有路径都是相对于这个的
+I don't have to redo all my paths, everything's going to be always relative to this
+
+366
+00:30:39,725 --> 00:30:44,225
+好了，所以那就是我对premake文件所做的所有更改
+okay, so that's all the changes that I made to the premake file
+
+367
+00:30:44,225 --> 00:30:50,500
+显然我已经运行了GenerateProjects.bat文件，实际上我已经重新生成了所有这些项目
+obviously I have ran the GenerateProjects.bat file, and I've actually regenerated all of these projects 
+
+368
+00:30:50,500 --> 00:30:58,325
+也就是说，这两个发生了变化，那么，好了，Application.h，所以我在这儿包含了Event.h
+which means that, that's why these two have changed, so yeah, okay, Application, so I've included Events here 
+
+369
+00:30:59,500 --> 00:31:04,875
+可能不需要在Application.h中包含，应该是在Application.cpp中
+probably didn't need to do it necessarily in the Application file in the header file, could be done in the cpp file 
+
+370
+00:31:05,275 --> 00:31:08,650
+但我在这里所做的只是，我们马上就会运行这段代码
+but all I've really done here is just, and we'll run this code in a minute
+
+371
+00:31:08,900 --> 00:31:16,300
+但我刚创建了一个小测试，以及WindowResizeEvent，然后用HZ_TRACE记录它
+but I've just created a little test,  I've created a WindowResizeEvent like that, and then I've just logged it using HZ_TRACE
+
+372
+00:31:16,300 --> 00:31:21,460
+因为我们已经添加了这些输出流操作符，应该能够这样做，好了，酷
+and because we've added those output stream operators, we should just be able to do that, okay, cool
+
+373
+00:31:21,460 --> 00:31:32,725
+然后Core.h中，添加了BIT宏，这样我们就能很容易地定义位字段，然后进入日志系统
+and then in Core.h, I added that BIT macro, just so that we can define bit fields easily, and then into our logging system
+
+374
+00:31:32,725 --> 00:31:37,800
+我还添加了这个包含，也就是spdlog的输出流操作符
+I have added this include, which is the output stream operator for spdlog for speed log
+
+375
+00:31:37,800 --> 00:31:44,075
+这样我们就能使用我们的自定义，这样我们就能像事件中那样记录自定义类型
+so that we can actually use our kind of custom, so that we can log custom types like in our events
+
+376
+00:31:44,075 --> 00:31:49,850
+好了，就这样，就这样，那就是所有的变更，所以在这里做一个小测试，所做的就是
+okay, that's it, that's all, that's changed, so to do a little test here what I've done is
+
+377
+00:31:49,850 --> 00:31:53,860
+同样，我得到了WindowResizeEvent，只是创建了一个WindowResizeEvent，记录它
+again, I've got this WindowResizeEvent, just creates a WindowResizeEvent, and then we just log it 
+
+378
+00:31:53,860 --> 00:32:01,275
+如果我运行这段代码，你们可以看到我的WindowResizeEvent被正确记录，一切都很好
+if I run this code, you can see that I get my WindowResizeEvent being logged correctly, and everything is great 
+
+379
+00:32:01,900 --> 00:32:06,075
+如果我做了别的事，你们知道的，为什么不能，例如，看，你们知道
+if I do something else, you know, why couldn't for example, see, you know 
+
+380
+00:32:06,075 --> 00:32:14,925
+这个在。。。IsInCategory，我不知道，可能是Application吧，然后打个trace日志
+is this in the, IsInCategory, I don't know, Application, then we could trace it
+
+381
+00:32:15,650 --> 00:32:19,900
+否则的话，你们知道的，如果它在，让我们试试别的分类
+otherwise, you know, if it's in, let's just try other category
+
+382
+00:32:19,900 --> 00:32:27,550
+那个不在的话，EventClass，应该是EventCategoryInput
+that is not in, EventClass, EventCategoryInput
+
+383
+00:32:29,450 --> 00:32:32,225
+所以这应该只记录一次，对吧，我可以在这里放一个断点
+so this should only log it once, right, and I can put a break point here
+
+384
+00:32:32,225 --> 00:32:35,725
+为了验证实际发生了什么，你们可以看到它在那个分类中
+just to verify what actually happens you can see it is in that category
+
+385
+00:32:35,725 --> 00:32:38,200
+那么我们实际上就记录了它，但它不在这个分类中的话
+so we actually log it, and it's not in this category 
+
+386
+00:32:38,200 --> 00:32:44,746
+那么就忽略它，最后，它会被记录一次，好了，所以那就是想法，它真的很简单
+so we skip it, and in the end, it gets logged once, ok, so that's kind of the idea, it's really quite simple
+
+387
+00:32:45,600 --> 00:32:49,425
+我们有一个非常基本的测试，显然当我们开始实现一个Window类时
+and we've got a very basic test, obviously as we start to implement a Window class 
+
+388
+00:32:49,425 --> 00:32:55,080
+这可能是我们的下一个主要任务，之后，可能是一些其他的事情，比如预编译头
+which is probably gonna be our next major thing, after, maybe some other things like precompiled headers
+
+389
+00:32:55,850 --> 00:33:00,500
+会正确地使用这个事件系统，你们会看到它完全运行起来，好了
+will actually start using this event system properly, and you'll see it fully in action all right 
+
+390
+00:33:00,500 --> 00:33:04,500
+所以我希望你们喜欢这个视频，告诉我你们对这种新形式的看法，我真的很喜欢
+so I hope you guys enjoyed this video, let me know what you think of this new format, I really like it
+
+391
+00:33:04,500 --> 00:33:09,475
+这就结束了，超过30分钟，不管怎样，想象一下，如果写所有这些代码，可能需要一个小时
+this ended up over 30 minutes, anyway, imagine, if I'd written all this code, it were probably an hour
+
+392
+00:33:09,475 --> 00:33:13,990
+我可能真的很无聊，我只是我真的很开心，这也让我感觉轻松了很多
+I probably be really boring, and I'm just I'm really happy, and it this just makes it easier for me as well
+
+393
+00:33:13,990 --> 00:33:17,425
+因为我没有集中注意力，也没有忘记任何事情
+because instead of concentrating, and making sure that I'm not forgetting anything
+
+394
+00:33:17,425 --> 00:33:22,050
+写正确的代码，我的压力就会小一些
+and typing the right code, again, I'm less stressed about that
+
+395
+00:33:22,050 --> 00:33:26,675
+我可以花更多的时间来解释这些代码的作用
+and I'm actually I can actually spend more time explaining what the code actually does
+
+396
+00:33:26,675 --> 00:33:30,350
+对我来说，这更有趣，可能对你们更有用
+and like to me, that's more fun and possibly more useful to you guys 
+
+397
+00:33:30,350 --> 00:33:36,175
+如果你们注意到有什么不同以及从中得到什么信息，请告诉我
+let me know if you notice any differences in kind of how this goes and the information you're getting out of this
+
+398
+00:33:36,450 --> 00:33:38,875
+但不管怎样，我希望你们喜欢这个视频，如果你们喜欢的话，就为它点赞吧
+but anyway, I hope you guys enjoy this video, if you did, you can hit that like button 
+
+399
+00:33:39,300 --> 00:33:42,975
+如我之前所说的，你们可以访问patreon.com/thecherno来支持这个系列
+you can have support this series by going to patreon.com/thecherno as I said earlier
+
+400
+00:33:42,975 --> 00:33:46,425
+你们将可以访问我们已经拥有Window类的私有存储库
+you will get access to that private repository in which we already have a Window class
+
+401
+00:33:46,425 --> 00:33:50,475
+我按了f5，抱歉，我们已经有了Window类
+I just hit f5, I'm sorry, in which we already have the Window class
+
+402
+00:33:50,650 --> 00:33:55,950
+所有这些事件都在使用，所以你们希望看到这个事件系统像今天这样运行
+as well as all these events being used, so you want to see this event system in action like today 
+
+403
+00:33:55,950 --> 00:34:01,050
+你们可以去帮助支持这个系列，并且那些明显有助于支持这个系列的东西
+you can just go and help support the series, and of what obviously does help actually support this series
+
+404
+00:34:01,050 --> 00:34:05,600
+所以你们会看到更多的视频，我们有一个很好的小社区
+so you'll see more episodes, and it's just a good little community we have 
+
+405
+00:34:05,600 --> 00:34:08,475
+这使得这个系列成为可能，这是了不起的
+which makes this series possible, which is awesome
+
+406
+00:34:08,475 --> 00:34:13,750
+因为我喜欢为你们做这些视频，下次我真的想做预编译头文件
+because I love making these videos for you guys, next time I really want to do precompiled headers
+
+407
+00:34:14,175 --> 00:34:19,325
+然后在那之后，我想我们可能最终会开始讨论，我们如何实现Window类
+and then after that, I think we'll probably finally be able to start talking about, how we can implement a Window class
+
+408
+00:34:19,650 --> 00:34:22,800
+因为在屏幕上出现一些东西，会很好，我真的很高兴
+because getting something on the screen, would be quite nice, I'm really happy 
+
+409
+00:34:22,800 --> 00:34:27,400
+我们有这个先进的系统我刚想起我没有讲的一件事是
+we have this advanced system one thing that I just remembered that I didn't talk about is and it 
+
+410
+00:34:27,400 --> 00:34:33,500
+可能会或多或少地和Window类联系在一起那就是输入系统
+which will probably be more or less tied with the Window class is going to be an input system
+
+411
+00:34:34,150 --> 00:34:36,950
+因此我们能够收到输入事件的通知
+so we have the ability to be notified about input events
+
+412
+00:34:37,340 --> 00:34:45,525
+但我们不能请求当前状态是什么，比如键盘上的一个键是什么，那也很重要
+but we can't actually ask as to what the current state of, like a key on our keyboard is, that's going to be important as well
+
+413
+00:34:45,525 --> 00:34:49,050
+因为在接受活动的同时，能够说
+because whilst receiving events are great, it's also really nice to be able to say 
+
+414
+00:34:49,050 --> 00:34:53,950
+嘿，你知道吗，现在按的是鼠标左键，我们不能用系统来做这个
+hey, you know, it is the left mouse button currently pressed, we can't actually do this with the system 
+
+415
+00:34:54,175 --> 00:34:58,804
+我们能做的是接收一个鼠标事件，然后存储该事件，直到我们得到一个MouseReleasedEvent
+what we could do is receive a mouse event and then store that event, until we get a MouseReleasedEvent
+
+416
+00:34:59,325 --> 00:35:02,350
+那样的话，我们可以保存MouseButtonPressed
+and in that way, you know, we could save MouseButtonPressed
+
+417
+00:35:02,350 --> 00:35:05,300
+但不想在客户端这样做，我想把它转移到Hazel
+but instead of doing that on the client side, I'd like to move that into Hazel 
+
+418
+00:35:05,300 --> 00:35:12,325
+让它成为接口可以做的事情，所以我们会在未来重新调整输入事件来支持它
+and just have it as something that the api can do, so we will kind of revisit input events in the future to support that 
+
+419
+00:35:12,925 --> 00:35:18,975
+但同样，那不是一个高级的东西，那只是一个，那就像一个输入状态，输入管理器集成
+but again, that's not an advances thing, that's just a, that's just like an input state, input manager conflate
+
+420
+00:35:19,700 --> 00:35:23,300
+不管怎样，希望你们喜欢这个视频，我们下次再见，再见
+anyway, hope you guys enjoy this video, I will see you next time, goodbye
+

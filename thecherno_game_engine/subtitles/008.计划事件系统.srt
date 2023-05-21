@@ -1,0 +1,965 @@
+﻿1
+00:00:00,000 --> 00:00:03,400
+嘿，你们好，我是TheCherno，欢迎回到我的游戏引擎系列
+hey, what's up guys, my name is TheCherno, welcome back to my game engine series 
+
+2
+00:00:03,675 --> 00:00:09,025
+那么上次我们讲了如何配置premake为了生成我们项目的构建系统
+so last time we took a look at setting up premake for up on a build system our project generation system
+
+3
+00:00:09,200 --> 00:00:11,600
+如果你们还没看过那个视频的话，一定要去看看
+make sure you check out that video, if you haven't already
+
+4
+00:00:11,775 --> 00:00:15,700
+今天我们会有一个老式的计划会议，我们来计划
+and today we're gonna have a good old fashioned kind of planning session in which we plan
+
+5
+00:00:15,875 --> 00:00:20,575
+我们接下来要做的是，为我们的引擎创建一个事件系统
+what we're going to do next, which is going to be to kind of create an event system for our engine 
+
+6
+00:00:20,825 --> 00:00:24,300
+这样我们就可以处理窗口事件，就可以接收
+so that we can deal with window events that we will have to receive
+
+7
+00:00:24,425 --> 00:00:29,975
+比如像你们知道的，关闭窗口，调整窗口大小，输入事件比如鼠标事件或键盘事件
+such as you know, the window being closed, the window being resized, input events such as mouse events of keyboard events 
+
+8
+00:00:30,250 --> 00:00:35,225
+每当引擎中发生那样的事情时，我们希望应用程序能意识到它
+whenever stuff like that happens in our engine, we want our application to kind of become aware of it
+
+9
+00:00:35,375 --> 00:00:40,825
+并且有机会去处理它，让Hazal意识到事情正在发生
+and have a chance to handle it, and just basically have hazal be aware that things are happening to it
+
+10
+00:00:40,825 --> 00:00:43,100
+所以那就是今天要讲的内容
+so that's what today is going to kind of be about
+
+11
+00:00:43,450 --> 00:00:46,650
+首先，我想感谢所有让这个系列成为可能的赞助人
+first of all, I just want to thank all the patrons that make this series possible
+
+12
+00:00:46,650 --> 00:00:50,225
+如果你们还没支持这个系列，可以访问patreon.com/thecherno
+if you guys aren't supporting the series, you can go to patreon.com/thecherno 
+
+13
+00:00:50,875 --> 00:00:55,700
+你们会得到这些视频提前一周，以及访问一个私人开发分支
+you'll get these videos one week early as well as access to a private development brach branch in
+
+14
+00:00:55,700 --> 00:01:00,225
+我们今天要讨论的所有内容，以及未来的许多内容都已经写好了
+which everything we're going to talk about today, and many episodes in the future is already written
+
+15
+00:01:00,825 --> 00:01:05,200
+很明显，这对整个系列都很有帮助，那也是为什么大家都有这些视频的原因
+and obviously it just helps the board the series, and that's why these videos are here for everyone else
+
+16
+00:01:05,200 --> 00:01:10,750
+所以非常感谢大家，好了，对于事件系统，我们来说说这个
+so huge thank you to everyone as always, okay, so event systems, let's talk about this
+
+17
+00:01:10,750 --> 00:01:16,925
+这是我最喜欢写的东西之一，只是因为它，它的连接方式很令人满意
+this is one of my favorite things to write, just because it's, it's quite, the way it links together is quite satisfying 
+
+18
+00:01:16,925 --> 00:01:22,925
+这只是这只是一件必须要做的事，就像，在以前
+and it's just it's just something that does need to be done sometime, like, in the past 
+
+19
+00:01:22,925 --> 00:01:27,025
+我以前可能会先写一个完整的窗口系统，然后再处理事件
+I used to maybe write like a whole windows system first, and then deal with events
+
+20
+00:01:27,025 --> 00:01:30,350
+但是这样做是没有意义的，你们还不如先搞定事件系统
+but it's just there's no point in doing that, you might as well get the event system done
+
+21
+00:01:30,625 --> 00:01:33,750
+这样当你们要写窗口的时候
+so that when you get get to the point of actually writing your window
+
+22
+00:01:34,700 --> 00:01:40,490
+你们就可以调度所有事件，一切都会正常运行，一切都会很好
+you can already kind of dispatch all your events, and everything will just work, and everything is gonna be great
+
+23
+00:01:41,325 --> 00:01:45,725
+因为你们可以在没有系统的情况下编写一个完整的渲染器，甚至不需要处理任何事件
+because kind of you can write it with no system an entire renderer without even dealing with events at all
+
+24
+00:01:45,975 --> 00:01:51,600
+但一旦你们开始这么说，我想要一个可以通过鼠标键盘或其他工具移动的相机
+but then as soon as you start saying that, I want a camera that I can move around using the mouse and keyboard or whatever 
+
+25
+00:01:52,025 --> 00:01:58,100
+你们会开始想，哦，好吧，你们知道的，要把它做好，我必须花上一段时间
+you start being like, oh well, you know, to do this properly, I have to spend like a while now
+
+26
+00:01:58,100 --> 00:02:03,200
+要写一个事件系统，那么我们会马上把这些都搞出来
+writing a whole event system, so we're gonna get all that out of the way kind of immediately
+
+27
+00:02:03,375 --> 00:02:08,500
+这样当建立一个窗口时，我们就能很容易地处理所有的事情
+so that would then when we actually do build up a window, we can deal with everything really easily
+
+28
+00:02:08,950 --> 00:02:13,700
+所以我要从头开始，看看这一切是如何组合在一起的，好吧
+so I'm gonna go to the drawing board, and see exactly how all this is going to together, okay 
+
+29
+00:02:13,700 --> 00:02:18,925
+那么现在，我们有一个叫做Application的东西，这是Application类
+so at the moment, we have something it's called an Application, this is that kind of Application class
+
+30
+00:02:19,350 --> 00:02:24,800
+这是我们很多事情的中心类，我的意思是主要的
+which is kind of like our central really class for a lot of things, I mean primarily
+
+31
+00:02:24,800 --> 00:02:31,725
+这是我们实际Hazal应用程序的一种表示，就像在重要的事情方面一样
+this is kind of a representation of our actual Hazal application, like in terms of important things
+
+32
+00:02:31,725 --> 00:02:36,150
+它包含了，我的意思是，运行循环可能是最大的东西之一，这意味着本质上
+it contains, I mean, the run loop is probably one of the biggest things, which means that essentially 
+
+33
+00:02:36,150 --> 00:02:41,000
+它包含了循环，能够保持所有内容的运行并持续更新我们的游戏
+it contains the loop that keeps everything running and keeps updating kind of our game all the time
+
+34
+00:02:41,325 --> 00:02:46,800
+但这也作为这些的中心，它也需要能够接收事件
+but also this being the central kind of hub for things, it also needs to be able to receive events
+
+35
+00:02:46,800 --> 00:02:52,925
+因此，最终将它们调度到游戏中的所有层
+so that dispatch them eventually to something called a layer to all the layers in our games
+
+36
+00:02:53,350 --> 00:02:57,100
+我们以后会讲到层，所以我现在就不多说了
+now layers are something that we'll talk about in the future, so I won't mention them too much 
+
+37
+00:02:57,375 --> 00:03:02,480
+因为我们会有一个单独的视频讲那个，而且这里也不是100%需要的
+because we'll have a separate video on that, and  also they're not really a hundred percent required by this cope of 
+
+38
+00:03:02,480 --> 00:03:05,575
+我们将在这个事件系统中实现什么
+what we're gonna be implementing in terms of this event system
+
+39
+00:03:06,300 --> 00:03:12,000
+它们只是为将来再添加，但要知道这个Application最终会把事件传递到层
+so they're just summing for the future, but just know that kind of the application will eventually propagate events to layers 
+
+40
+00:03:12,000 --> 00:03:16,010
+所以它们可以处理那个了，所以就我们在那里的Application而言
+so that they can kind of deal with that, so in terms of our Application there
+
+41
+00:03:16,850 --> 00:03:23,925
+我们有一个Application，它需要能够接收事件，那么如何把那些运行起来呢
+we have an Application, this needs to be able to receive events, so how does all of that work well
+
+42
+00:03:24,875 --> 00:03:33,075
+既然两者都有，既然我们专门讨论窗口事件，那么让我们画一个Window类
+since both, since we're specifically talking about window events, let's kind of draw a little Window class that we might have here
+
+43
+00:03:33,875 --> 00:03:36,225
+我们可能在这里有，然后看看这个通信是如何运行的
+and then see how that communication is going to work 
+
+44
+00:03:36,225 --> 00:03:42,225
+所以Window类是组成应用的实际窗口的表示
+so our Window class is a representation of our actual window that kind of makes up our application
+
+45
+00:03:42,225 --> 00:03:45,320
+所以这就是字面意思，就像你们知道的，窗口，有一个标题栏的窗口
+so this is literally, like you know, windows, kind of window with a title bar
+
+46
+00:03:45,900 --> 00:03:51,075
+比如你们知道的，我们可能有三角形渲染和所有这些东西
+and like you know, we might have like the triangle rendering and all that stuff over here 
+
+47
+00:03:51,075 --> 00:03:53,690
+每次我们在这个窗口中接收事件
+and every time we receive events in this window
+
+48
+00:03:53,690 --> 00:03:58,325
+不管是大小调整发生了，还是有人按下了关闭按钮
+whether it be kind of the fact that a resize has taken place, someone's hit the close button
+
+49
+00:03:58,875 --> 00:04:04,175
+我们有鼠标移动之类的事件，当这些事件发生时
+we have kind of mouse move events or whatever and all that stuff, whenever that stuff happens 
+
+50
+00:04:04,725 --> 00:04:08,125
+你们知道的，键盘事件，所有这些发生的时候
+and you know, keyboard events whatever all that when all that stuff happens 
+
+51
+00:04:08,475 --> 00:04:13,975
+我们的窗口库或Win32接口或我们使用的任何库都会收到一个事件
+our kind of window library or just the Win32 API or whatever we're using will receive an event
+
+52
+00:04:14,400 --> 00:04:20,800
+一旦那个事件在那个Window类中发生，我们需要一种方式将它通信回Application
+and then once that event happens inside that Window class, we need a way of communicating that back to Application
+
+53
+00:04:21,050 --> 00:04:27,200
+但是你们猜怎么着，我们实际上并不想把我们的Application绑定到Window类
+but guess what, we don't actually want to tie our Application to the Window class
+
+54
+00:04:27,425 --> 00:04:31,900
+所以Window类根本不应该知道Application类的存在
+so the Window class should not be aware of our Application class at all
+
+55
+00:04:31,975 --> 00:04:37,825
+Application类创建了一个Window，对吧，它显然意识到了这一点，对吧
+the Application class kind of creates a Window, right, so it's clearly kind of aware of that, right 
+
+56
+00:04:38,225 --> 00:04:42,550
+但我不想让Window类真正了解Application
+but I don't want the Window class actually having any knowledge of Application
+
+57
+00:04:42,550 --> 00:04:48,225
+那不是真正的联系，它应该存在，所以我们实际上需要做的是
+that's not really a link, that should exist, so what we need to do actually is
+
+58
+00:04:48,225 --> 00:04:54,775
+创建一些方法，将所有这些事件发送回Application
+create some kind of method for kind of messaging back all of these events to the Application
+
+59
+00:04:54,775 --> 00:04:59,525
+Application可以处理它们，并且因为Application创建了一个Window
+to the Application can kind of deal with them, and because the Application creates a Window
+
+60
+00:04:59,525 --> 00:05:03,750
+很明显，它有能力构建所有此类消息的传递系统
+it has the ability obviously to kind of set up all of that kind of messaging system 
+
+61
+00:05:04,150 --> 00:05:09,900
+所以长话短说，当一个事件在我们的窗口内发生时，会发生什么
+so long story short this is what happens, when an event occurs inside our actual window
+
+62
+00:05:10,025 --> 00:05:17,050
+这个Window类会接收一个事件回调，对吧，然后它要做的就是构造一个Hazel事件
+this Window class will receive an event callback, right, and then what it has to do is construct essentially a Hazel event
+
+63
+00:05:17,750 --> 00:05:22,225
+然后以某种方式传递回Application，好了，那么让我们讨论一下细节
+and then somehow propagated back to Application, okay, so let's talk about the details of that
+
+64
+00:05:22,625 --> 00:05:27,925
+那么首先，Hazel事件，对吧，我们需要什么，我们需要一些事件类，对吧
+so first of all, Hazel event, right, what do we need, well, we need some kind of event class, right
+
+65
+00:05:27,925 --> 00:05:33,125
+实际上是一个事件系统，它包含已发生事件所需的所有详细信息
+an event system really, which contains all the details required by an event that has occurred
+
+66
+00:05:33,450 --> 00:05:37,400
+那么鼠标点击，对吧，我移动了我的鼠标，并且点击了这里
+so a mouse click, right, I've just moved my mouse, and I've clicked it over here 
+
+67
+00:05:37,575 --> 00:05:42,800
+我们需要什么样的信息，我们肯定需要点击的x和y位置
+what kind of information do we need, well, we definitely need kind of the X&Y position of that click
+
+68
+00:05:43,100 --> 00:05:49,625
+以及按下了哪个按钮，对吧，然后我们根据那些信息能做的就是
+as well as which button was pressed, right, and then what we can do with that information is 
+
+69
+00:05:49,625 --> 00:05:54,050
+创建一个鼠标按键按下事件，我一定会写出来
+create something called a mouse button pressed event, which I'm definitely going to write out 
+
+70
+00:05:54,275 --> 00:05:58,425
+但我们创建了一个鼠标按钮按下事件，对吧，它实际上只是一个结构体
+but we create a mouse button pressed event, right, which is essentially just a struct
+
+71
+00:05:58,425 --> 00:06:02,925
+它包含这个位置和这个按钮，一旦我们创建了它
+which contains this position and this button, and once we've created that
+
+72
+00:06:02,925 --> 00:06:09,650
+这是我们自己的自定义数据类型，我们需要一种方式将数据发送到Application
+which is kind of our own custom data type, we need a way to actually send that data over to Application
+
+73
+00:06:09,750 --> 00:06:13,375
+所以我们把所有的事情都联系到这个关系上了，以及它的原理
+so that so we kind of everything kind of ties back to that link, and how it works well 
+
+74
+00:06:14,200 --> 00:06:18,625
+我们不希望Window持有像Application指针之类的东西
+we don't want Window to actually hold like an Application pointer or something like that
+
+75
+00:06:19,225 --> 00:06:26,250
+但实际上我们想做的是给这个Application一个机会，为Window提供一个回调
+but instead what we want to do is essentially give the opportunity for this Application to provide Window with a callback
+
+76
+00:06:26,500 --> 00:06:33,800
+这可能只是一个简单的函数指针，实际上我们会先处理它
+now this could be something as simple as just a function pointer, in fact we kind of deal with that first to begin with
+
+77
+00:06:33,800 --> 00:06:36,550
+然后我们可以用更抽象的方法来巧妙地处理这个问题
+and then we can more abstract ways of deftly dealing with this
+
+78
+00:06:36,875 --> 00:06:40,550
+但实际上发生的是当我们从Application类创建一个Window
+but essentially what happens is when we create a Window from our a Application class
+
+79
+00:06:40,700 --> 00:06:45,950
+我们还会设置一个回调到那个Window类，一个事件回调
+we also going to create, we're also going to set a callback to that Window class, an event callback
+
+80
+00:06:46,350 --> 00:06:52,800
+因此，每次这个Window获得一个事件，它可以检查回调是否存在
+so that every time this Window gets an event, it can check to see if the callback is present
+
+81
+00:06:52,800 --> 00:06:59,850
+回调的权限不为空，如果回调不为空，就会用这个事件数据调用回调函数，对吧
+rights of the callback isn't null, and if the callback isn't null, is going to call the callback with this event data, okay
+
+82
+00:07:00,250 --> 00:07:06,875
+Application会有一个函数叫OnEvent，它可能会接收一些东西
+and then since basically Application will have a function called OnEvent, which might you know take in something 
+
+83
+00:07:06,875 --> 00:07:14,550
+比如事件引用，对吧，它就会从Window调用这个函数，好了
+like an event reference, right, it's going to call this function from Window, okay
+
+84
+00:07:14,550 --> 00:07:19,925
+所以Window不知道Application，但如果我们设置回调的话，Window会知道这个函数
+so Window doesn't actually know about Application, but if we set a callback, Window does know about this function 
+
+85
+00:07:20,250 --> 00:07:23,250
+所以Window会在Application中调用这个函数
+and so Window will call this function with this kind of data
+
+86
+00:07:23,500 --> 00:07:29,850
+突然之间，Application就有一个OnEvent函数和自己的事件方法，对吧
+in a suddenly, Application which has a OnEvent function and own event method on itself, right
+
+87
+00:07:30,075 --> 00:07:37,000
+所有的事件数据都会被冻结，这就是所谓的阻塞事件
+this will get cold with all the event data, now this is kind of something known as like a blocking event
+
+88
+00:07:37,325 --> 00:07:42,425
+那么出现这种情况的原因是，你们知道的，当我们收到那个鼠标事件时
+so the reason that kind of is the case is because, you know, when we do receive that mouse event
+
+89
+00:07:42,425 --> 00:07:46,840
+那个鼠标按钮按下事件，我们可能在栈上构造它
+that mouse button pressed event, we construct it probably on the stack right there 
+
+90
+00:07:47,025 --> 00:07:53,225
+然后我们立即调用这个函数，它不是，它有点，你们知道的，会暂停所有其他事件
+and then we immediately call this function, so it's not, it kind of, you know, pauses all the other events 
+
+91
+00:07:53,425 --> 00:07:57,725
+当我们处理这个事件时，所以那就是为什么它被称为阻塞事件
+while we deal with this event, and so that's why it's kind of called a blocking event
+
+92
+00:07:58,050 --> 00:08:03,025
+将来，你们可以创建类似缓冲事件系统的东西
+now in the future, you could create something like a buffered event system 
+
+93
+00:08:03,025 --> 00:08:08,170
+也就是说它会抓取信息队列，将数据存储在其他地方
+which basically says that it kind of you know grabs this information queues, it stores the data elsewhere
+
+94
+00:08:08,275 --> 00:08:13,550
+继续进行其他事件，然后可能每帧一次，我们会遍历事件队列，就像这里的事件一样
+proceeds to other events, and then maybe once per frame, we kind of go through that queue of events, like an event here
+
+95
+00:08:14,025 --> 00:08:19,000
+我们只是在那里调度和处理所有这些，而不是在收到事件后立即做
+and we just kind of dispatch and handle all of them there, instead of doing it immediately, upon receiving the event 
+
+96
+00:08:19,375 --> 00:08:23,475
+但我发现它不一定需要直接在引擎中实现
+but I find it as something that doesn't necessarily need to be implemented straight away in an engine 
+
+97
+00:08:23,825 --> 00:08:26,500
+我们可以直接处理这个，这个更简单
+we can kind of just deal with this, and this is a lot simpler
+
+98
+00:08:26,500 --> 00:08:29,975
+所以如果我们能做到那一点，那也许是未来可以探索的东西
+so if we do kind of that, that is maybe something to explore in the future
+
+99
+00:08:30,450 --> 00:08:33,625
+当事情变得更复杂的时候，我们想要更多的控制
+when things get a little bit more complicated, and we want a little bit more control about 
+
+100
+00:08:34,300 --> 00:08:40,175
+我有点，你知道，我们的引擎是如何运转的，而不仅仅是阻塞整个引擎，每次事件发生时
+I'm kind of, you know, how our our engine flows, and do not just block the whole engine and every time in event occurs 
+
+101
+00:08:40,175 --> 00:08:45,625
+直到应用程序中所有东西都完全处理了它，所以就像缓冲区事件一样
+until it's been fully handled by everything in our application, so like a buffer event 
+
+102
+00:08:46,300 --> 00:08:50,930
+你们可能最终会产生一个更好的想法，但就目前而言，这完全没问题
+you may end up being a better idea in the future, but for now, this is totally fine
+
+103
+00:08:51,175 --> 00:08:56,750
+好了，所以现在如果收到了那个，它可以将事件发送到任何需要它的地方
+okay, so now if it's received that, it can kind of dispatch the event to anything that requires it
+
+104
+00:08:56,750 --> 00:09:00,575
+那么例如，你们知道的，我们之前讲过的层栈
+so for example, you know, we talked about the layer stack that we had earlier
+
+105
+00:09:00,900 --> 00:09:03,440
+它可以将事件传递到层栈
+it can kind of propagate that event down the layer stack
+
+106
+00:09:03,440 --> 00:09:07,350
+这样所有的层都有机会接收鼠标按键按下事件并处理它
+so that all the layers have a chance to kind of receive that mouse button press event and handle it
+
+107
+00:09:07,350 --> 00:09:15,075
+并且可能会阻止更多层接收那个事件，如果需要，如果需要的话，但就是那样
+and maybe block further layers from receiving that event, if the need, if if need be, but that's kind of it
+
+108
+00:09:15,175 --> 00:09:22,325
+你们知道的，我们的Application现在能够通过函数指针感知Window发生的事件
+you know, our Application is now about aware of an event that's occurred from our Window just by kind of that function pointer
+
+109
+00:09:22,325 --> 00:09:26,725
+而不是函数指针，或者std函数之类的东西
+now instead of having like a function pointer, or like an you know std function or something like that that 
+
+110
+00:09:26,925 --> 00:09:32,350
+我们在Window上设置，你们基本上可以创建一个类似事件侦听器的接口，就叫
+we set on Window, you could essentially create like an event listener interface, called 
+
+111
+00:09:32,350 --> 00:09:42,000
+比如IEventListener之类的，也许Window可以有一个数组，或类似于IEventListener的容器
+like IEventListener or something, and maybe window could have like an array, or some kind of like you know container of IEventListeners
+
+112
+00:09:42,450 --> 00:09:48,400
+然后，每次事件发生时，它都会简单地通过这种IEventListens集合
+and then every time an event occurs, it simply goes through that kind of collection of IEventListens
+
+113
+00:09:48,400 --> 00:09:55,400
+然后调用OneEvent，对吧，所以Application本身可能最终成为IEventListener
+and then the calls OnEvent, right, so Application itself could end up kind of being you know an IEventListener
+
+114
+00:09:55,950 --> 00:10:00,425
+因为它会像你们知道的所有层一样监听事件
+because it listens to events as would you know all the layers
+
+115
+00:10:01,250 --> 00:10:05,600
+因此，由于它需要实现那个接口，因此它将实现OnEvent
+and so because it kind of needs to implement that interface, it would then implement OnEvent
+
+116
+00:10:05,875 --> 00:10:14,475
+然后将其自身设置为IEventListener到Window，这可能有，你们知道的，IEventListener
+and then set itself kind of as IEventListener to Window, which might have, you know, IEventListener
+
+117
+00:10:16,300 --> 00:10:21,675
+你们知道的，就像它们的数组或其他什么，然后这会遍历所有IEventListener
+you know, just like an array of them or whatever, and then this would kind of go through all the IEventListeners
+
+118
+00:10:21,675 --> 00:10:24,375
+然后调用他们的OnEvent函数，这样你们就可以那样做了
+and actually call their OnEvent function, so you could do something like that
+
+119
+00:10:24,375 --> 00:10:27,375
+它更抽象，更高级
+it's a little bit more abstract, a little bit more kind of high-level
+
+120
+00:10:27,375 --> 00:10:31,075
+就像我猜的，只是有一个类似std函数，或者像一个原始函数指针之类的东西
+like I guess, just having like std function, or like a raw function pointer or something like that 
+
+121
+00:10:31,075 --> 00:10:35,225
+但那样就可以完成任务了，这并不重要，这些都是实现细节
+but that kind of gets the job done, it doesn't matter, those are kind of all implementation details
+
+122
+00:10:35,425 --> 00:10:37,850
+所以就我们现在要做的事情而言
+so in terms of what we actually have to do right now then
+
+123
+00:10:38,850 --> 00:10:44,675
+在这种Window存在之前，我们可能需要做的是，创建一个叫做IEventListener的接口
+what we need to do before this kind of Window even exists is we probably need to make something called IEventListener
+
+124
+00:10:44,825 --> 00:10:49,825
+我们需要创建整个事件系统，我们需要创建事件所需的所有数据
+we need to make this whole kind of event system, so we actually need to create all the data, we need for events
+
+125
+00:10:49,825 --> 00:10:52,975
+所以每种事件类型，你们知道的，我们都有一个基本事件类型
+so every type of event, you know, we'll have like a base event type
+
+126
+00:10:53,300 --> 00:10:58,250
+然后每一种类型的事件都会从这里开始
+and then every type of event of event will kind of you know stem stem down from there essentially 
+
+127
+00:10:58,500 --> 00:11:02,675
+所以我们会有所有关于窗口的事件，比如调整大小和关闭，会有所有的高级输入
+so we'll have all about window events, like a resize and close, will have all of our input advanced
+
+128
+00:11:02,675 --> 00:11:07,275
+鼠标按下，鼠标移动，按键按下，按键释放，诸如此类的
+mouse button pressed, mouse moved, key pressed, key released, that kind of stuff
+
+129
+00:11:08,425 --> 00:11:12,025
+然后我们还可以有实际的Application事件，如果需要的话
+and then we could also have actual Application events, if we wanted to
+
+130
+00:11:12,375 --> 00:11:16,975
+那么例如Application，这些源于Application，所以像运行本地事件之类的东西，对吧
+so for example Application, and these originate from Applications, so stuff like run local events, right 
+
+131
+00:11:17,250 --> 00:11:21,400
+那么就是OnUpdate，OnTick，OnRender，所有这些事件
+so OnUpdate, OnTick, OnRender, all of those kind of events
+
+132
+00:11:21,500 --> 00:11:26,475
+而不是直接从Application类中传递
+instead of being just propagated immediately from the kind of Application class
+
+133
+00:11:26,725 --> 00:11:30,400
+它们实际上可以作为事件进行调度，然后层可以
+they could actually be kind of dispatched as events, and then layers could
+
+134
+00:11:30,400 --> 00:11:36,560
+例如监听OnUpdate或其他什么，或者只监听OnUpdate OnTick或其他的事件
+for example listen to OnUpdate or whatever, or just just listen to an OnUpdate OnTick events whatever 
+
+135
+00:11:36,675 --> 00:11:39,275
+并且如果它们愿意的话，可以就在那里处理
+and then if they chose them to, they could kind of handle it there 
+
+136
+00:11:39,375 --> 00:11:43,475
+所以这类事件系统也会考虑到那一点，但基本上我要说的是
+so that's this kind of event system will allow for that as well, but basically what I'm saying is
+
+137
+00:11:43,475 --> 00:11:47,625
+我们需要构造所有我们有的事件类，然后我们也想要
+we need to construct all of the kind of event classes that we have, and then we also want to have 
+
+138
+00:11:47,625 --> 00:11:52,675
+你们知道的，还有某些调试数据，比如事件名之类的
+you know, certain debug data as well, so for example it may be like event names and stuff like that 
+
+139
+00:11:52,675 --> 00:11:56,200
+我们还想让你们了解事件类别，因此我们需要做一些不同的事情
+we also want you know event categories, so there's a few different things that we need to do
+
+140
+00:11:56,200 --> 00:12:00,550
+这种情况就变得有些复杂了，我们还需要一种称为事件调度器的东西
+this kind of becomes a little bit more complicated, we also want something called an event dispatcher
+
+141
+00:12:00,775 --> 00:12:07,950
+基本上在这个OneEvent类上，在这种OneEvent函数上，包含这种事件的引用
+which basically on this OnEvent class, on this kind of OnEvent function, which contains this kind of event reference
+
+142
+00:12:08,175 --> 00:12:13,150
+我们希望能够根据事件的类型将其调度给不同的函数
+we want to be able to kind of dispatch that event to maybe a different function based on its type
+
+143
+00:12:13,150 --> 00:12:18,925
+所以我们最终可能会有一个OnMouse，你们知道的，Moved函数（OnMouseMoved）
+so we might end up having something like an OnMouse, you know, Moved function 
+
+144
+00:12:19,175 --> 00:12:26,400
+特别是接收MouseMoveEvent之类的，然后快速右转
+which takes specifically like a MouseMoveEvent or something like that, and then turn right fast
+
+145
+00:12:26,775 --> 00:12:31,450
+然后，如果这种事件类型最终成为MouseMoveEvent
+and then kind of what happens is if this event type ends up being a MouseMoveEvent
+
+146
+00:12:31,600 --> 00:12:34,850
+然后我们想自动地将它调度给这个函数
+then we want to automatically kind of dispatch it to this function automatically
+
+147
+00:12:34,850 --> 00:12:39,325
+就像不需要写任何繁重的代码或其他什么
+like without having to do any kind of really heavy code or whatever right there
+
+148
+00:12:39,325 --> 00:12:42,275
+在OnEvent函数中查找类型配对以及所有这些
+in the OnEvent function to find out what the type pairs and all that
+
+149
+00:12:42,550 --> 00:12:46,750
+因此，只需创建一种事件调度器，就可以相当简单地实现这一点
+so that can be achieved fairly simply by just creating kind of an event dispatcher
+
+150
+00:12:46,950 --> 00:12:52,575
+这个小类只是包装一个事件，然后找出它的类型，并将它调度给给定的函数指针
+ little class which is just wraps an event, and then just figures out its type, and dispatches it to a given function pointer 
+
+151
+00:12:52,575 --> 00:12:57,675
+如果它匹配到了正确的类型，那么像这样的事情，对吧，这就是我们需要马上写的
+if it matches the right type, so things like that, right, that's what we need to write basically right away
+
+152
+00:12:57,675 --> 00:13:03,300
+并且那就是我们下一期要做的，并且从那时起，我们将被困在编写Window类中
+and that's what we'll do next episode, now and then from there, we'll be stuck writing our Window class 
+
+153
+00:13:03,875 --> 00:13:07,650
+并且然后你们知道的，把它和事件系统连接起来
+and then you know, hooking, hooking that up with the event system
+
+154
+00:13:07,650 --> 00:13:13,600
+能够回调到Application类，然后提供我们实际需要的所有事件细节
+and being able to kind of call back to the Application class, and then provide all the event details that we actually need
+
+155
+00:13:13,950 --> 00:13:18,325
+所以那就是我们的计划，我觉得这听起来很不错，这就是我们为Hazel做的下一步计划
+so that's the plan, I think it sounds pretty good, those are kind of our next steps for Hazel
+
+156
+00:13:18,725 --> 00:13:22,850
+好了，差不多就是这样了，那就是我们要写的整个事件系统
+okay, so that's pretty much it, that's our whole kind of event system that we have to actually write
+
+157
+00:13:23,150 --> 00:13:29,975
+以及如何将所有这些事件传递给bash应用程序，并将它们传递到我们的层栈中
+along with kind of how we're going to communicate all those events bash application, and propagate them to our kind of layer stack
+
+158
+00:13:30,275 --> 00:13:32,525
+是的，我喜欢写这些东西，应该会很有趣
+yeah, I love kind of writing this stuff, should be a little fun
+
+159
+00:13:32,525 --> 00:13:38,300
+希望我们能把所有这些事件类型以及应用程序和事件列表都挤在一集里
+hopefully we can actually squeeze in all these event types as well as the application and event lists and stuff all in one episode 
+
+160
+00:13:38,300 --> 00:13:44,700
+我们会看到下一期可能会很长，但我希望你们喜欢这些规划视频
+we'll see next episode might end up being quite long, but yeah I hope you guys kind of enjoy these planning videos 
+
+161
+00:13:44,700 --> 00:13:48,075
+这是有点必要的，我认为只是一种讨论
+it's something that is the 1% necessary, and I think just kind of talking about
+
+162
+00:13:48,075 --> 00:13:52,010
+我们真正要做的而不是直接去做，还是非常重要的
+what we're actually going to do instead of just kind of doing it is really important
+
+163
+00:13:52,010 --> 00:13:54,725
+因为，记住，这个系列是给你们学习的
+because, remember, this series is kind of here for you guys to learn 
+
+164
+00:13:54,725 --> 00:13:58,900
+不一定只是看着我写一个引擎，没有说太多
+not necessarily to just kind of watch me write an engine without really saying much
+
+165
+00:13:58,900 --> 00:14:03,400
+只是你们知道的，不讨论，因为我想在这个系列中讨论的是
+and just you know, kind of not talking about, because what I like to talk about in this series is
+
+166
+00:14:03,400 --> 00:14:07,950
+我为什么要做这些决定以及这些决定是如何结合在一起的
+why I make the decisions that I do make and kind of how all this fits together 
+
+167
+00:14:07,950 --> 00:14:11,750
+这样你们就能理解引擎的实际架构和所有的东西
+so that you guys can understand the actual architecture of an engine and all that stuff
+
+168
+00:14:11,750 --> 00:14:15,250
+不管怎样，关于我在这里描述的，请在下面留下你们的想法
+anyway, leave your thoughts below, as to what I've kind of described here
+
+169
+00:14:15,250 --> 00:14:19,800
+在我的设计中，请记住，你们知道的这些都不是一成不变的
+in my design, keep in mind, that you know none of this is set in stone 
+
+170
+00:14:20,325 --> 00:14:23,375
+如果有人说，嘿，你应该这样做，你知道，我们可以谈谈
+if someone says, hey, you should do it this way, you know, we can talk about that 
+
+171
+00:14:23,375 --> 00:14:27,975
+我们可以讨论那个，你们知道的，可以提交一个PR之类的
+we can discuss that, you know, you can submit like a pull request or something for example
+
+172
+00:14:27,975 --> 00:14:31,200
+现在这样做可能太早了，因为存储库很干净
+maybe too early to do that nowadays, because the repository is quiet
+
+173
+00:14:31,450 --> 00:14:34,100
+你们知道的，平淡现在不是什么裸库的意思
+you know, bland isn't quite a kind of bear right now
+
+174
+00:14:34,225 --> 00:14:37,200
+但在未来，你们总是可以提交一个PR，我们一直在讨论那个
+but in the future, you know, you can always submit a pull request, and we always discussed that
+
+175
+00:14:37,200 --> 00:14:40,575
+实际上已经有一些了，我们已经在github上讨论过了
+there's actually been a few already that, we've discussed on the github repository
+
+176
+00:14:40,575 --> 00:14:44,950
+将会是另一种蓝色，是的，我们不经常谈论这种事情
+will be in the different blue um, but yeah we don't always talk about this stuff
+
+177
+00:14:45,500 --> 00:14:49,275
+特别是在这些设计会议中，这是一个好主意，你们知道，在一个真正的软件团队中
+and especially in these design sessions, it's a good idea, you know, in a real kind of software team 
+
+178
+00:14:49,275 --> 00:14:52,700
+就像我刚才做的那样，有人会做一个小演示
+what happens is someone will basically give a little presentation, like I've just done 
+
+179
+00:14:53,330 --> 00:14:57,025
+然后我们可以围坐在一起，就像你们知道的，试着在其中找出漏洞，尝试一下
+and then we can sit around in a group, and be like you know, trying to poke holes in it and try a bit
+
+180
+00:14:57,025 --> 00:15:00,200
+但在这种情况下会发生什么，在那种情况下会发生什么
+like yeah but what happens in this scenario, what happens in that scenario
+
+181
+00:15:00,700 --> 00:15:03,100
+你们知道的，也许这样做更好
+you know, maybe a better way of doing it, would be this way
+
+182
+00:15:03,100 --> 00:15:06,675
+或者你们是否考虑过性能，或者像客户端的接口需求
+or have you thought about being a performance, or like client kind of API requirements 
+
+183
+00:15:06,675 --> 00:15:12,200
+或者只是有这些东西需要考虑，所以那就是为什么整个设计会议真的非常非常重要
+or just there's all this stuff to consider, so that's why these whole design sessions are really really important
+
+184
+00:15:12,200 --> 00:15:14,725
+不管怎样，希望你们喜欢这个视频，如果喜欢，就为它点赞吧
+anyway, hope you guys enjoy this video, if you did, you can hit the like button
+
+185
+00:15:14,875 --> 00:15:18,300
+你们也可以通过访问patreon.com/thecherno来支持这个系列
+you can also help support the series by going to patreon.com/thecherno
+
+186
+00:15:18,300 --> 00:15:22,200
+你们已经看到下一期视频了，如果在YouTube上看这个视频，它是公开的
+you'll get the next video already, if you're watching this live on YouTube, it's public 
+
+187
+00:15:22,450 --> 00:15:26,675
+下一期视频实际上已经发布了，所以你们可以看到我现在正在实现所有这些东西
+the next video is actually already out, so you can already see me implementing all this stuff right now
+
+188
+00:15:26,925 --> 00:15:32,675
+如果你们访问patreon.com/thecherno，我说的是赞助人
+if you just go on over to patreon.com/thecherno, and also you'll I mean for the patrons as well
+
+189
+00:15:32,675 --> 00:15:37,925
+在我的私人开发分支中，我在这里描述的整个事件系统已经存在了几个星期了
+in my private development branch, this whole event system everything I've described here has been around for like weeks
+
+190
+00:15:38,300 --> 00:15:43,000
+所以如果你们有兴趣在这个系列中提前看看会发生什么，绝对可以去看看
+so you can definitely check that out, if you're interested to kind of surge ahead in the series and see what's coming
+
+191
+00:15:43,175 --> 00:15:48,700
+还有就是在解释或发布代码之前把所有代码都弄好
+as well as just kind of get all the code to play around with before it even kind of gets explained or goes live
+
+192
+00:15:49,350 --> 00:15:51,800
+我希望在下个视频中看到你们，我们将开始
+I hope to see you guys in that in the next video, we're actually gonna start
+
+193
+00:15:51,800 --> 00:15:54,700
+实现这些东西，在那之前会非常令人兴奋，再见
+implementing the stuffs, gonna be really exciting until then, goodbye
+
