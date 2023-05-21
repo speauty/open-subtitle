@@ -14,7 +14,7 @@
 
   合成视频：[点击观看](https://www.bilibili.com/video/BV1XD4y1v7RY?share_source=copy_web)
 
-- #### 游戏引擎教程
+- #### [游戏引擎教程](./thecherno_game_engine/README.md)
 
   > 作者：TheCherno，译者：Speauty
 
